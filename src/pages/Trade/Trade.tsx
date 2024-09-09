@@ -1,8 +1,10 @@
 import { Flex, Text, Button, Box } from "@radix-ui/themes";
+import TradeHeader from "./TradeHeader";
 
 const Trade = () => {
   return (
-    <Flex direction="column" gap="180px" p="20px" width={"100%"}>
+    <Flex direction="column" gap="180px" width={"100%"}>
+      <TradeHeader />
       <Box
         style={{
           // backgroundColor: "var(--accent1)",

@@ -8,7 +8,7 @@ const NavBar = () => {
       height={{ initial: "65px", md: "100vh" }}
       py={{ initial: "0", md: "25px" }}
       px={{ initial: "15px", md: "6px" }}
-      position={"sticky"}
+      position={{ initial: "static", md: "sticky" }}
       top={"0"}
       style={{
         backgroundColor: "dimGray",
