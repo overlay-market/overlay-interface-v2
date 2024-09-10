@@ -11,18 +11,17 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --accent1: green;
-  --accent2: linear-gradient(90deg, #FFC955 0%, #FF7CD5 100%);
-  --accent3: #ff1f1f;
-  --accent4: #ff7b7b;
-  --accent5: #ff5252;
-  --accent6: #ff1f1f;
-  --accent7: #ff7b7b;
-  --accent8: #ff5252;
-  --accent9: #ff1f1f;
-  --accent10: #ff7b7b;
-  --accent11: #ff5252;
-  --accent12: #ff1f1f;
+
+  /* radix default themes override */
+
+  .radix-themes {
+    --default-font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --default-font-size: 14px;
+    --radius-2: 8px;
+    --cursor-button: pointer;
+  }
+
+  
 }
 
 body {
