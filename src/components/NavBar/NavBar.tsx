@@ -1,5 +1,7 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
 import LogoImg from "../../assets/images/overlay-logo-only-no-background.png";
+import { GradientOutlineButton } from "../Button/GradientButton";
+import { theme } from "../../theme/theme";
 
 const NavBar = () => {
   return (
@@ -11,7 +13,7 @@ const NavBar = () => {
       position={{ initial: "static", md: "sticky" }}
       top={"0"}
       style={{
-        backgroundColor: "dimGray",
+        backgroundColor: `${theme.background}`,
       }}
     >
       <Flex
@@ -32,7 +34,16 @@ const NavBar = () => {
             <Text>Home</Text>
             <Text>Trade</Text>
           </Flex>
-          <Flex>
+          <Flex direction={"column"} gap={"20px"}>
+            <GradientOutlineButton
+              title={"Buy OV"}
+              width={"78px"}
+              height={"29px"}
+              onClick={() => {
+                console.log("buy OV!");
+              }}
+            />
+
             <Text>Social link</Text>
           </Flex>
         </Flex>
