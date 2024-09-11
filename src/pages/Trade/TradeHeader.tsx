@@ -1,4 +1,10 @@
 import { Flex, Text, Box, Separator } from "@radix-ui/themes";
+import { theme } from "../../theme/theme";
+import styled from "styled-components";
+
+const StyledSeparator = styled(Separator)`
+  background-color: ${theme.darkBlue};
+`;
 
 const TradeHeader = () => {
   return (
@@ -6,7 +12,7 @@ const TradeHeader = () => {
       width={"100%"}
       height={"65px"}
       style={{
-        backgroundColor: "pink",
+        borderBottom: `1px solid ${theme.darkBlue}`,
       }}
     >
       <Flex
@@ -15,24 +21,26 @@ const TradeHeader = () => {
         align={"center"}
         width={"100%"}
         height={"100%"}
+        style={{ textAlign: "end" }}
       >
         <Box width={"150px"}>
           <Text>Market name</Text>
         </Box>
-        <Separator orientation="vertical" size="2" />
+        <StyledSeparator orientation="vertical" size="4" />
         <Box width={"150px"}>
           <Text>Price</Text>
         </Box>
 
-        <Separator orientation="vertical" size="2" />
+        <StyledSeparator orientation="vertical" size="4" />
         <Box width={"150px"}>
           <Text>OI balance</Text>
         </Box>
 
-        <Separator orientation="vertical" size="2" />
+        <StyledSeparator orientation="vertical" size="4" />
         <Box width={"150px"}>
           <Text>Funding</Text>
         </Box>
+        <StyledSeparator orientation="vertical" size="4" />
       </Flex>
     </Box>
   );

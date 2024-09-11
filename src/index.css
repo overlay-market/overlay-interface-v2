@@ -4,7 +4,7 @@
   font-weight: 400;
 
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #2C2C2C;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,6 +19,7 @@
     --default-font-size: 14px;
     --radius-2: 8px;
     --cursor-button: pointer;
+    --gray-12: #ECECEC;
   }
 
   
