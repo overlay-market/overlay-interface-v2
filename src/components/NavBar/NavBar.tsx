@@ -1,7 +1,11 @@
-import { Box, Flex, Text } from "@radix-ui/themes";
+import { Box, Flex, Link, Text } from "@radix-ui/themes";
 import LogoImg from "../../assets/images/overlay-logo-only-no-background.png";
 import { GradientOutlineButton } from "../Button/GradientButton";
 import { theme } from "../../theme/theme";
+import Xlogo from "../../assets/images/social-links/X_logo.png";
+import MirrorLogo from "../../assets/images/social-links/Mirror.png";
+import DiscordLogo from "../../assets/images/social-links/Discord.png";
+import { LINKS } from "../../constants/links";
 
 const NavBar = () => {
   return (
@@ -85,8 +89,27 @@ const NavBar = () => {
                 console.log("buy OV!");
               }}
             />
-
-            <Text>Social link</Text>
+            <Flex justify={"between"}>
+              <Link href={LINKS.X} target="blank">
+                <img src={Xlogo} alt="XLogo" width={"16px"} height={"16px"} />
+              </Link>
+              <Link href={LINKS.DISCORD} target="blank">
+                <img
+                  src={DiscordLogo}
+                  alt="DiscordLogo"
+                  width={"16px"}
+                  height={"16px"}
+                />
+              </Link>
+              <Link href={LINKS.MIRROR} target="blank">
+                <img
+                  src={MirrorLogo}
+                  alt="MirrorLogo"
+                  width={"16px"}
+                  height={"16px"}
+                />
+              </Link>
+            </Flex>
           </Flex>
         </Flex>
 
