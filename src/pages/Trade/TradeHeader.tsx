@@ -3,16 +3,16 @@ import { theme } from "../../theme/theme";
 import styled from "styled-components";
 
 const StyledSeparator = styled(Separator)`
-  background-color: ${theme.darkBlue};
+  background-color: ${theme.color.darkBlue};
 `;
 
 const TradeHeader = () => {
   return (
     <Box
       width={"100%"}
-      height={"65px"}
+      height={`${theme.headerSize.height}`}
       style={{
-        borderBottom: `1px solid ${theme.darkBlue}`,
+        borderBottom: `1px solid ${theme.color.darkBlue}`,
       }}
     >
       <Flex

@@ -8,10 +8,10 @@ const Trade = () => {
       <TradeHeader />
       <Flex direction="column" gap="20px">
         <Flex height={"561px"} width={"100%"}>
-          <Box flexGrow={"1"} style={{ background: `${theme.darkBlue}` }}>
+          <Box flexGrow={"1"} style={{ background: `${theme.color.darkBlue}` }}>
             Chart
           </Box>
-          <Box width={"321px"} style={{ background: `${theme.grey3}` }}>
+          <Box width={"321px"} style={{ background: `${theme.color.grey3}` }}>
             trade widget
           </Box>
         </Flex>

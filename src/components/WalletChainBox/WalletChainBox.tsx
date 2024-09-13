@@ -3,10 +3,17 @@ import {
   GradientOutlineButton,
   GradientSolidButton,
 } from "../Button/GradientButton";
+import { theme } from "../../theme/theme";
 
 const WalletChainBox = () => {
   return (
-    <Box width="308px" height="65px" position="absolute" top="0" right="0">
+    <Box
+      width="308px"
+      height={`${theme.headerSize.height}`}
+      position="absolute"
+      top="0"
+      right="0"
+    >
       <Flex
         gap={"20px"}
         align={"center"}

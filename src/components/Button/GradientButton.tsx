@@ -75,7 +75,7 @@ export const GradientSolidButton = ({
 }: GradientButtonProps) => {
   return (
     <GradientSolidBtnWrapper width={width} height={height} onClick={onClick}>
-      <Text style={{ color: `${theme.black}` }}>{title}</Text>
+      <Text style={{ color: `${theme.color.black}` }}>{title}</Text>
     </GradientSolidBtnWrapper>
   );
 };

@@ -14,7 +14,7 @@ const App = () => {
       minHeight={"100vh"}
       width={"100vw"}
       style={{
-        backgroundColor: `${theme.background}`,
+        backgroundColor: `${theme.color.background}`,
       }}
     >
       <Flex direction={{ initial: "column", md: "row" }}>
