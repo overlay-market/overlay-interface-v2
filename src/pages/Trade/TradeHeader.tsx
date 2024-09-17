@@ -2,6 +2,7 @@ import { Flex, Text, Box, Separator } from "@radix-ui/themes";
 import { theme } from "../../theme/theme";
 import styled from "styled-components";
 import { ProgressBar } from "../../components/ProgressBar/ProgressBar";
+import MarketsDropdownList from "./MarketsDropdownList";
 
 const StyledSeparator = styled(Separator)`
   background-color: ${theme.color.darkBlue};
@@ -12,20 +13,18 @@ const TradeHeader = () => {
     <Box
       width={"100%"}
       height={`${theme.headerSize.height}`}
+      position={"relative"}
       style={{
         borderBottom: `1px solid ${theme.color.darkBlue}`,
       }}
     >
       <Flex
-        direction="row"
         align={"center"}
         width={"100%"}
         height={"100%"}
         style={{ textAlign: "end" }}
       >
-        <Box width={"260px"}>
-          <Text>Market name</Text>
-        </Box>
+        <MarketsDropdownList />
 
         <StyledSeparator orientation="vertical" size="4" />
 
