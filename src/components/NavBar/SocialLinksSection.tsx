@@ -32,7 +32,7 @@ const SocialLinksSection = () => {
   return (
     <Flex justify={"between"}>
       {SOCIAL_LINKS.map((link) => (
-        <Link href={link.href} target="blank">
+        <Link href={link.href} target="blank" key={link.href}>
           <img src={link.src} alt={link.alt} width={"16px"} height={"16px"} />
         </Link>
       ))}

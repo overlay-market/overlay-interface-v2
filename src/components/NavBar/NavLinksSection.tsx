@@ -73,6 +73,7 @@ const NavLinksSection = () => {
     <Flex direction={"column"} gap={"8px"}>
       {NAV_LINKS.map((link) => (
         <StyledNavLink
+          key={link.label}
           to={link.to}
           label={link.label}
           icon={link.icon}

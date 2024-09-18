@@ -10,7 +10,7 @@ import {
 import { theme } from "../../theme/theme";
 import styled from "styled-components";
 import useOutsideClick from "../../hooks/useOutsideClick";
-import { useState } from "react";
+import { useState, Fragment } from "react";
 
 const StyledSeparator = styled(Separator)`
   background-color: ${theme.color.darkBlue};
@@ -150,8 +150,8 @@ const MarketsDropdownList = () => {
         >
           <ScrollArea type="auto" scrollbars="vertical" style={{ height: 530 }}>
             <Flex direction="column" align={"center"}>
-              {marketsList.map((market) => (
-                <>
+              {marketsList.map((market, idx) => (
+                <Fragment key={idx}>
                   <MarketItem
                     width={"100%"}
                     py={"12px"}
@@ -180,7 +180,7 @@ const MarketsDropdownList = () => {
                   <Box width={"100%"} px={"4px"}>
                     <StyledSeparator size="4" />
                   </Box>
-                </>
+                </Fragment>
               ))}
             </Flex>
           </ScrollArea>
