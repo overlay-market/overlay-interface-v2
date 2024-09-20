@@ -1,11 +1,11 @@
 // import { useSetSlippageModalToggle } from "../../state/application/hooks";
-// import { useBuildState } from "../../state/build/hooks";
 import { Flex, Text } from "@radix-ui/themes";
 import { theme } from "../../../theme/theme";
+import { useTradeState } from "../../../state/trade/hooks";
 
 export const MainTradeDetails = () => {
   // const toggleSetSlippageModal = useSetSlippageModalToggle();
-  // const { setSlippageValue } = useBuildState();
+  const { slippageValue } = useTradeState();
 
   return (
     <Flex direction={"column"} gap="16px">
@@ -26,8 +26,7 @@ export const MainTradeDetails = () => {
               color: theme.color.blue2,
             }}
           >
-            {/* {`${setSlippageValue}% slippage`} */}
-            1% slippage
+            {`${slippageValue}% slippage`}
           </Text>
         </Flex>
         <Text style={{ color: theme.color.blue1 }}>1.77673 B</Text>

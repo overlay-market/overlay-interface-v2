@@ -5,8 +5,7 @@ import { theme } from "../../theme/theme";
 
 type LeverageSliderProps = {
   value: number;
-  liquidationPrice?: any;
-  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onChange: (newValue: number[]) => void;
   min: number;
   max: number;
   step: number;
@@ -35,9 +34,8 @@ export const LeverageSlider = ({
         </Text>
       </Flex>
       <StyledRoot
-        defaultValue={[2]}
-        // value={value}
-        // onValueChange={onChange}
+        value={[value]}
+        onValueChange={onChange}
         min={min}
         max={max}
         step={step}

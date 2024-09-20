@@ -2,8 +2,17 @@ import { Flex, Box } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import { theme } from "../../theme/theme";
 import TradeWidget from "./TradeWidget/TradeWidget";
+import { useEffect } from "react";
+import { useTradeActionHandlers } from "../../state/trade/hooks";
 
 const Trade = () => {
+  const { onResetTradeState } = useTradeActionHandlers();
+  const marketId = "";
+
+  useEffect(() => {
+    onResetTradeState();
+  }, [marketId, onResetTradeState]);
+
   return (
     <Flex direction="column" width={"100%"}>
       <TradeHeader />

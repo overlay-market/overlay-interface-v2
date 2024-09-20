@@ -9,23 +9,33 @@ import { LeverageSlider } from "../../../components/LeverageSlider/LeverageSlide
 import { useCallback, useEffect, useState } from "react";
 import { NumericalInput } from "../../../components/NumericalInput/NumericalInput";
 import { MainTradeDetails } from "./MainTradeDetails";
+import {
+  useTradeActionHandlers,
+  useTradeState,
+} from "../../../state/trade/hooks";
 
 const TradeWidget = () => {
+  const { selectedLeverage, isLong, typedValue, slippageValue } =
+    useTradeState();
+  const {
+    onAmountInput,
+    onSelectLeverage,
+    onSelectPositionSide,
+    onResetTradeState,
+  } = useTradeActionHandlers();
+
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
   const maxInputIncludingFees = "0";
+  const capLeverage = 5;
 
   const handleUserInput = useCallback(
     (input: string) => {
       if (input !== maxInputIncludingFees) {
         setIsMaxSelected(false);
       }
-      // onAmountInput(input)
+      onAmountInput(input);
     },
-    [
-      // onAmountInput,
-      setIsMaxSelected,
-      maxInputIncludingFees,
-    ]
+    [onAmountInput, setIsMaxSelected, maxInputIncludingFees]
   );
 
   // Update amount input when max selected and leverage is changed (thus maxInputIncludingFees changes)
@@ -35,14 +45,9 @@ const TradeWidget = () => {
     }
   }, [isMaxSelected, maxInputIncludingFees, handleUserInput]);
 
-  const handleLeverageInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      // onSelectLeverage(e.target.value)
-    },
-    [
-      // onSelectLeverage
-    ]
-  );
+  const handleLeverageInput = (newValue: number[]) => {
+    onSelectLeverage(newValue[0].toString());
+  };
 
   const handleMaxInput = () => {
     setIsMaxSelected(true);
@@ -91,10 +96,10 @@ const TradeWidget = () => {
 
       <LeverageSlider
         min={1}
-        max={10}
+        max={capLeverage ?? 1}
         step={0.1}
-        value={2}
-        onChange={(e) => handleLeverageInput}
+        value={Number(selectedLeverage)}
+        onChange={(newValue: number[]) => handleLeverageInput(newValue)}
       />
 
       <InputContainer>
@@ -114,8 +119,7 @@ const TradeWidget = () => {
           </Flex>
           <Flex justify="between">
             <NumericalInput
-              // value={typedValue?.toString()}
-              value={undefined}
+              value={typedValue?.toString()}
               onUserInput={handleUserInput}
             />
             <Text weight={"bold"} style={{ color: theme.color.blue1 }}>
