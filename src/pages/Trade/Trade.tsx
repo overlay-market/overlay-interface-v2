@@ -1,6 +1,7 @@
 import { Flex, Box } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import { theme } from "../../theme/theme";
+import TradeWidget from "./TradeWidget/TradeWidget";
 
 const Trade = () => {
   return (
@@ -11,9 +12,7 @@ const Trade = () => {
           <Box flexGrow={"1"} style={{ background: `${theme.color.darkBlue}` }}>
             Chart
           </Box>
-          <Box width={"321px"} style={{ background: `${theme.color.grey3}` }}>
-            trade widget
-          </Box>
+          <TradeWidget />
         </Flex>
         <Box>Positions</Box>
       </Flex>

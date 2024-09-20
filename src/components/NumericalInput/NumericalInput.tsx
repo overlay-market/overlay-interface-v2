@@ -21,12 +21,12 @@ const StyledInput = styled.input<{
   background-color: transparent;
   font-size: ${({ fontSize }) => fontSize ?? "16px"};
   font-weight: ${({ fontWeight }) => fontWeight ?? "700"};
-  text-align: ${({ align }) => align && align};
+  text-align: ${({ align }) => align && "left"};
   height: ${({ height }) => (height ? height : "auto")};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: ${({ padding }) => padding ?? "0px 8px"};
+  padding: ${({ padding }) => padding ?? "0px"};
   -webkit-appearance: textfield;
 
   ::-webkit-search-decoration {
