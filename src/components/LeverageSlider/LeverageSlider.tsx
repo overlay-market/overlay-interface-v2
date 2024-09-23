@@ -19,10 +19,6 @@ export const LeverageSlider = ({
   max,
   step,
 }: LeverageSliderProps) => {
-  console.log({
-    value,
-    onChange,
-  });
   return (
     <Flex direction={"column"} gap={"4px"}>
       <Flex justify={"between"}>

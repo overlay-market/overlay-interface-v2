@@ -28,6 +28,13 @@ const TradeWidget = () => {
   const maxInputIncludingFees = "0";
   const capLeverage = 5;
 
+  const handleSelectPositionSide = useCallback(
+    (isLong: boolean) => {
+      onSelectPositionSide(isLong);
+    },
+    [onSelectPositionSide]
+  );
+
   const handleUserInput = useCallback(
     (input: string) => {
       if (input !== maxInputIncludingFees) {
@@ -65,8 +72,8 @@ const TradeWidget = () => {
     >
       <Flex height={"64px"} gap={"8px"}>
         <SelectLongPositionButton
-          active={"1" === "1"}
-          onClick={() => console.log("Long")}
+          active={isLong}
+          onClick={() => handleSelectPositionSide(true)}
           style={{ background: theme.color.grey4 }}
         >
           <Flex direction={"column"} justify={"center"} align={"center"}>
@@ -79,8 +86,8 @@ const TradeWidget = () => {
           </Flex>
         </SelectLongPositionButton>
         <SelectShortPositionButton
-          active={1 !== 1}
-          onClick={() => console.log("Short")}
+          active={!isLong}
+          onClick={() => handleSelectPositionSide(false)}
           style={{ background: theme.color.grey4 }}
         >
           <Flex direction={"column"} justify={"center"} align={"center"}>
