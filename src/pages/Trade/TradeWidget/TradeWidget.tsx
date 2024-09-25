@@ -13,16 +13,12 @@ import {
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
+import { AdditionalTradeDetails } from "./AdditionalTradeDetails";
 
 const TradeWidget = () => {
-  const { selectedLeverage, isLong, typedValue, slippageValue } =
-    useTradeState();
-  const {
-    onAmountInput,
-    onSelectLeverage,
-    onSelectPositionSide,
-    onResetTradeState,
-  } = useTradeActionHandlers();
+  const { selectedLeverage, isLong, typedValue } = useTradeState();
+  const { onAmountInput, onSelectLeverage, onSelectPositionSide } =
+    useTradeActionHandlers();
 
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
   const maxInputIncludingFees = "0";
@@ -137,6 +133,8 @@ const TradeWidget = () => {
       </InputContainer>
 
       <MainTradeDetails />
+      {/* <TradeButtonComponent /> */}
+      <AdditionalTradeDetails />
     </Flex>
   );
 };

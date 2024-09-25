@@ -73,7 +73,7 @@ export const NumericalInput = React.memo(function InnerInput({
   align?: "right" | "left";
   height?: string;
   padding?: string;
-  isFocused: boolean;
+  isFocused?: boolean;
   prependSymbol?: string | undefined;
   color?: string;
 } & Omit<React.HTMLProps<HTMLInputElement>, "ref" | "onChange" | "as">) {
