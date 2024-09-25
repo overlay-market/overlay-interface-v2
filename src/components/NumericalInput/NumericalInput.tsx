@@ -21,7 +21,7 @@ const StyledInput = styled.input<{
   background-color: transparent;
   font-size: ${({ fontSize }) => fontSize ?? "16px"};
   font-weight: ${({ fontWeight }) => fontWeight ?? "700"};
-  text-align: ${({ align }) => align && "left"};
+  text-align: ${({ align }) => (align ? align : "left")};
   height: ${({ height }) => (height ? height : "auto")};
   white-space: nowrap;
   overflow: hidden;
@@ -61,6 +61,8 @@ export const NumericalInput = React.memo(function InnerInput({
   height,
   padding,
   color,
+  align,
+  isFocused = false,
   ...rest
 }: {
   value: string | number | undefined;
@@ -71,6 +73,7 @@ export const NumericalInput = React.memo(function InnerInput({
   align?: "right" | "left";
   height?: string;
   padding?: string;
+  isFocused: boolean;
   prependSymbol?: string | undefined;
   color?: string;
 } & Omit<React.HTMLProps<HTMLInputElement>, "ref" | "onChange" | "as">) {
@@ -102,8 +105,10 @@ export const NumericalInput = React.memo(function InnerInput({
       inputMode="decimal"
       autoComplete="off"
       autoCorrect="off"
+      autoFocus={isFocused}
       // text-specific options
       type="text"
+      align={align}
       pattern="^[0-9]*[.,]?[0-9]*$"
       placeholder={placeholder || "0.0"}
       minLength={1}
