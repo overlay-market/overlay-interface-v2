@@ -23,5 +23,12 @@ export const theme = {
   headerSize: {
     width: '88px',
     height: '78px'
-  }
+  },
+  breakpoints: {
+    xs: '520px',
+    sm: '768px',
+    md: '1024px',
+    lg: '1280px',
+    xl: '1640px'
+  },
 };
