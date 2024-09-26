@@ -14,6 +14,7 @@ import {
   useTradeState,
 } from "../../../state/trade/hooks";
 import { AdditionalTradeDetails } from "./AdditionalTradeDetails";
+import { TradeButtonComponent } from "./TradeButtonComponent";
 
 const TradeWidget = () => {
   const { selectedLeverage, isLong, typedValue } = useTradeState();
@@ -133,7 +134,7 @@ const TradeWidget = () => {
       </InputContainer>
 
       <MainTradeDetails />
-      {/* <TradeButtonComponent /> */}
+      <TradeButtonComponent />
       <AdditionalTradeDetails />
     </Flex>
   );

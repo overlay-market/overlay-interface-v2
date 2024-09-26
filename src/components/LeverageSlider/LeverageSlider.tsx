@@ -21,7 +21,7 @@ export const LeverageSlider = ({
 }: LeverageSliderProps) => {
   return (
     <Flex direction={"column"} gap={"4px"}>
-      <Flex justify={"between"}>
+      <Flex justify={"between"} height={"19px"}>
         <Text size={"3"} style={{ color: theme.color.blue1 }}>
           Leverage
         </Text>
