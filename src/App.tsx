@@ -6,8 +6,10 @@ import NavBar from "./components/NavBar/NavBar";
 import WalletChainBox from "./components/WalletChainBox/WalletChainBox";
 import Markets from "./pages/Markets/Markets";
 import { theme } from "./theme/theme";
+import useSDK from "./hooks/useSDK";
 
 const App = () => {
+  useSDK()
   return (
     <Container
       maxWidth={"1280px"}
