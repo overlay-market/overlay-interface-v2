@@ -19,7 +19,12 @@ const Trade = () => {
     <Flex direction="column" width={"100%"}>
       <TradeHeader />
       <Flex direction="column" gap="20px">
-        <Flex height={"561px"} width={"100%"}>
+        <Flex
+          height={{ initial: "auto", sm: "561px" }}
+          width={"100%"}
+          direction={{ initial: "column-reverse", sm: "row" }}
+          align={{ initial: "center", sm: "start" }}
+        >
           <Box flexGrow={"1"} style={{ background: `${theme.color.darkBlue}` }}>
             Chart
           </Box>
