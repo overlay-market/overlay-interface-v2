@@ -15,14 +15,9 @@ import {
 } from "../../../state/trade/hooks";
 
 const TradeWidget = () => {
-  const { selectedLeverage, isLong, typedValue, slippageValue } =
-    useTradeState();
-  const {
-    onAmountInput,
-    onSelectLeverage,
-    onSelectPositionSide,
-    onResetTradeState,
-  } = useTradeActionHandlers();
+  const { selectedLeverage, isLong, typedValue } = useTradeState();
+  const { onAmountInput, onSelectLeverage, onSelectPositionSide } =
+    useTradeActionHandlers();
 
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
   const maxInputIncludingFees = "0";
