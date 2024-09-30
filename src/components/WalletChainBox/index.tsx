@@ -1,11 +1,8 @@
 import { Box, Flex } from "@radix-ui/themes";
-import {
-  GradientOutlineButton,
-  GradientSolidButton,
-} from "../Button/GradientButton";
-import { theme } from "../../theme/theme";
+import { GradientOutlineButton, GradientSolidButton } from "../Button";
+import theme from "../../theme";
 
-const WalletChainBox = () => {
+const WalletChainBox: React.FC = () => {
   return (
     <Box
       width="308px"
@@ -25,7 +22,7 @@ const WalletChainBox = () => {
           title={"Buy OV"}
           width={"78px"}
           height={"29px"}
-          onClick={() => {
+          handleClick={() => {
             console.log("buy OV!");
           }}
         />
@@ -33,7 +30,7 @@ const WalletChainBox = () => {
           title={"Connect Wallet"}
           width={"136px"}
           height={"32px"}
-          onClick={() => {
+          handleClick={() => {
             console.log("Connect wallet");
           }}
         />

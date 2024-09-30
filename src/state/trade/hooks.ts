@@ -9,38 +9,38 @@ export function useTradeState(): AppState['trade'] {
 
 const slippageRegex: RegExp = /^(?:\d{1,2}(?:\.\d{0,2})?|\.\d{1,2}|100(?:\.0{1,2})?)?$/;
 
-export function useTradeActionHandlers(): {
-  onAmountInput: (typedValue: string | undefined) => void;
-  onSelectLeverage: (selectedLeverage: string) => void;
-  onSelectPositionSide: (isLong: boolean) => void;
-  onSetSlippage: (slippageValue: DefaultTxnSettings | string) => void;
-  onSetTxnDeadline: ( txnDeadline: DefaultTxnSettings | string) => void;
-  onResetTradeState: () => void;
-} {
+export const useTradeActionHandlers = (): {
+  handleAmountInput: (typedValue: string | undefined) => void;
+  handleLeverageSelect: (selectedLeverage: string) => void;
+  handlePositionSideSelect: (isLong: boolean) => void;
+  handleSlippageSet: (slippageValue: DefaultTxnSettings | string) => void;
+  handleTxnDeadlineSet: ( txnDeadline: DefaultTxnSettings | string) => void;
+  handleTradeStateReset: () => void;
+} => {
   const dispatch = useAppDispatch();
 
-  const onAmountInput = useCallback(
+  const handleAmountInput = useCallback(
     (typedValue: string | undefined) => {
       dispatch(typeInput({ typedValue }))
     },
     [dispatch]
   );
 
-  const onSelectLeverage = useCallback(
+  const handleLeverageSelect = useCallback(
     (selectedLeverage: string) => {
       dispatch(selectLeverage({ selectedLeverage }))
     },
     [dispatch]
   );
 
-  const onSelectPositionSide = useCallback(
+  const handlePositionSideSelect = useCallback(
     (isLong: boolean) => {
       dispatch(selectPositionSide({ isLong }))
     },
     [dispatch]
   );
 
-  const onSetSlippage = useCallback(
+  const handleSlippageSet = useCallback(
     (slippageValue: DefaultTxnSettings | string) => {
       if (Number(slippageValue) < .01 && slippageValue.length > 3) {
         dispatch(setSlippage({slippageValue: DefaultTxnSettings.DEFAULT_SLIPPAGE}))
@@ -57,14 +57,14 @@ export function useTradeActionHandlers(): {
     [dispatch]
   )
 
-  const onSetTxnDeadline = useCallback(
+  const handleTxnDeadlineSet = useCallback(
     (txnDeadline: DefaultTxnSettings | string) => {
       dispatch(setTxnDeadline({ txnDeadline }))
     },
     [dispatch]
   )
 
-  const onResetTradeState = useCallback(
+  const handleTradeStateReset = useCallback(
     () => {
       dispatch(resetTradeState())
     },
@@ -72,20 +72,20 @@ export function useTradeActionHandlers(): {
   )
 
   return {
-    onAmountInput,
-    onSelectLeverage,
-    onSelectPositionSide,
-    onSetSlippage,
-    onSetTxnDeadline,
-    onResetTradeState
+    handleAmountInput,
+    handleLeverageSelect,
+    handlePositionSideSelect,
+    handleSlippageSet,
+    handleTxnDeadlineSet,
+    handleTradeStateReset,
   }
 };
 
 
-export function useDerivedTradeInfo(): {
+export const useDerivedTradeInfo = (): {
   tradeData: object | undefined
   inputError?: string
-}{
+} => {
   const account = '';
 
   const { 

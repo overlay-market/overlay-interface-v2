@@ -1,8 +1,8 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { theme } from "../../../theme/theme";
+import theme from "../../../theme";
 import { InfoIcon } from "../../../assets/icons/svg-icons";
 
-export const AdditionalTradeDetails = () => {
+const AdditionalTradeDetails: React.FC = () => {
   return (
     <Flex direction={"column"} gap="8px">
       <Flex justify={"between"} height={"17px"}>
@@ -32,3 +32,5 @@ export const AdditionalTradeDetails = () => {
     </Flex>
   );
 };
+
+export default AdditionalTradeDetails;

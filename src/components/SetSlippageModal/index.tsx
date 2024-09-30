@@ -1,31 +1,30 @@
 import { useCallback, useEffect } from "react";
 import { Settings } from "react-feather";
-import { NumericalInput } from "../NumericalInput/NumericalInput";
+import NumericalInput from "../NumericalInput";
 import { useTradeActionHandlers, useTradeState } from "../../state/trade/hooks";
 import { DefaultTxnSettings } from "../../state/trade/actions";
 import { Box, Flex, Text } from "@radix-ui/themes";
-import { theme } from "../../theme/theme";
-import { MINIMUM_SLIPPAGE_VALUE } from "../../pages/Trade/Trade";
-import Modal from "../Modal/Modal";
+import theme from "../../theme";
+import { MINIMUM_SLIPPAGE_VALUE } from "../../pages/Trade";
+import Modal from "../Modal";
 
-export default function SetSlippageModal() {
+const SetSlippageModal: React.FC = () => {
   const account = "";
   const { slippageValue } = useTradeState();
-  const { onSetSlippage } = useTradeActionHandlers();
+  const { handleSlippageSet } = useTradeActionHandlers();
 
-  const handleResetSlippage = useCallback(
-    (e: any) => {
-      onSetSlippage(DefaultTxnSettings.DEFAULT_SLIPPAGE);
-    },
-    [onSetSlippage]
-  );
+  const handleResetSlippage = useCallback(() => {
+    handleSlippageSet(DefaultTxnSettings.DEFAULT_SLIPPAGE);
+  }, [handleSlippageSet]);
 
   useEffect(() => {
     const fetchSlippage = async () => {
       const storedSlippage = localStorage.getItem(`slippage`);
       // When value is edited or not a valid number, set to default slippage value
       if (storedSlippage && !isNaN(Number(storedSlippage))) {
-        onSetSlippage(storedSlippage || DefaultTxnSettings.DEFAULT_SLIPPAGE);
+        handleSlippageSet(
+          storedSlippage || DefaultTxnSettings.DEFAULT_SLIPPAGE
+        );
       } else {
         localStorage.setItem(
           `slippage`,
@@ -35,7 +34,7 @@ export default function SetSlippageModal() {
     };
 
     fetchSlippage();
-  }, [account, onSetSlippage, slippageValue]);
+  }, [account, handleSlippageSet, slippageValue]);
 
   return (
     <Modal
@@ -94,7 +93,7 @@ export default function SetSlippageModal() {
               <Flex align={"center"} p={"8px"}>
                 <NumericalInput
                   value={slippageValue}
-                  onUserInput={onSetSlippage}
+                  handleUserInput={handleSlippageSet}
                   align={"right"}
                   isFocused={true}
                 />
@@ -120,4 +119,6 @@ export default function SetSlippageModal() {
       </Flex>
     </Modal>
   );
-}
+};
+
+export default SetSlippageModal;

@@ -1,11 +1,11 @@
 import { Box, Flex } from "@radix-ui/themes";
 import LogoImg from "../../assets/images/overlay-logo-only-no-background.png";
-import { GradientOutlineButton } from "../Button/GradientButton";
-import { theme } from "../../theme/theme";
+import theme from "../../theme";
 import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
+import { GradientOutlineButton } from "../Button";
 
-const NavBar = () => {
+const NavBar: React.FC = () => {
   return (
     <Box
       width={{ initial: "100%", md: `${theme.headerSize.width}` }}
@@ -40,7 +40,7 @@ const NavBar = () => {
               title={"Buy OV"}
               width={"78px"}
               height={"29px"}
-              onClick={() => {
+              handleClick={() => {
                 console.log("buy OV!");
               }}
             />

@@ -1,15 +1,15 @@
 import "./App.css";
 import { Navigate, Route, Routes } from "react-router-dom";
-import Trade from "./pages/Trade/Trade";
+import Trade from "./pages/Trade";
 import { Container, Flex } from "@radix-ui/themes";
-import NavBar from "./components/NavBar/NavBar";
-import WalletChainBox from "./components/WalletChainBox/WalletChainBox";
-import Markets from "./pages/Markets/Markets";
-import { theme } from "./theme/theme";
+import NavBar from "./components/NavBar";
+import WalletChainBox from "./components/WalletChainBox";
+import Markets from "./pages/Markets";
+import theme from "./theme";
 import useSDK from "./hooks/useSDK";
 
 const App = () => {
-  useSDK()
+  useSDK();
   return (
     <Container
       maxWidth={"1280px"}

@@ -1,17 +1,7 @@
-import { Box, Flex } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import { useState, useEffect } from "react";
-import styled from "styled-components";
-import { theme } from "../../theme/theme";
-
-const Bar = styled(Box)<{ width?: number; color: string }>`
-  position: relative;
-  height: 4px;
-  transition: 1s ease-out;
-  transition-property: width, background-color;
-  width: ${({ width }) => `${width}%`};
-  background-color: ${({ color }) => color};
-  animation: progressAnimation 1s;
-`;
+import theme from "../../theme";
+import { Bar } from "./progress-bar-styles";
 
 type ProgressBarProps = {
   value: number | undefined | null;
@@ -19,11 +9,11 @@ type ProgressBarProps = {
   width?: string;
 };
 
-export const ProgressBar = ({
+const ProgressBar: React.FC<ProgressBarProps> = ({
   value,
   max,
   width = "60px",
-}: ProgressBarProps) => {
+}) => {
   const [shortPercentage, setShortPercentage] = useState(100);
   const [longPercentage, setLongPercentage] = useState(0);
   const currentShortPercentage =
@@ -66,3 +56,5 @@ export const ProgressBar = ({
     </Flex>
   );
 };
+
+export default ProgressBar;

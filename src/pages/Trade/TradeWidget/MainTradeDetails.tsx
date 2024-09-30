@@ -1,8 +1,8 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { theme } from "../../../theme/theme";
-import SetSlippageModal from "../../../components/SetSlippageModal/SetSlippageModal";
+import theme from "../../../theme";
+import SetSlippageModal from "../../../components/SetSlippageModal";
 
-export const MainTradeDetails = () => {
+const MainTradeDetails: React.FC = () => {
   return (
     <Flex direction={"column"} gap="16px">
       <Flex justify={"between"} height={"17px"}>
@@ -25,3 +25,5 @@ export const MainTradeDetails = () => {
     </Flex>
   );
 };
+
+export default MainTradeDetails;

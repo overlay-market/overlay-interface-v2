@@ -1,5 +1,6 @@
+import React, { ReactNode } from "react";
 import { Flex } from "@radix-ui/themes";
-import { StyledNavLink } from "./StyledNavLink";
+import StyledNavLink from "./StyledNavLink";
 import {
   BackpackIcon,
   BackpackActiveIcon,
@@ -20,7 +21,6 @@ import {
   StakeIcon,
   StakeActiveIcon,
 } from "../../assets/icons/navBar-icons/stake";
-import { ReactNode } from "react";
 
 export interface NavLinkAsset {
   to: string;
@@ -68,7 +68,7 @@ const NAV_LINKS: Array<NavLinkAsset> = [
   },
 ];
 
-const NavLinksSection = () => {
+const NavLinksSection: React.FC = () => {
   return (
     <Flex direction={"column"} gap={"8px"}>
       {NAV_LINKS.map((link) => (

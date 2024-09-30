@@ -1,19 +1,19 @@
 import { Flex, Box } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
-import { theme } from "../../theme/theme";
-import TradeWidget from "./TradeWidget/TradeWidget";
-import { useEffect } from "react";
+import theme from "../../theme";
+import TradeWidget from "./TradeWidget";
+import React, { useEffect } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
-const Trade = () => {
-  const { onResetTradeState } = useTradeActionHandlers();
+const Trade: React.FC = () => {
+  const { handleTradeStateReset } = useTradeActionHandlers();
   const marketId = "";
 
   useEffect(() => {
-    onResetTradeState();
-  }, [marketId, onResetTradeState]);
+    handleTradeStateReset();
+  }, [marketId, handleTradeStateReset]);
 
   return (
     <Flex direction="column" width={"100%"}>
