@@ -1,6 +1,6 @@
 import { Flex } from "@radix-ui/themes";
 import MarketsHeader from "./MarketsHeader";
-import { FirstSection } from "./MarketsWidget/MarketsFirstSection";
+import { FirstSection } from "./MarketsFirstSection";
 
 const Markets = () => {
   return (
