@@ -5,7 +5,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import futuristic1 from "../../assets/images/futuristic1.webp";
-import MarketCards from "../../components/MarketCards/MarketCards";
+import MarketCards from "../../components/MarketCards";
 
 const cardsData = [
   { image: futuristic1, title: "AI Index", value: "$94.21" },

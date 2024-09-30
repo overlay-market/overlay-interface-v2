@@ -1,6 +1,6 @@
 import { Box, Flex } from "@radix-ui/themes";
-import { OptionalLinkBanner } from "../../components/Banner/OptionalLinkBanner/OptionalLinkBanner";
-import { PromotedBanner } from "../../components/Banner/PromotedBanner/PromotedBanner";
+import { OptionalLinkBanner } from "../../components/Banner/OptionalLinkBanner";
+import { PromotedBanner } from "../../components/Banner/PromotedBanner";
 
 export const FirstSection = () => {
   return (
