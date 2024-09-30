@@ -5,8 +5,6 @@ import TradeWidget from "./TradeWidget";
 import React, { useEffect } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 
-export const MINIMUM_SLIPPAGE_VALUE = 0.05;
-
 const Trade: React.FC = () => {
   const { handleTradeStateReset } = useTradeActionHandlers();
   const marketId = "";

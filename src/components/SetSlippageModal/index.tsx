@@ -1,11 +1,14 @@
 import { useCallback, useEffect } from "react";
 import { Settings } from "react-feather";
 import NumericalInput from "../NumericalInput";
-import { useTradeActionHandlers, useTradeState } from "../../state/trade/hooks";
+import {
+  MINIMUM_SLIPPAGE_VALUE,
+  useTradeActionHandlers,
+  useTradeState,
+} from "../../state/trade/hooks";
 import { DefaultTxnSettings } from "../../state/trade/actions";
 import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
-import { MINIMUM_SLIPPAGE_VALUE } from "../../pages/Trade";
 import Modal from "../Modal";
 
 const SetSlippageModal: React.FC = () => {
@@ -36,6 +39,15 @@ const SetSlippageModal: React.FC = () => {
     fetchSlippage();
   }, [account, handleSlippageSet, slippageValue]);
 
+  const handleSlippageModalClose = () => {
+    if (Number(slippageValue) < MINIMUM_SLIPPAGE_VALUE) {
+      handleSlippageSet(MINIMUM_SLIPPAGE_VALUE.toString());
+    }
+    if (slippageValue === ".") {
+      handleSlippageSet(DefaultTxnSettings.DEFAULT_SLIPPAGE);
+    }
+  };
+
   return (
     <Modal
       triggerElement={
@@ -55,6 +67,7 @@ const SetSlippageModal: React.FC = () => {
       borderColor={`${theme.color.blue2}80`}
       width="375px"
       minHeight="190px"
+      handleClose={handleSlippageModalClose}
     >
       <Flex
         direction={"column"}

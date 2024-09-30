@@ -3,6 +3,8 @@ import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
 import { DefaultTxnSettings, resetTradeState, selectLeverage, selectPositionSide, setSlippage, setTxnDeadline, typeInput } from "./actions";
 
+export const MINIMUM_SLIPPAGE_VALUE = 0.05;
+
 export function useTradeState(): AppState['trade'] {
   return useAppSelector((state) => state.trade);
 }
@@ -42,8 +44,8 @@ export const useTradeActionHandlers = (): {
 
   const handleSlippageSet = useCallback(
     (slippageValue: DefaultTxnSettings | string) => {
-      if (Number(slippageValue) < .01 && slippageValue.length > 3) {
-        dispatch(setSlippage({slippageValue: DefaultTxnSettings.DEFAULT_SLIPPAGE}))
+      if (Number(slippageValue) < MINIMUM_SLIPPAGE_VALUE && slippageValue.length > 3) {
+        dispatch(setSlippage({slippageValue: MINIMUM_SLIPPAGE_VALUE.toString()}))
       }
       if(slippageValue === '.') {
         dispatch(setSlippage({ slippageValue }))
