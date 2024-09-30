@@ -1,49 +1,67 @@
 import { Table } from "@radix-ui/themes";
-import { LineChart, Line } from "recharts";
+// import { LineChart, Line } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
-import OverlayLogo from "../../assets/images/overlay-logo-only-no-background.png";
+// import OverlayLogo from "../../assets/images/overlay-logo-only-no-background.png";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { SelectItem } from "@radix-ui/react-select";
+import useSDK from "../../hooks/useSDK";
+import { useEffect, useState } from "react";
+import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 
 type MarketData = {
-  icon: string;
-  name: string;
-  price: number;
-  change1h: number;
-  change24h: number;
-  change7d: number;
-  funding: number;
-  oiBalance: string;
-  last7Days: number[];
+  ask: bigint;
+  bid: bigint;
+  capOi: bigint;
+  circuitBreakerLevel: bigint;
+  currency: string;
+  descriptionText: string;
+  disabled: boolean;
+  fullLogo: string;
+  fundingRate: bigint;
+  id: string;
+  logo: string;
+  marketId: string;
+  marketLogo: string;
+  marketName: string;
+  mid: bigint;
+  oiLong: bigint;
+  oiShort: bigint;
+  oracleLogo: string;
+  parsedAnnualFundingRate: string;
+  parsedAsk: string;
+  parsedBid: string;
+  parsedCapOi: string;
+  parsedDailyFundingRate: string;
+  parsedMid: string;
+  parsedOiLong: string;
+  parsedOiShort: string;
+  priceCurrency: string;
+  volumeAsk: bigint;
+  volumeBid: bigint;
 };
 
-const data: MarketData[] = [
-  {
-    icon: "/src/assets/icons/social-links/Discord.png",
-    name: "AI Index",
-    price: 94.21,
-    change1h: 0.1,
-    change24h: 0.1,
-    change7d: 0.1,
-    funding: 4.53,
-    oiBalance: "50% 50%",
-    last7Days: [50, 55, 45, 60, 58, 63, 60],
-  },
-  {
-    icon: "/placeholder.svg?height=40&width=40",
-    name: "EV Commodity Index",
-    price: 94.21,
-    change1h: 0.1,
-    change24h: 0.1,
-    change7d: 0.1,
-    funding: 4.53,
-    oiBalance: "50% 50%",
-    last7Days: [52, 57, 48, 61, 59, 1500, 86],
-  },
-];
-
 export default function Component() {
+  const [marketsData, setMarketsData] = useState<MarketData[]>([]);
+  const { chainId: contextChainID } = useMultichainContext();
+  const sdk = useSDK();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const activeMarkets = await sdk.markets.getActiveMarkets();
+        console.log("activeMarkets", activeMarkets);
+
+        activeMarkets && setMarketsData(activeMarkets);
+      } catch (error) {
+        console.error("Error fetching markets:", error);
+      }
+    };
+
+    fetchData();
+  }, [contextChainID]);
+
+  console.log("marketsData", marketsData[1]);
   return (
     <div className="p-4 text-white">
       <Table.Root
@@ -157,68 +175,73 @@ export default function Component() {
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
-          {data.map((item, index) => (
-            <Table.Row
-              key={index}
-              className="border-b"
-              style={{
-                borderBottom: `1px solid ${theme.color.darkBlue}`,
-              }}
-            >
-              <Table.Cell>
-                <div className="flex items-center">
+          {marketsData &&
+            marketsData.map((market, index) => (
+              <Table.Row
+                key={index}
+                className="border-b"
+                style={{
+                  borderBottom: `1px solid ${theme.color.darkBlue}`,
+                }}
+              >
+                <Table.Cell className="px-2 py-1">
+                  <div className="flex items-center justify-center">
+                    <img
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        objectFit: "cover",
+                      }}
+                      src={market.marketLogo}
+                      alt={market.marketName}
+                      className="rounded-full"
+                    />
+                  </div>
+                </Table.Cell>
+                {/* <Table.Cell>${market.price.toFixed(2)}</Table.Cell>
+                <Table.Cell className="text-green-400">
+                  ^{market.change1h.toFixed(1)}%
+                </Table.Cell>
+                <Table.Cell className="text-green-400">
+                  ^{market.change24h.toFixed(1)}%
+                </Table.Cell>
+                <Table.Cell className="text-green-400">
+                  ^{market.change7d.toFixed(1)}%
+                </Table.Cell>
+                <Table.Cell className="text-green-400">
+                  +{market.funding.toFixed(2)}%
+                </Table.Cell>
+                <Table.Cell>
+                  <div className="flex items-center">
+                    <div className="w-1/2 h-2 bg-red-500 rounded-l-full"></div>
+                    <div className="w-1/2 h-2 bg-green-500 rounded-r-full"></div>
+                  </div>
+                </Table.Cell>
+                <Table.Cell>
                   <img
-                    src={item.icon}
+                    src={OverlayLogo}
                     alt={item.name}
-                    className="w-10 h-10 mr-2 rounded-full"
+                    className="w-6 h-6 ml-2 rounded-full"
+                    style={{ maxHeight: 30, maxWidth: 30 }}
                   />
-                  <span>{item.name}</span>
-                </div>
-              </Table.Cell>
-              <Table.Cell>${item.price.toFixed(2)}</Table.Cell>
-              <Table.Cell className="text-green-400">
-                ^{item.change1h.toFixed(1)}%
-              </Table.Cell>
-              <Table.Cell className="text-green-400">
-                ^{item.change24h.toFixed(1)}%
-              </Table.Cell>
-              <Table.Cell className="text-green-400">
-                ^{item.change7d.toFixed(1)}%
-              </Table.Cell>
-              <Table.Cell className="text-green-400">
-                +{item.funding.toFixed(2)}%
-              </Table.Cell>
-              <Table.Cell>
-                <div className="flex items-center">
-                  <div className="w-1/2 h-2 bg-red-500 rounded-l-full"></div>
-                  <div className="w-1/2 h-2 bg-green-500 rounded-r-full"></div>
-                </div>
-              </Table.Cell>
-              <Table.Cell>
-                <img
-                  src={OverlayLogo}
-                  alt={item.name}
-                  className="w-6 h-6 ml-2 rounded-full"
-                  style={{ maxHeight: 30, maxWidth: 30 }}
-                />
-              </Table.Cell>
-              <Table.Cell>
-                <LineChart
-                  width={100}
-                  height={30}
-                  data={item.last7Days.map((value) => ({ value }))}
-                >
-                  <Line
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#4ade80"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </Table.Cell>
-            </Table.Row>
-          ))}
+                </Table.Cell>
+                <Table.Cell>
+                  <LineChart
+                    width={100}
+                    height={30}
+                    data={market.map((value) => ({ value }))}
+                  >
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke="#4ade80"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </Table.Cell> */}
+              </Table.Row>
+            ))}
         </Table.Body>
       </Table.Root>
     </div>
