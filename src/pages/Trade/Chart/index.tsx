@@ -5,7 +5,7 @@ import {
   ResolutionString,
   IChartingLibraryWidget,
   EntityId,
-} from "../../../charting_library/charting_library";
+} from "../../../charting_library";
 import * as React from "react";
 import styled from "styled-components";
 import Datafeed from "./chartDatafeed";
