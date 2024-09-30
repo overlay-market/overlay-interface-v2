@@ -5,7 +5,7 @@ import {
   ResolutionString,
   IChartingLibraryWidget,
   EntityId,
-} from "../../../charting_library";
+} from "../../../charting_library/charting_library";
 import * as React from "react";
 import styled from "styled-components";
 import Datafeed from "./chartDatafeed";
@@ -34,17 +34,13 @@ export interface ChartContainerProps {
   theme: ChartingLibraryWidgetOptions["theme"];
 }
 
-type BuildChartProps = {
+type ChartProps = {
   marketId?: string;
   longPrice: string | number;
   shortPrice: string | number;
 };
 
-export const Chart: React.FC<BuildChartProps> = ({
-  marketId,
-  longPrice,
-  shortPrice,
-}) => {
+const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
   const chartContainerRef =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
   const chainId = 80084;
@@ -326,3 +322,5 @@ export const Chart: React.FC<BuildChartProps> = ({
 
   return <TVChartContainer ref={chartContainerRef} />;
 };
+
+export default Chart;

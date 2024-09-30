@@ -4,7 +4,7 @@ import {getBinSizeAndUnit, getMarketChartUrl} from './helpers'
 
 const idToSubscription = new Map()
 
-export function subscribeOnStream(symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback, lastBarCached) {
+export const subscribeOnStream = (symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback, lastBarCached) => {
   let subscriptionItem = idToSubscription.get(subscriberUID)
 
   if (subscriptionItem) return
@@ -44,7 +44,7 @@ export function subscribeOnStream(symbolInfo, resolution, onRealtimeCallback, su
   idToSubscription.set(subscriberUID, subscriptionItem)
 }
 
-function updateLastDailyBar(lastBar, subscriberUID) {
+const updateLastDailyBar = (lastBar, subscriberUID) => {
   const subscriptionItem = idToSubscription.get(subscriberUID)
 
   if (subscriptionItem) {
@@ -83,7 +83,7 @@ function updateLastDailyBar(lastBar, subscriberUID) {
   }
 }
 
-export function unsubscribeFromStream(subscriberUID) {
+export const unsubscribeFromStream = (subscriberUID) => {
   const subscriptionItem = idToSubscription.get(subscriberUID)
 
   if (subscriptionItem) {

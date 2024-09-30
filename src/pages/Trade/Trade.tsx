@@ -3,7 +3,7 @@ import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget/TradeWidget";
 import { useEffect } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
-import { Chart } from "./Chart";
+import Chart from "./Chart";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 

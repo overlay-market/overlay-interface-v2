@@ -1,19 +1,19 @@
 import {MARKET_CHART_URL} from '../../../constants/applications'
 import {SUPPORTED_CHAINID} from '../../../constants/chains'
 
-export function isSepolia(chainId) {
+export const isSepolia = (chainId) => {
   return chainId === Number(SUPPORTED_CHAINID.ARBITRUM_SEPOLIA)
 }
 
-export function isImola(chainId) {
+export const isImola = (chainId) => {
   return chainId === Number(SUPPORTED_CHAINID.IMOLA)
 }
 
-export function isBartio(chainId) {
+export const isBartio = (chainId) => {
   return chainId === Number(SUPPORTED_CHAINID.BARTIO)
 }
 
-export function getMarketChartUrl(value) {
+export const getMarketChartUrl = (value) => {
   const chainId = typeof value === 'number' ? value : JSON.parse(value.ticker).chainId
 
   if (isSepolia(chainId)) {
@@ -27,7 +27,7 @@ export function getMarketChartUrl(value) {
   }
 }
 
-export function getBinSizeAndUnit(input) {
+export const getBinSizeAndUnit = (input) => {
   const numValue = Number(input)
 
   if (!isNaN(numValue) && isFinite(numValue)) {
