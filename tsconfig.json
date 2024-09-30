@@ -21,7 +21,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "custom-types.d.ts"],
   "exclude": ["src/charting_library"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
