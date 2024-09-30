@@ -10,7 +10,7 @@ export function useTradeState(): AppState['trade'] {
 const slippageRegex: RegExp = /^(?:\d{1,2}(?:\.\d{0,2})?|\.\d{1,2}|100(?:\.0{1,2})?)?$/;
 
 export const useTradeActionHandlers = (): {
-  handleAmountInput: (typedValue: string | undefined) => void;
+  handleAmountInput: (typedValue: string) => void;
   handleLeverageSelect: (selectedLeverage: string) => void;
   handlePositionSideSelect: (isLong: boolean) => void;
   handleSlippageSet: (slippageValue: DefaultTxnSettings | string) => void;
@@ -20,7 +20,7 @@ export const useTradeActionHandlers = (): {
   const dispatch = useAppDispatch();
 
   const handleAmountInput = useCallback(
-    (typedValue: string | undefined) => {
+    (typedValue: string) => {
       dispatch(typeInput({ typedValue }))
     },
     [dispatch]

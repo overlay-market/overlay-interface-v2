@@ -123,7 +123,7 @@ const TradeWidget: React.FC = () => {
           </Flex>
           <Flex justify="between">
             <NumericalInput
-              value={typedValue?.toString()}
+              value={typedValue}
               handleUserInput={handleUserInput}
             />
             <Text weight={"bold"} style={{ color: theme.color.blue1 }}>

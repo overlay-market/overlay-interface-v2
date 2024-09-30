@@ -4,8 +4,8 @@ import theme from "../../theme";
 import { Bar } from "./progress-bar-styles";
 
 type ProgressBarProps = {
-  value: number | undefined | null;
-  max: number | undefined | null;
+  value: number;
+  max: number;
   width?: string;
 };
 
@@ -16,8 +16,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 }) => {
   const [shortPercentage, setShortPercentage] = useState(100);
   const [longPercentage, setLongPercentage] = useState(0);
-  const currentShortPercentage =
-    max && value !== undefined && value !== null ? (value / max) * 100 : 100;
+  const currentShortPercentage = max && value ? (value / max) * 100 : 100;
 
   const currentLongPercentage = 100 - currentShortPercentage;
 

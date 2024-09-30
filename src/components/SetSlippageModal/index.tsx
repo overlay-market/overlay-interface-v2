@@ -13,7 +13,7 @@ const SetSlippageModal: React.FC = () => {
   const { slippageValue } = useTradeState();
   const { handleSlippageSet } = useTradeActionHandlers();
 
-  const handleResetSlippage = useCallback(() => {
+  const handleSlippageReset = useCallback(() => {
     handleSlippageSet(DefaultTxnSettings.DEFAULT_SLIPPAGE);
   }, [handleSlippageSet]);
 
@@ -70,7 +70,7 @@ const SetSlippageModal: React.FC = () => {
 
           <Flex gap={"8px"} justify={"end"} align={"center"}>
             <Text
-              onClick={handleResetSlippage}
+              onClick={handleSlippageReset}
               style={{
                 color:
                   slippageValue === DefaultTxnSettings.DEFAULT_SLIPPAGE
