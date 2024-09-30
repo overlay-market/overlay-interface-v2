@@ -1,5 +1,5 @@
 import { Flex, Text, Box } from "@radix-ui/themes";
-import { theme } from "../../theme/theme";
+import theme from "../../theme";
 
 const MarketsHeader = () => {
   return (

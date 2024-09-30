@@ -1,14 +1,16 @@
-import { GradientOutlineButton } from "../../../components/Button/GradientButton";
+import { GradientOutlineButton } from "../../../components/Button";
 
-export const TradeButtonComponent = () => {
+const TradeButtonComponent: React.FC = () => {
   return (
     <GradientOutlineButton
       title={"Trade"}
       width={"100%"}
       height={"40px"}
-      onClick={() => {
+      handleClick={() => {
         console.log("trade");
       }}
     />
   );
 };
+
+export default TradeButtonComponent;

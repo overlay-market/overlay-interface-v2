@@ -1,24 +1,24 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { theme } from "../../../theme/theme";
+import theme from "../../../theme";
 import {
   InputContainer,
   SelectLongPositionButton,
   SelectShortPositionButton,
-} from "./TradeWidget_";
-import { LeverageSlider } from "../../../components/LeverageSlider/LeverageSlider";
+} from "./trade-widget-styles";
 import { useCallback, useEffect, useState } from "react";
-import { NumericalInput } from "../../../components/NumericalInput/NumericalInput";
-import { MainTradeDetails } from "./MainTradeDetails";
+import NumericalInput from "../../../components/NumericalInput";
+import MainTradeDetails from "./MainTradeDetails";
 import {
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
-import { AdditionalTradeDetails } from "./AdditionalTradeDetails";
-import { TradeButtonComponent } from "./TradeButtonComponent";
+import AdditionalTradeDetails from "./AdditionalTradeDetails";
+import TradeButtonComponent from "./TradeButtonComponent";
+import LeverageSlider from "../../../components/LeverageSlider";
 
-const TradeWidget = () => {
+const TradeWidget: React.FC = () => {
   const { selectedLeverage, isLong, typedValue } = useTradeState();
-  const { onAmountInput, onSelectLeverage, onSelectPositionSide } =
+  const { handleAmountInput, handleLeverageSelect, handlePositionSideSelect } =
     useTradeActionHandlers();
 
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
@@ -27,9 +27,9 @@ const TradeWidget = () => {
 
   const handleSelectPositionSide = useCallback(
     (isLong: boolean) => {
-      onSelectPositionSide(isLong);
+      handlePositionSideSelect(isLong);
     },
-    [onSelectPositionSide]
+    [handlePositionSideSelect]
   );
 
   const handleUserInput = useCallback(
@@ -37,9 +37,9 @@ const TradeWidget = () => {
       if (input !== maxInputIncludingFees) {
         setIsMaxSelected(false);
       }
-      onAmountInput(input);
+      handleAmountInput(input);
     },
-    [onAmountInput, setIsMaxSelected, maxInputIncludingFees]
+    [handleAmountInput, setIsMaxSelected, maxInputIncludingFees]
   );
 
   // Update amount input when max selected and leverage is changed (thus maxInputIncludingFees changes)
@@ -50,7 +50,7 @@ const TradeWidget = () => {
   }, [isMaxSelected, maxInputIncludingFees, handleUserInput]);
 
   const handleLeverageInput = (newValue: number[]) => {
-    onSelectLeverage(newValue[0].toString());
+    handleLeverageSelect(newValue[0].toString());
   };
 
   const handleMaxInput = () => {
@@ -103,7 +103,7 @@ const TradeWidget = () => {
         max={capLeverage ?? 1}
         step={0.1}
         value={Number(selectedLeverage)}
-        onChange={(newValue: number[]) => handleLeverageInput(newValue)}
+        handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
       />
 
       <InputContainer>
@@ -123,8 +123,8 @@ const TradeWidget = () => {
           </Flex>
           <Flex justify="between">
             <NumericalInput
-              value={typedValue?.toString()}
-              onUserInput={handleUserInput}
+              value={typedValue}
+              handleUserInput={handleUserInput}
             />
             <Text weight={"bold"} style={{ color: theme.color.blue1 }}>
               OVL

@@ -1,24 +1,25 @@
 import { Range } from "@radix-ui/react-slider";
-import { StyledRoot, StyledThumb, StyledTrack } from "./LeverageSlider_";
 import { Flex, Text } from "@radix-ui/themes";
-import { theme } from "../../theme/theme";
+import theme from "../../theme";
+import React from "react";
+import { StyledRoot, StyledThumb, StyledTrack } from "./leverage-slider-styles";
 
 type LeverageSliderProps = {
   value: number;
-  onChange: (newValue: number[]) => void;
+  handleChange: (newValue: number[]) => void;
   min: number;
   max: number;
   step: number;
   margin?: string;
 };
 
-export const LeverageSlider = ({
+const LeverageSlider: React.FC<LeverageSliderProps> = ({
   value,
-  onChange,
+  handleChange,
   min,
   max,
   step,
-}: LeverageSliderProps) => {
+}) => {
   return (
     <Flex direction={"column"} gap={"4px"}>
       <Flex justify={"between"} height={"19px"}>
@@ -31,7 +32,7 @@ export const LeverageSlider = ({
       </Flex>
       <StyledRoot
         value={[value]}
-        onValueChange={onChange}
+        onValueChange={handleChange}
         min={min}
         max={max}
         step={step}
@@ -44,3 +45,5 @@ export const LeverageSlider = ({
     </Flex>
   );
 };
+
+export default LeverageSlider;

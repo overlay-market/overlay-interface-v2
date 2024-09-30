@@ -1,14 +1,10 @@
-import { Flex, Text, Box, Separator } from "@radix-ui/themes";
-import { theme } from "../../theme/theme";
-import styled from "styled-components";
-import { ProgressBar } from "../../components/ProgressBar/ProgressBar";
+import { Flex, Text, Box } from "@radix-ui/themes";
+import theme from "../../theme";
+import ProgressBar from "../../components/ProgressBar";
 import MarketsDropdownList from "./MarketsDropdownList";
+import { StyledSeparator } from "./trade-header-styles";
 
-const StyledSeparator = styled(Separator)`
-  background-color: ${theme.color.darkBlue};
-`;
-
-const TradeHeader = () => {
+const TradeHeader: React.FC = () => {
   return (
     <Box
       width={"100%"}

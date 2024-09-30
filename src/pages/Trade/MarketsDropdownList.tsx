@@ -2,27 +2,16 @@ import {
   Flex,
   Text,
   Box,
-  Separator,
   ChevronDownIcon,
   Avatar,
   ScrollArea,
 } from "@radix-ui/themes";
-import { theme } from "../../theme/theme";
-import styled from "styled-components";
+import theme from "../../theme";
 import useOutsideClick from "../../hooks/useOutsideClick";
-import { useState, Fragment } from "react";
+import React, { useState, Fragment } from "react";
+import { MarketItem, StyledSeparator } from "./markets-dropdown-list-styles";
 
-const StyledSeparator = styled(Separator)`
-  background-color: ${theme.color.darkBlue};
-`;
-
-const MarketItem = styled(Flex)`
-  &:hover {
-    background: ${theme.color.grey7};
-  }
-`;
-
-const MarketsDropdownList = () => {
+const MarketsDropdownList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useOutsideClick(() => setIsOpen(false));
   const toggleDropdown = () => setIsOpen((prev) => !prev);

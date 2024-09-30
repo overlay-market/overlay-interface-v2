@@ -5,7 +5,7 @@ export enum DefaultTxnSettings {
   DEFAULT_DEADLINE = '30'
 };
 
-export const typeInput = createAction<{ typedValue: string | undefined }>('trade/typeInput');
+export const typeInput = createAction<{ typedValue: string }>('trade/typeInput');
 export const selectLeverage = createAction<{ selectedLeverage: string }>('trade/selectLeverage');
 export const selectPositionSide = createAction<{ isLong: boolean }>('trade/selectPositionSide');
 export const setSlippage = createAction<{ slippageValue: DefaultTxnSettings | string }>('trade/setSlippage');

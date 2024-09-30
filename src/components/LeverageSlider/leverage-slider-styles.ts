@@ -1,6 +1,6 @@
 import { Root, Thumb, Track } from "@radix-ui/react-slider";
 import styled from "styled-components";
-import { theme } from "../../theme/theme";
+import  theme from "../../theme";
 
 export const StyledRoot = styled(Root)`
   position: relative;

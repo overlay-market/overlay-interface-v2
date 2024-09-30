@@ -1,6 +1,6 @@
 import { Box } from "@radix-ui/themes"
 import styled from "styled-components"
-import { theme } from "../../../theme/theme"
+import  theme  from "../../../theme"
 
 export const SelectLongPositionButton = styled(Box)<{ active: boolean }>`
   padding: 12px;
