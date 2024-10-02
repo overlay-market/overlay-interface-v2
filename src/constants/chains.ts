@@ -1,4 +1,4 @@
-import { defineChain } from 'viem'
+import { Chain, defineChain } from 'viem'
 
 export enum SUPPORTED_CHAINID {
   MAINNET = 1, //at launch
@@ -10,6 +10,15 @@ export enum SUPPORTED_CHAINID {
   IMOLA = 30732,
   BARTIO = 80084,
 }
+
+export const DEFAULT_NET = SUPPORTED_CHAINID[421614]
+export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.ARBITRUM_SEPOLIA
+
+export const WORKING_CHAINS = [
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.ARBITRUM_SEPOLIA], 
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.IMOLA], 
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.BARTIO],
+]
  
 export const imola = defineChain({
   id: 30732,
