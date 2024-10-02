@@ -1,15 +1,8 @@
-import { PropsWithChildren, createContext, useEffect } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import { UserRejectedRequestError } from "viem";
-import {
-  ResolvedRegister,
-  UseConnectReturnType,
-  useConnect as useConnectWagmi,
-} from "wagmi";
+import { useConnect as useConnectWagmi } from "wagmi";
 import useDisconnect from "../../hooks/useDisconnect";
-
-const ConnectionContext = createContext<
-  UseConnectReturnType<ResolvedRegister["config"]> | undefined
->(undefined);
+import { ConnectionContext } from "./types";
 
 const ConnectionProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const { disconnect } = useDisconnect();
