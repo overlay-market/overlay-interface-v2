@@ -8,7 +8,7 @@ import { OverlaySDK } from 'overlay-sdk';
 // import { CHAINS, DEFAULT_CHAINID,  VIEM_CHAINS } from '../constants/chains';
 import { arbitrumSepolia } from 'viem/chains';
 
-export default function useSDK() {
+const useSDK = (): OverlaySDK => {
   const DEFAULT_CHAINID = 421614
   
   const rpcProvider = createPublicClient({
@@ -26,3 +26,5 @@ export default function useSDK() {
   console.log('overlay-sdk initialized:', sdk)
   return sdk
 }
+
+export default useSDK;
