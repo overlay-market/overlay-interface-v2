@@ -1,4 +1,5 @@
 import { Chain, defineChain } from 'viem'
+import { arbitrumSepolia, berachainTestnetbArtio } from 'viem/chains'
 
 export enum SUPPORTED_CHAINID {
   MAINNET = 1, //at launch
@@ -37,3 +38,10 @@ export const imola = defineChain({
     default: { name: 'Explorer', url: 'https://explorer.devnet.imola.movementlabs.xyz/#/?network=testnet' },
   }
 })
+
+export const VIEM_CHAINS: { [key: number]: Chain} = {
+  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: arbitrumSepolia,
+  [SUPPORTED_CHAINID.BARTIO]: berachainTestnetbArtio,
+  [SUPPORTED_CHAINID.IMOLA]: imola,
+};
+ 
