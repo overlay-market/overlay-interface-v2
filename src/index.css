@@ -1,5 +1,5 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -15,7 +15,7 @@
   /* radix default themes override */
 
   .radix-themes {
-    --default-font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --default-font-family: Inter, sans-serif;
     --default-font-size: 14px;
     --radius-2: 8px;
     --cursor-button: pointer;
