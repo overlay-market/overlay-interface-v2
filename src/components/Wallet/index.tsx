@@ -1,8 +1,9 @@
 import { Box, Flex } from "@radix-ui/themes";
-import { GradientOutlineButton, GradientSolidButton } from "../Button";
+import { GradientOutlineButton } from "../Button";
 import theme from "../../theme";
+import Web3Status from "./Web3Status";
 
-const WalletChainBox: React.FC = () => {
+const Wallet: React.FC = () => {
   return (
     <Box
       width="308px"
@@ -10,6 +11,7 @@ const WalletChainBox: React.FC = () => {
       position="absolute"
       top="0"
       right="0"
+      style={{ zIndex: "10" }}
     >
       <Flex
         gap={"20px"}
@@ -26,17 +28,10 @@ const WalletChainBox: React.FC = () => {
             console.log("buy OV!");
           }}
         />
-        <GradientSolidButton
-          title={"Connect Wallet"}
-          width={"136px"}
-          height={"32px"}
-          handleClick={() => {
-            console.log("Connect wallet");
-          }}
-        />
+        <Web3Status />
       </Flex>
     </Box>
   );
 };
 
-export default WalletChainBox;
+export default Wallet;

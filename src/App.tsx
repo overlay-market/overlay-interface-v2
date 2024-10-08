@@ -3,12 +3,12 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Trade from "./pages/Trade";
 import { Container, Flex } from "@radix-ui/themes";
 import NavBar from "./components/NavBar";
-import WalletChainBox from "./components/WalletChainBox";
 import Markets from "./pages/Markets";
 import theme from "./theme";
 import useSDK from "./hooks/useSDK";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
 import useMultichainContext from "./providers/MultichainContextProvider/useMultichainContext";
+import Wallet from "./components/Wallet";
 
 const App = () => {
   useSDK();
@@ -26,7 +26,7 @@ const App = () => {
       >
         <Flex direction={{ initial: "column", md: "row" }}>
           <NavBar />
-          <WalletChainBox />
+          <Wallet />
           <Routes>
             <Route path="/" element={<Navigate to="/markets" />} />
             <Route path="/markets" element={<Markets />} />
