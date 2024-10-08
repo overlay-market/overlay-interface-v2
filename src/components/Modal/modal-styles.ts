@@ -36,3 +36,10 @@ export const StyledContent = styled(Dialog.Content)<{
     width: ${({ width }) => (width ? width : "400px")};
   }
 `;
+
+export const StyledClose = styled(Dialog.Close)`
+  color: ${theme.color.grey2};
+  &:hover {
+    opacity: 0.7;
+  }
+`;
