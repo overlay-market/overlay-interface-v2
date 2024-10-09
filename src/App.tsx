@@ -9,8 +9,13 @@ import useSDK from "./hooks/useSDK";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
 import useMultichainContext from "./providers/MultichainContextProvider/useMultichainContext";
 import Wallet from "./components/Wallet";
+import { useRef } from "react";
+import useSyncChainQuery from "./hooks/useSyncChainQuery";
 
 const App = () => {
+  const chainIdRef = useRef<number | undefined>(undefined);
+  useSyncChainQuery(chainIdRef);
+
   useSDK();
   const { chainId: contextChainID } = useMultichainContext();
 
