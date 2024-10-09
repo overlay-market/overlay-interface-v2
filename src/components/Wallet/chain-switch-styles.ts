@@ -1,5 +1,6 @@
 import { DropdownMenu } from "@radix-ui/themes";
 import styled from "styled-components";
+import theme from "../../theme";
 
 export const ChainLogo = styled.div<{ src: string }>`
   background: no-repeat center/contain url(${({ src }) => src});
@@ -8,7 +9,7 @@ export const ChainLogo = styled.div<{ src: string }>`
 `;
 
 export const DropdownContent = styled(DropdownMenu.Content)`
-  background-color: #2E3343;
+  background-color: ${theme.color.grey4};
   border-radius: 8px;
   padding: 10px 0px;
   width: 232px;
@@ -25,7 +26,7 @@ export const DropdownItem = styled(DropdownMenu.Item)`
   cursor: pointer;
   
   &:hover {
-    background-color: #202431;
+    background-color: ${theme.color.background};
     font-weight: 700;
     border-radius: 0px;
   }

@@ -1,6 +1,6 @@
 const theme = {
   color: {
-    background: '#2C2C2C',
+    background: '#171721',
     white: '#FFFFFF',
     black: '#000000',
     green1: '#5FD0AB',
@@ -15,7 +15,7 @@ const theme = {
     grey1: '#F2F2F2',
     grey2: '#ECECEC',
     grey3: '#A8A6A6',
-    grey4: '#393939',
+    grey4: '#252534',
     grey5: '#373A44',
     grey6: '#2E3343',
     grey7: '#111111',

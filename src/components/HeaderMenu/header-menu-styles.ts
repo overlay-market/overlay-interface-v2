@@ -3,7 +3,7 @@ import styled from "styled-components";
 import theme from "../../theme";
 
 export const DropdownContent = styled(DropdownMenu.Content)`
-  background-color: #2E3343;
+  background-color: ${theme.color.grey4};
   border-radius: 8px;
   padding: 10px 0px;
   width: 240px;
@@ -20,7 +20,7 @@ export const DropdownItem = styled(DropdownMenu.Item)`
   cursor: pointer;
   
   &:hover {
-    background-color: #202431;
+    background-color: ${theme.color.background};
     border-radius: 0px;
   }
 `;
@@ -49,7 +49,7 @@ export const HeaderMenuButton = styled.div`
   padding: 8px;
   border-radius: 8px;
   gap: 8px;
-  background: ${theme.color.grey6};
+  background: ${theme.color.grey4};
   position: relative;
   outline: none;
   border: 0;
