@@ -3,6 +3,7 @@ import { GradientOutlineButton } from "../Button";
 import theme from "../../theme";
 import Web3Status from "./Web3Status";
 import ChainSwitch from "./ChainSwitch";
+import HeaderMenu from "../HeaderMenu";
 
 const Wallet: React.FC = () => {
   return (
@@ -30,6 +31,7 @@ const Wallet: React.FC = () => {
           }}
         />
         <ChainSwitch />
+        <HeaderMenu />
         <Web3Status />
       </Flex>
     </Box>
