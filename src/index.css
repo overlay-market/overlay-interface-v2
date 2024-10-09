@@ -22,6 +22,10 @@
     --gray-12: #ECECEC;
   }
 
+  .rt-BaseMenuViewport {
+    padding: 0 !important; /* Force removal of padding */
+  }
+
   
 }
 

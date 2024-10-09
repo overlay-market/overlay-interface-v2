@@ -1,5 +1,8 @@
 import { Chain, defineChain } from 'viem'
 import { arbitrumSepolia, berachainTestnetbArtio } from 'viem/chains'
+import ArbitrumSepoliaLogo from "../assets/images/arbitrum-testnet-logo.png";
+import ImolaLogo from "../assets/images/imola-logo.png";
+import BartioLogo from "../assets/images/bartio-logo.png";
 
 export enum SUPPORTED_CHAINID {
   MAINNET = 1, //at launch
@@ -43,5 +46,26 @@ export const VIEM_CHAINS: { [key: number]: Chain} = {
   [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: arbitrumSepolia,
   [SUPPORTED_CHAINID.BARTIO]: berachainTestnetbArtio,
   [SUPPORTED_CHAINID.IMOLA]: imola,
+};
+
+export const NETWORK_ICONS: { [chainId in SUPPORTED_CHAINID | number]: string } =
+  {
+    [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
+    [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
+    [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
+  };
+
+
+export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
+  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: "Arbitrum Sepolia",
+  [SUPPORTED_CHAINID.IMOLA]: "Movement",
+  [SUPPORTED_CHAINID.BARTIO]: "Berachain bArtio",
+};
+
+export const CHAIN_LIST_ORDER: { [x: number]: number } = {
+  [1]: SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
+  [2]: SUPPORTED_CHAINID.BARTIO,
+  [3]: SUPPORTED_CHAINID.IMOLA,
+  
 };
  

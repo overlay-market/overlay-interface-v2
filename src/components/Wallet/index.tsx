@@ -2,6 +2,7 @@ import { Box, Flex } from "@radix-ui/themes";
 import { GradientOutlineButton } from "../Button";
 import theme from "../../theme";
 import Web3Status from "./Web3Status";
+import ChainSwitch from "./ChainSwitch";
 
 const Wallet: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const Wallet: React.FC = () => {
             console.log("buy OV!");
           }}
         />
+        <ChainSwitch />
         <Web3Status />
       </Flex>
     </Box>
