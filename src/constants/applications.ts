@@ -4,3 +4,7 @@ export enum MARKET_CHART_URL {
   BARTIO = 'https://api.overlay.market/bartio-charts/v1/charts',
   DEFAULT = 'https://api.overlay.market/charts/v1/charts',
 }
+
+// export const DEFAULT_MARKET_ID = encodeURIComponent("Counter-Strike 2 Skins")
+export const DEFAULT_MARKET_ID = encodeURIComponent("Knives - CS2 Skins")
+// export const DEFAULT_MARKET_ID = encodeURIComponent("BTC Dominance")
