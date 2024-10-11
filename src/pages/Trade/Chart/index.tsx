@@ -12,6 +12,7 @@ import Datafeed from "./chartDatafeed";
 import moment from "moment";
 import { getMarketChartUrl } from "./helpers";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 
 const TVChartContainer = styled.div`
   height: 561px;
@@ -35,43 +36,29 @@ export interface ChartContainerProps {
   theme: ChartingLibraryWidgetOptions["theme"];
 }
 
-type ChartProps = {
-  marketAddress: string;
-  marketName: string;
-  longPrice: string;
-  shortPrice: string;
-};
-
-const Chart: React.FC<ChartProps> = ({
-  marketAddress,
-  marketName,
-  longPrice,
-  shortPrice,
-}) => {
+const Chart: React.FC = () => {
   const chartContainerRef =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
   const { chainId } = useMultichainContext();
 
-  const [ask, setAsk] = useState(Number(longPrice));
-  const [bid, setBid] = useState(Number(shortPrice));
+  const { currentMarket: market } = useCurrentMarketState();
+
+  const [ask, setAsk] = useState<number>(0);
+  const [bid, setBid] = useState<number>(0);
 
   useEffect(() => {
-    if (isNaN(ask)) {
-      setAsk(Number(longPrice));
+    if (market) {
+      setAsk(Number(market?.parsedAsk.replaceAll(",", "")));
+      setBid(Number(market?.parsedBid.replaceAll(",", "")));
     }
-    if (isNaN(bid)) {
-      setBid(Number(shortPrice));
-    }
-    setAsk(Number(longPrice));
-    setBid(Number(shortPrice));
-  }, [longPrice, shortPrice]);
+  }, [market]);
 
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
   const longPriceLineRef = useRef<EntityId | null>(null);
   const shortPriceLineRef = useRef<EntityId | null>(null);
 
   useEffect(() => {
-    if (marketAddress && ask && bid && chainId !== undefined) {
+    if (market && ask && bid && chainId !== undefined) {
       const fractionDigitsAmount = Math.max(
         String(bid + ". ").split(".")[1].length,
         String(ask + ". ").split(".")[1].length
@@ -79,8 +66,8 @@ const Chart: React.FC<ChartProps> = ({
 
       const defaultProps: Omit<ChartContainerProps, "container"> = {
         symbol: JSON.stringify({
-          marketAddress,
-          description: marketName,
+          marketAddress: market.id,
+          description: market.marketName,
           chainId: chainId,
         }),
         interval: "60" as ResolutionString,
@@ -261,18 +248,18 @@ const Chart: React.FC<ChartProps> = ({
         tvWidget.remove();
       };
     }
-  }, [marketAddress, chainId, ask, bid]);
+  }, [market, chainId, ask, bid]);
 
   // Effect to update the longPrice shape
   useEffect(() => {
-    if (tvWidgetRef.current && longPriceLineRef.current && longPrice) {
+    if (tvWidgetRef.current && longPriceLineRef.current && ask) {
       const currentTime = Date.now() / 1000;
       const chart = tvWidgetRef.current?.activeChart();
 
       chart.removeEntity(longPriceLineRef.current);
 
       const newLongPriceLine = chart.createMultipointShape(
-        [{ time: currentTime, price: Number(longPrice) }],
+        [{ time: currentTime, price: ask }],
         {
           shape: "horizontal_line",
           lock: true,
@@ -294,18 +281,18 @@ const Chart: React.FC<ChartProps> = ({
       );
       longPriceLineRef.current = newLongPriceLine;
     }
-  }, [longPrice]);
+  }, [ask]);
 
   // Effect to update the shortPrice shape
   useEffect(() => {
-    if (tvWidgetRef.current && shortPriceLineRef.current && shortPrice) {
+    if (tvWidgetRef.current && shortPriceLineRef.current && bid) {
       const currentTime = Date.now() / 1000;
       const chart = tvWidgetRef.current?.activeChart();
 
       chart.removeEntity(shortPriceLineRef.current);
 
       const newShortPriceLine = chart.createMultipointShape(
-        [{ time: currentTime, price: Number(shortPrice) }],
+        [{ time: currentTime, price: bid }],
         {
           shape: "horizontal_line",
           lock: true,
@@ -327,7 +314,7 @@ const Chart: React.FC<ChartProps> = ({
       );
       shortPriceLineRef.current = newShortPriceLine;
     }
-  }, [shortPrice]);
+  }, [bid]);
 
   return <TVChartContainer ref={chartContainerRef} />;
 };

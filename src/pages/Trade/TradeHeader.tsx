@@ -8,11 +8,11 @@ import { useEffect, useMemo, useState } from "react";
 import useSDK from "../../hooks/useSDK";
 import { toWei } from "overlay-sdk/dist/common/utils/formatWei";
 import { useTradeState } from "../../state/trade/hooks";
-import { MarketData } from "../../types/marketTypes";
 import {
   toPercentUnit,
   toScientificNumber,
 } from "overlay-sdk/dist/common/utils";
+import { useCurrentMarketState } from "../../state/currentMarket/hooks";
 
 export const limitDigitsInDecimals = (
   input: string | number | null | undefined,
@@ -31,14 +31,12 @@ export const limitDigitsInDecimals = (
   }
 };
 
-type TradeHeaderProps = {
-  market: MarketData | undefined;
-};
-
-const TradeHeader: React.FC<TradeHeaderProps> = ({ market }) => {
+const TradeHeader: React.FC = () => {
   const { marketId } = useParams();
   const sdk = useSDK();
+  const { currentMarket: market } = useCurrentMarketState();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
+
   const [price, setPrice] = useState<string>("");
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
   const [funding, setFunding] = useState<string>("-");
@@ -55,7 +53,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ market }) => {
             toWei(typedValue),
             toWei(selectedLeverage),
             isLong,
-            5
+            8
           );
           price && setPrice(limitDigitsInDecimals(price as string));
         } catch (error) {
@@ -153,6 +151,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ market }) => {
                 : theme.color.green2,
             }}
           >
+            {isFundingRatePositive ? `+` : ``}
             {funding}
           </Text>
         </Flex>

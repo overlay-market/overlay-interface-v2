@@ -9,6 +9,10 @@ import useSDK from "../../hooks/useSDK";
 import { MarketData } from "../../types/marketTypes";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import Loader from "../../components/Loader";
+import {
+  useCurrentMarketActionHandlers,
+  useCurrentMarketState,
+} from "../../state/currentMarket/hooks";
 
 export const limitDigitsInDecimals = (
   input: string | number | null | undefined,
@@ -28,18 +32,14 @@ export const limitDigitsInDecimals = (
 };
 
 const Trade: React.FC = () => {
-  const { handleTradeStateReset } = useTradeActionHandlers();
   const { marketId } = useParams();
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
+  const { currentMarket } = useCurrentMarketState();
+  const { handleTradeStateReset } = useTradeActionHandlers();
+  const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
 
   const [markets, setMarkets] = useState<MarketData[] | undefined>(undefined);
-  const [currentMarket, setCurrentMarket] = useState<MarketData | undefined>(
-    undefined
-  );
-
-  const [longPrice, setLongPrice] = useState<string>("");
-  const [shortPrice, setShortPrice] = useState<string>("");
 
   useEffect(() => {
     const fetchActiveMarkets = async () => {
@@ -58,19 +58,12 @@ const Trade: React.FC = () => {
 
   useEffect(() => {
     if (markets) {
-      const curMarket = markets.find(
+      const currentMarket = markets.find(
         (market) => market.marketName === marketId
       );
-      curMarket && setCurrentMarket(curMarket);
+      currentMarket && handleCurrentMarketSet(currentMarket);
     }
   }, [marketId, chainId, markets]);
-
-  useEffect(() => {
-    if (currentMarket) {
-      setLongPrice(currentMarket.parsedAsk);
-      setShortPrice(currentMarket.parsedBid);
-    }
-  }, [currentMarket]);
 
   useEffect(() => {
     handleTradeStateReset();
@@ -78,7 +71,8 @@ const Trade: React.FC = () => {
 
   return (
     <Flex direction="column" width={"100%"}>
-      <TradeHeader market={currentMarket} />
+      <TradeHeader />
+
       <Flex direction="column" gap="20px">
         <Flex
           height={{ initial: "auto", sm: "561px" }}
@@ -89,12 +83,7 @@ const Trade: React.FC = () => {
         >
           {currentMarket ? (
             <>
-              <Chart
-                marketAddress={currentMarket?.id}
-                marketName={currentMarket?.marketName}
-                longPrice={longPrice.replaceAll(",", "")}
-                shortPrice={shortPrice.replaceAll(",", "")}
-              />
+              <Chart />
               <TradeWidget />
             </>
           ) : (
