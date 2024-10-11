@@ -11,6 +11,7 @@ import styled from "styled-components";
 import Datafeed from "./chartDatafeed";
 import moment from "moment";
 import { getMarketChartUrl } from "./helpers";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 
 const TVChartContainer = styled.div`
   height: 561px;
@@ -35,15 +36,21 @@ export interface ChartContainerProps {
 }
 
 type ChartProps = {
-  marketId?: string;
-  longPrice: string | number;
-  shortPrice: string | number;
+  marketAddress: string;
+  marketName: string;
+  longPrice: string;
+  shortPrice: string;
 };
 
-const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
+const Chart: React.FC<ChartProps> = ({
+  marketAddress,
+  marketName,
+  longPrice,
+  shortPrice,
+}) => {
   const chartContainerRef =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
-  const chainId = 80084;
+  const { chainId } = useMultichainContext();
 
   const [ask, setAsk] = useState(Number(longPrice));
   const [bid, setBid] = useState(Number(shortPrice));
@@ -55,6 +62,8 @@ const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
     if (isNaN(bid)) {
       setBid(Number(shortPrice));
     }
+    setAsk(Number(longPrice));
+    setBid(Number(shortPrice));
   }, [longPrice, shortPrice]);
 
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
@@ -62,7 +71,7 @@ const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
   const shortPriceLineRef = useRef<EntityId | null>(null);
 
   useEffect(() => {
-    if (marketId && ask && bid && chainId !== undefined) {
+    if (marketAddress && ask && bid && chainId !== undefined) {
       const fractionDigitsAmount = Math.max(
         String(bid + ". ").split(".")[1].length,
         String(ask + ". ").split(".")[1].length
@@ -70,8 +79,8 @@ const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
 
       const defaultProps: Omit<ChartContainerProps, "container"> = {
         symbol: JSON.stringify({
-          marketId,
-          description: "market name!!!",
+          marketAddress,
+          description: marketName,
           chainId: chainId,
         }),
         interval: "60" as ResolutionString,
@@ -252,7 +261,7 @@ const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
         tvWidget.remove();
       };
     }
-  }, [marketId, chainId, ask, bid]);
+  }, [marketAddress, chainId, ask, bid]);
 
   // Effect to update the longPrice shape
   useEffect(() => {

@@ -8,6 +8,24 @@ import { useParams } from "react-router-dom";
 import useSDK from "../../hooks/useSDK";
 import { MarketData } from "../../types/marketTypes";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
+import Loader from "../../components/Loader";
+
+export const limitDigitsInDecimals = (
+  input: string | number | null | undefined,
+  sigFig: number = 4
+) => {
+  if (Number(input) < 1) {
+    return Number(input).toLocaleString("en-US", {
+      maximumSignificantDigits: sigFig,
+      minimumSignificantDigits: sigFig,
+    });
+  } else {
+    return Number(input).toLocaleString("en-US", {
+      maximumFractionDigits: sigFig,
+      minimumFractionDigits: sigFig,
+    });
+  }
+};
 
 const Trade: React.FC = () => {
   const { handleTradeStateReset } = useTradeActionHandlers();
@@ -19,6 +37,9 @@ const Trade: React.FC = () => {
   const [currentMarket, setCurrentMarket] = useState<MarketData | undefined>(
     undefined
   );
+
+  const [longPrice, setLongPrice] = useState<string>("");
+  const [shortPrice, setShortPrice] = useState<string>("");
 
   useEffect(() => {
     const fetchActiveMarkets = async () => {
@@ -44,8 +65,12 @@ const Trade: React.FC = () => {
     }
   }, [marketId, chainId, markets]);
 
-  const longPrice = "17.1916".toString();
-  const shortPrice = "17.0784".toString();
+  useEffect(() => {
+    if (currentMarket) {
+      setLongPrice(currentMarket.parsedAsk);
+      setShortPrice(currentMarket.parsedBid);
+    }
+  }, [currentMarket]);
 
   useEffect(() => {
     handleTradeStateReset();
@@ -62,12 +87,26 @@ const Trade: React.FC = () => {
           align={{ initial: "center", sm: "start" }}
           px={{ initial: "20px", sm: "0" }}
         >
-          <Chart
-            marketId={marketId}
-            longPrice={longPrice.replaceAll(",", "")}
-            shortPrice={shortPrice.replaceAll(",", "")}
-          />
-          <TradeWidget />
+          {currentMarket ? (
+            <>
+              <Chart
+                marketAddress={currentMarket?.id}
+                marketName={currentMarket?.marketName}
+                longPrice={longPrice.replaceAll(",", "")}
+                shortPrice={shortPrice.replaceAll(",", "")}
+              />
+              <TradeWidget />
+            </>
+          ) : (
+            <Flex
+              width={"100%"}
+              height={"100%"}
+              align={"center"}
+              justify={"center"}
+            >
+              <Loader />
+            </Flex>
+          )}
         </Flex>
         <Box>Positions</Box>
       </Flex>
