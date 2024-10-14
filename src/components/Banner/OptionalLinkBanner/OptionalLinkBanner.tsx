@@ -1,40 +1,36 @@
-import { Flex, Text } from "@radix-ui/themes";
-import styled from "styled-components";
-import { StyledOptionalLinkBanner } from "./OptionalLinkBanner_";
+import React from "react";
+import {
+  StyledOptionalLinkBanner,
+  StyledFlex,
+  SubtitleText,
+  TitleText,
+  LinkText,
+  LinkIcon,
+} from "../Banners_";
+import { theme } from "../../../theme/theme";
 
-const StyledFlex = styled(Flex)`
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-`;
-
-const TitleText = styled(Text)`
-  font-size: 20px;
-  font-weight: 500;
-`;
-
-const SubtitleText = styled(Text)`
-  font-size: 16px;
-  font-weight: 400;
-`;
-
-interface OptionalLinkBanner {
+interface OptionalLinkBannerProps {
   Title: string;
   Name: string;
   Link: string;
 }
 
-export const OptionalLinkBanner = ({
+export const OptionalLinkBanner: React.FC<OptionalLinkBannerProps> = ({
   Title,
   Name,
   Link,
-}: OptionalLinkBanner) => {
+}) => {
   return (
     <StyledOptionalLinkBanner>
       <StyledFlex>
         <SubtitleText>{Title}</SubtitleText>
-        <TitleText>{Name}</TitleText>
-        <SubtitleText>{Link}</SubtitleText>
+        <TitleText style={{ color: theme.color.darkBlue }}>
+          {Name} is Live
+        </TitleText>
+        <LinkText to={"link"}>
+          {Link}
+          <LinkIcon />
+        </LinkText>
       </StyledFlex>
     </StyledOptionalLinkBanner>
   );

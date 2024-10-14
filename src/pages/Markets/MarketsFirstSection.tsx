@@ -4,12 +4,16 @@ import { PromotedBanner } from "../../components/Banner/PromotedBanner/PromotedB
 
 export const FirstSection = () => {
   return (
-    <Flex gap="3" style={{ width: "100%", marginLeft: "50px" }}>
+    <Flex gap="3" style={{ marginLeft: "50px" }}>
       <Box flexGrow="7" flexShrink="1" flexBasis="0%">
-        <PromotedBanner Title="Title" Name="Name" Value="Value" />
+        <PromotedBanner
+          Title="CGMI"
+          Name="Chess Grand Masters Index"
+          Value="194.21"
+        />
       </Box>
       <Box flexGrow="3" flexShrink="1" flexBasis="0%">
-        <OptionalLinkBanner Title="Title" Name="Name" Link="Link" />
+        <OptionalLinkBanner Title="Governance" Name="OIP-78" Link="Vote Now" />
       </Box>
     </Flex>
   );
