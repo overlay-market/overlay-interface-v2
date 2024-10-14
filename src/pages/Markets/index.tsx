@@ -11,6 +11,7 @@ const Markets: React.FC = () => {
       <FirstSection />
       <Carousel />
       <MarketsTable />
+      Markets
     </Flex>
   );
 };
