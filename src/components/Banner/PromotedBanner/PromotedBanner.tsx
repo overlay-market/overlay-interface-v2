@@ -1,36 +1,26 @@
-import { Flex, Text } from "@radix-ui/themes";
-import styled from "styled-components";
-import { StyledPromotedBanner } from "./PromotedBanner_";
+import React from "react";
+import {
+  StyledPromotedBanner,
+  StyledFlex,
+  SubtitleText,
+  TitleText,
+  CardsValue,
+} from "../Banners_";
+import { theme } from "../../../theme/theme";
 
-const StyledFlex = styled(Flex)`
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-`;
-
-const TitleText = styled(Text)`
-  font-size: 20px;
-  font-weight: 500;
-`;
-
-const SubtitleText = styled(Text)`
-  font-size: 16px;
-  font-weight: 400;
-`;
-
-interface PromotedBanner {
+interface PromotedBannerProps {
   Title: string;
   Name: string;
   Value: string;
 }
 
-export const PromotedBanner = ({ Title, Name, Value }: PromotedBanner) => {
+export const PromotedBanner = ({ Title, Name, Value }: PromotedBannerProps) => {
   return (
     <StyledPromotedBanner>
       <StyledFlex>
         <SubtitleText>{Title}</SubtitleText>
-        <TitleText>{Name}</TitleText>
-        <SubtitleText>{Value}</SubtitleText>
+        <TitleText style={{ color: theme.color.grey1 }}>{Name}</TitleText>
+        <CardsValue>${Value}</CardsValue>
       </StyledFlex>
     </StyledPromotedBanner>
   );
