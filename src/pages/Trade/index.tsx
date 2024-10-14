@@ -13,6 +13,7 @@ import {
   useCurrentMarketActionHandlers,
   useCurrentMarketState,
 } from "../../state/currentMarket/hooks";
+import { useMarketsActionHandlers } from "../../state/markets/hooks";
 
 export const limitDigitsInDecimals = (
   input: string | number | null | undefined,
@@ -38,6 +39,7 @@ const Trade: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
+  const { handleMarketsUpdate } = useMarketsActionHandlers();
 
   const [markets, setMarkets] = useState<MarketData[] | undefined>(undefined);
 
@@ -54,7 +56,7 @@ const Trade: React.FC = () => {
     };
 
     fetchActiveMarkets();
-  }, [marketId, chainId]);
+  }, [chainId]);
 
   useEffect(() => {
     if (markets) {
@@ -64,6 +66,12 @@ const Trade: React.FC = () => {
       currentMarket && handleCurrentMarketSet(currentMarket);
     }
   }, [marketId, chainId, markets]);
+
+  useEffect(() => {
+    if (markets) {
+      handleMarketsUpdate(markets);
+    }
+  }, [chainId, markets]);
 
   useEffect(() => {
     handleTradeStateReset();
