@@ -11,11 +11,8 @@ import useOutsideClick from "../../../hooks/useOutsideClick";
 import React, { useState, Fragment } from "react";
 import { useMarketsState } from "../../../state/markets/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import {
-  toPercentUnit,
-  toScientificNumber,
-} from "overlay-sdk/dist/common/utils";
 import MarketItem from "./MarketItem";
+import { toPercentUnit, toScientificNumber } from "overlay-sdk";
 
 const MarketsList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);

@@ -6,14 +6,11 @@ import {
   useTradeState,
 } from "../../../state/trade/hooks";
 import {
-  toPercentUnit,
-  toScientificNumber,
-} from "overlay-sdk/dist/common/utils";
-import {
   LongPositionSelectButton,
   ShortPositionSelectButton,
 } from "./position-select-component-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { toPercentUnit, toScientificNumber } from "overlay-sdk";
 
 const PositionSelectComponent: React.FC = () => {
   const { currentMarket: market } = useCurrentMarketState();

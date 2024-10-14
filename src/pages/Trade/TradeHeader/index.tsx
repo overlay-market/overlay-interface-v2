@@ -6,30 +6,14 @@ import { StyledSeparator } from "./trade-header-styles";
 import { useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import useSDK from "../../../hooks/useSDK";
-import { toWei } from "overlay-sdk/dist/common/utils/formatWei";
 import { useTradeState } from "../../../state/trade/hooks";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
+  limitDigitsInDecimals,
   toPercentUnit,
   toScientificNumber,
-} from "overlay-sdk/dist/common/utils";
-import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-
-export const limitDigitsInDecimals = (
-  input: string | number | null | undefined,
-  sigFig: number = 4
-) => {
-  if (Number(input) < 1) {
-    return Number(input).toLocaleString("en-US", {
-      maximumSignificantDigits: sigFig,
-      minimumSignificantDigits: sigFig,
-    });
-  } else {
-    return Number(input).toLocaleString("en-US", {
-      maximumFractionDigits: sigFig,
-      minimumFractionDigits: sigFig,
-    });
-  }
-};
+  toWei,
+} from "overlay-sdk";
 
 const TradeHeader: React.FC = () => {
   const { marketId } = useParams();
