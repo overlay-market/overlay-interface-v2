@@ -1,18 +1,18 @@
 import { Flex, Text, Box } from "@radix-ui/themes";
-import theme from "../../theme";
-import ProgressBar from "../../components/ProgressBar";
-import MarketsDropdownList from "./MarketsDropdownList";
+import theme from "../../../theme";
+import ProgressBar from "../../../components/ProgressBar";
+import MarketsList from "./MarketsList";
 import { StyledSeparator } from "./trade-header-styles";
 import { useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import useSDK from "../../hooks/useSDK";
+import useSDK from "../../../hooks/useSDK";
 import { toWei } from "overlay-sdk/dist/common/utils/formatWei";
-import { useTradeState } from "../../state/trade/hooks";
+import { useTradeState } from "../../../state/trade/hooks";
 import {
   toPercentUnit,
   toScientificNumber,
 } from "overlay-sdk/dist/common/utils";
-import { useCurrentMarketState } from "../../state/currentMarket/hooks";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 
 export const limitDigitsInDecimals = (
   input: string | number | null | undefined,
@@ -121,7 +121,7 @@ const TradeHeader: React.FC = () => {
         height={"100%"}
         style={{ textAlign: "end" }}
       >
-        <MarketsDropdownList />
+        <MarketsList />
 
         <StyledSeparator orientation="vertical" size="4" />
 
