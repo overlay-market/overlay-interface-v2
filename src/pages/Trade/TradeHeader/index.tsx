@@ -14,9 +14,11 @@ import {
   toScientificNumber,
   toWei,
 } from "overlay-sdk";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 
 const TradeHeader: React.FC = () => {
   const { marketId } = useParams();
+  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
@@ -34,7 +36,7 @@ const TradeHeader: React.FC = () => {
         try {
           const price = await sdk.trade.getPrice(
             marketId,
-            toWei(typedValue),
+            typedValue ? toWei(typedValue) : undefined,
             toWei(selectedLeverage),
             isLong,
             8
@@ -47,7 +49,7 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchPrice();
-  }, [marketId, typedValue, selectedLeverage, isLong]);
+  }, [marketId, typedValue, selectedLeverage, isLong, chainId]);
 
   useEffect(() => {
     market &&

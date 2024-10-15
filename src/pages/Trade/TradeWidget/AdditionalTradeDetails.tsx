@@ -46,7 +46,7 @@ const AdditionalTradeDetails: React.FC = () => {
 
   useEffect(() => {
     const fetchLiquidationPriceEstimate = async () => {
-      if (marketId && address) {
+      if (marketId && address && typedValue) {
         try {
           const estLiqPrice = await sdk.trade.getLiquidationPriceEstimate(
             marketId,
