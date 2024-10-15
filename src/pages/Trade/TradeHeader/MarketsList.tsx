@@ -12,7 +12,12 @@ import React, { useState, Fragment } from "react";
 import { useMarketsState } from "../../../state/markets/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import MarketItem from "./MarketItem";
-import { toPercentUnit, toScientificNumber } from "overlay-sdk";
+import {
+  limitDigitsInDecimals,
+  toPercentUnit,
+  toScientificNumber,
+} from "overlay-sdk";
+import { HeaderMarketName } from "./markets-list-styles";
 
 const MarketsList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,9 +46,7 @@ const MarketsList: React.FC = () => {
             fallback={<Text style={{ fontSize: "6px" }}>{`logo`}</Text>}
             color="gray"
           />
-          <Text weight={"medium"} truncate>
-            {currentMarket?.marketName}
-          </Text>
+          <HeaderMarketName>{currentMarket?.marketName}</HeaderMarketName>
         </Flex>
 
         {isOpen ? (
@@ -69,7 +72,9 @@ const MarketsList: React.FC = () => {
                   const currencyPrice = `${market.priceCurrency}${
                     market.priceCurrency === "%"
                       ? toPercentUnit(market.parsedMid)
-                      : toScientificNumber(market.parsedMid)
+                      : toScientificNumber(
+                          limitDigitsInDecimals(market.parsedMid)
+                        )
                   }`;
                   return (
                     <Fragment key={market.id}>
