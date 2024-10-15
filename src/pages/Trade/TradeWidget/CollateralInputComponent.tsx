@@ -73,7 +73,7 @@ const CollateralInputComponent: React.FC = () => {
     <Box
       width={"100%"}
       p={"8px"}
-      style={{ borderRadius: "8px", background: theme.color.grey7 }}
+      style={{ borderRadius: "8px", background: theme.color.grey4 }}
     >
       <Flex direction={"column"} gap="22px">
         <Flex justify="between">

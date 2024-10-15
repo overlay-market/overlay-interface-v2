@@ -28,6 +28,7 @@ const TradeWidget: React.FC = () => {
       px={"8px"}
       pt={"8px"}
       pb={"20px"}
+      flexShrink={"0"}
     >
       <PositionSelectComponent />
 

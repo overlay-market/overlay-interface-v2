@@ -10,7 +10,11 @@ import {
   ShortPositionSelectButton,
 } from "./position-select-component-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { toPercentUnit, toScientificNumber } from "overlay-sdk";
+import {
+  limitDigitsInDecimals,
+  toPercentUnit,
+  toScientificNumber,
+} from "overlay-sdk";
 
 const PositionSelectComponent: React.FC = () => {
   const { currentMarket: market } = useCurrentMarketState();
@@ -26,7 +30,7 @@ const PositionSelectComponent: React.FC = () => {
         `${market.priceCurrency}${
           market.priceCurrency === "%"
             ? toPercentUnit(market.parsedAsk)
-            : toScientificNumber(market.parsedAsk)
+            : toScientificNumber(limitDigitsInDecimals(market.parsedAsk))
         }`
       );
     market &&
@@ -34,7 +38,7 @@ const PositionSelectComponent: React.FC = () => {
         `${market.priceCurrency}${
           market.priceCurrency === "%"
             ? toPercentUnit(market.parsedBid)
-            : toScientificNumber(market.parsedBid)
+            : toScientificNumber(limitDigitsInDecimals(market.parsedBid))
         }`
       );
   }, [market]);
