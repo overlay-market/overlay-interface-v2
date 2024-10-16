@@ -15,7 +15,21 @@ export const useCurrentMarketActionHandlers = (): {
 
   const handleCurrentMarketSet = useCallback(
     (currentMarket: MarketData) => {
-      dispatch(setCurrentMarket({ currentMarket }))
+      const currentMarketParsed = {
+        ...currentMarket,
+        ask: currentMarket.ask.toString(),
+        bid: currentMarket.bid.toString(),
+        capOi: currentMarket.capOi.toString(),
+        circuitBreakerLevel: currentMarket.circuitBreakerLevel.toString(),
+        fundingRate: currentMarket.fundingRate.toString(),
+        mid: currentMarket.mid.toString(),
+        oiLong: currentMarket.oiLong.toString(),
+        oiShort: currentMarket.oiShort.toString(),  
+        volumeAsk: currentMarket.volumeAsk.toString(),
+        volumeBid: currentMarket.volumeBid.toString(),
+      }
+
+      dispatch(setCurrentMarket({ currentMarket: currentMarketParsed }))
     },
     [dispatch]
   )

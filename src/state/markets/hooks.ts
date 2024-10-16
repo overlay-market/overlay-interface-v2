@@ -8,7 +8,6 @@ export function useMarketsState(): AppState['markets'] {
   return useAppSelector(state => state.markets)
 }
 
-
 export const useMarketsActionHandlers = (): {
   handleMarketsUpdate: (markets: MarketData[]) => void;
 } => {
@@ -16,7 +15,21 @@ export const useMarketsActionHandlers = (): {
 
   const handleMarketsUpdate = useCallback(
     (markets: MarketData[]) => {
-      dispatch(updateMarkets({ markets }))
+      const marketsParsed = markets.map((market) => {return {
+        ...market,
+        ask: market.ask.toString(),
+        bid: market.bid.toString(),
+        capOi: market.capOi.toString(),
+        circuitBreakerLevel: market.circuitBreakerLevel.toString(),
+        fundingRate: market.fundingRate.toString(),
+        mid: market.mid.toString(),
+        oiLong: market.oiLong.toString(),
+        oiShort: market.oiShort.toString(),  
+        volumeAsk: market.volumeAsk.toString(),
+        volumeBid: market.volumeBid.toString(),
+      }})
+
+      dispatch(updateMarkets({ markets: marketsParsed }))
     },
     [dispatch]
   )

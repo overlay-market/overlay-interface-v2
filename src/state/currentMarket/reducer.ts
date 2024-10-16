@@ -2,10 +2,10 @@ import { createReducer } from "@reduxjs/toolkit";
 import {
   setCurrentMarket
 } from "./actions";
-import { MarketData } from "../../types/marketTypes";
+import { MarketDataParsed } from "../../types/marketTypes";
 
 export interface CurrentMarketState {
-  readonly currentMarket: MarketData | undefined;
+  readonly currentMarket: MarketDataParsed | undefined;
 }
 
 export const initialState: CurrentMarketState = {
