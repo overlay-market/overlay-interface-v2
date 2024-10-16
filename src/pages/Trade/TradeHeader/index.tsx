@@ -15,6 +15,7 @@ import {
   toWei,
 } from "overlay-sdk";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 
 const TradeHeader: React.FC = () => {
   const { marketId } = useParams();
@@ -25,12 +26,15 @@ const TradeHeader: React.FC = () => {
 
   const [price, setPrice] = useState<string>("");
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
-  const [funding, setFunding] = useState<string>("-");
-  const [long, setLong] = useState<number>(0);
-  const [short, setShort] = useState<number>(0);
-  const [total, setTotal] = useState<number>(0);
+  const [funding, setFunding] = useState<string | undefined>(undefined);
+  const [shortPercentageOfTotalOi, setShortPercentageOfTotalOi] =
+    useState<string>("0");
+  const [longPercentageOfTotalOi, setLongPercentageOfTotalOi] =
+    useState<string>("0");
 
   useEffect(() => {
+    let interval: NodeJS.Timeout;
+
     const fetchPrice = async () => {
       if (marketId) {
         try {
@@ -49,7 +53,9 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchPrice();
-  }, [marketId, typedValue, selectedLeverage, isLong, chainId]);
+    interval = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [marketId, typedValue, selectedLeverage, isLong, chainId, sdk]);
 
   useEffect(() => {
     market &&
@@ -64,33 +70,49 @@ const TradeHeader: React.FC = () => {
   }, [price, market]);
 
   useEffect(() => {
-    market && setFunding(`${market.parsedDailyFundingRate}%`);
-  }, [market]);
+    let interval: NodeJS.Timeout;
 
-  const isFundingRatePositive = useMemo(() => {
-    return Math.sign(Number(market?.parsedDailyFundingRate)) > 0;
-  }, [market]);
+    const fetchFunding = async () => {
+      if (marketId) {
+        try {
+          const funding = await sdk.trade.getFunding(marketId);
+          funding && setFunding(funding);
+        } catch (error) {
+          console.error("Error fetching funding:", error);
+        }
+      }
+    };
+
+    fetchFunding();
+    interval = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [marketId, chainId, sdk]);
 
   useEffect(() => {
-    if (market?.parsedOiLong !== undefined)
-      setLong(Number(market.parsedOiLong));
-    if (market?.parsedOiShort !== undefined)
-      setShort(Number(market.parsedOiShort));
-  }, [market]);
+    let interval: NodeJS.Timeout;
 
-  useEffect(() => setTotal(long + short), [long, short]);
+    const fetchOiBalance = async () => {
+      if (marketId) {
+        try {
+          const oiBalance = await sdk.trade.getOIBalance(marketId);
+          oiBalance &&
+            setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
+          oiBalance &&
+            setLongPercentageOfTotalOi(oiBalance.longPercentageOfTotalOi);
+        } catch (error) {
+          console.error("Error fetching oi balance:", error);
+        }
+      }
+    };
 
-  const defaultZero = "00.00";
+    fetchOiBalance();
+    interval = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [marketId, chainId, sdk]);
 
-  const shortPercentageOfTotalOi =
-    Number.isFinite(short) && Number.isFinite(total) && total > 0
-      ? ((short / total) * 100).toFixed(2)
-      : defaultZero;
-
-  const longPercentageOfTotalOi =
-    Number.isFinite(long) && Number.isFinite(total) && total > 0
-      ? ((long / total) * 100).toFixed(2)
-      : defaultZero;
+  const isFundingRatePositive = useMemo(() => {
+    return Math.sign(Number(funding)) > 0;
+  }, [funding]);
 
   return (
     <Box
@@ -138,7 +160,7 @@ const TradeHeader: React.FC = () => {
             }}
           >
             {isFundingRatePositive ? `+` : ``}
-            {funding}
+            {funding ? `${funding}%` : `-`}
           </Text>
         </Flex>
 

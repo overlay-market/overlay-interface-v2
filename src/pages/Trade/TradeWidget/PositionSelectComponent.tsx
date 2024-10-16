@@ -15,33 +15,69 @@ import {
   toPercentUnit,
   toScientificNumber,
 } from "overlay-sdk";
+import { useParams } from "react-router-dom";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import useSDK from "../../../hooks/useSDK";
+import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 
 const PositionSelectComponent: React.FC = () => {
+  const { marketId } = useParams();
+  const { chainId } = useMultichainContext();
+  const sdk = useSDK();
+
   const { currentMarket: market } = useCurrentMarketState();
   const { isLong } = useTradeState();
   const { handlePositionSideSelect } = useTradeActionHandlers();
 
-  const [longPrice, setLongPrice] = useState<string>("");
-  const [shortPrice, setShortPrice] = useState<string>("");
+  const [ask, setAsk] = useState<string>("");
+  const [bid, setBid] = useState<string>("");
+  const [currencyAsk, setCurrencyAsk] = useState<string>("-");
+  const [currencyBid, setCurrencyBid] = useState<string>("-");
 
   useEffect(() => {
-    market &&
-      setLongPrice(
+    let interval: NodeJS.Timeout;
+
+    const fetchBidAndAsk = async () => {
+      if (marketId) {
+        try {
+          const bidAndAsk = await sdk.trade.getBidAndAsk(marketId, 8);
+
+          bidAndAsk && setAsk(limitDigitsInDecimals(bidAndAsk.ask as number));
+          bidAndAsk && setBid(limitDigitsInDecimals(bidAndAsk.bid as number));
+        } catch (error) {
+          console.error("Error fetching bid and ask:", error);
+        }
+      }
+    };
+
+    fetchBidAndAsk();
+    interval = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [marketId, chainId, sdk]);
+
+  useEffect(() => {
+    ask &&
+      market &&
+      setCurrencyAsk(
         `${market.priceCurrency}${
           market.priceCurrency === "%"
-            ? toPercentUnit(market.parsedAsk)
-            : toScientificNumber(limitDigitsInDecimals(market.parsedAsk))
+            ? toPercentUnit(ask)
+            : toScientificNumber(ask)
         }`
       );
-    market &&
-      setShortPrice(
+  }, [ask, market]);
+
+  useEffect(() => {
+    bid &&
+      market &&
+      setCurrencyBid(
         `${market.priceCurrency}${
           market.priceCurrency === "%"
-            ? toPercentUnit(market.parsedBid)
-            : toScientificNumber(limitDigitsInDecimals(market.parsedBid))
+            ? toPercentUnit(bid)
+            : toScientificNumber(bid)
         }`
       );
-  }, [market]);
+  }, [bid, market]);
 
   const handleSelectPositionSide = useCallback(
     (isLong: boolean) => {
@@ -62,7 +98,7 @@ const PositionSelectComponent: React.FC = () => {
             Buy
           </Text>
           <Text size={"1"} style={{ color: theme.color.blue1 }}>
-            {longPrice}
+            {currencyAsk}
           </Text>
         </Flex>
       </LongPositionSelectButton>
@@ -76,7 +112,7 @@ const PositionSelectComponent: React.FC = () => {
             Sell
           </Text>
           <Text size={"1"} style={{ color: theme.color.blue1 }}>
-            {shortPrice}
+            {currencyBid}
           </Text>
         </Flex>
       </ShortPositionSelectButton>
