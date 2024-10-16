@@ -1,0 +1,71 @@
+import { Chain, defineChain } from 'viem'
+import { arbitrumSepolia, berachainTestnetbArtio } from 'viem/chains'
+import ArbitrumSepoliaLogo from "../assets/images/arbitrum-testnet-logo.png";
+import ImolaLogo from "../assets/images/imola-logo.png";
+import BartioLogo from "../assets/images/bartio-logo.png";
+
+export enum SUPPORTED_CHAINID {
+  MAINNET = 1, //at launch
+  RINKEBY = 4, //pre-launch only
+  GÖRLI = 5, //pre-launch only
+  ARBITRUM = 42161,
+  ARBITRUM_GÖRLI = 421613,
+  ARBITRUM_SEPOLIA = 421614,
+  IMOLA = 30732,
+  BARTIO = 80084,
+}
+
+export const DEFAULT_NET = SUPPORTED_CHAINID[421614]
+export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.ARBITRUM_SEPOLIA
+
+export const WORKING_CHAINS = [
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.ARBITRUM_SEPOLIA], 
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.IMOLA], 
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.BARTIO],
+]
+ 
+export const imola = defineChain({
+  id: 30732,
+  name: 'Movement',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'MOVE',
+    symbol: 'MOVE',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://overlay-rpc.devnet.imola.movementnetwork.xyz'],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: 'https://explorer.devnet.imola.movementlabs.xyz/#/?network=testnet' },
+  }
+})
+
+export const VIEM_CHAINS: { [key: number]: Chain} = {
+  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: arbitrumSepolia,
+  [SUPPORTED_CHAINID.BARTIO]: berachainTestnetbArtio,
+  [SUPPORTED_CHAINID.IMOLA]: imola,
+};
+
+export const NETWORK_ICONS: { [chainId in SUPPORTED_CHAINID | number]: string } =
+  {
+    [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
+    [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
+    [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
+  };
+
+
+export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
+  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: "Arbitrum Sepolia",
+  [SUPPORTED_CHAINID.IMOLA]: "Movement",
+  [SUPPORTED_CHAINID.BARTIO]: "Berachain bArtio",
+};
+
+export const CHAIN_LIST_ORDER: { [x: number]: number } = {
+  [1]: SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
+  [2]: SUPPORTED_CHAINID.BARTIO,
+  [3]: SUPPORTED_CHAINID.IMOLA,
+  
+};
+ 

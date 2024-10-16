@@ -20,6 +20,7 @@ export const StyledInput = styled.input<{
   background-color: transparent;
   font-size: ${({ fontSize }) => fontSize ?? "16px"};
   font-weight: ${({ fontWeight }) => fontWeight ?? "700"};
+  font-family: Inter;
   text-align: ${({ align }) => (align ? align : "left")};
   height: ${({ height }) => (height ? height : "auto")};
   white-space: nowrap;

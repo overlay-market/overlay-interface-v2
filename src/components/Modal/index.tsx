@@ -1,20 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import theme from "../../theme";
 import { X } from "react-feather";
-import { StyledContent, StyledOverlay } from "./modal-styles";
+import { StyledClose, StyledContent, StyledOverlay } from "./modal-styles";
 
 type ModalProps = {
   minHeight?: string | false;
   maxHeight?: string;
   width?: string;
   maxWidth?: string;
+  fontSizeTitle?: string;
+  textAlignTitle?: "left" | "right" | "center" | "justify";
   borderColor?: string;
   boxShadow?: string;
   triggerElement: React.ReactNode;
   handleClose?: () => void;
   title?: string;
   children?: React.ReactNode;
+  open?: boolean;
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -22,24 +24,24 @@ const Modal: React.FC<ModalProps> = ({
   maxWidth,
   minHeight = false,
   maxHeight,
+  fontSizeTitle = "20px",
+  textAlignTitle = "center",
   borderColor,
   boxShadow,
   triggerElement,
   handleClose,
   title,
   children,
+  open,
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       handleClose && handleClose();
     }
-    setIsOpen(open);
   };
 
   return (
-    <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>{triggerElement}</Dialog.Trigger>
       <Dialog.Portal>
         <StyledOverlay />
@@ -52,14 +54,18 @@ const Modal: React.FC<ModalProps> = ({
           boxShadow={boxShadow}
         >
           <Dialog.Title
-            style={{ margin: "0", fontSize: "20px", textAlign: "center" }}
+            style={{
+              margin: "0",
+              fontSize: fontSizeTitle,
+              textAlign: textAlignTitle,
+            }}
           >
             {title}
           </Dialog.Title>
 
           {children}
 
-          <Dialog.Close
+          <StyledClose
             asChild
             style={{
               position: "absolute",
@@ -68,8 +74,8 @@ const Modal: React.FC<ModalProps> = ({
               cursor: "pointer",
             }}
           >
-            <X size={24} color={theme.color.grey1} />
-          </Dialog.Close>
+            <X size={24} />
+          </StyledClose>
         </StyledContent>
       </Dialog.Portal>
     </Dialog.Root>
