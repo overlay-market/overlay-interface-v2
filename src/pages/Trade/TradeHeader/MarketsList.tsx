@@ -30,11 +30,15 @@ const MarketsList: React.FC = () => {
     <Box ref={ref}>
       <Flex
         width={"260px"}
+        height={`${theme.headerSize.height}`}
         align={"center"}
         justify={"between"}
         p={"12px"}
         gap={"10px"}
-        style={{ cursor: "pointer" }}
+        style={{
+          cursor: "pointer",
+          borderRight: `1px solid ${theme.color.darkBlue}`,
+        }}
         onClick={toggleDropdown}
       >
         <Flex justify={"start"} align={"center"} gap={"10px"}>

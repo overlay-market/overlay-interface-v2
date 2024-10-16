@@ -1,8 +1,13 @@
-import { Flex, Text, Box } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
 import ProgressBar from "../../../components/ProgressBar";
 import MarketsList from "./MarketsList";
-import { StyledSeparator } from "./trade-header-styles";
+import {
+  MarketInfoContainer,
+  ResponsiveEmptyPlaceholder,
+  StyledFlex,
+  TradeHeaderContainer,
+} from "./trade-header-styles";
 import { useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import useSDK from "../../../hooks/useSDK";
@@ -115,75 +120,86 @@ const TradeHeader: React.FC = () => {
   }, [funding]);
 
   return (
-    <Box
-      width={"100%"}
-      height={`${theme.headerSize.height}`}
-      position={"relative"}
-      style={{
-        borderBottom: `1px solid ${theme.color.darkBlue}`,
-      }}
-    >
-      <Flex
-        align={"center"}
-        width={"100%"}
-        height={"100%"}
-        style={{ textAlign: "end" }}
-      >
+    <>
+      <ResponsiveEmptyPlaceholder></ResponsiveEmptyPlaceholder>
+      <TradeHeaderContainer>
         <MarketsList />
 
-        <StyledSeparator orientation="vertical" size="4" />
-
-        <Flex
-          width={"97px"}
-          direction="column"
-          py={"12px"}
-          pr={"12px"}
-          pl={"2px"}
-        >
-          <Text weight="light" style={{ fontSize: "10px" }}>
-            Price
-          </Text>
-          <Text>{currencyPrice}</Text>
-        </Flex>
-
-        <StyledSeparator orientation="vertical" size="4" />
-
-        <Flex width={"97px"} direction={"column"} p={"12px"}>
-          <Text weight="light" style={{ fontSize: "10px" }}>
-            Funding
-          </Text>
-          <Text
+        <MarketInfoContainer>
+          <Flex
+            width={"114px"}
+            height={"100%"}
+            justify={"center"}
+            direction="column"
+            p={"12px"}
+            flexShrink={"0"}
             style={{
-              color: isFundingRatePositive
-                ? theme.color.red2
-                : theme.color.green2,
+              borderRight: `1px solid ${theme.color.darkBlue}`,
             }}
           >
-            {isFundingRatePositive ? `+` : ``}
-            {funding ? `${funding}%` : `-`}
-          </Text>
-        </Flex>
-
-        <StyledSeparator orientation="vertical" size="4" />
-
-        <Flex width={"195px"} direction={"column"} p={"12px"} align={"end"}>
-          <Text weight="light" style={{ fontSize: "10px" }}>
-            OI balance
-          </Text>
-          <Flex gap={"4px"} align={"center"}>
-            <Text style={{ color: theme.color.red2 }}>
-              {shortPercentageOfTotalOi}%
+            <Text weight="light" style={{ fontSize: "10px" }}>
+              Price
             </Text>
-            <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
-            <Text style={{ color: theme.color.green2 }}>
-              {longPercentageOfTotalOi}%
-            </Text>
+            <Text>{currencyPrice}</Text>
           </Flex>
-        </Flex>
 
-        <StyledSeparator orientation="vertical" size="4" />
-      </Flex>
-    </Box>
+          <StyledFlex>
+            <Flex
+              width={"97px"}
+              height={"100%"}
+              direction={"column"}
+              justify={"center"}
+              p={"12px"}
+              style={{
+                borderRight: `1px solid ${theme.color.darkBlue}`,
+              }}
+            >
+              <Text weight="light" style={{ fontSize: "10px" }}>
+                Funding
+              </Text>
+              <Text
+                style={{
+                  color: isFundingRatePositive
+                    ? theme.color.red2
+                    : theme.color.green2,
+                }}
+              >
+                {isFundingRatePositive ? `+` : ``}
+                {funding ? `${funding}%` : `-`}
+              </Text>
+            </Flex>
+
+            <Flex
+              width={"195px"}
+              height={"100%"}
+              direction={"column"}
+              justify={"center"}
+              p={"12px"}
+              align={"end"}
+              style={{
+                borderRight: `1px solid ${theme.color.darkBlue}`,
+              }}
+            >
+              <Text weight="light" style={{ fontSize: "10px" }}>
+                OI balance
+              </Text>
+              <Flex gap={"4px"} align={"center"}>
+                <Text style={{ color: theme.color.red2 }}>
+                  {shortPercentageOfTotalOi}%
+                </Text>
+                <ProgressBar
+                  max={100}
+                  value={Number(shortPercentageOfTotalOi)}
+                />
+                <Text style={{ color: theme.color.green2 }}>
+                  {longPercentageOfTotalOi}%
+                </Text>
+              </Flex>
+            </Flex>
+          </StyledFlex>
+        </MarketInfoContainer>
+      </TradeHeaderContainer>
+    </>
   );
 };
 
