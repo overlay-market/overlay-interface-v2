@@ -9,12 +9,37 @@ import TradeButtonComponent from "./TradeButtonComponent";
 import LeverageSlider from "../../../components/LeverageSlider";
 import PositionSelectComponent from "./PositionSelectComponent";
 import CollateralInputComponent from "./CollateralInputComponent";
+import useSDK from "../../../hooks/useSDK";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { useEffect, useState } from "react";
+import { Address } from "viem";
+import { formatWeiToParsedNumber } from "overlay-sdk";
 
 const TradeWidget: React.FC = () => {
+  const sdk = useSDK();
+  const { currentMarket: market } = useCurrentMarketState();
   const { selectedLeverage } = useTradeState();
   const { handleLeverageSelect } = useTradeActionHandlers();
 
-  const capLeverage = 5;
+  const [capLeverage, setCapleverage] = useState<number>(5);
+
+  useEffect(() => {
+    const fetchCapLeverage = async () => {
+      if (market) {
+        try {
+          const capLeverage = await sdk.market.getCapLeverage(
+            market.id as Address
+          );
+          const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
+          parsedCapLeverage && setCapleverage(parsedCapLeverage);
+        } catch (error) {
+          console.error("Error fetching capLeverage:", error);
+        }
+      }
+    };
+
+    fetchCapLeverage();
+  }, [market]);
 
   const handleLeverageInput = (newValue: number[]) => {
     handleLeverageSelect(newValue[0].toString());
