@@ -22,10 +22,10 @@ export default {
   },
 
   resolveSymbol: async (symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension) => {
-    const {marketId, description, chainId} = JSON.parse(symbolName || '{}')
+    const {marketAddress, description, chainId} = JSON.parse(symbolName || '{}')
     
     const symbolInfo = {
-      ticker: JSON.stringify({marketId, description, chainId}),
+      ticker: JSON.stringify({marketAddress, description, chainId}),
       name: description,
       description: description,
       type: 'crypto',
@@ -40,7 +40,7 @@ export default {
       supported_resolutions: configurationData.supported_resolutions,
       volume_precision: 2,
       data_status: 'streaming',
-      marketAddress: marketId,
+      marketAddress: marketAddress,
       has_intraday: true,
       format: 'volume',
     }
