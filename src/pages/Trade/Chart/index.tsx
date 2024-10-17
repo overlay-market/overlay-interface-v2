@@ -279,68 +279,83 @@ const Chart: React.FC = () => {
 
   // Effect to update the longPrice shape
   useEffect(() => {
-    if (tvWidgetRef.current && longPriceLineRef.current && ask) {
-      const currentTime = Date.now() / 1000;
-      const chart = tvWidgetRef.current?.activeChart();
+    let interval: NodeJS.Timeout;
 
-      chart.removeEntity(longPriceLineRef.current);
+    const updateLongPriceShape = () => {
+      if (tvWidgetRef.current && longPriceLineRef.current && ask) {
+        const currentTime = Date.now() / 1000;
+        const chart = tvWidgetRef.current?.activeChart();
 
-      const newLongPriceLine = chart.createMultipointShape(
-        [{ time: currentTime, price: ask }],
-        {
-          shape: "horizontal_line",
-          lock: true,
-          disableSelection: true,
-          disableSave: true,
-          disableUndo: true,
-          filled: false,
-          zOrder: "top",
-          overrides: {
-            linecolor: "#089981",
-            linewidth: 1,
-            text: "ask",
-            showLabel: true,
-            textcolor: "#089981",
-            horzLabelsAlign: "right",
-            vertLabelsAlign: "bottom",
-          },
-        }
-      );
-      longPriceLineRef.current = newLongPriceLine;
-    }
+        chart.removeEntity(longPriceLineRef.current);
+
+        const newLongPriceLine = chart.createMultipointShape(
+          [{ time: currentTime, price: ask }],
+          {
+            shape: "horizontal_line",
+            lock: true,
+            disableSelection: true,
+            disableSave: true,
+            disableUndo: true,
+            filled: false,
+            zOrder: "top",
+            overrides: {
+              linecolor: "#089981",
+              linewidth: 1,
+              text: "ask",
+              showLabel: true,
+              textcolor: "#089981",
+              horzLabelsAlign: "right",
+              vertLabelsAlign: "bottom",
+            },
+          }
+        );
+
+        longPriceLineRef.current = newLongPriceLine as EntityId;
+      }
+    };
+
+    interval = setInterval(updateLongPriceShape, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
   }, [ask]);
 
   // Effect to update the shortPrice shape
   useEffect(() => {
-    if (tvWidgetRef.current && shortPriceLineRef.current && bid) {
-      const currentTime = Date.now() / 1000;
-      const chart = tvWidgetRef.current?.activeChart();
+    let interval: NodeJS.Timeout;
 
-      chart.removeEntity(shortPriceLineRef.current);
+    const updateShortPriceShape = () => {
+      if (tvWidgetRef.current && shortPriceLineRef.current && bid) {
+        const currentTime = Date.now() / 1000;
+        const chart = tvWidgetRef.current?.activeChart();
 
-      const newShortPriceLine = chart.createMultipointShape(
-        [{ time: currentTime, price: bid }],
-        {
-          shape: "horizontal_line",
-          lock: true,
-          disableSelection: true,
-          disableSave: true,
-          disableUndo: true,
-          filled: false,
-          zOrder: "top",
-          overrides: {
-            linecolor: "#f23645",
-            linewidth: 1,
-            textcolor: "#f23645",
-            text: "bid",
-            showLabel: true,
-            horzLabelsAlign: "right",
-            vertLabelsAlign: "top",
-          },
-        }
-      );
-      shortPriceLineRef.current = newShortPriceLine;
-    }
+        chart.removeEntity(shortPriceLineRef.current);
+
+        const newShortPriceLine = chart.createMultipointShape(
+          [{ time: currentTime, price: bid }],
+          {
+            shape: "horizontal_line",
+            lock: true,
+            disableSelection: true,
+            disableSave: true,
+            disableUndo: true,
+            filled: false,
+            zOrder: "top",
+            overrides: {
+              linecolor: "#f23645",
+              linewidth: 1,
+              textcolor: "#f23645",
+              text: "bid",
+              showLabel: true,
+              horzLabelsAlign: "right",
+              vertLabelsAlign: "top",
+            },
+          }
+        );
+        shortPriceLineRef.current = newShortPriceLine;
+      }
+    };
+
+    interval = setInterval(updateShortPriceShape, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
   }, [bid]);
 
   return <TVChartContainer ref={chartContainerRef} />;
