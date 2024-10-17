@@ -13,6 +13,10 @@ import moment from "moment";
 import { getMarketChartUrl } from "./helpers";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import useSDK from "../../../hooks/useSDK";
+import { useParams } from "react-router-dom";
+import { limitDigitsInDecimals } from "overlay-sdk";
+import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 
 const TVChartContainer = styled.div`
   height: 561px;
@@ -39,19 +43,42 @@ export interface ChartContainerProps {
 const Chart: React.FC = () => {
   const chartContainerRef =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
+  const { marketId } = useParams();
   const { chainId } = useMultichainContext();
+  const sdk = useSDK();
 
   const { currentMarket: market } = useCurrentMarketState();
 
-  const [ask, setAsk] = useState<number>(0);
-  const [bid, setBid] = useState<number>(0);
+  const [ask, setAsk] = useState<number | undefined>(undefined);
+  const [bid, setBid] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    if (market) {
-      setAsk(Number(market?.parsedAsk.replaceAll(",", "")));
-      setBid(Number(market?.parsedBid.replaceAll(",", "")));
-    }
-  }, [market]);
+    let interval: NodeJS.Timeout;
+
+    const fetchBidAndAsk = async () => {
+      if (marketId) {
+        try {
+          const bidAndAsk = await sdk.trade.getBidAndAsk(marketId, 8);
+
+          const ask =
+            bidAndAsk &&
+            limitDigitsInDecimals(bidAndAsk.ask as number).replaceAll(",", "");
+          const bid =
+            bidAndAsk &&
+            limitDigitsInDecimals(bidAndAsk.bid as number).replaceAll(",", "");
+
+          setAsk(Number(ask));
+          setBid(Number(bid));
+        } catch (error) {
+          console.error("Error fetching bid and ask:", error);
+        }
+      }
+    };
+
+    fetchBidAndAsk();
+    interval = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [marketId, chainId, sdk]);
 
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
   const longPriceLineRef = useRef<EntityId | null>(null);
@@ -148,7 +175,7 @@ const Chart: React.FC = () => {
                     return `${(price / 1000).toFixed(3)}K`;
                   }
                   if (price < 1) {
-                    if ("%" === "%") {
+                    if (market.priceCurrency === "%") {
                       return (price * 100).toFixed(2);
                     } else {
                       return price.toFixed(fractionDigitsAmount);
