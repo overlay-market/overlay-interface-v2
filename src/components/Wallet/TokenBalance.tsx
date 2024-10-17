@@ -15,7 +15,7 @@ const TokenBalance: React.FC = () => {
   const [ovlBalance, setOvlBalance] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchBalance = async () => {
       if (account) {
         try {
           const ovlBalance = await sdk.ov.balance(account, 8);
@@ -26,8 +26,8 @@ const TokenBalance: React.FC = () => {
       }
     };
 
-    fetchData();
-  }, [chainId, account]);
+    fetchBalance();
+  }, [chainId, account, sdk]);
 
   return (
     <Text

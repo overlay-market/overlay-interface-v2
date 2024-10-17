@@ -18,7 +18,7 @@ const useSDK = (): OverlaySDK => {
     rpcProvider,
     web3Provider: walletClient as any,
   });
-  console.log('overlay-sdk initialized:', sdk)
+
   return sdk
 }
 

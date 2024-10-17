@@ -89,7 +89,7 @@ const PositionSelectComponent: React.FC = () => {
   return (
     <Flex height={"64px"} gap={"8px"}>
       <LongPositionSelectButton
-        active={isLong}
+        active={isLong.toString()}
         onClick={() => handleSelectPositionSide(true)}
         style={{ background: theme.color.grey4 }}
       >
@@ -103,7 +103,7 @@ const PositionSelectComponent: React.FC = () => {
         </Flex>
       </LongPositionSelectButton>
       <ShortPositionSelectButton
-        active={!isLong}
+        active={isLong.toString()}
         onClick={() => handleSelectPositionSide(false)}
         style={{ background: theme.color.grey4 }}
       >
