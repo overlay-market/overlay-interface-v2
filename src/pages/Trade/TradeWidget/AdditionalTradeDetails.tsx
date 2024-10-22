@@ -7,28 +7,41 @@ import useSDK from "../../../hooks/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useTradeState } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   limitDigitsInDecimals,
   toPercentUnit,
   toScientificNumber,
-  toWei,
 } from "overlay-sdk";
+import { TradeStateData } from "../../../types/tradeStateTypes";
 
-const AdditionalTradeDetails: React.FC = () => {
+type AdditionalTradeDetailsProps = {
+  tradeState?: TradeStateData;
+};
+
+const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
+  tradeState,
+}) => {
   const { marketId } = useParams();
   const { chainId } = useMultichainContext();
   const { address } = useAccount();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
-  const { typedValue, selectedLeverage, isLong, slippageValue } =
-    useTradeState();
+  const { typedValue, slippageValue } = useTradeState();
 
   const [fee, setFee] = useState<number>(0);
-  const [estLiquidationPrice, setEstLiquidationPrice] = useState<string>("0");
   const [currencyEstLiquidationPrice, setCurrencyEstLiquidationPrice] =
     useState<string | undefined>(undefined);
-  const [expectedOi, setExpectedOi] = useState<string | undefined>(undefined);
+
+  const estLiquidationPrice: number | undefined = useMemo(() => {
+    if (!tradeState) return undefined;
+    return Number(tradeState.liquidationPriceEstimate);
+  }, [tradeState]);
+
+  const expectedOi: string | undefined = useMemo(() => {
+    if (!tradeState) return undefined;
+    return limitDigitsInDecimals(tradeState.expectedOi);
+  }, [tradeState]);
 
   useEffect(() => {
     const fetchFee = async () => {
@@ -45,52 +58,6 @@ const AdditionalTradeDetails: React.FC = () => {
   }, [marketId, chainId]);
 
   useEffect(() => {
-    const fetchLiquidationPriceEstimate = async () => {
-      if (marketId && address && typedValue) {
-        try {
-          const estLiqPrice = await sdk.trade.getLiquidationPriceEstimate(
-            marketId,
-            toWei(typedValue),
-            toWei(selectedLeverage),
-            isLong,
-            8
-          );
-          estLiqPrice &&
-            setEstLiquidationPrice(limitDigitsInDecimals(estLiqPrice));
-        } catch (error) {
-          console.error("Error fetching estLiqPrice:", error);
-        }
-      }
-    };
-
-    fetchLiquidationPriceEstimate();
-  }, [marketId, address, typedValue, selectedLeverage, chainId, isLong]);
-
-  useEffect(() => {
-    const fetchExpectedOi = async () => {
-      if (marketId && address && typedValue) {
-        try {
-          const expectedOi = await sdk.trade.getOiEstimate(
-            marketId,
-            toWei(typedValue),
-            toWei(selectedLeverage),
-            isLong,
-            8
-          );
-          expectedOi &&
-            setExpectedOi(
-              toScientificNumber(limitDigitsInDecimals(expectedOi as string))
-            );
-        } catch (error) {
-          console.error("Error fetching expected Oi:", error);
-        }
-      }
-    };
-
-    fetchExpectedOi();
-  }, [marketId, address, typedValue, selectedLeverage, chainId, isLong]);
-
-  useEffect(() => {
     estLiquidationPrice &&
       market &&
       typedValue &&
@@ -105,12 +72,6 @@ const AdditionalTradeDetails: React.FC = () => {
       market && setCurrencyEstLiquidationPrice(`${market.priceCurrency}0`);
     }
   }, [estLiquidationPrice, market, typedValue, address]);
-
-  useEffect(() => {
-    if (!address || !typedValue) {
-      setExpectedOi(undefined);
-    }
-  }, [address, typedValue]);
 
   return (
     <Flex direction={"column"} gap="8px">

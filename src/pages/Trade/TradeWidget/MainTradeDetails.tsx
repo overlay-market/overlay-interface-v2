@@ -2,60 +2,42 @@ import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
 import SetSlippageModal from "../../../components/SetSlippageModal";
 import { useTradeState } from "../../../state/trade/hooks";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import { useEffect, useMemo, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
-import useSDK from "../../../hooks/useSDK";
 import {
   limitDigitsInDecimals,
   toPercentUnit,
   toScientificNumber,
-  toWei,
 } from "overlay-sdk";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { TradeStateData } from "../../../types/tradeStateTypes";
 
-const MainTradeDetails: React.FC = () => {
-  const { marketId } = useParams();
-  const { chainId } = useMultichainContext();
+type MainTradeDetailsProps = {
+  tradeState?: TradeStateData;
+};
+
+const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
   const { address } = useAccount();
-  const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
-  const { typedValue, selectedLeverage, isLong, slippageValue } =
-    useTradeState();
+  const { typedValue } = useTradeState();
 
-  const [price, setPrice] = useState<string | undefined>(undefined);
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
-  const [minPrice, setMinPrice] = useState<string | undefined>(undefined);
   const [currencyMinPrice, setCurrencyMinPrice] = useState<string>("-");
-  const [priceImpact, setPriceImpact] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    const fetchPriceInfo = async () => {
-      if (marketId && address && typedValue) {
-        try {
-          const priceInfo = await sdk.trade.getPriceInfo(
-            marketId,
-            toWei(typedValue),
-            toWei(selectedLeverage),
-            Number(slippageValue),
-            isLong,
-            8
-          );
+  const price: string | undefined = useMemo(() => {
+    if (!tradeState) return undefined;
+    return limitDigitsInDecimals(tradeState?.priceInfo.price as string);
+  }, [tradeState]);
 
-          priceInfo &&
-            setPrice(limitDigitsInDecimals(priceInfo.price as number));
-          priceInfo &&
-            setMinPrice(limitDigitsInDecimals(priceInfo.minPrice as number));
-          priceInfo && setPriceImpact(priceInfo.priceImpactPercentage);
-        } catch (error) {
-          console.error("Error fetching priceInfo:", error);
-        }
-      }
-    };
+  const minPrice: string | undefined = useMemo(() => {
+    if (!tradeState) return undefined;
+    return limitDigitsInDecimals(tradeState?.priceInfo.minPrice as string);
+  }, [tradeState]);
 
-    fetchPriceInfo();
-  }, [marketId, address, typedValue, selectedLeverage, chainId, isLong]);
+  const priceImpact: string | undefined = useMemo(() => {
+    if (!tradeState) return undefined;
+    return tradeState.priceInfo.priceImpactPercentage;
+  }, [tradeState]);
 
   useEffect(() => {
     price &&

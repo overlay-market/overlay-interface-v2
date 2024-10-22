@@ -37,7 +37,7 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
 
   const price: string = useMemo(() => {
     const parsedPrice = limitDigitsInDecimals(
-      formatUnits(BigInt(tradeState.priceInfo.price), 18)
+      tradeState.priceInfo.price as string
     );
     if (!market) return "-";
     const transformedPrice =
@@ -49,7 +49,7 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
 
   const minPrice: string = useMemo(() => {
     const parsedMinPrice = limitDigitsInDecimals(
-      formatUnits(BigInt(tradeState.priceInfo.minPrice), 18)
+      tradeState.priceInfo.minPrice as string
     );
     if (!market) return "-";
     const transformedMinPrice =

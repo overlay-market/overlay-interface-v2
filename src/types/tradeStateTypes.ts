@@ -10,7 +10,7 @@ const enum TradeState {
 }
 
 export interface TradeStateData {
-  liquidationPriceEstimate: number;
+  liquidationPriceEstimate: string | number;
   expectedOi: string | number;
   maxInputIncludingFees: number;
   priceInfo: {

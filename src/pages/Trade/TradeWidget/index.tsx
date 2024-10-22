@@ -13,15 +13,64 @@ import useSDK from "../../../hooks/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useState } from "react";
 import { Address } from "viem";
-import { formatWeiToParsedNumber } from "overlay-sdk";
+import { formatWeiToParsedNumber, toWei } from "overlay-sdk";
+import { useParams } from "react-router-dom";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import useAccount from "../../../hooks/useAccount";
+import { TradeStateData } from "../../../types/tradeStateTypes";
 
 const TradeWidget: React.FC = () => {
+  const { marketId } = useParams();
+  const { chainId } = useMultichainContext();
+  const { address } = useAccount();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
-  const { selectedLeverage } = useTradeState();
+  const { typedValue, selectedLeverage, isLong, slippageValue } =
+    useTradeState();
+
   const { handleLeverageSelect } = useTradeActionHandlers();
 
+  const [loading, setLoading] = useState<boolean>(false);
   const [capLeverage, setCapleverage] = useState<number>(5);
+  const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
+    undefined
+  );
+
+  useEffect(() => {
+    const fetchTradeState = async () => {
+      if (marketId && address && typedValue) {
+        setLoading(true);
+
+        try {
+          const tradeState = await sdk.trade.getTradeState(
+            marketId,
+            toWei(typedValue),
+            toWei(selectedLeverage),
+            Number(slippageValue),
+            isLong,
+            address
+          );
+          console.log({ tradeState, typedValue });
+
+          tradeState && setTradeState(tradeState);
+        } catch (error) {
+          console.error("Error fetching trade state:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTradeState();
+  }, [
+    marketId,
+    address,
+    typedValue,
+    selectedLeverage,
+    chainId,
+    isLong,
+    slippageValue,
+  ]);
 
   useEffect(() => {
     const fetchCapLeverage = async () => {
@@ -66,9 +115,9 @@ const TradeWidget: React.FC = () => {
       />
 
       <CollateralInputComponent />
-      <MainTradeDetails />
-      <TradeButtonComponent />
-      <AdditionalTradeDetails />
+      <MainTradeDetails tradeState={tradeState} />
+      <TradeButtonComponent loading={loading} tradeState={tradeState} />
+      <AdditionalTradeDetails tradeState={tradeState} />
     </Flex>
   );
 };
