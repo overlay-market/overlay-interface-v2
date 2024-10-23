@@ -37,8 +37,16 @@ const TradeWidget: React.FC = () => {
   );
 
   useEffect(() => {
+    let isCancelled = false; // Flag to track if the effect should be cancelled
+    setLoading(false);
+
     const fetchTradeState = async () => {
-      if (marketId && address && typedValue) {
+      if (!typedValue || typedValue === "") {
+        setTradeState(undefined);
+        return;
+      }
+
+      if (marketId && address && typedValue !== "") {
         setLoading(true);
 
         try {
@@ -50,18 +58,26 @@ const TradeWidget: React.FC = () => {
             isLong,
             address
           );
-          console.log({ tradeState, typedValue });
-
-          tradeState && setTradeState(tradeState);
+          if (!isCancelled && tradeState) {
+            // Only set state if the effect hasn't been cancelled
+            setTradeState(tradeState);
+          }
         } catch (error) {
           console.error("Error fetching trade state:", error);
         } finally {
-          setLoading(false);
+          if (!isCancelled) {
+            setLoading(false);
+          }
         }
       }
     };
 
     fetchTradeState();
+
+    // Cleanup function to cancel the fetch if conditions change
+    return () => {
+      isCancelled = true; // Set flag to true, preventing any state updates
+    };
   }, [
     marketId,
     address,
