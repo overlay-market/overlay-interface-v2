@@ -14,7 +14,6 @@ import {
   toPercentUnit,
   toScientificNumber,
 } from "overlay-sdk";
-import { formatUnits } from "viem";
 import DetailRow from "./DetailRow";
 
 type ConfirnTxnModalProps = {
