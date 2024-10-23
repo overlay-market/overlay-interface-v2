@@ -1,4 +1,5 @@
 import {createAction} from '@reduxjs/toolkit'
+import { TransactionType } from '../../constants/transaction'
 
 export type PopupContent =
   {
@@ -6,6 +7,7 @@ export type PopupContent =
       hash: string
       success: boolean
       message: string
+      type: TransactionType | number | string
     }
   }
 
