@@ -5,7 +5,7 @@ import {
   selectLeverage,
   selectPositionSide,
   setSlippage,
-  setTxnDeadline,
+  updateTxnHash,
   resetTradeState
 } from "./actions";
 
@@ -14,7 +14,8 @@ export interface TradeState {
   readonly selectedLeverage: string;
   readonly isLong: boolean;
   readonly slippageValue: DefaultTxnSettings | string;
-  readonly txnDeadline: DefaultTxnSettings | string;
+  readonly txnHash: string;
+  readonly previousTxnHash: string;
 }
 
 export const initialState: TradeState = {
@@ -22,7 +23,8 @@ export const initialState: TradeState = {
   selectedLeverage: "1",
   isLong: true,
   slippageValue: "1",
-  txnDeadline: "30",
+  txnHash: '',
+  previousTxnHash: '',
 };
 
 export default createReducer<TradeState>(initialState, (builder) =>
@@ -39,15 +41,13 @@ export default createReducer<TradeState>(initialState, (builder) =>
     .addCase(setSlippage, (state, action) => {
       state.slippageValue = action.payload.slippageValue;
     })
-    .addCase(setTxnDeadline, (state, { payload: { txnDeadline } }) => {
-      state.txnDeadline = txnDeadline;
+    .addCase(updateTxnHash, (state, action) => {
+      state.previousTxnHash = state.txnHash;
+      state.txnHash = action.payload.txnHash;
     })
     .addCase(resetTradeState, (state) => {
       state.typedValue = initialState.typedValue;
       state.selectedLeverage = initialState.selectedLeverage;
       state.isLong = initialState.isLong;
-      // Avoid resetting slippage value
-      // state.slippageValue = initialState.slippageValue;
-      state.txnDeadline = initialState.txnDeadline;
     })
 );

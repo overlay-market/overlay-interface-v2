@@ -21,6 +21,7 @@ import {
   StakeIcon,
   StakeActiveIcon,
 } from "../../assets/icons/navBar-icons/stake";
+import { DEFAULT_MARKET_ID } from "../../constants/applications";
 
 export interface NavLinkAsset {
   to: string;
@@ -37,7 +38,7 @@ const NAV_LINKS: Array<NavLinkAsset> = [
     activeIcon: <BackpackActiveIcon />,
   },
   {
-    to: "/trade",
+    to: `/trade/${DEFAULT_MARKET_ID}`,
     label: "Trade",
     icon: <TradeIcon />,
     activeIcon: <TradeActiveIcon />,

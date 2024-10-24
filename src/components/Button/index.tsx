@@ -1,1 +1,5 @@
-export { GradientOutlineButton, GradientSolidButton } from "./GradientButton";
+export {
+  GradientOutlineButton,
+  GradientSolidButton,
+  GradientLoaderButton,
+} from "./GradientButton";
