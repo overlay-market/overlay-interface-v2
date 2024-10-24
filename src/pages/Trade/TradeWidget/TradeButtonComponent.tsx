@@ -14,7 +14,7 @@ import { toWei } from "overlay-sdk";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { TradeStateData } from "../../../types/tradeStateTypes";
-import { Address } from "viem";
+import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
@@ -32,7 +32,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const sdk = useSDK();
   const { open } = useWeb3Modal();
   const { currentMarket: market } = useCurrentMarketState();
-  const { handleTradeStateReset } = useTradeActionHandlers();
+  const { handleTradeStateReset, handleTxnHashUpdate } =
+    useTradeActionHandlers();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
@@ -79,6 +80,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           priceLimit: toWei(tradeState.priceInfo.minPrice as string),
         })
         .then((result) => {
+          handleTxnHashUpdate(result.hash);
           addPopup(
             {
               txn: {
@@ -128,9 +130,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     sdk.ov
       .approve({
         to: market?.id as Address,
-        amount: toWei(typedValue),
+        amount: maxUint256,
       })
       .then((result) => {
+        handleTxnHashUpdate(result.hash);
         addPopup(
           {
             txn: {
@@ -188,6 +191,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   return (
     <>
       {loading && <GradientLoaderButton title={"Trade"} />}
+
       {address && !loading && tradeState?.tradeState !== "Approve OVL" && (
         <GradientOutlineButton
           title={title ?? "Trade"}
@@ -203,14 +207,20 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         />
       )}
 
-      {!loading && tradeState && tradeState.tradeState === "Approve OVL" && (
-        <GradientOutlineButton
-          title={"Approve OVL"}
-          width={"100%"}
-          height={"40px"}
-          handleClick={handleApprove}
-        />
-      )}
+      {address &&
+        !loading &&
+        tradeState &&
+        tradeState.tradeState === "Approve OVL" &&
+        (attemptingTransaction ? (
+          <GradientLoaderButton title={"Pending confirmation..."} />
+        ) : (
+          <GradientOutlineButton
+            title={"Approve OVL"}
+            width={"100%"}
+            height={"40px"}
+            handleClick={handleApprove}
+          />
+        ))}
 
       {tradeState && tradeState.tradeState === "Trade" && (
         <ConfirmTxnModal

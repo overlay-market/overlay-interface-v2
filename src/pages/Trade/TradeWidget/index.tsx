@@ -1,6 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import MainTradeDetails from "./MainTradeDetails";
 import {
+  useIsNewTxnHash,
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
@@ -25,11 +26,10 @@ const TradeWidget: React.FC = () => {
   const { address } = useAccount();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
+  const isNewTxnHash = useIsNewTxnHash();
   const { typedValue, selectedLeverage, isLong, slippageValue } =
     useTradeState();
-
   const { handleLeverageSelect } = useTradeActionHandlers();
-
   const [loading, setLoading] = useState<boolean>(false);
   const [capLeverage, setCapleverage] = useState<number>(5);
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
@@ -59,7 +59,6 @@ const TradeWidget: React.FC = () => {
             address
           );
           if (!isCancelled && tradeState) {
-            // Only set state if the effect hasn't been cancelled
             setTradeState(tradeState);
           }
         } catch (error) {
@@ -76,7 +75,7 @@ const TradeWidget: React.FC = () => {
 
     // Cleanup function to cancel the fetch if conditions change
     return () => {
-      isCancelled = true; // Set flag to true, preventing any state updates
+      isCancelled = true;
     };
   }, [
     marketId,
@@ -86,6 +85,7 @@ const TradeWidget: React.FC = () => {
     chainId,
     isLong,
     slippageValue,
+    isNewTxnHash,
   ]);
 
   useEffect(() => {

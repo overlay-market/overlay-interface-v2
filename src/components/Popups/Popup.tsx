@@ -54,7 +54,7 @@ const Popup: React.FC<PopupProps> = ({ removeAfterMs, content, popKey }) => {
           width={"26px"}
           height={"26px"}
           color={theme.color.background}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", minWidth: "26px" }}
           onClick={removeThisPopup}
         />
       </Flex>
