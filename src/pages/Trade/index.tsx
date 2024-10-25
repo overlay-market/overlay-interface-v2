@@ -1,4 +1,4 @@
-import { Flex, Box } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
 import React, { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ import {
   useCurrentMarketState,
 } from "../../state/currentMarket/hooks";
 import { useMarketsActionHandlers } from "../../state/markets/hooks";
+import PositionsTable from "./PositionsTable";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
@@ -88,7 +89,10 @@ const Trade: React.FC = () => {
             </Flex>
           )}
         </Flex>
-        <Box>Positions</Box>
+        <PositionsTable />
+        <Text weight={"bold"} size={"5"}>
+          About This Market
+        </Text>
       </Flex>
     </Flex>
   );
