@@ -6,6 +6,7 @@ import { ChevronDown } from "react-feather";
 export const Table = styled.table<{ width: string }>`
   width: ${(props) => (props.width ?? '100%')};
   border-collapse: collapse;
+  margin: 24px 0px;
 `;
 
 export const StyledHeader = styled.th`

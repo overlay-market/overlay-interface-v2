@@ -4,7 +4,6 @@ import theme from "../../../theme";
 
 export const PositionsTableContainer = styled(Flex)`
   flex-direction: column;
-  gap: 24px;
   width: 100%;
   padding: 16px 8px 66px;
   border-bottom: 1px solid ${theme.color.darkBlue};

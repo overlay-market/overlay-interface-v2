@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, ScrollArea, Text } from "@radix-ui/themes";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import {
   Dropdown,
@@ -54,59 +54,63 @@ const StyledTable: React.FC<TableProps> = ({
 
   return (
     <>
-      <Table width={width}>
-        <thead>
-          <tr>
-            {headerColumns.map((column: string) => (
-              <StyledHeader>{column}</StyledHeader>
-            ))}
-          </tr>
-        </thead>
-        <tbody>{body}</tbody>
-      </Table>
+      <ScrollArea type="auto" scrollbars="horizontal" size="2">
+        <Table width={width}>
+          <thead>
+            <tr>
+              {headerColumns.map((column: string) => (
+                <StyledHeader>{column}</StyledHeader>
+              ))}
+            </tr>
+          </thead>
+          <tbody>{body}</tbody>
+        </Table>
+      </ScrollArea>
 
       {/* Pagination */}
       {positionsTotalNumber > 10 && (
-        <Flex align="center" mt="4" gap="2">
-          {/* Previous Button */}
-          <PaginationButton
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-            navBtn={true}
-          >
-            <Flex>
-              <ChevronLeft />
-            </Flex>
-          </PaginationButton>
+        <Flex align="center" wrap={"wrap"}>
+          <Flex pt="4">
+            {/* Previous Button */}
+            <PaginationButton
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              navBtn={true}
+            >
+              <Flex>
+                <ChevronLeft />
+              </Flex>
+            </PaginationButton>
 
-          {/* Page Numbers */}
-          {[...Array(totalPages)].map((_, pageIndex) => {
-            const page = pageIndex + 1;
-            return (
-              <PaginationButton
-                key={pageIndex}
-                onClick={() => handlePageClick(page)}
-                active={page === currentPage}
-                navBtn={false}
-              >
-                {page}
-              </PaginationButton>
-            );
-          })}
+            {/* Page Numbers */}
+            {[...Array(totalPages)].map((_, pageIndex) => {
+              const page = pageIndex + 1;
+              return (
+                <PaginationButton
+                  key={pageIndex}
+                  onClick={() => handlePageClick(page)}
+                  active={page === currentPage}
+                  navBtn={false}
+                >
+                  {page}
+                </PaginationButton>
+              );
+            })}
 
-          {/* Next Button */}
-          <PaginationButton
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            navBtn={true}
-          >
-            <Flex>
-              <ChevronRight />
-            </Flex>
-          </PaginationButton>
+            {/* Next Button */}
+            <PaginationButton
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              navBtn={true}
+            >
+              <Flex>
+                <ChevronRight />
+              </Flex>
+            </PaginationButton>
+          </Flex>
 
           {/* Items per page selector */}
-          <Flex align="center" gap="2">
+          <Flex align="center" pl={"14px"} pt="4">
             <Text style={{ color: theme.color.grey3 }}>Show:</Text>
 
             <Dropdown>
