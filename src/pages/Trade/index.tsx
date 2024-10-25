@@ -4,7 +4,7 @@ import TradeWidget from "./TradeWidget";
 import React, { useEffect, useState } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useSDK from "../../hooks/useSDK";
 import { MarketData } from "../../types/marketTypes";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
@@ -20,6 +20,7 @@ const Trade: React.FC = () => {
   const { marketId } = useParams();
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
+  const navigate = useNavigate();
   const { currentMarket } = useCurrentMarketState();
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
@@ -47,7 +48,14 @@ const Trade: React.FC = () => {
       const currentMarket = markets.find(
         (market) => market.marketName === marketId
       );
-      currentMarket && handleCurrentMarketSet(currentMarket);
+
+      if (currentMarket) {
+        handleCurrentMarketSet(currentMarket);
+      } else {
+        const activeMarket = markets[0];
+        handleCurrentMarketSet(activeMarket);
+        navigate(`/trade/${activeMarket.marketId}`);
+      }
     }
   }, [marketId, chainId, markets]);
 
