@@ -1,6 +1,5 @@
 const theme = {
   color: {
-<<<<<<< HEAD:src/theme/theme.ts
     background: "#2C2C2C",
     white: "#FFFFFF",
     black: "#000000",
@@ -26,7 +25,6 @@ const theme = {
   headerSize: {
     width: "88px",
     height: "78px",
-=======
     background: '#171721',
     white: '#FFFFFF',
     black: '#000000',
@@ -53,7 +51,6 @@ const theme = {
     md: '1024px',
     lg: '1280px',
     xl: '1640px'
->>>>>>> 1222c406e1410c74cfa90dd6c2431f6c19e9de18:src/theme/index.ts
   },
 };
 
