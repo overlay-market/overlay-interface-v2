@@ -15,6 +15,7 @@ import {
 } from "../../state/currentMarket/hooks";
 import { useMarketsActionHandlers } from "../../state/markets/hooks";
 import PositionsTable from "./PositionsTable";
+import InfoMarketSection from "./InfoMarketSection";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
@@ -98,9 +99,7 @@ const Trade: React.FC = () => {
           )}
         </Flex>
         <PositionsTable />
-        <Text weight={"bold"} size={"5"}>
-          About This Market
-        </Text>
+        <InfoMarketSection />
       </Flex>
     </Flex>
   );
