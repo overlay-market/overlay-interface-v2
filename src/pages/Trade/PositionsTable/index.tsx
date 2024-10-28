@@ -54,8 +54,8 @@ const PositionsTable: React.FC = () => {
             account as Address
           );
 
-          positions && setPositions(positions);
-          const positionsLength = positions && positions.length;
+          positions && setPositions(positions.data);
+          const positionsLength = positions && positions.data.length;
           positionsLength && setPositionsTotalNumber(positionsLength);
         } catch (error) {
           console.error("Error fetching open positions:", error);
