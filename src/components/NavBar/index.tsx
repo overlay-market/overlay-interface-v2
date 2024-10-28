@@ -3,7 +3,7 @@ import LogoImg from "../../assets/images/overlay-logo-only-no-background.png";
 import theme from "../../theme";
 import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
-import { GradientOutlineButton } from "../Button";
+import { LinksWrapper } from "./navbar-styles";
 
 const NavBar: React.FC = () => {
   return (
@@ -27,28 +27,10 @@ const NavBar: React.FC = () => {
       >
         <img src={LogoImg} alt="Logo" width={"40px"} height={"40px"} />
 
-        <Flex
-          direction="column"
-          justify={"between"}
-          flexGrow={"1"}
-          display={{ initial: "none", md: "flex" }}
-        >
+        <LinksWrapper direction="column" justify={"between"} flexGrow={"1"}>
           <NavLinksSection />
-
-          <Flex direction={"column"} gap={"20px"}>
-            <GradientOutlineButton
-              title={"Buy OV"}
-              width={"78px"}
-              height={"29px"}
-              handleClick={() => {
-                console.log("buy OV!");
-              }}
-            />
-            <SocialLinksSection />
-          </Flex>
-        </Flex>
-
-        <Box display={{ initial: "block", md: "none" }}>NavBar Hamburger</Box>
+          <SocialLinksSection />
+        </LinksWrapper>
       </Flex>
     </Box>
   );

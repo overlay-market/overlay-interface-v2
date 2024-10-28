@@ -1,6 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import { NavLinkAsset } from "./NavLinksSection";
 import { ActiveLabel, StyledBox, StyledLink } from "./styled-nav-link-styles";
+import React from "react";
 
 const StyledNavLink: React.FC<NavLinkAsset> = ({
   to,
@@ -13,10 +14,10 @@ const StyledNavLink: React.FC<NavLinkAsset> = ({
       {({ isActive }) => (
         <StyledBox>
           <Flex
-            direction={"column"}
-            justify="center"
+            direction={{ initial: "row", md: "column" }}
+            justify={{ initial: "start", md: "center" }}
             align="center"
-            gap={"4px"}
+            gap={{ initial: "10px", md: "4px" }}
           >
             {isActive ? activeIcon : icon}
             {isActive ? <ActiveLabel>{label}</ActiveLabel> : <>{label}</>}

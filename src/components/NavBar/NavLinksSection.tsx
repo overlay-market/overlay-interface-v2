@@ -76,7 +76,7 @@ const NavLinksSection: React.FC = () => {
   ];
 
   return (
-    <Flex direction={"column"} gap={"8px"}>
+    <Flex direction={"column"} gap={{ initial: "0", md: "8px" }}>
       {NAV_LINKS.map((link) => (
         <StyledNavLink
           key={link.label}

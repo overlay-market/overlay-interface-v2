@@ -55,3 +55,16 @@ export const HeaderMenuButton = styled.div`
   border: 0;
   cursor: pointer;
 `;
+
+export const Separator = styled.div`
+  display: flex;
+  justify-content: center;
+  height: 1px;
+  width: 86%;
+  background: ${theme.color.grey5};
+  margin: 16px auto;
+  
+  @media (min-width: 1024px) {
+    display: none;
+  }
+`
