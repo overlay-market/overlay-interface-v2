@@ -1,3 +1,4 @@
+import React from "react";
 import { Flex, Link } from "@radix-ui/themes";
 import Xlogo from "../../assets/icons/social-links/X_logo.png";
 import MirrorLogo from "../../assets/icons/social-links/Mirror.png";
@@ -28,7 +29,7 @@ const SOCIAL_LINKS: Array<LinkAsset> = [
   },
 ];
 
-const SocialLinksSection = () => {
+const SocialLinksSection: React.FC = () => {
   return (
     <Flex justify={"between"}>
       {SOCIAL_LINKS.map((link) => (

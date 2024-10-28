@@ -10,7 +10,7 @@ import {
 } from "./actions";
 
 export interface TradeState {
-  readonly typedValue: string | undefined;
+  readonly typedValue: string;
   readonly selectedLeverage: string;
   readonly isLong: boolean;
   readonly slippageValue: DefaultTxnSettings | string;
