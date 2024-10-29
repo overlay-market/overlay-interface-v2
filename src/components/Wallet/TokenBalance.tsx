@@ -7,15 +7,17 @@ import { useEffect, useState } from "react";
 import useSDK from "../../hooks/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../hooks/useAccount";
+import { useIsNewTxnHash } from "../../state/trade/hooks";
 
 const TokenBalance: React.FC = () => {
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
+  const isNewTxnHash = useIsNewTxnHash();
   const [ovlBalance, setOvlBalance] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchBalance = async () => {
       if (account) {
         try {
           const ovlBalance = await sdk.ov.balance(account, 8);
@@ -26,8 +28,8 @@ const TokenBalance: React.FC = () => {
       }
     };
 
-    fetchData();
-  }, [chainId, account]);
+    fetchBalance();
+  }, [chainId, account, sdk, isNewTxnHash]);
 
   return (
     <Text

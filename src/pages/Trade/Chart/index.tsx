@@ -11,6 +11,12 @@ import styled from "styled-components";
 import Datafeed from "./chartDatafeed";
 import moment from "moment";
 import { getMarketChartUrl } from "./helpers";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import useSDK from "../../../hooks/useSDK";
+import { useParams } from "react-router-dom";
+import { limitDigitsInDecimals } from "overlay-sdk";
+import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 
 const TVChartContainer = styled.div`
   height: 561px;
@@ -34,35 +40,52 @@ export interface ChartContainerProps {
   theme: ChartingLibraryWidgetOptions["theme"];
 }
 
-type ChartProps = {
-  marketId?: string;
-  longPrice: string | number;
-  shortPrice: string | number;
-};
-
-const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
+const Chart: React.FC = () => {
   const chartContainerRef =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
-  const chainId = 80084;
+  const { marketId } = useParams();
+  const { chainId } = useMultichainContext();
+  const sdk = useSDK();
 
-  const [ask, setAsk] = useState(Number(longPrice));
-  const [bid, setBid] = useState(Number(shortPrice));
+  const { currentMarket: market } = useCurrentMarketState();
+
+  const [ask, setAsk] = useState<number | undefined>(undefined);
+  const [bid, setBid] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    if (isNaN(ask)) {
-      setAsk(Number(longPrice));
-    }
-    if (isNaN(bid)) {
-      setBid(Number(shortPrice));
-    }
-  }, [longPrice, shortPrice]);
+    let interval: NodeJS.Timeout;
+
+    const fetchBidAndAsk = async () => {
+      if (marketId) {
+        try {
+          const bidAndAsk = await sdk.trade.getBidAndAsk(marketId, 8);
+
+          const ask =
+            bidAndAsk &&
+            limitDigitsInDecimals(bidAndAsk.ask as number).replaceAll(",", "");
+          const bid =
+            bidAndAsk &&
+            limitDigitsInDecimals(bidAndAsk.bid as number).replaceAll(",", "");
+
+          setAsk(Number(ask));
+          setBid(Number(bid));
+        } catch (error) {
+          console.error("Error fetching bid and ask:", error);
+        }
+      }
+    };
+
+    fetchBidAndAsk();
+    interval = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [marketId, chainId, sdk]);
 
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
   const longPriceLineRef = useRef<EntityId | null>(null);
   const shortPriceLineRef = useRef<EntityId | null>(null);
 
   useEffect(() => {
-    if (marketId && ask && bid && chainId !== undefined) {
+    if (market && ask && bid && chainId !== undefined) {
       const fractionDigitsAmount = Math.max(
         String(bid + ". ").split(".")[1].length,
         String(ask + ". ").split(".")[1].length
@@ -70,8 +93,8 @@ const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
 
       const defaultProps: Omit<ChartContainerProps, "container"> = {
         symbol: JSON.stringify({
-          marketId,
-          description: "market name!!!",
+          marketAddress: market.id,
+          description: market.marketName,
           chainId: chainId,
         }),
         interval: "60" as ResolutionString,
@@ -152,7 +175,7 @@ const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
                     return `${(price / 1000).toFixed(3)}K`;
                   }
                   if (price < 1) {
-                    if ("%" === "%") {
+                    if (market.priceCurrency === "%") {
                       return (price * 100).toFixed(2);
                     } else {
                       return price.toFixed(fractionDigitsAmount);
@@ -252,73 +275,88 @@ const Chart: React.FC<ChartProps> = ({ marketId, longPrice, shortPrice }) => {
         tvWidget.remove();
       };
     }
-  }, [marketId, chainId, ask, bid]);
+  }, [market, chainId, ask, bid]);
 
   // Effect to update the longPrice shape
   useEffect(() => {
-    if (tvWidgetRef.current && longPriceLineRef.current && longPrice) {
-      const currentTime = Date.now() / 1000;
-      const chart = tvWidgetRef.current?.activeChart();
+    let interval: NodeJS.Timeout;
 
-      chart.removeEntity(longPriceLineRef.current);
+    const updateLongPriceShape = () => {
+      if (tvWidgetRef.current && longPriceLineRef.current && ask) {
+        const currentTime = Date.now() / 1000;
+        const chart = tvWidgetRef.current?.activeChart();
 
-      const newLongPriceLine = chart.createMultipointShape(
-        [{ time: currentTime, price: Number(longPrice) }],
-        {
-          shape: "horizontal_line",
-          lock: true,
-          disableSelection: true,
-          disableSave: true,
-          disableUndo: true,
-          filled: false,
-          zOrder: "top",
-          overrides: {
-            linecolor: "#089981",
-            linewidth: 1,
-            text: "ask",
-            showLabel: true,
-            textcolor: "#089981",
-            horzLabelsAlign: "right",
-            vertLabelsAlign: "bottom",
-          },
-        }
-      );
-      longPriceLineRef.current = newLongPriceLine;
-    }
-  }, [longPrice]);
+        chart.removeEntity(longPriceLineRef.current);
+
+        const newLongPriceLine = chart.createMultipointShape(
+          [{ time: currentTime, price: ask }],
+          {
+            shape: "horizontal_line",
+            lock: true,
+            disableSelection: true,
+            disableSave: true,
+            disableUndo: true,
+            filled: false,
+            zOrder: "top",
+            overrides: {
+              linecolor: "#089981",
+              linewidth: 1,
+              text: "ask",
+              showLabel: true,
+              textcolor: "#089981",
+              horzLabelsAlign: "right",
+              vertLabelsAlign: "bottom",
+            },
+          }
+        );
+
+        longPriceLineRef.current = newLongPriceLine as EntityId;
+      }
+    };
+
+    interval = setInterval(updateLongPriceShape, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [ask]);
 
   // Effect to update the shortPrice shape
   useEffect(() => {
-    if (tvWidgetRef.current && shortPriceLineRef.current && shortPrice) {
-      const currentTime = Date.now() / 1000;
-      const chart = tvWidgetRef.current?.activeChart();
+    let interval: NodeJS.Timeout;
 
-      chart.removeEntity(shortPriceLineRef.current);
+    const updateShortPriceShape = () => {
+      if (tvWidgetRef.current && shortPriceLineRef.current && bid) {
+        const currentTime = Date.now() / 1000;
+        const chart = tvWidgetRef.current?.activeChart();
 
-      const newShortPriceLine = chart.createMultipointShape(
-        [{ time: currentTime, price: Number(shortPrice) }],
-        {
-          shape: "horizontal_line",
-          lock: true,
-          disableSelection: true,
-          disableSave: true,
-          disableUndo: true,
-          filled: false,
-          zOrder: "top",
-          overrides: {
-            linecolor: "#f23645",
-            linewidth: 1,
-            textcolor: "#f23645",
-            text: "bid",
-            showLabel: true,
-            horzLabelsAlign: "right",
-            vertLabelsAlign: "top",
-          },
-        }
-      );
-      shortPriceLineRef.current = newShortPriceLine;
-    }
-  }, [shortPrice]);
+        chart.removeEntity(shortPriceLineRef.current);
+
+        const newShortPriceLine = chart.createMultipointShape(
+          [{ time: currentTime, price: bid }],
+          {
+            shape: "horizontal_line",
+            lock: true,
+            disableSelection: true,
+            disableSave: true,
+            disableUndo: true,
+            filled: false,
+            zOrder: "top",
+            overrides: {
+              linecolor: "#f23645",
+              linewidth: 1,
+              textcolor: "#f23645",
+              text: "bid",
+              showLabel: true,
+              horzLabelsAlign: "right",
+              vertLabelsAlign: "top",
+            },
+          }
+        );
+        shortPriceLineRef.current = newShortPriceLine;
+      }
+    };
+
+    interval = setInterval(updateShortPriceShape, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [bid]);
 
   return <TVChartContainer ref={chartContainerRef} />;
 };
