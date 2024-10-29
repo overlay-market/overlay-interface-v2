@@ -1,6 +1,6 @@
 import { Table } from "@radix-ui/themes";
 import { LineChart, Line } from "recharts";
-import { theme } from "../../theme/theme";
+import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
 import OverlayLogo from "../../assets/images/overlay-logo-only-no-background.png";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";

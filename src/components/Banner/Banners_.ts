@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Flex, Text } from "@radix-ui/themes";
-import { theme } from "../../theme/theme";
+import theme from "../../theme";
 import { Link } from "react-router-dom";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
 

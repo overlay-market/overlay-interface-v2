@@ -7,7 +7,7 @@ import {
   LinkText,
   LinkIcon,
 } from "../Banners_";
-import { theme } from "../../../theme/theme";
+import theme from "../../../theme";
 
 interface OptionalLinkBannerProps {
   Title: string;

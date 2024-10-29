@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { theme } from "../../theme/theme";
+import theme from "../../theme";
 import { Flex } from "@radix-ui/themes";
 
 export const CustomCard = styled(Flex)`
