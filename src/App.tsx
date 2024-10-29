@@ -11,6 +11,7 @@ import useMultichainContext from "./providers/MultichainContextProvider/useMulti
 import Wallet from "./components/Wallet";
 import { useRef } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
+import Popups from "./components/Popups";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -29,13 +30,14 @@ const App = () => {
           backgroundColor: `${theme.color.background}`,
         }}
       >
+        <Popups />
         <Flex direction={{ initial: "column", md: "row" }}>
           <NavBar />
           <Wallet />
           <Routes>
             <Route path="/" element={<Navigate to="/markets" />} />
             <Route path="/markets" element={<Markets />} />
-            <Route path="/trade" element={<Trade />} />
+            <Route path="/trade/:marketId" element={<Trade />} />
           </Routes>
         </Flex>
       </Container>

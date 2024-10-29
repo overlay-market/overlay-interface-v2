@@ -6,7 +6,7 @@ type BurgerProps = {
 
 const MenuHamburger = ({ open }: BurgerProps) => {
   const isExpanded = open ? true : false;
-  console.log({ open });
+
   return (
     <StyledBurger
       aria-label="Toggle menu"

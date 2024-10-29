@@ -10,9 +10,10 @@ import { DefaultTxnSettings } from "../../state/trade/actions";
 import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import Modal from "../Modal";
+import useAccount from "../../hooks/useAccount";
 
 const SetSlippageModal: React.FC = () => {
-  const account = "";
+  const account = useAccount();
   const { slippageValue } = useTradeState();
   const { handleSlippageSet } = useTradeActionHandlers();
 

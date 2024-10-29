@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectLeverage, selectPositionSide, setSlippage, setTxnDeadline, typeInput } from "./actions";
+import { DefaultTxnSettings, resetTradeState, selectLeverage, selectPositionSide, setSlippage, typeInput, updateTxnHash } from "./actions";
+import usePrevious from "../../hooks/usePrevious";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
@@ -16,7 +17,7 @@ export const useTradeActionHandlers = (): {
   handleLeverageSelect: (selectedLeverage: string) => void;
   handlePositionSideSelect: (isLong: boolean) => void;
   handleSlippageSet: (slippageValue: DefaultTxnSettings | string) => void;
-  handleTxnDeadlineSet: ( txnDeadline: DefaultTxnSettings | string) => void;
+  handleTxnHashUpdate: (txnHash: string) => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -59,12 +60,12 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   )
 
-  const handleTxnDeadlineSet = useCallback(
-    (txnDeadline: DefaultTxnSettings | string) => {
-      dispatch(setTxnDeadline({ txnDeadline }))
+  const handleTxnHashUpdate = useCallback(
+    (txnHash: string) => {
+      dispatch(updateTxnHash({ txnHash }))
     },
     [dispatch]
-  )
+  );
 
   const handleTradeStateReset = useCallback(
     () => {
@@ -78,60 +79,14 @@ export const useTradeActionHandlers = (): {
     handleLeverageSelect,
     handlePositionSideSelect,
     handleSlippageSet,
-    handleTxnDeadlineSet,
+    handleTxnHashUpdate,
     handleTradeStateReset,
   }
 };
 
-
-export const useDerivedTradeInfo = (): {
-  tradeData: object | undefined
-  inputError?: string
-} => {
-  const account = '';
-
-  const { 
-    typedValue,
-    selectedLeverage,
-    isLong,
-    slippageValue,
-    txnDeadline
-  } = useTradeState();
-
-  let tradeData: object | undefined;
-
-  // if any inputs missing, will not allow buildCallback to be created
-  if (typedValue === '' || typedValue === '.' || isLong === null || isLong === undefined) {
-    tradeData = undefined;
-  } else {
-    tradeData = {
-      typedValue,
-      selectedLeverage,
-      isLong,
-      slippageValue,
-      txnDeadline
-    }
-  }
-
-  let inputError: string | undefined;
-  if (!account) {
-    inputError = `Connect Wallet`
-  }
-
-  if (typedValue === '' || typedValue === '.') {
-    inputError = `Input Collateral Amount`
-  }
-
-  if (!selectedLeverage) {
-    inputError = `Select Leverage Amount`
-  }
-
-  if (isLong === null) {
-    inputError = `Select Long or Short Position`
-  }
-
-  return {
-    tradeData,
-    inputError,
-  }
+export const useIsNewTxnHash = (): boolean => {
+  const txnHash = useAppSelector((state) => state.trade.txnHash);
+  const previousTxnHash = usePrevious(txnHash)
+  
+  return txnHash !== '' && txnHash !== previousTxnHash
 }
