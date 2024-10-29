@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
       <Web3Provider>
-        <BrowserRouter basename="/">
+        <BrowserRouter>
           <ThemeProvider theme={theme}>
             <DefaultRadixTheme>
               <App />
