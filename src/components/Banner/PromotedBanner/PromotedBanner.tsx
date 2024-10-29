@@ -1,4 +1,3 @@
-import React from "react";
 import {
   StyledPromotedBanner,
   StyledFlex,
@@ -6,7 +5,7 @@ import {
   TitleText,
   CardsValue,
 } from "../Banners_";
-import { theme } from "../../../theme/theme";
+import theme from "../../../theme";
 
 interface PromotedBannerProps {
   Title: string;
