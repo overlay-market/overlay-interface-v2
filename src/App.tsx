@@ -13,6 +13,7 @@ import { useRef } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
 import Popups from "./components/Popups";
 import { DEFAULT_MARKET_ID } from "./constants/applications";
+import Portfolio from "./pages/Portfolio";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -43,6 +44,7 @@ const App = () => {
               element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
             />
             <Route path="/trade/:marketId" element={<Trade />} />
+            <Route path="/portfolio" element={<Portfolio />} />
           </Routes>
         </Flex>
       </Container>
