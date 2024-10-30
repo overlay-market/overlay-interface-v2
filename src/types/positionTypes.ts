@@ -11,3 +11,24 @@ export interface OpenPositionData {
   unrealizedPnL: string | number | undefined;
   parsedFunding: string | number | undefined;
 }
+
+export interface UnwindPositionData {
+  marketName: string | undefined;
+  positionSide: string | undefined;
+  parsedCreatedTimestamp: string | undefined;
+  parsedClosedTimestamp: string | undefined;
+  entryPrice: string | undefined;
+  exitPrice: string | undefined;
+  size: string | undefined;
+  pnl: string | number | undefined;
+}
+
+export interface LiquidatedPositionData {
+  marketName: string | undefined;
+  position: string | undefined;
+  created: string | undefined;
+  liquidated: string | undefined;
+  entryPrice: string | undefined;
+  exitPrice: string | undefined;
+  size: string | number | undefined;
+}
