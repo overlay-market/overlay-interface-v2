@@ -64,8 +64,6 @@ const SetSlippageModal: React.FC = () => {
         </Text>
       }
       title={"Slippage"}
-      boxShadow={`0px 0px 12px 6px rgba(91, 96, 164, 0.25)`}
-      borderColor={`${theme.color.blue2}80`}
       width="375px"
       minHeight="190px"
       handleClose={handleSlippageModalClose}

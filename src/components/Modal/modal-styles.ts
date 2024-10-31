@@ -30,8 +30,8 @@ export const StyledContent = styled(Dialog.Content)<{
   left: 50%;
   transform: translate(-50%, -50%);
   box-shadow: ${({ boxShadow }) =>
-    boxShadow ?? `0 4px 8px 0 ${theme.color.background}80`};
-  border: 1px solid ${({ borderColor }) => borderColor ?? "#12b4ff"};
+    boxShadow ?? `0px 0px 12px 6px rgba(91, 96, 164, 0.25)`};
+  border: 1px solid ${({ borderColor }) => borderColor ?? `${theme.color.blue2}80`};
   @media (min-width: ${theme.breakpoints.xs}) {
     width: ${({ width }) => (width ? width : "400px")};
   }
