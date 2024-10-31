@@ -1,20 +1,20 @@
-import { useTradeState } from "../../../../state/trade/hooks";
 import { Flex, Text } from "@radix-ui/themes";
-import theme from "../../../../theme";
-import Modal from "../../../../components/Modal";
-import {
-  GradientLoaderButton,
-  GradientSolidButton,
-} from "../../../../components/Button";
-import { TradeStateData } from "../../../../types/tradeStateTypes";
-import { useCurrentMarketState } from "../../../../state/currentMarket/hooks";
 import { useMemo } from "react";
 import {
   limitDigitsInDecimals,
   toPercentUnit,
   toScientificNumber,
 } from "overlay-sdk";
-import DetailRow from "./DetailRow";
+import { TradeStateData } from "../../../types/tradeStateTypes";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { useTradeState } from "../../../state/trade/hooks";
+import Modal from "../../../components/Modal";
+import theme from "../../../theme";
+import DetailRow from "../../../components/Modal/DetailRow";
+import {
+  GradientLoaderButton,
+  GradientSolidButton,
+} from "../../../components/Button";
 
 type ConfirnTxnModalProps = {
   open: boolean;
@@ -81,8 +81,6 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
       handleClose={handleDismiss}
       title={"Confirm Transaction"}
       fontSizeTitle={"16px"}
-      boxShadow={`0px 0px 12px 6px rgba(91, 96, 164, 0.25)`}
-      borderColor={`${theme.color.blue2}80`}
       width="352px"
       minHeight="565px"
     >

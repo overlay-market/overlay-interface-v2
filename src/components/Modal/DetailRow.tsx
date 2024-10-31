@@ -1,6 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
-import Loader from "../../../../components/Loader";
-import theme from "../../../../theme";
+import theme from "../../theme";
+import Loader from "../Loader";
 
 type AdditionalDetailRowProps = {
   detail: string;
