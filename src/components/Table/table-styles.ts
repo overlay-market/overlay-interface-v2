@@ -20,6 +20,11 @@ export const StyledHeader = styled.th`
 
 export const StyledRow = styled.tr`
   border-bottom: 1px solid ${theme.color.grey6};
+
+  &:hover {
+    background-color: ${theme.color.grey7};
+    cursor: pointer;
+   }
 `;
 
 export const StyledCell = styled.td`

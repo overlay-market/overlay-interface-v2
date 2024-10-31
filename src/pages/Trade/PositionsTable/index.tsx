@@ -90,6 +90,7 @@ const PositionsTable: React.FC = () => {
       <StyledTable
         headerColumns={POSITIONS_COLUMNS}
         width={"796px"}
+        minWidth={"600px"}
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
         positionsTotalNumber={positionsTotalNumber}

@@ -16,7 +16,7 @@ const LiquidatedPosition: React.FC<LiquidatedPositionProps> = ({
   const isLong = positionSide === "Long";
 
   return (
-    <StyledRow style={{ fontSize: "12px" }}>
+    <StyledRow style={{ fontSize: "12px", cursor: "auto" }}>
       <StyledCell>{position.marketName}</StyledCell>
       <StyledCell>{position.size} OVL</StyledCell>
       <StyledCell>
