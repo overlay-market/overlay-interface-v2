@@ -10,6 +10,8 @@ export interface OpenPositionData {
   size: number | string | undefined;
   unrealizedPnL: string | number | undefined;
   parsedFunding: string | number | undefined;
+  marketAddress: Address;
+  positionId: number;
 }
 
 export interface UnwindPositionData {
@@ -21,6 +23,8 @@ export interface UnwindPositionData {
   exitPrice: string | undefined;
   size: string | undefined;
   pnl: string | number | undefined;
+  unwindNumber: number;
+  positionId: number;
 }
 
 export interface LiquidatedPositionData {

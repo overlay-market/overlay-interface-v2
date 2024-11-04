@@ -31,7 +31,7 @@ const ClosedPositionModal: React.FC<ClosedPositionModalProps> = ({
             fontSize: "20px",
           }}
         >
-          ID: 3528 - UNWIND: #0
+          ID: {position.positionId} - UNWIND: #{position.unwindNumber}
         </Text>
         <Text
           style={{
