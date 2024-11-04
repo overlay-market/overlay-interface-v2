@@ -4,13 +4,14 @@ import { HeaderEmptyPlaceholder } from "./portfolio-styles";
 import OpenPositionsTable from "./OpenPositionsTable";
 import UnwindsTable from "./UnwindsTable";
 import LiquidatesTable from "./LiquidatesTable";
+import Overview from "./Overview";
 
 const Portfolio: React.FC = () => {
   return (
     <Flex direction="column" width={"100%"}>
       <HeaderEmptyPlaceholder></HeaderEmptyPlaceholder>
 
-      {/* <Overview /> */}
+      <Overview />
       <OpenPositionsTable />
       <UnwindsTable />
       <LiquidatesTable />

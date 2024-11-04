@@ -78,7 +78,7 @@ const OpenPositionsTable: React.FC = () => {
     <Flex
       direction={"column"}
       px={"8px"}
-      pt={"16px"}
+      pt={"36px"}
       pb={"66px"}
       width={"100%"}
       style={{
