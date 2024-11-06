@@ -8,12 +8,9 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useTradeState } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
 import { useEffect, useMemo, useState } from "react";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-} from "overlay-sdk";
+import { limitDigitsInDecimals } from "overlay-sdk";
 import { TradeStateData } from "../../../types/tradeStateTypes";
+import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 type AdditionalTradeDetailsProps = {
   tradeState?: TradeStateData;
@@ -62,11 +59,10 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
       market &&
       typedValue &&
       setCurrencyEstLiquidationPrice(
-        `${market.priceCurrency}${
-          market.priceCurrency === "%"
-            ? toPercentUnit(estLiquidationPrice)
-            : toScientificNumber(estLiquidationPrice)
-        }`
+        `${market.priceCurrency}${formatPriceByCurrency(
+          estLiquidationPrice,
+          market.priceCurrency
+        )}`
       );
     if (!address || !typedValue) {
       market && setCurrencyEstLiquidationPrice(`${market.priceCurrency}0`);
