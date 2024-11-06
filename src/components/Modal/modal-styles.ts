@@ -29,6 +29,7 @@ export const StyledContent = styled(Dialog.Content)<{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  outline: none;
   box-shadow: ${({ boxShadow }) =>
     boxShadow ?? `0px 0px 12px 6px rgba(91, 96, 164, 0.25)`};
   border: 1px solid ${({ borderColor }) => borderColor ?? `${theme.color.blue2}80`};
