@@ -12,6 +12,7 @@ export interface OpenPositionData {
   parsedFunding: string | number | undefined;
   marketAddress: Address;
   positionId: number;
+  priceCurrency: string;
 }
 
 export interface UnwindPositionData {
