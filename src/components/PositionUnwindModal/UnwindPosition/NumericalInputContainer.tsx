@@ -1,6 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
-import NumericalInput from "../NumericalInput";
-import theme from "../../theme";
+import NumericalInput from "../../NumericalInput";
+import theme from "../../../theme";
 
 type NumericalInputContainerProps = {
   inputValue: string;
