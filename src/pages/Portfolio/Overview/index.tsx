@@ -10,8 +10,7 @@ import { IntervalType, OverviewData } from "../../../types/accountDetailsTypes";
 import MainOverviewCard from "./MainOverviewCard";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import OverviewChart from "./OverviewChart";
-
-const OVL_UNIT = "OVL";
+import { UNIT } from "../../../constants/applications";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
@@ -73,7 +72,7 @@ const Overview: React.FC = () => {
             <MainOverviewCard
               title={"Locked Sum + uPnL"}
               value={overviewData?.lockedPlusUnrealized}
-              unit={OVL_UNIT}
+              unit={UNIT}
             />
           </MainCardsGrid>
 
@@ -86,20 +85,20 @@ const Overview: React.FC = () => {
             <OverviewCard
               title="Locked Sum"
               value={overviewData?.totalValueLocked}
-              unit={OVL_UNIT}
+              unit={UNIT}
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
 
             <OverviewCard
               title="Realized"
               value={overviewData?.realizedPnl}
-              unit={OVL_UNIT}
+              unit={UNIT}
             />
 
             <OverviewCard
               title="Unrealized"
               value={overviewData?.unrealizedPnL}
-              unit={OVL_UNIT}
+              unit={UNIT}
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
           </InfoCardsGrid>
