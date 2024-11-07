@@ -39,12 +39,14 @@ export const GradientSolidButton: React.FC<GradientButtonProps> = ({
   title,
   width,
   height,
+  isDisabled = false,
   handleClick,
 }) => {
   return (
     <GradientSolidBtnWrapper
       width={width}
       height={height}
+      disabled={isDisabled}
       onClick={handleClick}
     >
       <Text style={{ color: `${theme.color.black}` }}>{title}</Text>

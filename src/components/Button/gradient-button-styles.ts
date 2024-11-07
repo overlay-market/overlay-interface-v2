@@ -45,6 +45,7 @@ export const ButtonTitle = styled.div<{ color?: string, disabled?: boolean }>`
 export const GradientSolidBtnWrapper = styled(Button)<{
   width?: string;
   height?: string;
+  disabled?: boolean;
 }>`
   padding: 7px 16px;
   border-radius: 8px;
@@ -55,7 +56,7 @@ export const GradientSolidBtnWrapper = styled(Button)<{
   cursor: pointer;
   
   &:hover {
-    box-shadow: 0px 0px 12px 3px #ffffff73;
+    box-shadow:  ${({ disabled }) => (disabled ? 'none' : '0px 0px 12px 3px #ffffff73')};
   }
 `;
 
