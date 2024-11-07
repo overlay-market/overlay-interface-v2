@@ -16,6 +16,7 @@ import Loader from "../Loader";
 import UnwindPosition from "./UnwindPosition";
 import PositionNotFound from "./PositionNotFound";
 import WithdrawOVL from "./WithdrawOVL";
+import { useTradeState } from "../../state/trade/hooks";
 
 type PositionUnwindModalProps = {
   open: boolean;
@@ -32,11 +33,16 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
   const { address: account } = useAccount();
   const isSuccessUnwindStateData = useTypeGuard<SuccessUnwindStateData>("pnl");
   const isErrorUnwindStateData = useTypeGuard<ErrorUnwindStateData>("error");
+  const { slippageValue } = useTradeState();
 
   const [unwindState, setUnwindState] = useState<UnwindStateData | undefined>(
     undefined
   );
   const [inputValue, setInputValue] = useState<string>("");
+
+  useEffect(() => {
+    setInputValue("");
+  }, [open]);
 
   useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
@@ -49,6 +55,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
             account,
             position.positionId,
             toWei(inputValue),
+            Number(slippageValue),
             4
           );
 
@@ -67,7 +74,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [position, account, inputValue, open]);
+  }, [position, account, inputValue, open, slippageValue]);
 
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
@@ -105,6 +112,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
           unwindState={unwindState}
           inputValue={inputValue}
           setInputValue={setInputValue}
+          handleDismiss={handleDismiss}
         />
       )}
 

@@ -31,6 +31,7 @@ export interface SuccessUnwindStateData {
   priceImpact: string;
   liquidationPrice: string | number | bigint;
   unwindState: string;
+  priceLimit: bigint;
 }
 
 export interface ErrorUnwindStateData {

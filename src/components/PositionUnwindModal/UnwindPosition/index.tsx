@@ -9,12 +9,14 @@ import UnwindAmountContainer from "./UnwindAmountContainer";
 import NumericalInputContainer from "./NumericalInputContainer";
 import Slider from "../../Slider";
 import UnwindPositionDetails from "./UnwindPositionDetails";
+import UnwindButtonComponent from "./UnwindButtonComponent";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
   unwindState: SuccessUnwindStateData;
   inputValue: string;
   setInputValue: (inputValue: string) => void;
+  handleDismiss: () => void;
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({
@@ -22,10 +24,11 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   unwindState,
   inputValue,
   setInputValue,
+  handleDismiss,
 }) => {
   const [percentageValue, setPercentageValue] = useState<string>("");
 
-  const { value, currentPrice } = useMemo(() => {
+  const { value, currentPrice, unwindBtnState } = useMemo(() => {
     const value = unwindState.value
       ? Number(unwindState.value).toString()
       : undefined;
@@ -35,10 +38,11 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           position.priceCurrency
         )
       : undefined;
-
+    const unwindBtnState = unwindState.unwindState ?? undefined;
     return {
       value,
       currentPrice,
+      unwindBtnState,
     };
   }, [unwindState]);
 
@@ -106,7 +110,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         handleUserInput={handleUserInput}
       />
 
-      <Flex width={"100%"} direction={"column"} pt={"20px"}>
+      <Flex width={"100%"} direction={"column"} py={"10px"} gap={"36px"}>
         <Slider
           title={" "}
           min={0}
@@ -124,6 +128,14 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
               : ""
           }
           handleChange={(input: number[]) => handlePercentageInput(input)}
+        />
+
+        <UnwindButtonComponent
+          position={position}
+          inputValue={inputValue}
+          priceLimit={unwindState.priceLimit}
+          unwindBtnState={unwindBtnState}
+          handleDismiss={handleDismiss}
         />
       </Flex>
 
