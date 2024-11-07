@@ -3,6 +3,7 @@ import theme from "../../../theme";
 
 export const ScrollContentWrapper = styled.div`
   max-height: 30vh;
+  margin-top: 20px;
   overflow-y: auto;
 
   /* Custom scrollbar styles */

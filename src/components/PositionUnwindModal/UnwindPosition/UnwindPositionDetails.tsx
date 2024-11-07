@@ -120,7 +120,7 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
 
   return (
     <ScrollContentWrapper>
-      <Flex mt={"48px"} direction={"column"} width={"100%"}>
+      <Flex direction={"column"} width={"100%"}>
         <DetailRow
           detail={"Profit/Loss"}
           value={`${pnl} ${UNIT}`}
@@ -138,7 +138,7 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
           valueColor={isLong ? theme.color.green1 : theme.color.red1}
         />
       </Flex>
-      <Flex direction={"column"} width={"100%"} mt={"48px"} mb={"24px"}>
+      <Flex direction={"column"} width={"100%"} mt={"30px"}>
         <DetailRow detail={"Value"} value={`${value} ${UNIT}`} />
         <DetailRow detail={"Open Interest"} value={oi} />
         <DetailRow detail={"Leverage"} value={`${leverage}x`} />
@@ -165,7 +165,7 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
           value={`${maintenanceMargin} ${UNIT}`}
         />
       </Flex>
-      <Flex direction={"column"} width={"100%"} mt={"48px"} mb={"24px"}>
+      <Flex direction={"column"} width={"100%"} mt={"30px"}>
         <DetailRow detail={"Entry Price"} value={entryPrice} />
         <DetailRow detail={"Current Price"} value={currentPrice} />
         <DetailRow
