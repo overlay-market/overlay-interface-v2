@@ -35,8 +35,10 @@ const LiquidatesTable: React.FC = () => {
 
   useEffect(() => {
     const fetchLiquidatePositions = async () => {
-      setLiquidatePositions(undefined);
-      setPositionsTotalNumber(0);
+      if (!account) {
+        setLiquidatePositions(undefined);
+        setPositionsTotalNumber(0);
+      }
 
       if (account) {
         setLoading(true);
@@ -103,7 +105,7 @@ const LiquidatesTable: React.FC = () => {
         }
       />
 
-      {loading ? (
+      {loading && !liquidatePositions ? (
         <Loader />
       ) : account ? (
         liquidatePositions &&

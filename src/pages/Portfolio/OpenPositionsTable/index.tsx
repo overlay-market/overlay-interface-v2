@@ -39,8 +39,10 @@ const OpenPositionsTable: React.FC = () => {
 
   useEffect(() => {
     const fetchOpenPositions = async () => {
-      setPositions(undefined);
-      setPositionsTotalNumber(0);
+      if (!account) {
+        setPositions(undefined);
+        setPositionsTotalNumber(0);
+      }
 
       if (account) {
         setLoading(true);
@@ -105,7 +107,7 @@ const OpenPositionsTable: React.FC = () => {
         }
       />
 
-      {loading ? (
+      {loading && !positions ? (
         <Loader />
       ) : account ? (
         positions &&

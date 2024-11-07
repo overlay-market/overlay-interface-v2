@@ -38,8 +38,10 @@ const UnwindsTable: React.FC = () => {
 
   useEffect(() => {
     const fetchUnwindPositions = async () => {
-      setUnwindPositions(undefined);
-      setPositionsTotalNumber(0);
+      if (!account) {
+        setUnwindPositions(undefined);
+        setPositionsTotalNumber(0);
+      }
 
       if (account) {
         setLoading(true);
@@ -104,7 +106,7 @@ const UnwindsTable: React.FC = () => {
         }
       />
 
-      {loading ? (
+      {loading && !unwindPositions ? (
         <Loader />
       ) : account ? (
         unwindPositions &&
