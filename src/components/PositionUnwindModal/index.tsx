@@ -119,7 +119,11 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
       )}
 
       {isUnwindStateError(unwindState) && unwindState.isShutdown && (
-        <WithdrawOVL position={position} unwindState={unwindState} />
+        <WithdrawOVL
+          position={position}
+          unwindState={unwindState}
+          handleDismiss={handleDismiss}
+        />
       )}
 
       {isUnwindStateError(unwindState) && !unwindState.isShutdown && (
