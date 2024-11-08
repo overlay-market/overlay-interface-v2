@@ -1,4 +1,5 @@
 import { Table } from "@radix-ui/themes";
+import { type Address } from "viem";
 // import { LineChart, Line } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
@@ -9,47 +10,27 @@ import useSDK from "../../hooks/useSDK";
 import { useEffect, useState } from "react";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 
-type MarketData = {
-  ask: bigint;
-  bid: bigint;
-  capOi: bigint;
-  circuitBreakerLevel: bigint;
-  currency: string;
-  descriptionText: string;
-  disabled: boolean;
-  fullLogo: string;
-  fundingRate: bigint;
-  id: string;
-  logo: string;
+export type TransformedMarketData = {
   marketId: string;
-  marketLogo: string;
-  marketName: string;
-  mid: bigint;
-  oiLong: bigint;
-  oiShort: bigint;
+  marketAddress: Address;
+  price: string | number | undefined;
+  funding: string | number | undefined;
+  longPercentageOfTotalOi: string;
+  shortPercentageOfTotalOi: string;
   oracleLogo: string;
-  parsedAnnualFundingRate: string;
-  parsedAsk: string;
-  parsedBid: string;
-  parsedCapOi: string;
-  parsedDailyFundingRate: string;
-  parsedMid: string;
-  parsedOiLong: string;
-  parsedOiShort: string;
+  marketLogo: string;
   priceCurrency: string;
-  volumeAsk: bigint;
-  volumeBid: bigint;
 };
 
 export default function MarketsTable() {
-  const [marketsData, setMarketsData] = useState<MarketData[]>([]);
+  const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
   const { chainId: contextChainID } = useMultichainContext();
   const sdk = useSDK();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const activeMarkets = await sdk.markets.getActiveMarkets();
+        const activeMarkets = await sdk.markets.transformMarketsData();
         console.log("activeMarkets", activeMarkets);
 
         activeMarkets && setMarketsData(activeMarkets);
@@ -73,7 +54,7 @@ export default function MarketsTable() {
           marginTop: 30,
         }}
       >
-        <Table.Header>
+        <Table.Header style={{ verticalAlign: "middle" }}>
           <Table.Row>
             <Table.ColumnHeaderCell className="text-gray-400">
               <div className="flex items-center justify-between">
@@ -193,7 +174,7 @@ export default function MarketsTable() {
                         objectFit: "cover",
                       }}
                       src={market.marketLogo}
-                      alt={market.marketName}
+                      // alt={market.marketName}
                       className="rounded-full"
                     />
                   </div>
