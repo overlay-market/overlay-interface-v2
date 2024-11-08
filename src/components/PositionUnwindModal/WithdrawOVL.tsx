@@ -1,13 +1,12 @@
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
-import { OpenPositionData } from "../../types/positionTypes";
-import { ErrorUnwindStateData } from "../../types/tradeStateTypes";
 import { formatPriceByCurrency } from "../../utils/formatPriceByCurrency";
 import { UNIT } from "../../constants/applications";
+import { OpenPositionData, UnwindStateError } from "overlay-sdk";
 
 type WithdrawOVLProps = {
   position: OpenPositionData;
-  unwindState: ErrorUnwindStateData;
+  unwindState: UnwindStateError;
 };
 
 const WithdrawOVL: React.FC<WithdrawOVLProps> = ({ position, unwindState }) => {

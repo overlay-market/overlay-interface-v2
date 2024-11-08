@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
-import { LiquidatedPositionData } from "../../../types/positionTypes";
+import { LiquidatedPositionData } from "overlay-sdk";
 
 type LiquidatedPositionProps = {
   position: LiquidatedPositionData;

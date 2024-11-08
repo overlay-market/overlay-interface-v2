@@ -1,9 +1,9 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
-import { UnwindPositionData } from "../../../types/positionTypes";
 import { useState } from "react";
 import ClosedPositionModal from "./ClosedPositionModal";
+import { UnwindPositionData } from "overlay-sdk";
 
 type UnwindPositionProps = {
   position: UnwindPositionData;

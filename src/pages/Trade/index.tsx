@@ -6,7 +6,6 @@ import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useParams } from "react-router-dom";
 import useSDK from "../../hooks/useSDK";
-import { MarketData } from "../../types/marketTypes";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import Loader from "../../components/Loader";
 import {
@@ -16,6 +15,7 @@ import {
 import { useMarketsActionHandlers } from "../../state/markets/hooks";
 import PositionsTable from "./PositionsTable";
 import InfoMarketSection from "./InfoMarketSection";
+import { ExpandedMarketData } from "overlay-sdk";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
@@ -27,7 +27,9 @@ const Trade: React.FC = () => {
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { handleMarketsUpdate } = useMarketsActionHandlers();
 
-  const [markets, setMarkets] = useState<MarketData[] | undefined>(undefined);
+  const [markets, setMarkets] = useState<ExpandedMarketData[] | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     const fetchActiveMarkets = async () => {

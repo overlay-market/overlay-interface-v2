@@ -6,11 +6,11 @@ import useSDK from "../../../hooks/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
-import { IntervalType, OverviewData } from "../../../types/accountDetailsTypes";
 import MainOverviewCard from "./MainOverviewCard";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import OverviewChart from "./OverviewChart";
 import { UNIT } from "../../../constants/applications";
+import { IntervalType, OverviewData } from "overlay-sdk";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();

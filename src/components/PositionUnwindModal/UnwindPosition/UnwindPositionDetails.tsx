@@ -1,16 +1,15 @@
 import { Flex } from "@radix-ui/themes";
 import { useMemo } from "react";
-import { SuccessUnwindStateData } from "../../../types/tradeStateTypes";
-import { OpenPositionData } from "../../../types/positionTypes";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 import theme from "../../../theme";
 import DetailRow from "../../Modal/DetailRow";
 import { UNIT } from "../../../constants/applications";
 import { ScrollContentWrapper } from "./unwind-position-details-styles";
+import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 
 type UnwindPositionDetailsProps = {
   position: OpenPositionData;
-  unwindState: SuccessUnwindStateData;
+  unwindState: UnwindStateSuccess;
 };
 
 const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({

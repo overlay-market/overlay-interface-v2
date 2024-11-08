@@ -9,16 +9,13 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import moment from "moment";
-import {
-  IntervalType,
-  OverviewDataByPeriod,
-} from "../../../types/accountDetailsTypes";
 import theme from "../../../theme";
 import {
   LegendLine,
   OverviewChartContainer,
   IntervalButton,
 } from "./overview-chart-styles";
+import { IntervalType, OverviewDataByPeriod } from "overlay-sdk";
 
 const intervals: IntervalType[] = ["1D", "1W", "1M", "6M", "1Y"];
 

@@ -1,7 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { useMemo } from "react";
-import { limitDigitsInDecimals } from "overlay-sdk";
-import { TradeStateData } from "../../../types/tradeStateTypes";
+import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useTradeState } from "../../../state/trade/hooks";
 import Modal from "../../../components/Modal";

@@ -2,19 +2,19 @@ import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
 import { setCurrentMarket } from "./actions";
-import { MarketData } from "../../types/marketTypes";
+import { ExpandedMarketData } from "overlay-sdk";
 
 export function useCurrentMarketState(): AppState['currentMarket'] {
   return useAppSelector((state) => state.currentMarket);
 }
 
 export const useCurrentMarketActionHandlers = (): {
-  handleCurrentMarketSet: (currentMarket: MarketData) => void;
+  handleCurrentMarketSet: (currentMarket: ExpandedMarketData) => void;
 } => {
   const dispatch = useAppDispatch();
 
   const handleCurrentMarketSet = useCallback(
-    (currentMarket: MarketData) => {
+    (currentMarket: ExpandedMarketData) => {
       const currentMarketParsed = {
         ...currentMarket,
         ask: currentMarket.ask.toString(),
@@ -27,6 +27,14 @@ export const useCurrentMarketActionHandlers = (): {
         oiShort: currentMarket.oiShort.toString(),  
         volumeAsk: currentMarket.volumeAsk.toString(),
         volumeBid: currentMarket.volumeBid.toString(),
+        parsedAnnualFundingRate: currentMarket.parsedAnnualFundingRate?.toString(),
+        parsedAsk: currentMarket.parsedAsk?.toString(),
+        parsedBid: currentMarket.parsedBid?.toString(),
+        parsedCapOi: currentMarket.parsedCapOi?.toString(),
+        parsedDailyFundingRate: currentMarket.parsedDailyFundingRate?.toString(),
+        parsedMid: currentMarket.parsedMid?.toString(),
+        parsedOiLong: currentMarket.parsedOiLong?.toString(),
+        parsedOiShort: currentMarket.parsedOiShort?.toString(),
       }
 
       dispatch(setCurrentMarket({ currentMarket: currentMarketParsed }))

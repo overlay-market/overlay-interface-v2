@@ -1,16 +1,16 @@
 import { Flex, Text } from "@radix-ui/themes";
 import Modal from "../Modal";
 import theme from "../../theme";
-import { OpenPositionData } from "../../types/positionTypes";
 import { useEffect, useState } from "react";
-import {
-  ErrorUnwindStateData,
-  SuccessUnwindStateData,
-  UnwindStateData,
-} from "../../types/tradeStateTypes";
 import useSDK from "../../hooks/useSDK";
 import useAccount from "../../hooks/useAccount";
-import { toWei } from "overlay-sdk";
+import {
+  OpenPositionData,
+  toWei,
+  UnwindStateData,
+  UnwindStateSuccess,
+  UnwindStateError,
+} from "overlay-sdk";
 import useTypeGuard from "../../hooks/useTypeGuard";
 import Loader from "../Loader";
 import UnwindPosition from "./UnwindPosition";
@@ -31,8 +31,8 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
 }) => {
   const sdk = useSDK();
   const { address: account } = useAccount();
-  const isSuccessUnwindStateData = useTypeGuard<SuccessUnwindStateData>("pnl");
-  const isErrorUnwindStateData = useTypeGuard<ErrorUnwindStateData>("error");
+  const isUnwindStateSuccess = useTypeGuard<UnwindStateSuccess>("pnl");
+  const isUnwindStateError = useTypeGuard<UnwindStateError>("error");
   const { slippageValue } = useTradeState();
 
   const [unwindState, setUnwindState] = useState<UnwindStateData | undefined>(
@@ -106,7 +106,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
         </Flex>
       )}
 
-      {isSuccessUnwindStateData(unwindState) && (
+      {isUnwindStateSuccess(unwindState) && (
         <UnwindPosition
           position={position}
           unwindState={unwindState}
@@ -116,11 +116,11 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
         />
       )}
 
-      {isErrorUnwindStateData(unwindState) && unwindState.isShutdown && (
+      {isUnwindStateError(unwindState) && unwindState.isShutdown && (
         <WithdrawOVL position={position} unwindState={unwindState} />
       )}
 
-      {isErrorUnwindStateData(unwindState) && !unwindState.isShutdown && (
+      {isUnwindStateError(unwindState) && !unwindState.isShutdown && (
         <PositionNotFound />
       )}
     </Modal>

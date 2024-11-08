@@ -6,10 +6,10 @@ import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
 import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
-import { UnwindPositionData } from "../../../types/positionTypes";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import UnwindPosition from "./UnwindPosition";
+import { UnwindPositionData } from "overlay-sdk";
 
 const UNWIND_POSITIONS_COLUMNS = [
   "Market",

@@ -4,9 +4,8 @@ import SetSlippageModal from "../../../components/SetSlippageModal";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useEffect, useMemo, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
-import { limitDigitsInDecimals } from "overlay-sdk";
+import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { TradeStateData } from "../../../types/tradeStateTypes";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 type MainTradeDetailsProps = {

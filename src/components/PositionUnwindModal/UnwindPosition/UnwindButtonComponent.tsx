@@ -5,12 +5,11 @@ import {
 } from "../../../components/Button";
 import useSDK from "../../../hooks/useSDK";
 import { useMemo, useState } from "react";
-import { toWei } from "overlay-sdk";
+import { OpenPositionData, toWei } from "overlay-sdk";
 import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
-import { OpenPositionData } from "../../../types/positionTypes";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
 import usePrevious from "../../../hooks/usePrevious";
 

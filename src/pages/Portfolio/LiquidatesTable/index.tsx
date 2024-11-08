@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
 import { Address } from "viem";
-import { LiquidatedPositionData } from "../../../types/positionTypes";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import LiquidatedPosition from "./LiquidatedPosition";
+import { LiquidatedPositionData } from "overlay-sdk";
 
 const LIQUIDATED_POSITIONS_COLUMNS = [
   "Market",

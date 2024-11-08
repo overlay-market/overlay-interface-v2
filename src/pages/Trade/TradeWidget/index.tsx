@@ -13,11 +13,10 @@ import useSDK from "../../../hooks/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useState } from "react";
 import { Address } from "viem";
-import { formatWeiToParsedNumber, toWei } from "overlay-sdk";
+import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
 import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
-import { TradeStateData } from "../../../types/tradeStateTypes";
 import Slider from "../../../components/Slider";
 
 const TradeWidget: React.FC = () => {

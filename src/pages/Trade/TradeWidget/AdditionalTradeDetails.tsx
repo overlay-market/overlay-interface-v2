@@ -8,8 +8,7 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useTradeState } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
 import { useEffect, useMemo, useState } from "react";
-import { limitDigitsInDecimals } from "overlay-sdk";
-import { TradeStateData } from "../../../types/tradeStateTypes";
+import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 type AdditionalTradeDetailsProps = {

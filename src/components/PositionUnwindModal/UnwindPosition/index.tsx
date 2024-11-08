@@ -1,7 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { useCallback, useMemo, useState } from "react";
-import { SuccessUnwindStateData } from "../../../types/tradeStateTypes";
-import { OpenPositionData } from "../../../types/positionTypes";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 import { formatDecimalToPercentage } from "../../../utils/formatDecimal";
 import theme from "../../../theme";
@@ -10,10 +8,11 @@ import NumericalInputContainer from "./NumericalInputContainer";
 import Slider from "../../Slider";
 import UnwindPositionDetails from "./UnwindPositionDetails";
 import UnwindButtonComponent from "./UnwindButtonComponent";
+import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
-  unwindState: SuccessUnwindStateData;
+  unwindState: UnwindStateSuccess;
   inputValue: string;
   setInputValue: (inputValue: string) => void;
   handleDismiss: () => void;

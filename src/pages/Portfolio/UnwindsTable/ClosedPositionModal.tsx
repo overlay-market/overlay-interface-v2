@@ -1,8 +1,8 @@
 import { Flex, Text } from "@radix-ui/themes";
 import Modal from "../../../components/Modal";
 import theme from "../../../theme";
-import { UnwindPositionData } from "../../../types/positionTypes";
 import DetailRow from "../../../components/Modal/DetailRow";
+import { UnwindPositionData } from "overlay-sdk";
 
 type ClosedPositionModalProps = {
   open: boolean;
