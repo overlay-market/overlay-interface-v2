@@ -11,6 +11,8 @@ type OpenPositionProps = {
 
 const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
   const [showModal, setShowModal] = useState(false);
+  const [selectedPosition, setSelectedPosition] =
+    useState<OpenPositionData | null>(null);
 
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
@@ -19,12 +21,14 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
   const isFundingPositive = Number(position.parsedFunding) > 0;
 
+  const handleItemClick = () => {
+    setSelectedPosition(position);
+    setShowModal(true);
+  };
+
   return (
     <>
-      <StyledRow
-        style={{ fontSize: "12px" }}
-        onClick={() => setShowModal(true)}
-      >
+      <StyledRow style={{ fontSize: "12px" }} onClick={handleItemClick}>
         <StyledCell>{position.marketName}</StyledCell>
         <StyledCell>{position.size} OVL</StyledCell>
         <StyledCell>
@@ -62,11 +66,13 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
         </StyledCell>
       </StyledRow>
 
-      <PositionUnwindModal
-        open={showModal}
-        position={position}
-        handleDismiss={() => setShowModal(false)}
-      />
+      {selectedPosition && (
+        <PositionUnwindModal
+          open={showModal}
+          position={selectedPosition}
+          handleDismiss={() => setShowModal(false)}
+        />
+      )}
     </>
   );
 };

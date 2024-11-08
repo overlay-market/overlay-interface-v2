@@ -48,6 +48,8 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     let isCancelled = false; // Flag to track if the effect should be cancelled
 
     const fetchUnwindState = async () => {
+      if (!position || !account || !open) return;
+
       if (position && account && open) {
         try {
           const unwindState = await sdk.trade.getUnwindState(
@@ -68,7 +70,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
       }
     };
 
-    fetchUnwindState();
+    open && fetchUnwindState();
 
     // Cleanup function to cancel the fetch if conditions change
     return () => {
