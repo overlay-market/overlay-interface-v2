@@ -41,7 +41,7 @@ type MarketData = {
   volumeBid: bigint;
 };
 
-export default function Component() {
+export default function MarketsTable() {
   const [marketsData, setMarketsData] = useState<MarketData[]>([]);
   const { chainId: contextChainID } = useMultichainContext();
   const sdk = useSDK();
