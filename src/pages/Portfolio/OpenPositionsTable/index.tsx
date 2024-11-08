@@ -55,6 +55,10 @@ const OpenPositionsTable: React.FC = () => {
           );
 
           positions && setPositions(positions.data);
+          if (!positions) {
+            setPositions(undefined);
+            setPositionsTotalNumber(0);
+          }
           const positionsLength = positions && positions.total;
           positionsLength && setPositionsTotalNumber(positionsLength);
         } catch (error) {

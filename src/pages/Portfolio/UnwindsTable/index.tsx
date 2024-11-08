@@ -54,6 +54,10 @@ const UnwindsTable: React.FC = () => {
           );
 
           unwinds && setUnwindPositions(unwinds.data);
+          if (!unwinds) {
+            setUnwindPositions(undefined);
+            setPositionsTotalNumber(0);
+          }
           const positionsLength = unwinds && unwinds.total;
           positionsLength && setPositionsTotalNumber(positionsLength);
         } catch (error) {
