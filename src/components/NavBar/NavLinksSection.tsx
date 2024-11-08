@@ -22,6 +22,7 @@ import {
   StakeActiveIcon,
 } from "../../assets/icons/navBar-icons/stake";
 import { DEFAULT_MARKET_ID } from "../../constants/applications";
+import { useCurrentMarketState } from "../../state/currentMarket/hooks";
 
 export interface NavLinkAsset {
   to: string;
@@ -30,48 +31,52 @@ export interface NavLinkAsset {
   activeIcon: ReactNode;
 }
 
-const NAV_LINKS: Array<NavLinkAsset> = [
-  {
-    to: "/markets",
-    label: "Markets",
-    icon: <BackpackIcon />,
-    activeIcon: <BackpackActiveIcon />,
-  },
-  {
-    to: `/trade/${DEFAULT_MARKET_ID}`,
-    label: "Trade",
-    icon: <TradeIcon />,
-    activeIcon: <TradeActiveIcon />,
-  },
-  {
-    to: "/portfolio",
-    label: "Portfolio",
-    icon: <BackpackIcon />,
-    activeIcon: <BackpackActiveIcon />,
-  },
-  {
-    to: "/powercards",
-    label: "PowerCards",
-    icon: <PowercardIcon />,
-    activeIcon: <PowercardActiveIcon />,
-  },
-  {
-    to: "/leaderboard",
-    label: "Leaderboard",
-    icon: <RocketIcon />,
-    activeIcon: <RocketActiveIcon />,
-  },
-  {
-    to: "/stake",
-    label: "Stake",
-    icon: <StakeIcon />,
-    activeIcon: <StakeActiveIcon />,
-  },
-];
-
 const NavLinksSection: React.FC = () => {
+  const { currentMarket } = useCurrentMarketState();
+
+  const activeMarketId = currentMarket?.marketId ?? DEFAULT_MARKET_ID;
+
+  const NAV_LINKS: Array<NavLinkAsset> = [
+    {
+      to: "/markets",
+      label: "Markets",
+      icon: <BackpackIcon />,
+      activeIcon: <BackpackActiveIcon />,
+    },
+    {
+      to: `/trade/${activeMarketId}`,
+      label: "Trade",
+      icon: <TradeIcon />,
+      activeIcon: <TradeActiveIcon />,
+    },
+    {
+      to: "/portfolio",
+      label: "Portfolio",
+      icon: <BackpackIcon />,
+      activeIcon: <BackpackActiveIcon />,
+    },
+    {
+      to: "/powercards",
+      label: "PowerCards",
+      icon: <PowercardIcon />,
+      activeIcon: <PowercardActiveIcon />,
+    },
+    {
+      to: "/leaderboard",
+      label: "Leaderboard",
+      icon: <RocketIcon />,
+      activeIcon: <RocketActiveIcon />,
+    },
+    {
+      to: "/stake",
+      label: "Stake",
+      icon: <StakeIcon />,
+      activeIcon: <StakeActiveIcon />,
+    },
+  ];
+
   return (
-    <Flex direction={"column"} gap={"8px"}>
+    <Flex direction={"column"} gap={{ initial: "0", md: "8px" }}>
       {NAV_LINKS.map((link) => (
         <StyledNavLink
           key={link.label}
