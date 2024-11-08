@@ -39,6 +39,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     undefined
   );
   const [inputValue, setInputValue] = useState<string>("");
+  const [unwindValue, setUnwindValue] = useState<bigint>(0n);
 
   useEffect(() => {
     setInputValue("");
@@ -56,7 +57,8 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
             position.marketAddress,
             account,
             position.positionId,
-            toWei(inputValue),
+            // toWei(inputValue),
+            unwindValue,
             Number(slippageValue),
             4
           );
@@ -114,6 +116,8 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
           unwindState={unwindState}
           inputValue={inputValue}
           setInputValue={setInputValue}
+          unwindValue={unwindValue}
+          setUnwindValue={setUnwindValue}
           handleDismiss={handleDismiss}
         />
       )}

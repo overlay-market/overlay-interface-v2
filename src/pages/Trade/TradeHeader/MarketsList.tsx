@@ -72,7 +72,7 @@ const MarketsList: React.FC = () => {
                   const currencyPrice = `${
                     market.priceCurrency
                   }${formatPriceByCurrency(
-                    market.parsedMid,
+                    market.parsedMid ?? 0,
                     market.priceCurrency
                   )}`;
 
