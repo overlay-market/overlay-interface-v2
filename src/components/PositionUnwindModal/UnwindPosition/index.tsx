@@ -8,7 +8,7 @@ import NumericalInputContainer from "./NumericalInputContainer";
 import Slider from "../../Slider";
 import UnwindPositionDetails from "./UnwindPositionDetails";
 import UnwindButtonComponent from "./UnwindButtonComponent";
-import { OpenPositionData, toWei, UnwindStateSuccess } from "overlay-sdk";
+import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import { formatUnits } from "viem";
 
 type UnwindPositionProps = {
@@ -61,15 +61,23 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
       setPercentageValue("0");
       setInputValue("0");
       setUnwindValue(0n);
-    }
-    if (percentage === 100) {
+    } else if (percentage === 100) {
       setPercentageValue("100");
       setInputValue(formatBigNumber(maxAmount).toString());
-      setUnwindValue(maxAmount);
+      setUnwindValue(unwindState.rawOi);
+    } else {
+      const percentageDecimal = percentage / 100;
+      setInputValue(
+        calculatePercentage(
+          maxAmount,
+          percentageDecimal
+        ).resultParsed.toString()
+      );
+      setPercentageValue(percentage.toString());
+      setUnwindValue(
+        calculatePercentage(unwindState.rawOi, percentageDecimal).result
+      );
     }
-    setInputValue(calculatePercentage(maxAmount, percentage).toString());
-    setPercentageValue(percentage.toString());
-    setUnwindValue(toWei(calculatePercentage(maxAmount, percentage)));
   };
 
   const handleUserInput = useCallback(
@@ -81,19 +89,27 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         setPercentageValue("0");
         setUnwindValue(0n);
         return;
-      }
-
-      if (exactAmount > 0 && exactAmount < maxAmountNumber) {
-        const result = formatDecimalToPercentage(exactAmount / maxAmountNumber);
+      } else if (exactAmount > 0 && exactAmount < maxAmountNumber) {
+        const percentage = formatDecimalToPercentage(
+          exactAmount / maxAmountNumber
+        );
+        const percentageDecimal = exactAmount / maxAmountNumber;
         setInputValue(input);
-        setUnwindValue(toWei(exactAmount));
-        if (result) setPercentageValue(result.toFixed(18));
+        setUnwindValue(
+          calculatePercentage(unwindState.rawOi, percentageDecimal).result
+        );
+        if (percentage) setPercentageValue(percentage.toFixed(18));
+      } else if (exactAmount === maxAmountNumber) {
+        setInputValue(input);
+        setPercentageValue("100");
+        setUnwindValue(unwindState.rawOi);
       } else {
         setInputValue(input);
-        if (exactAmount === maxAmountNumber) {
-          setUnwindValue(maxAmount);
-          setPercentageValue("100");
-        }
+        setPercentageValue("100");
+        const percentageDecimal = exactAmount / maxAmountNumber;
+        setUnwindValue(
+          calculatePercentage(unwindState.rawOi, percentageDecimal).result
+        );
       }
     },
 
@@ -103,11 +119,17 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   function calculatePercentage(
     value: bigint,
     percentage: number
-  ): string | number {
+  ): {
+    resultParsed: string | number;
+    result: bigint;
+  } {
     const percentageBigInt = BigInt(Math.round(percentage * 100)); // Convert percentage to an integer representation
-    const result = (value * percentageBigInt) / 10000n; // Multiply and divide by 10000 to account for the percentage conversion
+    const result = (value * percentageBigInt) / 100n; // Multiply and divide by 10000 to account for the percentage conversion
     const resultParsed = formatBigNumber(result);
-    return resultParsed;
+    return {
+      result,
+      resultParsed,
+    };
   }
 
   function formatBigNumber(
@@ -125,17 +147,21 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
     const newPercentageValue = input[0];
     if (newPercentageValue === 100) {
       setPercentageValue("100");
-      setUnwindValue(maxAmount);
-      setInputValue(formatBigNumber(maxAmount).toString());
+      setUnwindValue(unwindState.rawOi);
+      setInputValue(maxAmountNumber.toString());
+    } else {
+      setPercentageValue(newPercentageValue.toString());
+      const percentageDecimal = newPercentageValue / 100;
+      setInputValue(
+        calculatePercentage(
+          maxAmount,
+          percentageDecimal
+        ).resultParsed.toString()
+      );
+      setUnwindValue(
+        calculatePercentage(unwindState.rawOi, percentageDecimal).result
+      );
     }
-
-    setPercentageValue(newPercentageValue.toString());
-    // setInputValue(((newPercentageValue / 100) * maxAmount).toString());
-
-    setInputValue(
-      calculatePercentage(maxAmount, newPercentageValue).toString()
-    );
-    setUnwindValue(toWei(calculatePercentage(maxAmount, newPercentageValue)));
   };
 
   return (
@@ -183,6 +209,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         <UnwindButtonComponent
           position={position}
           inputValue={inputValue}
+          unwindValue={unwindValue}
           priceLimit={unwindState.priceLimit}
           unwindBtnState={unwindBtnState}
           handleDismiss={handleDismiss}

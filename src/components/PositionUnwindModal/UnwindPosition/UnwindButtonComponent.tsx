@@ -17,6 +17,7 @@ type UnwindButtonComponentProps = {
   position: OpenPositionData;
   unwindBtnState: string;
   inputValue: string;
+  unwindValue: bigint;
   priceLimit: bigint;
   handleDismiss: () => void;
 };
@@ -25,6 +26,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   position,
   unwindBtnState,
   inputValue,
+  unwindValue,
   priceLimit,
   handleDismiss,
 }) => {
@@ -50,7 +52,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   }, [inputValue, title]);
 
   const handleUnwind = async () => {
-    if (position && inputValue && priceLimit) {
+    if (position && unwindValue && inputValue && priceLimit) {
       setAttemptingUnwind(true);
 
       sdk.market
@@ -58,6 +60,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           marketAddress: position.marketAddress as Address,
           positionId: BigInt(position.positionId),
           fraction: toWei(inputValue),
+          // fraction: unwindValue,
           priceLimit: priceLimit,
         })
         .then((result) => {

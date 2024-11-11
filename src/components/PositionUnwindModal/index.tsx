@@ -6,7 +6,6 @@ import useSDK from "../../hooks/useSDK";
 import useAccount from "../../hooks/useAccount";
 import {
   OpenPositionData,
-  toWei,
   UnwindStateData,
   UnwindStateSuccess,
   UnwindStateError,
@@ -78,7 +77,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [position, account, inputValue, open, slippageValue]);
+  }, [position, account, inputValue, open, slippageValue, unwindValue]);
 
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
