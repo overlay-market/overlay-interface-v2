@@ -38,7 +38,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     undefined
   );
   const [inputValue, setInputValue] = useState<string>("");
-  const [unwindValue, setUnwindValue] = useState<bigint>(0n);
+  const [unwindPercentage, setUnwindPercentage] = useState<number>(0);
 
   useEffect(() => {
     setInputValue("");
@@ -56,8 +56,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
             position.marketAddress,
             account,
             position.positionId,
-            // toWei(inputValue),
-            unwindValue,
+            unwindPercentage,
             Number(slippageValue),
             4
           );
@@ -77,7 +76,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [position, account, inputValue, open, slippageValue, unwindValue]);
+  }, [position, account, open, slippageValue, unwindPercentage]);
 
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
@@ -115,8 +114,8 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
           unwindState={unwindState}
           inputValue={inputValue}
           setInputValue={setInputValue}
-          unwindValue={unwindValue}
-          setUnwindValue={setUnwindValue}
+          unwindPercentage={unwindPercentage}
+          setUnwindPercentage={setUnwindPercentage}
           handleDismiss={handleDismiss}
         />
       )}

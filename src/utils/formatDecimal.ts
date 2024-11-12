@@ -3,3 +3,7 @@ export const formatDecimalToPercentage = (decimal?: number | string) => {
   
   return number ? number * 100 : undefined
 }
+
+export const calculatePercentage = (value: number, percentageDecimal: number): number => {
+  return value * percentageDecimal
+}
