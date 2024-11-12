@@ -32,7 +32,7 @@ const App = () => {
         }}
       >
         <Popups />
-        <Flex direction={{ initial: "column", md: "row" }}>
+        <Flex direction={{ initial: "column", sm: "row" }}>
           <NavBar />
           <Wallet />
           <Routes>
