@@ -32,14 +32,18 @@ const SOCIAL_LINKS: Array<LinkAsset> = [
 const SocialLinksSection: React.FC = () => {
   return (
     <Flex
-      justify={{ initial: "start", md: "between" }}
-      px={{ initial: "20px", md: "0" }}
-      py={{ initial: "10px", md: "0" }}
-      gap={{ initial: "20px", md: "" }}
+      direction={{ initial: "row", sm: "column", md: "row" }}
+      justify={{ initial: "start", sm: "center", md: "between" }}
+      align={{ sm: "center" }}
+      px={{ initial: "20px", sm: "0" }}
+      py={{ initial: "10px", sm: "0" }}
+      gap={{ initial: "20px", sm: "4px", md: "0" }}
     >
       {SOCIAL_LINKS.map((link) => (
         <Link href={link.href} target="blank" key={link.href}>
-          <img src={link.src} alt={link.alt} width={"16px"} height={"16px"} />
+          <Flex p={{ initial: "0", sm: "12px", md: "0" }}>
+            <img src={link.src} alt={link.alt} width={"16px"} height={"16px"} />
+          </Flex>
         </Link>
       ))}
     </Flex>
