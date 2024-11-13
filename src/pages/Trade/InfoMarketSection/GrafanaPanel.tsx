@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Text } from "@radix-ui/themes";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 
 const GrafanaPanel: React.FC = () => {
@@ -17,13 +17,13 @@ const GrafanaPanel: React.FC = () => {
         </Text>
         {currentMarket 
           ? <iframe
-          src={snapshotUrl}
-          width="100%"
-          height="860"
-          frameBorder="0"
-          title="Grafana Snapshot"
-          ></iframe>
-          : <></>
+              src={snapshotUrl}
+              width="100%"
+              height="860"
+              frameBorder="0"
+              title="Grafana Snapshot"
+            ></iframe>
+          : <Skeleton height="860px" width="100%" />
         }
     </Flex>
   );
