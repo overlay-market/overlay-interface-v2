@@ -1,10 +1,8 @@
-import "./App.css";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Trade from "./pages/Trade";
-import { Container, Flex } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import NavBar from "./components/NavBar";
 import Markets from "./pages/Markets";
-import theme from "./theme";
 import useSDK from "./hooks/useSDK";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
 import useMultichainContext from "./providers/MultichainContextProvider/useMultichainContext";
@@ -13,6 +11,7 @@ import { useRef } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
 import Popups from "./components/Popups";
 import { DEFAULT_MARKET_ID } from "./constants/applications";
+import { AppContainer } from "./app-styles";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -23,16 +22,9 @@ const App = () => {
 
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
-      <Container
-        maxWidth={"1280px"}
-        minHeight={"100vh"}
-        width={"100vw"}
-        style={{
-          backgroundColor: `${theme.color.background}`,
-        }}
-      >
+      <AppContainer>
         <Popups />
-        <Flex direction={{ initial: "column", sm: "row" }}>
+        <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
           <NavBar />
           <Wallet />
           <Routes>
@@ -45,7 +37,7 @@ const App = () => {
             <Route path="/trade/:marketId" element={<Trade />} />
           </Routes>
         </Flex>
-      </Container>
+      </AppContainer>
     </MultichainContextProvider>
   );
 };
