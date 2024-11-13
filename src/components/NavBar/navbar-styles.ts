@@ -3,10 +3,11 @@ import styled from "styled-components";
 import theme from "../../theme";
 
 export const LinksWrapper = styled(Flex)`
-  visibility: hidden;
+  position: absolute;
+  left: -9999px;
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    visibility: visible;
+    position: static;
   }
 `;
 
