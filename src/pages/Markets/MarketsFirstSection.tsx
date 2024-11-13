@@ -4,7 +4,7 @@ import { PromotedBanner } from "../../components/Banner/PromotedBanner";
 
 export const FirstSection = () => {
   return (
-    <Flex gap="3" style={{ marginLeft: "50px" }}>
+    <Flex gap="3" ml="50px">
       <Box flexGrow="7" flexShrink="1" flexBasis="0%">
         <PromotedBanner
           Title="CGMI"

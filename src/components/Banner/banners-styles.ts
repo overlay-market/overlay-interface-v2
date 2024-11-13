@@ -50,13 +50,6 @@ export const StyledOptionalLinkBanner = styled(BaseBanner)`
 
 export const StyledPromotedBanner = styled(BaseBanner)``;
 
-export const StyledFlex = styled(Flex)`
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  width: 100%;
-`;
-
 export const TitleText = styled(Text)`
   font-size: clamp(18px, 4vw, 24px);
   font-weight: 600;

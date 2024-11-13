@@ -1,26 +1,13 @@
-import { Table } from "@radix-ui/themes";
-import { type Address } from "viem";
+import { Box, Flex, Table, Text } from "@radix-ui/themes";
 // import { LineChart, Line } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
-// import OverlayLogo from "../../assets/images/overlay-logo-only-no-background.png";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { SelectItem } from "@radix-ui/react-select";
 import useSDK from "../../hooks/useSDK";
 import { useEffect, useState } from "react";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
-
-export type TransformedMarketData = {
-  marketId: string;
-  marketAddress: Address;
-  price: string | number | undefined;
-  funding: string | number | undefined;
-  longPercentageOfTotalOi: string;
-  shortPercentageOfTotalOi: string;
-  oracleLogo: string;
-  marketLogo: string;
-  priceCurrency: string;
-};
+import { TransformedMarketData } from "overlay-sdk";
 
 export default function MarketsTable() {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
@@ -31,7 +18,6 @@ export default function MarketsTable() {
     const fetchData = async () => {
       try {
         const activeMarkets = await sdk.markets.transformMarketsData();
-        console.log("activeMarkets", activeMarkets);
 
         activeMarkets && setMarketsData(activeMarkets);
       } catch (error) {
@@ -42,9 +28,8 @@ export default function MarketsTable() {
     fetchData();
   }, [contextChainID]);
 
-  console.log("marketsData", marketsData[1]);
   return (
-    <div className="p-4 text-white">
+    <Box>
       <Table.Root
         variant="surface"
         style={{
@@ -56,13 +41,13 @@ export default function MarketsTable() {
       >
         <Table.Header style={{ verticalAlign: "middle" }}>
           <Table.Row>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              <div className="flex items-center justify-between">
-                <span>All Markets</span>
+            <Table.ColumnHeaderCell>
+              <Box>
+                <span style={{ color: theme.color.grey4 }}>All</span>
                 <Select.Root>
                   <Select.Trigger
                     style={{
-                      backgroundColor: theme.color.grey8,
+                      backgroundColor: theme.color.grey4,
                       borderRadius: 16,
                       padding: "4px 15px",
                       minHeight: 35,
@@ -73,19 +58,17 @@ export default function MarketsTable() {
                     }}
                   >
                     <Select.Value placeholder="Filter" />
-                    <Select.Icon className="SelectIcon">
+                    <Select.Icon>
                       <ChevronDownIcon />
                     </Select.Icon>
                     <Select.Portal>
-                      <Select.Content className="SelectContent">
-                        <Select.ScrollUpButton className="SelectScrollButton">
+                      <Select.Content>
+                        <Select.ScrollUpButton>
                           <ChevronUpIcon />
                         </Select.ScrollUpButton>
-                        <Select.Viewport className="SelectViewport">
+                        <Select.Viewport>
                           <Select.Group>
-                            <Select.Label className="SelectLabel">
-                              Fruits
-                            </Select.Label>
+                            <Select.Label>Fruits</Select.Label>
                             <SelectItem value="apple">Apple</SelectItem>
                             <SelectItem value="banana">Banana</SelectItem>
                             <SelectItem value="blueberry">Blueberry</SelectItem>
@@ -93,12 +76,10 @@ export default function MarketsTable() {
                             <SelectItem value="pineapple">Pineapple</SelectItem>
                           </Select.Group>
 
-                          <Select.Separator className="SelectSeparator" />
+                          <Select.Separator />
 
                           <Select.Group>
-                            <Select.Label className="SelectLabel">
-                              Vegetables
-                            </Select.Label>
+                            <Select.Label>Vegetables</Select.Label>
                             <SelectItem value="aubergine">Aubergine</SelectItem>
                             <SelectItem value="broccoli">Broccoli</SelectItem>
                             <SelectItem value="carrot" disabled>
@@ -108,51 +89,33 @@ export default function MarketsTable() {
                             <SelectItem value="leek">Leek</SelectItem>
                           </Select.Group>
 
-                          <Select.Separator className="SelectSeparator" />
+                          <Select.Separator />
 
                           <Select.Group>
-                            <Select.Label className="SelectLabel">
-                              Meat
-                            </Select.Label>
+                            <Select.Label>Meat</Select.Label>
                             <SelectItem value="beef">Beef</SelectItem>
                             <SelectItem value="chicken">Chicken</SelectItem>
                             <SelectItem value="lamb">Lamb</SelectItem>
                             <SelectItem value="pork">Pork</SelectItem>
                           </Select.Group>
                         </Select.Viewport>
-                        <Select.ScrollDownButton className="SelectScrollButton">
+                        <Select.ScrollDownButton>
                           <ChevronDownIcon />
                         </Select.ScrollDownButton>
                       </Select.Content>
                     </Select.Portal>
                   </Select.Trigger>
                 </Select.Root>
-              </div>
+              </Box>
             </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              Price
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              1h
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              24h
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              7d
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              Funding
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              OI Balance
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              Oracle
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell className="text-gray-400">
-              Last 7 Days
-            </Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>1h</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>24h</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>7d</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Funding</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Oracle</Table.ColumnHeaderCell>
+            <Table.ColumnHeaderCell>Last 7 Days</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
@@ -160,13 +123,12 @@ export default function MarketsTable() {
             marketsData.map((market, index) => (
               <Table.Row
                 key={index}
-                className="border-b"
                 style={{
                   borderBottom: `1px solid ${theme.color.darkBlue}`,
                 }}
               >
-                <Table.Cell className="px-2 py-1">
-                  <div className="flex items-center justify-center">
+                <Table.Cell style={{ padding: "8px 16px" }}>
+                  <Flex>
                     <img
                       style={{
                         width: "50px",
@@ -174,57 +136,72 @@ export default function MarketsTable() {
                         objectFit: "cover",
                       }}
                       src={market.marketLogo}
-                      // alt={market.marketName}
+                      alt={decodeURIComponent(market.marketId)}
                       className="rounded-full"
                     />
-                  </div>
+                    <span style={{ alignSelf: "center", marginLeft: 20 }}>
+                      {decodeURIComponent(market.marketId)}
+                    </span>
+                  </Flex>
                 </Table.Cell>
-                {/* <Table.Cell>${market.price.toFixed(2)}</Table.Cell>
-                <Table.Cell className="text-green-400">
-                  ^{market.change1h.toFixed(1)}%
-                </Table.Cell>
-                <Table.Cell className="text-green-400">
-                  ^{market.change24h.toFixed(1)}%
-                </Table.Cell>
-                <Table.Cell className="text-green-400">
-                  ^{market.change7d.toFixed(1)}%
-                </Table.Cell>
-                <Table.Cell className="text-green-400">
-                  +{market.funding.toFixed(2)}%
-                </Table.Cell>
+                <Table.Cell>${market.price}</Table.Cell>
+                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
+                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
+                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
+                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
                 <Table.Cell>
-                  <div className="flex items-center">
-                    <div className="w-1/2 h-2 bg-red-500 rounded-l-full"></div>
-                    <div className="w-1/2 h-2 bg-green-500 rounded-r-full"></div>
-                  </div>
+                  <Flex align="center" gap="2">
+                    <Text size="2">
+                      {Math.round(Number(market.shortPercentageOfTotalOi))}%
+                    </Text>
+                    <Box
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        width: "100px",
+                        height: "8px",
+                        backgroundColor: "#000000",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Box
+                        style={{
+                          width: `${market.shortPercentageOfTotalOi}%`,
+                          backgroundColor: "#FF5A5A",
+                          height: "100%",
+                          marginRight: "5px",
+                        }}
+                      />
+                      <Box
+                        style={{
+                          width: `${market.longPercentageOfTotalOi}%`,
+                          backgroundColor: "#4CAF50",
+                          height: "100%",
+                        }}
+                      />
+                    </Box>
+                    <Text size="2">
+                      {Math.round(Number(market.longPercentageOfTotalOi))}%
+                    </Text>
+                  </Flex>
                 </Table.Cell>
                 <Table.Cell>
                   <img
-                    src={OverlayLogo}
-                    alt={item.name}
-                    className="w-6 h-6 ml-2 rounded-full"
-                    style={{ maxHeight: 30, maxWidth: 30 }}
+                    src={market.oracleLogo}
+                    alt={decodeURIComponent(market.marketId)}
+                    style={{
+                      width: 24,
+                      height: 24,
+                      marginLeft: 8,
+                      borderRadius: "50%",
+                    }}
                   />
                 </Table.Cell>
-                <Table.Cell>
-                  <LineChart
-                    width={100}
-                    height={30}
-                    data={market.map((value) => ({ value }))}
-                  >
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#4ade80"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </Table.Cell> */}
+                <Table.Cell>/</Table.Cell>
               </Table.Row>
             ))}
         </Table.Body>
       </Table.Root>
-    </div>
+    </Box>
   );
 }
