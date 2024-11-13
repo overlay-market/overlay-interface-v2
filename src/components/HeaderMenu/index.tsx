@@ -20,6 +20,7 @@ import {
 } from "./header-menu-styles";
 import NavLinksSection from "../NavBar/NavLinksSection";
 import SocialLinksSection from "../NavBar/SocialLinksSection";
+import { NAVBAR_MODE } from "../../constants/applications";
 
 const networkLabel = (chainId: number) => {
   const isTestnet = [
@@ -76,11 +77,11 @@ const HeaderMenu = () => {
         )}
 
         <Box
-          display={{ initial: "block", md: "none" }}
+          display={{ initial: "block", sm: "none" }}
           width={{ initial: "auto" }}
           onClick={() => setOpen(false)}
         >
-          <NavLinksSection />
+          <NavLinksSection mode={NAVBAR_MODE.BURGER} />
         </Box>
 
         <Separator />
@@ -95,7 +96,7 @@ const HeaderMenu = () => {
           </DropdownItem>
         )}
         <Flex
-          display={{ initial: "flex", md: "none" }}
+          display={{ initial: "flex", sm: "none" }}
           onClick={() => setOpen(false)}
         >
           <SocialLinksSection />

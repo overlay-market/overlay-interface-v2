@@ -22,7 +22,8 @@ const theme = {
   },  
   headerSize: {
     width: '88px',
-    height: '78px'
+    height: '52px',
+    tabletWidth: '82px'
   },
   breakpoints: {
     xs: '520px',

@@ -4,8 +4,9 @@ import styled from "styled-components";
 
 export const ResponsiveEmptyPlaceholder = styled(Box)`
   height: 0;
+  border-bottom: 1px solid ${theme.color.darkBlue};
 
-  @media (min-width: 1024px) {
+  @media (min-width: ${theme.breakpoints.sm}) {
     width: 100%;
     height: ${theme.headerSize.height};
     border-bottom: 1px solid ${theme.color.darkBlue};

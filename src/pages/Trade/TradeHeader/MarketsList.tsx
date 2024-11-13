@@ -46,7 +46,7 @@ const MarketsList: React.FC = () => {
             radius="large"
             src={currentMarket?.marketLogo}
             variant="solid"
-            size="4"
+            size="2"
             fallback={<Text style={{ fontSize: "6px" }}>{`logo`}</Text>}
             color="gray"
           />

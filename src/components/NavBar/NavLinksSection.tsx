@@ -21,20 +21,29 @@ import {
   StakeIcon,
   StakeActiveIcon,
 } from "../../assets/icons/navBar-icons/stake";
-import { DEFAULT_MARKET_ID } from "../../constants/applications";
+import { DEFAULT_MARKET_ID, NAVBAR_MODE } from "../../constants/applications";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export interface NavLinkAsset {
   to: string;
   label: string;
   icon: ReactNode;
   activeIcon: ReactNode;
+  showOnMobile: boolean;
 }
 
-const NavLinksSection: React.FC = () => {
+type NavLinksSectionProps = {
+  mode?: NAVBAR_MODE;
+};
+
+const NavLinksSection: React.FC<NavLinksSectionProps> = ({
+  mode = NAVBAR_MODE.DEFAULT,
+}) => {
   const { currentMarket } = useCurrentMarketState();
 
   const activeMarketId = currentMarket?.marketId ?? DEFAULT_MARKET_ID;
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   const NAV_LINKS: Array<NavLinkAsset> = [
     {
@@ -42,51 +51,66 @@ const NavLinksSection: React.FC = () => {
       label: "Markets",
       icon: <BackpackIcon />,
       activeIcon: <BackpackActiveIcon />,
+      showOnMobile: true,
     },
     {
       to: `/trade/${activeMarketId}`,
       label: "Trade",
       icon: <TradeIcon />,
       activeIcon: <TradeActiveIcon />,
+      showOnMobile: true,
     },
     {
       to: "/portfolio",
       label: "Portfolio",
       icon: <BackpackIcon />,
       activeIcon: <BackpackActiveIcon />,
+      showOnMobile: true,
     },
     {
       to: "/powercards",
       label: "PowerCards",
       icon: <PowercardIcon />,
       activeIcon: <PowercardActiveIcon />,
+      showOnMobile: !isMobile,
     },
     {
       to: "/leaderboard",
-      label: "Leaderboard",
+      label:
+        isMobile && mode === NAVBAR_MODE.DEFAULT ? "Leaders" : "Leaderboard",
       icon: <RocketIcon />,
       activeIcon: <RocketActiveIcon />,
+      showOnMobile: true,
     },
     {
       to: "/stake",
       label: "Stake",
       icon: <StakeIcon />,
       activeIcon: <StakeActiveIcon />,
+      showOnMobile: true,
     },
   ];
 
   return (
-    <Flex direction={"column"} gap={{ initial: "0", md: "8px" }}>
-      {NAV_LINKS.map((link) => (
-        <StyledNavLink
-          key={link.label}
-          to={link.to}
-          label={link.label}
-          icon={link.icon}
-          activeIcon={link.activeIcon}
-        />
-      ))}
-    </Flex>
+    <>
+      {mode === NAVBAR_MODE.DEFAULT && (
+        <Flex
+          direction={{ initial: "row", sm: "column" }}
+          gap={{ initial: "4px", sm: "8px" }}
+        >
+          {NAV_LINKS.filter((link) => link.showOnMobile).map((link) => (
+            <StyledNavLink key={link.label} link={link} mode={mode} />
+          ))}
+        </Flex>
+      )}
+      {mode === NAVBAR_MODE.BURGER && (
+        <Flex direction={"column"} gap="0">
+          {NAV_LINKS.map((link) => (
+            <StyledNavLink key={link.label} link={link} mode={mode} />
+          ))}
+        </Flex>
+      )}
+    </>
   );
 };
 
