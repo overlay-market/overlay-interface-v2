@@ -15,7 +15,7 @@ const NavBar: React.FC = () => {
           md: `${theme.headerSize.width}`,
         }}
         height={{ initial: `${theme.headerSize.height}`, sm: "100vh" }}
-        py={{ initial: "0", sm: "20px" }}
+        py={{ initial: "0", sm: "10px" }}
         px={{ initial: "15px", sm: "6px" }}
         position={{ initial: "static", sm: "sticky" }}
         top={"0"}
@@ -29,7 +29,7 @@ const NavBar: React.FC = () => {
           height={{ initial: `${theme.headerSize.height}`, sm: "90vh" }}
           align={"center"}
         >
-          <img src={LogoImg} alt="Logo" width={"40px"} height={"40px"} />
+          <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
 
           <LinksWrapper direction="column" justify={"between"} flexGrow={"1"}>
             <NavLinksSection />
