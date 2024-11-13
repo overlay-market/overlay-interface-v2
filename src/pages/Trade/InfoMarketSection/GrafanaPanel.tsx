@@ -1,12 +1,10 @@
 import React from "react";
 import { Flex, Text } from "@radix-ui/themes";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 
 const GrafanaPanel: React.FC = () => {
-  const snapshotUrl = "https://grafana.overlay.market/dashboard/snapshot/MCcLUywiFzubMYf2mojNoWlalARD4zGA?kiosk"; // whole dashboard
-
-  function onloadFn() {
-    console.log('iframe content loaded');
-  }
+  const { currentMarket } = useCurrentMarketState();
+  const snapshotUrl = `https://grafana.overlay.market/stats-snapshot/${currentMarket?.id ?? ""}?kiosk`; // whole dashboard
 
   return (
     <Flex
@@ -17,14 +15,16 @@ const GrafanaPanel: React.FC = () => {
         <Text weight={"bold"} size={"5"}>
             Statistics
         </Text>
-        <iframe
-        onLoad={onloadFn}
-        src={snapshotUrl}
-        width="100%"
-        height="860"
-        frameBorder="0"
-        title="Grafana Snapshot"
-        ></iframe>
+        {currentMarket 
+          ? <iframe
+          src={snapshotUrl}
+          width="100%"
+          height="860"
+          frameBorder="0"
+          title="Grafana Snapshot"
+          ></iframe>
+          : <></>
+        }
     </Flex>
   );
 };
