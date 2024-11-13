@@ -3,7 +3,7 @@ import {
   CustomCard,
   CardsValue,
   CardsTitle,
-} from "./MarketCards_";
+} from "./market-cards-styles";
 
 interface MarketCardsProps {
   value: string;
