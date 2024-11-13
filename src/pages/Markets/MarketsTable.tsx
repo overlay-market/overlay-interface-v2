@@ -7,7 +7,12 @@ import { SelectItem } from "@radix-ui/react-select";
 import useSDK from "../../hooks/useSDK";
 import { useEffect, useState } from "react";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
-import { TransformedMarketData } from "overlay-sdk";
+import {
+  limitDigitsInDecimals,
+  toPercentUnit,
+  toScientificNumber,
+  TransformedMarketData,
+} from "overlay-sdk";
 
 export default function MarketsTable() {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
@@ -144,7 +149,18 @@ export default function MarketsTable() {
                     </span>
                   </Flex>
                 </Table.Cell>
-                <Table.Cell>${market.price}</Table.Cell>
+                <Table.Cell>
+                  {market.priceCurrency}
+                  {market.priceCurrency === "%"
+                    ? toPercentUnit(market.price)
+                    : toScientificNumber(
+                        Number(market.price) < 100000
+                          ? limitDigitsInDecimals(market.price)
+                          : Math.floor(Number(market.price)).toLocaleString(
+                              "en-US"
+                            )
+                      )}
+                </Table.Cell>
                 <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
                 <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
                 <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
