@@ -1,13 +1,13 @@
 import React from "react";
 import {
   StyledOptionalLinkBanner,
-  StyledFlex,
   SubtitleText,
   TitleText,
   LinkText,
   LinkIcon,
-} from "../Banners_";
+} from "../banners-styles";
 import theme from "../../../theme";
+import { Flex } from "@radix-ui/themes";
 
 interface OptionalLinkBannerProps {
   Title: string;
@@ -22,7 +22,12 @@ export const OptionalLinkBanner: React.FC<OptionalLinkBannerProps> = ({
 }) => {
   return (
     <StyledOptionalLinkBanner>
-      <StyledFlex>
+      <Flex
+        direction={"column"}
+        justify={"start"}
+        align={"start"}
+        width={"100%"}
+      >
         <SubtitleText>{Title}</SubtitleText>
         <TitleText style={{ color: theme.color.darkBlue }}>
           {Name} is Live
@@ -31,7 +36,7 @@ export const OptionalLinkBanner: React.FC<OptionalLinkBannerProps> = ({
           {Link}
           <LinkIcon />
         </LinkText>
-      </StyledFlex>
+      </Flex>
     </StyledOptionalLinkBanner>
   );
 };

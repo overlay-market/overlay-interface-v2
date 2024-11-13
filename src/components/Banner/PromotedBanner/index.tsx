@@ -1,11 +1,11 @@
 import {
   StyledPromotedBanner,
-  StyledFlex,
   SubtitleText,
   TitleText,
   CardsValue,
-} from "../Banners_";
+} from "../banners-styles";
 import theme from "../../../theme";
+import { Flex } from "@radix-ui/themes";
 
 interface PromotedBannerProps {
   Title: string;
@@ -16,11 +16,16 @@ interface PromotedBannerProps {
 export const PromotedBanner = ({ Title, Name, Value }: PromotedBannerProps) => {
   return (
     <StyledPromotedBanner>
-      <StyledFlex>
+      <Flex
+        direction={"column"}
+        justify={"start"}
+        align={"start"}
+        width={"100%"}
+      >
         <SubtitleText>{Title}</SubtitleText>
         <TitleText style={{ color: theme.color.grey1 }}>{Name}</TitleText>
         <CardsValue>${Value}</CardsValue>
-      </StyledFlex>
+      </Flex>
     </StyledPromotedBanner>
   );
 };
