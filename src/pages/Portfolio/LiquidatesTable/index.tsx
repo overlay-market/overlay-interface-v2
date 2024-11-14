@@ -81,7 +81,7 @@ const LiquidatesTable: React.FC = () => {
       direction={"column"}
       px={"8px"}
       pt={"16px"}
-      pb={"66px"}
+      pb={"120px"}
       width={"100%"}
       style={{
         borderBottom: `1px solid ${theme.color.darkBlue}`,
