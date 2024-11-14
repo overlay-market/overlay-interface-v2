@@ -7,6 +7,7 @@ import {
 } from "./description-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import theme from "../../../theme";
+import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
 
 const Description: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
@@ -42,14 +43,15 @@ const Description: React.FC = () => {
 
   return (
     <DescriptionContainer>
-      {currentMarket?.fullLogo && (
-        <MarketImg
-          src={currentMarket?.fullLogo}
-          alt={`market logo`}
-          width={"100%"}
-          height={"auto"}
-        />
-      )}
+      {currentMarket?.marketId &&
+        MARKETS_FULL_LOGOS[currentMarket.marketId] && (
+          <MarketImg
+            src={MARKETS_FULL_LOGOS[currentMarket.marketId]}
+            alt={`market logo`}
+            width={"100%"}
+            height={"auto"}
+          />
+        )}
 
       <Flex direction={"column"} px={"16px"} py={"32px"} gap={"8px"}>
         <Text weight={"bold"} size={"3"}>
