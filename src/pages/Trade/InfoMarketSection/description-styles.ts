@@ -3,13 +3,18 @@ import styled from "styled-components";
 import theme from "../../../theme";
 
 export const DescriptionContainer = styled(Box)`
-  width: 375px;
+  width: 350px;
+  min-width: 350px;
   border-radius: 8px;
   background: ${theme.color.grey4};
+
+  @media (min-width: 405px) {  
+    width: 375px;  
+    min-width: 375px;
+  }
 `
 
-export const MarketImg = styled.img`
-  
+export const MarketImg = styled.img`  
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 ` 
