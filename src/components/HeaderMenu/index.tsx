@@ -8,7 +8,7 @@ import {
   NETWORK_ICONS,
   SUPPORTED_CHAINID,
 } from "../../constants/chains";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import {usePrivy, useWallets} from '@privy-io/react-auth';
 import theme from "../../theme";
 import {
   ChainLogo,
@@ -21,6 +21,7 @@ import {
 import NavLinksSection from "../NavBar/NavLinksSection";
 import SocialLinksSection from "../NavBar/SocialLinksSection";
 import { NAVBAR_MODE } from "../../constants/applications";
+import {useSetActiveWallet} from '@privy-io/wagmi';
 
 const networkLabel = (chainId: number) => {
   const isTestnet = [
@@ -48,12 +49,15 @@ const HeaderMenu = () => {
     disconnect();
   };
 
-  const { open: openConnectWalletModal } = useWeb3Modal();
+  const {login} = usePrivy()
+  const {setActiveWallet} = useSetActiveWallet();
+  const {wallets, ready: walletsReady} = useWallets();
 
   const handleWalletConnect = async () => {
     try {
-      await openConnectWalletModal();
+      await login();
     } catch (error) {
+      walletsReady && setActiveWallet(wallets[0]);
       console.error("Failed to connect:", error);
     }
   };

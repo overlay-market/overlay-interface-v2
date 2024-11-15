@@ -11,7 +11,7 @@ import {
 } from "../../../state/trade/hooks";
 import { useCallback, useMemo, useState } from "react";
 import { toWei } from "overlay-sdk";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import {usePrivy} from '@privy-io/react-auth';
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { TradeStateData } from "../../../types/tradeStateTypes";
 import { Address, maxUint256 } from "viem";
@@ -30,7 +30,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 }) => {
   const { address } = useAccount();
   const sdk = useSDK();
-  const { open } = useWeb3Modal();
+  const {login: open} = usePrivy()
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
@@ -176,7 +176,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     const errorCode: number | string =
       errorObj.cause?.cause?.code || errorObj.code;
 
-    let errorMessage =
+    const errorMessage =
       errorObj.cause?.shortMessage || errorObj.cause?.cause?.shortMessage;
     return { errorCode, errorMessage };
   };
