@@ -1,28 +1,22 @@
 import { wagmiConfig } from "./wagmi";
 import { PropsWithChildren } from "react";
-import { WagmiProvider } from "wagmi";
+import {WagmiProvider} from '@privy-io/wagmi';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ConnectionProvider from "../ConnectionProvider";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { arbitrumSepolia } from "wagmi/chains";
-
-const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string;
+import { PrivyProvider } from "@privy-io/react-auth";
+import {privyConfig} from './privyConfig';
 
 const Web3Provider: React.FC<PropsWithChildren> = ({ children }) => {
   const queryClient = new QueryClient();
 
-  createWeb3Modal({
-    wagmiConfig,
-    projectId,
-    defaultChain: arbitrumSepolia,
-  });
-
   return (
-    <WagmiProvider config={wagmiConfig}>
+    <PrivyProvider appId='cm3g99g9p026e6jtjlcalrw4p' config={privyConfig}>
       <QueryClientProvider client={queryClient}>
-        <ConnectionProvider>{children}</ConnectionProvider>
-      </QueryClientProvider>
+    <WagmiProvider config={wagmiConfig}>
+    <ConnectionProvider>{children}</ConnectionProvider>
     </WagmiProvider>
+      </QueryClientProvider>
+    </PrivyProvider>
   );
 };
 
