@@ -1,10 +1,10 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
 import React, { useEffect, useState } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useSDK from "../../hooks/useSDK";
 import { MarketData } from "../../types/marketTypes";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
@@ -15,11 +15,13 @@ import {
 } from "../../state/currentMarket/hooks";
 import { useMarketsActionHandlers } from "../../state/markets/hooks";
 import PositionsTable from "./PositionsTable";
+import InfoMarketSection from "./InfoMarketSection";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
+  const navigate = useNavigate();
   const { currentMarket } = useCurrentMarketState();
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
@@ -47,7 +49,14 @@ const Trade: React.FC = () => {
       const currentMarket = markets.find(
         (market) => market.marketName === marketId
       );
-      currentMarket && handleCurrentMarketSet(currentMarket);
+
+      if (currentMarket) {
+        handleCurrentMarketSet(currentMarket);
+      } else {
+        const activeMarket = markets[0];
+        handleCurrentMarketSet(activeMarket);
+        navigate(`/trade/${activeMarket.marketId}`);
+      }
     }
   }, [marketId, chainId, markets]);
 
@@ -62,7 +71,7 @@ const Trade: React.FC = () => {
   }, [marketId, chainId, handleTradeStateReset]);
 
   return (
-    <Flex direction="column" width={"100%"}>
+    <Flex direction="column" width={"100%"} mb="100px">
       <TradeHeader />
 
       <Flex direction="column" gap="20px">
@@ -90,9 +99,7 @@ const Trade: React.FC = () => {
           )}
         </Flex>
         <PositionsTable />
-        <Text weight={"bold"} size={"5"}>
-          About This Market
-        </Text>
+        <InfoMarketSection />
       </Flex>
     </Flex>
   );

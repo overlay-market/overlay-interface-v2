@@ -3,54 +3,45 @@ import LogoImg from "../../assets/images/overlay-logo-only-no-background.png";
 import theme from "../../theme";
 import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
-import { GradientOutlineButton } from "../Button";
+import { LinksWrapper, MobileNavBar } from "./navbar-styles";
 
 const NavBar: React.FC = () => {
   return (
-    <Box
-      width={{ initial: "100%", md: `${theme.headerSize.width}` }}
-      height={{ initial: `${theme.headerSize.height}`, md: "100vh" }}
-      py={{ initial: "0", md: "20px" }}
-      px={{ initial: "15px", md: "6px" }}
-      position={{ initial: "static", md: "sticky" }}
-      top={"0"}
-      style={{
-        borderRight: `1px solid ${theme.color.darkBlue}`,
-        borderBottom: `1px solid ${theme.color.darkBlue}`,
-      }}
-    >
-      <Flex
-        direction={{ initial: "row", md: "column" }}
-        gap={{ initial: "20px", md: "8px" }}
-        height={{ initial: "65px", md: "90vh" }}
-        align={"center"}
+    <>
+      <Box
+        width={{
+          initial: "100%",
+          sm: `${theme.headerSize.tabletWidth}`,
+          md: `${theme.headerSize.width}`,
+        }}
+        height={{ initial: `${theme.headerSize.height}`, sm: "100vh" }}
+        py={{ initial: "0", sm: "10px" }}
+        px={{ initial: "15px", sm: "6px" }}
+        position={{ initial: "static", sm: "sticky" }}
+        top={"0"}
+        style={{
+          borderRight: `1px solid ${theme.color.darkBlue}`,
+        }}
       >
-        <img src={LogoImg} alt="Logo" width={"40px"} height={"40px"} />
-
         <Flex
-          direction="column"
-          justify={"between"}
-          flexGrow={"1"}
-          display={{ initial: "none", md: "flex" }}
+          direction={{ initial: "row", sm: "column" }}
+          gap={{ initial: "20px", sm: "8px" }}
+          height={{ initial: `${theme.headerSize.height}`, sm: "90vh" }}
+          align={"center"}
         >
-          <NavLinksSection />
+          <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
 
-          <Flex direction={"column"} gap={"20px"}>
-            <GradientOutlineButton
-              title={"Buy OV"}
-              width={"78px"}
-              height={"29px"}
-              handleClick={() => {
-                console.log("buy OV!");
-              }}
-            />
+          <LinksWrapper direction="column" justify={"between"} flexGrow={"1"}>
+            <NavLinksSection />
             <SocialLinksSection />
-          </Flex>
+          </LinksWrapper>
         </Flex>
+      </Box>
 
-        <Box display={{ initial: "block", md: "none" }}>NavBar Hamburger</Box>
-      </Flex>
-    </Box>
+      <MobileNavBar>
+        <NavLinksSection />
+      </MobileNavBar>
+    </>
   );
 };
 
