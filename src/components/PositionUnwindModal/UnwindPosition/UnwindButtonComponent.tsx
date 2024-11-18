@@ -128,6 +128,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           title={title}
           width={"100%"}
           height={"46px"}
+          size={"14px"}
           isDisabled={isDisabledUnwindButton}
         />
       )}
@@ -135,6 +136,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
       {attemptingUnwind && (
         <GradientLoaderButton
           height={"46px"}
+          size={"14px"}
           title={"Pending confirmation..."}
         />
       )}

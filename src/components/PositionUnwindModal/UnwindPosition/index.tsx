@@ -1,5 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 import {
   calculatePercentage,
@@ -12,6 +12,7 @@ import Slider from "../../Slider";
 import UnwindPositionDetails from "./UnwindPositionDetails";
 import UnwindButtonComponent from "./UnwindButtonComponent";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
+import useDebounce from "../../../hooks/useDebounce";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
@@ -33,6 +34,8 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   handleDismiss,
 }) => {
   const [percentageValue, setPercentageValue] = useState<string>("");
+  const [selectedPercent, setSelectedPercent] = useState<number>(0);
+  const debouncedSelectedPercent = useDebounce(selectedPercent, 500);
 
   const { value, currentPrice, unwindBtnState } = useMemo(() => {
     const value = unwindState.value
@@ -51,6 +54,12 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
       unwindBtnState,
     };
   }, [unwindState]);
+
+  useEffect(() => {
+    if (debouncedSelectedPercent) {
+      setUnwindPercentage(debouncedSelectedPercent);
+    }
+  }, [debouncedSelectedPercent]);
 
   const maxAmount: number = useMemo(() => Number(value) ?? 0, [value]);
 
@@ -80,23 +89,23 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
       if (exactAmount === 0) {
         setInputValue(input);
         setPercentageValue("0");
-        setUnwindPercentage(0);
+        setSelectedPercent(0);
         return;
       } else if (exactAmount > 0 && exactAmount < maxAmount) {
         const percentageDecimal = exactAmount / maxAmount;
         const percentage = formatDecimalToPercentage(percentageDecimal);
         setInputValue(input);
-        setUnwindPercentage(percentageDecimal);
+        setSelectedPercent(percentageDecimal);
         if (percentage) setPercentageValue(percentage.toFixed(18));
       } else if (exactAmount === maxAmount) {
         setInputValue(input);
         setPercentageValue("100");
-        setUnwindPercentage(1);
+        setSelectedPercent(1);
       } else {
         setInputValue(input);
         setPercentageValue("100");
         const percentageDecimal = exactAmount / maxAmount;
-        setUnwindPercentage(percentageDecimal);
+        setSelectedPercent(percentageDecimal);
       }
     },
 
@@ -105,9 +114,10 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
 
   const handlePercentageInput = (input: number[]) => {
     const newPercentageValue = input[0];
+
     if (newPercentageValue === 100) {
       setPercentageValue("100");
-      setUnwindPercentage(1);
+      setSelectedPercent(1);
       setInputValue(maxAmount.toString());
     } else {
       setPercentageValue(newPercentageValue.toString());
@@ -115,7 +125,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
       setInputValue(
         calculatePercentage(maxAmount, percentageDecimal).toString()
       );
-      setUnwindPercentage(percentageDecimal);
+      setSelectedPercent(percentageDecimal);
     }
   };
 
