@@ -76,7 +76,7 @@ const Description: React.FC = () => {
             <Text
               weight={"medium"}
               onClick={toggleTruncate}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", textDecoration: "underline" }}
             >
               {isTruncated ? "Read more" : "Read less"}
             </Text>
