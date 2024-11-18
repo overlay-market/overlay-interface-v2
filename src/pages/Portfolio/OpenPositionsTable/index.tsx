@@ -83,7 +83,6 @@ const OpenPositionsTable: React.FC = () => {
   return (
     <Flex
       direction={"column"}
-      px={"8px"}
       pt={"36px"}
       pb={"66px"}
       width={"100%"}

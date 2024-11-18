@@ -79,7 +79,6 @@ const LiquidatesTable: React.FC = () => {
   return (
     <Flex
       direction={"column"}
-      px={"8px"}
       pt={"16px"}
       pb={"120px"}
       width={"100%"}
