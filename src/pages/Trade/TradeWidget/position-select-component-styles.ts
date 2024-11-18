@@ -3,7 +3,7 @@ import styled from "styled-components"
 import  theme  from "../../../theme"
 
 export const LongPositionSelectButton = styled(Box)<{ active: string }>`
-  padding: 12px;
+  padding: 4px 12px;
   border-radius: 8px;
   width: 100%; 
   cursor: pointer;
@@ -16,7 +16,7 @@ export const LongPositionSelectButton = styled(Box)<{ active: string }>`
 `
 
 export const ShortPositionSelectButton = styled(Box)<{ active: string }>`
-  padding: 12px;
+  padding: 4px 12px;
   border-radius: 8px;
   width: 100%;  
   cursor: pointer; 

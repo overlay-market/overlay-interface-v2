@@ -26,6 +26,7 @@ const Wallet: React.FC = () => {
           title={"Buy OV"}
           width={"78px"}
           height={"29px"}
+          size={"12px"}
           handleClick={() => {
             console.log("buy OV!");
           }}
