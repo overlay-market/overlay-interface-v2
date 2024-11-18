@@ -14,7 +14,8 @@ const ROWS_PER_PAGE = [10, 20, 50];
 
 type TableProps = {
   headerColumns: string[];
-  width: string;
+  width?: string;
+  minWidth?: string;
   currentPage: number;
   positionsTotalNumber: number;
   itemsPerPage: number;
@@ -26,6 +27,7 @@ type TableProps = {
 const StyledTable: React.FC<TableProps> = ({
   headerColumns,
   width,
+  minWidth,
   currentPage,
   positionsTotalNumber,
   itemsPerPage,
@@ -55,7 +57,7 @@ const StyledTable: React.FC<TableProps> = ({
   return (
     <>
       <ScrollArea type="auto" scrollbars="horizontal" size="2">
-        <Table width={width}>
+        <Table width={width} minWidth={minWidth}>
           <thead>
             <tr>
               {headerColumns.map((column: string) => (
@@ -85,16 +87,86 @@ const StyledTable: React.FC<TableProps> = ({
             {/* Page Numbers */}
             {[...Array(totalPages)].map((_, pageIndex) => {
               const page = pageIndex + 1;
-              return (
-                <PaginationButton
-                  key={pageIndex}
-                  onClick={() => handlePageClick(page)}
-                  active={page === currentPage}
-                  navBtn={false}
-                >
-                  {page}
-                </PaginationButton>
-              );
+
+              if (currentPage <= 4) {
+                if (page <= 5 || page === totalPages) {
+                  return (
+                    <PaginationButton
+                      key={pageIndex}
+                      onClick={() => handlePageClick(page)}
+                      active={page === currentPage}
+                      navBtn={false}
+                    >
+                      {page}
+                    </PaginationButton>
+                  );
+                }
+                if (page === 6) {
+                  return (
+                    <Text
+                      key={`ellipsis-${page}`}
+                      style={{ padding: "6px 5px 0" }}
+                    >
+                      ...
+                    </Text>
+                  );
+                }
+              } else if (currentPage > totalPages - 4) {
+                if (page === 1 || page > totalPages - 5) {
+                  return (
+                    <PaginationButton
+                      key={pageIndex}
+                      onClick={() => handlePageClick(page)}
+                      active={page === currentPage}
+                      navBtn={false}
+                    >
+                      {page}
+                    </PaginationButton>
+                  );
+                }
+                if (page === totalPages - 5) {
+                  return (
+                    <Text
+                      key={`ellipsis-${page}`}
+                      style={{ padding: "6px 5px 0" }}
+                    >
+                      ...
+                    </Text>
+                  );
+                }
+              } else {
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <PaginationButton
+                      key={pageIndex}
+                      onClick={() => handlePageClick(page)}
+                      active={page === currentPage}
+                      navBtn={false}
+                    >
+                      {page}
+                    </PaginationButton>
+                  );
+                }
+                if (
+                  (page === 2 && currentPage > 4) ||
+                  (page === totalPages - 1 && currentPage < totalPages - 3)
+                ) {
+                  return (
+                    <Text
+                      key={`ellipsis-${page}`}
+                      style={{ padding: "6px 5px 0" }}
+                    >
+                      ...
+                    </Text>
+                  );
+                }
+              }
+
+              return null;
             })}
 
             {/* Next Button */}

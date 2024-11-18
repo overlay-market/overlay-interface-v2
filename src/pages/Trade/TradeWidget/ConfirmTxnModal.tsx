@@ -1,20 +1,16 @@
-import { useTradeState } from "../../../../state/trade/hooks";
 import { Flex, Text } from "@radix-ui/themes";
-import theme from "../../../../theme";
-import Modal from "../../../../components/Modal";
+import { useMemo } from "react";
+import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { useTradeState } from "../../../state/trade/hooks";
+import Modal from "../../../components/Modal";
+import theme from "../../../theme";
+import DetailRow from "../../../components/Modal/DetailRow";
 import {
   GradientLoaderButton,
   GradientSolidButton,
-} from "../../../../components/Button";
-import { TradeStateData } from "../../../../types/tradeStateTypes";
-import { useCurrentMarketState } from "../../../../state/currentMarket/hooks";
-import { useMemo } from "react";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-} from "overlay-sdk";
-import DetailRow from "./DetailRow";
+} from "../../../components/Button";
+import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 type ConfirnTxnModalProps = {
   open: boolean;
@@ -35,38 +31,34 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
   const { slippageValue, isLong, selectedLeverage } = useTradeState();
 
   const price: string = useMemo(() => {
-    const parsedPrice = limitDigitsInDecimals(
-      tradeState.priceInfo.price as string
-    );
     if (!market) return "-";
-    const transformedPrice =
-      market.priceCurrency === "%"
-        ? toPercentUnit(parsedPrice).toString()
-        : toScientificNumber(parsedPrice);
+
+    const transformedPrice = formatPriceByCurrency(
+      tradeState.priceInfo.price as string,
+      market.priceCurrency
+    );
+
     return transformedPrice;
   }, [tradeState, market]);
 
   const minPrice: string = useMemo(() => {
-    const parsedMinPrice = limitDigitsInDecimals(
-      tradeState.priceInfo.minPrice as string
-    );
     if (!market) return "-";
-    const transformedMinPrice =
-      market.priceCurrency === "%"
-        ? toPercentUnit(parsedMinPrice).toString()
-        : toScientificNumber(parsedMinPrice);
+
+    const transformedMinPrice = formatPriceByCurrency(
+      tradeState.priceInfo.minPrice as string,
+      market.priceCurrency
+    );
     return transformedMinPrice;
   }, [tradeState, market]);
 
   const liquidationPriceEstimate: string = useMemo(() => {
-    const parsedPrice = limitDigitsInDecimals(
-      tradeState.liquidationPriceEstimate
-    );
     if (!market) return "-";
-    const transformedPrice =
-      market.priceCurrency === "%"
-        ? toPercentUnit(parsedPrice).toString()
-        : toScientificNumber(parsedPrice);
+
+    const transformedPrice = formatPriceByCurrency(
+      tradeState.liquidationPriceEstimate,
+      market.priceCurrency
+    );
+
     return transformedPrice;
   }, [tradeState, market]);
 
@@ -81,8 +73,6 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
       handleClose={handleDismiss}
       title={"Confirm Transaction"}
       fontSizeTitle={"16px"}
-      boxShadow={`0px 0px 12px 6px rgba(91, 96, 164, 0.25)`}
-      borderColor={`${theme.color.blue2}80`}
       width="352px"
       minHeight="565px"
     >

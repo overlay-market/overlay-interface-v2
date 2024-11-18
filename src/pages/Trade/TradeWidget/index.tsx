@@ -7,18 +7,17 @@ import {
 } from "../../../state/trade/hooks";
 import AdditionalTradeDetails from "./AdditionalTradeDetails";
 import TradeButtonComponent from "./TradeButtonComponent";
-import LeverageSlider from "../../../components/LeverageSlider";
 import PositionSelectComponent from "./PositionSelectComponent";
 import CollateralInputComponent from "./CollateralInputComponent";
 import useSDK from "../../../hooks/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useState } from "react";
 import { Address } from "viem";
-import { formatWeiToParsedNumber, toWei } from "overlay-sdk";
+import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
 import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
-import { TradeStateData } from "../../../types/tradeStateTypes";
+import Slider from "../../../components/Slider";
 
 const TradeWidget: React.FC = () => {
   const { marketId } = useParams();
@@ -122,11 +121,13 @@ const TradeWidget: React.FC = () => {
     >
       <PositionSelectComponent />
 
-      <LeverageSlider
+      <Slider
+        title={"Leverage"}
         min={1}
         max={capLeverage ?? 1}
         step={0.1}
         value={Number(selectedLeverage)}
+        valueUnit={"x"}
         handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
       />
 

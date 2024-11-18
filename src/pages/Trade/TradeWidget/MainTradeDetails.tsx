@@ -4,13 +4,9 @@ import SetSlippageModal from "../../../components/SetSlippageModal";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useEffect, useMemo, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-} from "overlay-sdk";
+import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { TradeStateData } from "../../../types/tradeStateTypes";
+import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 type MainTradeDetailsProps = {
   tradeState?: TradeStateData;
@@ -44,11 +40,10 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
       typedValue &&
       market &&
       setCurrencyPrice(
-        `${market.priceCurrency}${
-          market.priceCurrency === "%"
-            ? toPercentUnit(price)
-            : toScientificNumber(price)
-        }`
+        `${market.priceCurrency}${formatPriceByCurrency(
+          price,
+          market.priceCurrency
+        )}`
       );
   }, [price, market, typedValue]);
 
@@ -57,11 +52,10 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
       typedValue &&
       market &&
       setCurrencyMinPrice(
-        `${market.priceCurrency}${
-          market.priceCurrency === "%"
-            ? toPercentUnit(minPrice)
-            : toScientificNumber(minPrice)
-        }`
+        `${market.priceCurrency}${formatPriceByCurrency(
+          minPrice,
+          market.priceCurrency
+        )}`
       );
   }, [minPrice, market, typedValue]);
 

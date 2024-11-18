@@ -9,9 +9,9 @@ import StyledTable from "../../../components/Table";
 import OpenPosition from "./OpenPosition";
 import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
-import { OpenPositionData } from "../../../types/positionTypes";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
+import { OpenPositionData } from "overlay-sdk";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -90,6 +90,7 @@ const PositionsTable: React.FC = () => {
       <StyledTable
         headerColumns={POSITIONS_COLUMNS}
         width={"680px"}
+        minWidth={"600px"}
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
         positionsTotalNumber={positionsTotalNumber}

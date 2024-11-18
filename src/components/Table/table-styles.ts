@@ -3,8 +3,9 @@ import theme from "../../theme";
 import { Button, Flex } from "@radix-ui/themes";
 import { ChevronDown } from "react-feather";
 
-export const Table = styled.table<{ width: string }>`
+export const Table = styled.table<{ width?: string, minWidth?: string }>`
   width: ${(props) => (props.width ?? '100%')};
+  min-width: ${(props) => (props.minWidth ?? '100%')};
   border-collapse: collapse;
   margin: 24px 0px;
 `;
@@ -19,6 +20,11 @@ export const StyledHeader = styled.th`
 
 export const StyledRow = styled.tr`
   border-bottom: 1px solid ${theme.color.grey6};
+
+  &:hover {
+    background-color: ${theme.color.grey7};
+    cursor: pointer;
+   }
 `;
 
 export const StyledCell = styled.td`

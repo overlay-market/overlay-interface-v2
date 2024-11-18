@@ -10,10 +10,9 @@ import {
   useTradeState,
 } from "../../../state/trade/hooks";
 import { useCallback, useMemo, useState } from "react";
-import { toWei } from "overlay-sdk";
+import { toWei, TradeStateData } from "overlay-sdk";
 import { useWeb3Modal } from "@web3modal/wagmi/react";
 import ConfirmTxnModal from "./ConfirmTxnModal";
-import { TradeStateData } from "../../../types/tradeStateTypes";
 import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";

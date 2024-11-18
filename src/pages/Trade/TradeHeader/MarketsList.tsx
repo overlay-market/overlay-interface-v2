@@ -12,12 +12,8 @@ import React, { useState, Fragment } from "react";
 import { useMarketsState } from "../../../state/markets/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import MarketItem from "./MarketItem";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-} from "overlay-sdk";
 import { HeaderMarketName } from "./markets-list-styles";
+import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 const MarketsList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -73,13 +69,13 @@ const MarketsList: React.FC = () => {
             <Flex direction="column" align={"center"}>
               {markets &&
                 markets.map((market) => {
-                  const currencyPrice = `${market.priceCurrency}${
-                    market.priceCurrency === "%"
-                      ? toPercentUnit(market.parsedMid)
-                      : toScientificNumber(
-                          limitDigitsInDecimals(market.parsedMid)
-                        )
-                  }`;
+                  const currencyPrice = `${
+                    market.priceCurrency
+                  }${formatPriceByCurrency(
+                    market.parsedMid ?? 0,
+                    market.priceCurrency
+                  )}`;
+
                   return (
                     <Fragment key={market.id}>
                       <MarketItem

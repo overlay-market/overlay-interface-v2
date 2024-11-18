@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
-import { OpenPositionData } from "../../../types/positionTypes";
+import { OpenPositionData } from "overlay-sdk";
 
 type OpenPositionProps = {
   position: OpenPositionData;

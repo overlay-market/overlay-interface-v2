@@ -9,6 +9,8 @@ export const DEFAULT_MARKET_ID = encodeURIComponent("BTC Dominance")
 
 export const TRADE_POLLING_INTERVAL = 30000
 
+export const UNIT = 'OVL'
+
 export enum NAVBAR_MODE {
   BURGER = 'burger',
   DEFAULT = 'default'

@@ -1,11 +1,16 @@
 import { Flex } from "@radix-ui/themes";
 import MarketsHeader from "./MarketsHeader";
+import { FirstSection } from "./MarketsFirstSection";
+import Carousel from "./MarketsCarousel";
+import MarketsTable from "./MarketsTable";
 
 const Markets: React.FC = () => {
   return (
-    <Flex direction="column" width={"100%"}>
+    <Flex direction="column" width={"100%"} overflowX={"hidden"}>
       <MarketsHeader />
-      Markets
+      <FirstSection />
+      <Carousel />
+      <MarketsTable />
     </Flex>
   );
 };

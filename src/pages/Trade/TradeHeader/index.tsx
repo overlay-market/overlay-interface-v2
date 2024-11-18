@@ -13,14 +13,10 @@ import { useEffect, useMemo, useState } from "react";
 import useSDK from "../../../hooks/useSDK";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-  toWei,
-} from "overlay-sdk";
+import { limitDigitsInDecimals, toWei } from "overlay-sdk";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
+import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 const TradeHeader: React.FC = () => {
   const { marketId } = useParams();
@@ -66,11 +62,10 @@ const TradeHeader: React.FC = () => {
     market &&
       price &&
       setCurrencyPrice(
-        `${market.priceCurrency}${
-          market.priceCurrency === "%"
-            ? toPercentUnit(price)
-            : toScientificNumber(price)
-        }`
+        `${market.priceCurrency}${formatPriceByCurrency(
+          price,
+          market.priceCurrency
+        )}`
       );
   }, [price, market]);
 

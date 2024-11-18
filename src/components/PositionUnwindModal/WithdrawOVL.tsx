@@ -1,0 +1,138 @@
+import { Flex, Text } from "@radix-ui/themes";
+import theme from "../../theme";
+import { UNIT } from "../../constants/applications";
+import { OpenPositionData, UnwindStateError } from "overlay-sdk";
+import { GradientLoaderButton, GradientOutlineButton } from "../Button";
+import { useState } from "react";
+import useSDK from "../../hooks/useSDK";
+import { useTradeActionHandlers } from "../../state/trade/hooks";
+import { useAddPopup } from "../../state/application/hooks";
+import { TransactionType } from "../../constants/transaction";
+import { currentTimeParsed } from "../../utils/currentTime";
+
+type WithdrawOVLProps = {
+  position: OpenPositionData;
+  unwindState: UnwindStateError;
+  handleDismiss: () => void;
+};
+
+const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
+  position,
+  unwindState,
+  handleDismiss,
+}) => {
+  const sdk = useSDK();
+  const { handleTxnHashUpdate } = useTradeActionHandlers();
+  const addPopup = useAddPopup();
+  const currentTimeForId = currentTimeParsed();
+
+  const [attemptingWithdraw, setAttemptingWithdraw] = useState(false);
+
+  const cost = unwindState.cost
+    ? Number(unwindState.cost).toString()
+    : undefined;
+
+  const handleWithdraw = async () => {
+    if (position) {
+      setAttemptingWithdraw(true);
+
+      sdk.market
+        .emergencyWithdraw({
+          marketAddress: position.marketAddress,
+          positionId: BigInt(position.positionId),
+        })
+        .then((result) => {
+          handleTxnHashUpdate(result.hash);
+
+          addPopup(
+            {
+              txn: {
+                hash: result.hash,
+                success: result.receipt?.status === "success",
+                message: "",
+                type: TransactionType.UNWIND_OVL_POSITION,
+              },
+            },
+            result.hash
+          );
+        })
+        .catch((error: Error) => {
+          const { errorCode, errorMessage } = handleError(error);
+
+          addPopup(
+            {
+              txn: {
+                hash: currentTimeForId,
+                success: false,
+                message: errorMessage,
+                type: errorCode,
+              },
+            },
+            currentTimeForId
+          );
+        })
+        .finally(() => {
+          setAttemptingWithdraw(false);
+          handleDismiss();
+        });
+    }
+  };
+
+  const handleError = (error: Error) => {
+    const errorString = JSON.stringify(error);
+    const errorObj = JSON.parse(errorString);
+
+    const errorCode: number | string =
+      errorObj.cause?.cause?.code || errorObj.code;
+
+    let errorMessage =
+      errorObj.cause?.shortMessage || errorObj.cause?.cause?.shortMessage;
+    return { errorCode, errorMessage };
+  };
+
+  return (
+    <>
+      <Flex
+        mt={"24px"}
+        direction={"column"}
+        width={"100%"}
+        align={"center"}
+        gap={"24px"}
+      >
+        <Text
+          style={{
+            color: theme.color.blue1,
+            fontWeight: "500",
+            fontSize: "20px",
+          }}
+        >
+          Withdraw: {cost ?? "-"} {UNIT}
+        </Text>
+        <Text
+          style={{
+            textAlign: "center",
+          }}
+        >
+          This market has been shut down.
+          <br />
+          You may only withdraw any previously deposited OVL.
+        </Text>
+
+        {!attemptingWithdraw && (
+          <GradientOutlineButton
+            title={`Withdraw ${UNIT}`}
+            width={"100%"}
+            height={"40px"}
+            handleClick={handleWithdraw}
+          />
+        )}
+
+        {attemptingWithdraw && (
+          <GradientLoaderButton title={"Pending confirmation..."} />
+        )}
+      </Flex>
+    </>
+  );
+};
+
+export default WithdrawOVL;

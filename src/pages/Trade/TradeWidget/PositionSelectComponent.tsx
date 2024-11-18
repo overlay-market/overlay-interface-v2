@@ -10,15 +10,12 @@ import {
   ShortPositionSelectButton,
 } from "./position-select-component-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-} from "overlay-sdk";
+import { limitDigitsInDecimals } from "overlay-sdk";
 import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../hooks/useSDK";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
+import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 const PositionSelectComponent: React.FC = () => {
   const { marketId } = useParams();
@@ -59,11 +56,10 @@ const PositionSelectComponent: React.FC = () => {
     ask &&
       market &&
       setCurrencyAsk(
-        `${market.priceCurrency}${
-          market.priceCurrency === "%"
-            ? toPercentUnit(ask)
-            : toScientificNumber(ask)
-        }`
+        `${market.priceCurrency}${formatPriceByCurrency(
+          ask,
+          market.priceCurrency
+        )}`
       );
   }, [ask, market]);
 
@@ -71,11 +67,10 @@ const PositionSelectComponent: React.FC = () => {
     bid &&
       market &&
       setCurrencyBid(
-        `${market.priceCurrency}${
-          market.priceCurrency === "%"
-            ? toPercentUnit(bid)
-            : toScientificNumber(bid)
-        }`
+        `${market.priceCurrency}${formatPriceByCurrency(
+          bid,
+          market.priceCurrency
+        )}`
       );
   }, [bid, market]);
 

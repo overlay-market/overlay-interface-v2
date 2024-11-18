@@ -11,6 +11,7 @@ import { useRef } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
 import Popups from "./components/Popups";
 import { DEFAULT_MARKET_ID } from "./constants/applications";
+import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 
 const App = () => {
@@ -35,6 +36,7 @@ const App = () => {
               element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
             />
             <Route path="/trade/:marketId" element={<Trade />} />
+            <Route path="/portfolio" element={<Portfolio />} />
           </Routes>
         </Flex>
       </AppContainer>
