@@ -12,7 +12,7 @@ import React, { useState, Fragment } from "react";
 import { useMarketsState } from "../../../state/markets/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import MarketItem from "./MarketItem";
-import { HeaderMarketName } from "./markets-list-styles";
+import { HeaderMarketName, MarketsListContainer } from "./markets-list-styles";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 
 const MarketsList: React.FC = () => {
@@ -24,19 +24,7 @@ const MarketsList: React.FC = () => {
 
   return (
     <Box ref={ref}>
-      <Flex
-        width={"260px"}
-        height={`${theme.headerSize.height}`}
-        align={"center"}
-        justify={"between"}
-        p={"12px"}
-        gap={"10px"}
-        style={{
-          cursor: "pointer",
-          borderRight: `1px solid ${theme.color.darkBlue}`,
-        }}
-        onClick={toggleDropdown}
-      >
+      <MarketsListContainer onClick={toggleDropdown}>
         <Flex justify={"start"} align={"center"} gap={"10px"}>
           <Avatar
             radius="large"
@@ -54,7 +42,7 @@ const MarketsList: React.FC = () => {
         ) : (
           <ChevronDownIcon />
         )}
-      </Flex>
+      </MarketsListContainer>
 
       {isOpen && (
         <Box
@@ -63,7 +51,11 @@ const MarketsList: React.FC = () => {
           position={"absolute"}
           top={theme.headerSize.height}
           left={"0"}
-          style={{ background: theme.color.background, zIndex: 10 }}
+          style={{
+            background: theme.color.background,
+            zIndex: 10,
+            borderTop: `1px solid ${theme.color.darkBlue}`,
+          }}
         >
           <ScrollArea type="auto" scrollbars="vertical" style={{ height: 530 }}>
             <Flex direction="column" align={"center"}>

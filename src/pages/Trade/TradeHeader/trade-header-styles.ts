@@ -4,64 +4,44 @@ import styled from "styled-components";
 
 export const ResponsiveEmptyPlaceholder = styled(Box)`
   height: 0;
+  margin: 0 15px;
   border-bottom: 1px solid ${theme.color.darkBlue};
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    width: 100%;
-    height: ${theme.headerSize.height};
-    border-bottom: 1px solid ${theme.color.darkBlue};
-  }
-
-  @media (min-width: 1120px) {
-    height: 0;
-  }
 `;
 
 export const TradeHeaderContainer = styled(Flex)`
-  border-bottom: 1px solid ${theme.color.darkBlue};
   width: 100%;
-  height: auto;
   flex-direction: column;
-  align-items: start;
-  text-align: end;
   position: relative;
+    
+  @media (min-width: ${theme.breakpoints.sm}) {
+    border-bottom: 1px solid ${theme.color.darkBlue};
+  }
   
-  @media (min-width: 680px) {
-    height: ${theme.headerSize.height};
+  @media (min-width: ${theme.breakpoints.lg}) {
     flex-direction: row;
   }
 `;
 
 export const MarketInfoContainer = styled(Flex)`
-  flex-direction: column;  
-  height: auto;
+  height: 50px;
   width: 100%;
-  border-top: 1px solid ${theme.color.darkBlue};
-
-  @media (min-width: 440px) {
-    height: auto;
-    flex-direction: row;
-    
+  justify-content: space-between;
+ 
+  @media (min-width:  ${theme.breakpoints.sm}) {    
+    height: ${theme.headerSize.height};
+    border-top: 1px solid ${theme.color.darkBlue};
   }
 
-  @media (min-width: 680px) {    
-    border-top: none;
-    height: ${theme.headerSize.height};
+  @media (min-width: ${theme.breakpoints.lg}) {
+    justify-content: start;
   }
 `;
 
 export const StyledFlex = styled(Flex)`
-  height: 60px;
-  width: 100%;
-  border-top: 1px solid ${theme.color.darkBlue};
+  height: 100%;
+  flex-direction: column;
 
-  @media (min-width: 440px) {
-    height: auto;
-    border-top: none;
-  }
-
-  @media (min-width: 680px) {
-    flex-direction: row;    
+  @media (min-width: ${theme.breakpoints.sm}) {
+    border-right: 1px solid ${theme.color.darkBlue};
   }
 `;
-
