@@ -122,7 +122,7 @@ const TradeHeader: React.FC = () => {
 
         <MarketInfoContainer>
           <StyledFlex
-            width={{ initial: "109px", sm: "167px", lg: "97px" }}
+            width={{ initial: "109px", sm: "167px", lg: "119px" }}
             p={{ initial: "8px 0px 8px 15px", sm: "12px 15px", md: "12px" }}
           >
             <Text weight="light" style={{ fontSize: "10px" }}>

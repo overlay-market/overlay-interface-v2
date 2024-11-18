@@ -19,6 +19,7 @@ import useMultichainContext from "../../../providers/MultichainContextProvider/u
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { TradeWidgetContainer } from "./trade-widget-styles";
 
 const TradeWidget: React.FC = () => {
   const { marketId } = useParams();
@@ -112,10 +113,10 @@ const TradeWidget: React.FC = () => {
   };
 
   return (
-    <Flex
+    <TradeWidgetContainer
       direction={"column"}
       gap={{ initial: "16px", sm: "24px" }}
-      width={{ initial: "343px", sm: "321px", xl: "418px" }}
+      width={{ initial: "343px", sm: "321px" }}
       px={{ initial: "0px", sm: "8px" }}
       pt={"8px"}
       pb={"20px"}
@@ -148,7 +149,7 @@ const TradeWidget: React.FC = () => {
       )}
 
       <AdditionalTradeDetails tradeState={tradeState} />
-    </Flex>
+    </TradeWidgetContainer>
   );
 };
 

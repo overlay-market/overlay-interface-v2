@@ -20,6 +20,10 @@ export const TradeHeaderContainer = styled(Flex)`
   @media (min-width: ${theme.breakpoints.lg}) {
     flex-direction: row;
   }
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    border-bottom: none;
+  }
 `;
 
 export const MarketInfoContainer = styled(Flex)`
