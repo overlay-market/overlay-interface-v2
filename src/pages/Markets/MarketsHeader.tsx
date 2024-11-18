@@ -3,7 +3,6 @@ import theme from "../../theme";
 import { MarketInfoContainer } from "../Trade/TradeHeader/trade-header-styles";
 
 const MarketsHeader = ({ ovSupply }: { ovSupply: bigint | undefined }) => {
-  console.log("totalSupply", ovSupply);
   return (
     <MarketInfoContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>

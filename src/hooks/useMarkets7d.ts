@@ -48,8 +48,6 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
               )
               ?.deploymentAddress.toLowerCase();
 
-            console.log({ marketAddressSepolia });
-
             const binSize = 15;
 
             const response = await axios.get<MarketDataPoint[]>(
@@ -80,10 +78,6 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
                 (_, index) => index % Math.floor(chartData.length / 20) === 0
               )
               .map((dataPoint) => dataPoint.close / chartData[0].close);
-
-            console.log({ oneHourDataPoint });
-            console.log({ twentyFourHoursDataPoint });
-            console.log({ sevenDaysChartData });
 
             return {
               marketId,
