@@ -9,7 +9,10 @@ const Wallet: React.FC = () => {
   return (
     <Box
       width="308px"
-      height={`${theme.headerSize.height}`}
+      height={{
+        initial: theme.headerSize.mobileHeight,
+        sm: theme.headerSize.height,
+      }}
       position="absolute"
       top="0"
       right="0"

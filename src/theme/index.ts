@@ -23,7 +23,8 @@ const theme = {
   headerSize: {
     width: '88px',
     height: '52px',
-    tabletWidth: '82px'
+    tabletWidth: '82px',
+    mobileHeight: '64px',
   },
   breakpoints: {
     xs: '520px',
