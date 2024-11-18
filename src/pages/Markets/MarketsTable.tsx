@@ -23,7 +23,6 @@ export default function MarketsTable({
 }: MarketsTableProps): JSX.Element {
   const marketIds = marketsData.map((market) => market.marketId);
   const markets7d = useMarkets7d(marketIds);
-  console.log({ markets7d });
   return (
     <Box>
       <Table.Root
