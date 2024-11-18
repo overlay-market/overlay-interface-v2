@@ -44,19 +44,27 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
         },
         768: {
           slidesPerView: 3,
-          spaceBetween: 20,
+          spaceBetween: 0,
         },
         1024: {
           slidesPerView: 4,
-          spaceBetween: 20,
+          spaceBetween: 0,
         },
         1280: {
           slidesPerView: 5,
-          spaceBetween: 20,
+          spaceBetween: 0,
         },
-        1536: {
+        1440: {
           slidesPerView: 6,
-          spaceBetween: 20,
+          spaceBetween: 0,
+        },
+        1700: {
+          slidesPerView: 7,
+          spaceBetween: 0,
+        },
+        1900: {
+          slidesPerView: 8,
+          spaceBetween: 0,
         },
       }}
     >
