@@ -1,38 +1,29 @@
 import { Box, Flex, Table, Text } from "@radix-ui/themes";
-// import { LineChart, Line } from "recharts";
+import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { SelectItem } from "@radix-ui/react-select";
-import useSDK from "../../hooks/useSDK";
-import { useEffect, useState } from "react";
-import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import {
   limitDigitsInDecimals,
   toPercentUnit,
   toScientificNumber,
   TransformedMarketData,
 } from "overlay-sdk";
+import ProgressBar from "../../components/ProgressBar";
+// import { MarketChartMap } from "../../constants/markets";
+import { useMarkets7d } from "../../hooks/useMarkets7d";
 
-export default function MarketsTable() {
-  const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
-  const { chainId: contextChainID } = useMultichainContext();
-  const sdk = useSDK();
+interface MarketsTableProps {
+  marketsData: TransformedMarketData[];
+}
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const activeMarkets = await sdk.markets.transformMarketsData();
-
-        activeMarkets && setMarketsData(activeMarkets);
-      } catch (error) {
-        console.error("Error fetching markets:", error);
-      }
-    };
-
-    fetchData();
-  }, [contextChainID]);
-
+export default function MarketsTable({
+  marketsData,
+}: MarketsTableProps): JSX.Element {
+  const marketIds = marketsData.map((market) => market.marketId);
+  const markets7d = useMarkets7d(marketIds);
+  console.log({ markets7d });
   return (
     <Box>
       <Table.Root
@@ -48,7 +39,7 @@ export default function MarketsTable() {
           <Table.Row>
             <Table.ColumnHeaderCell>
               <Box>
-                <span style={{ color: theme.color.grey4 }}>All</span>
+                <span style={{ color: theme.color.grey3 }}>ALL</span>
                 <Select.Root>
                   <Select.Trigger
                     style={{
@@ -125,97 +116,145 @@ export default function MarketsTable() {
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
           {marketsData &&
-            marketsData.map((market, index) => (
-              <Table.Row
-                key={index}
-                style={{
-                  borderBottom: `1px solid ${theme.color.darkBlue}`,
-                }}
-              >
-                <Table.Cell style={{ padding: "8px 16px" }}>
-                  <Flex>
-                    <img
+            marketsData.map((market, index) => {
+              const market7d = markets7d.find(
+                (m) => m.marketId === market.marketId
+              );
+
+              if (!market7d) return null;
+
+              return (
+                <Table.Row
+                  key={index}
+                  style={{
+                    borderBottom: `1px solid ${theme.color.darkBlue}`,
+                  }}
+                >
+                  <Table.Cell style={{ padding: "8px 16px" }}>
+                    <Flex>
+                      <img
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                        src={market.marketLogo}
+                        alt={decodeURIComponent(market.marketId)}
+                        className="rounded-full"
+                      />
+                      <span style={{ alignSelf: "center", marginLeft: 20 }}>
+                        {decodeURIComponent(market.marketId)}
+                      </span>
+                    </Flex>
+                  </Table.Cell>
+                  <Table.Cell>
+                    {market.priceCurrency}
+                    {market.priceCurrency === "%"
+                      ? toPercentUnit(market.price)
+                      : toScientificNumber(
+                          Number(market.price) < 100000
+                            ? limitDigitsInDecimals(market.price)
+                            : Math.floor(Number(market.price)).toLocaleString(
+                                "en-US"
+                              )
+                        )}
+                  </Table.Cell>
+                  <Table.Cell
+                    style={{
+                      color:
+                        (market7d.oneHourChange ?? 0) >= 0
+                          ? theme.color.green2
+                          : theme.color.red2,
+                    }}
+                  >
+                    {market7d.oneHourChange?.toFixed(2)}%
+                  </Table.Cell>
+                  <Table.Cell
+                    style={{
+                      color:
+                        (market7d.sevenDayChange ?? 0) >= 0
+                          ? theme.color.green2
+                          : theme.color.red2,
+                    }}
+                  >
+                    {market7d.sevenDayChange?.toFixed(2)}%
+                  </Table.Cell>
+                  <Table.Cell
+                    style={{
+                      color:
+                        (market7d.twentyFourHourChange ?? 0) >= 0
+                          ? theme.color.green2
+                          : theme.color.red2,
+                    }}
+                  >
+                    {market7d.twentyFourHourChange?.toFixed(2)}%
+                  </Table.Cell>
+                  <Table.Cell style={{ color: theme.color.green2 }}>
+                    <span
                       style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                      }}
-                      src={market.marketLogo}
-                      alt={decodeURIComponent(market.marketId)}
-                      className="rounded-full"
-                    />
-                    <span style={{ alignSelf: "center", marginLeft: 20 }}>
-                      {decodeURIComponent(market.marketId)}
-                    </span>
-                  </Flex>
-                </Table.Cell>
-                <Table.Cell>
-                  {market.priceCurrency}
-                  {market.priceCurrency === "%"
-                    ? toPercentUnit(market.price)
-                    : toScientificNumber(
-                        Number(market.price) < 100000
-                          ? limitDigitsInDecimals(market.price)
-                          : Math.floor(Number(market.price)).toLocaleString(
-                              "en-US"
-                            )
-                      )}
-                </Table.Cell>
-                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
-                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
-                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
-                <Table.Cell style={{ color: "green" }}>1%</Table.Cell>
-                <Table.Cell>
-                  <Flex align="center" gap="2">
-                    <Text size="2">
-                      {Math.round(Number(market.shortPercentageOfTotalOi))}%
-                    </Text>
-                    <Box
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        width: "100px",
-                        height: "8px",
-                        backgroundColor: "#000000",
-                        overflow: "hidden",
+                        color:
+                          market.funding && Number(market.funding) < 0
+                            ? theme.color.red2
+                            : theme.color.green2,
                       }}
                     >
-                      <Box
-                        style={{
-                          width: `${market.shortPercentageOfTotalOi}%`,
-                          backgroundColor: "#FF5A5A",
-                          height: "100%",
-                          marginRight: "5px",
-                        }}
+                      {market.funding && Number(market.funding) < 0
+                        ? market.funding
+                        : `+${market.funding}`}
+                    </span>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Flex align="center" gap="2">
+                      <Text size="2" style={{ color: theme.color.red2 }}>
+                        {Math.round(Number(market.shortPercentageOfTotalOi))}%
+                      </Text>
+                      <ProgressBar
+                        max={100}
+                        value={Number(market.shortPercentageOfTotalOi)}
                       />
-                      <Box
-                        style={{
-                          width: `${market.longPercentageOfTotalOi}%`,
-                          backgroundColor: "#4CAF50",
-                          height: "100%",
-                        }}
+                      <Text size="2" style={{ color: theme.color.green2 }}>
+                        {Math.round(Number(market.longPercentageOfTotalOi))}%
+                      </Text>
+                    </Flex>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <img
+                      src={market.oracleLogo}
+                      alt={decodeURIComponent(market.marketId)}
+                      style={{
+                        width: 24,
+                        height: 24,
+                        marginLeft: 8,
+                        borderRadius: "50%",
+                      }}
+                    />
+                  </Table.Cell>
+                  <Table.Cell>
+                    <LineChart
+                      width={100}
+                      height={30}
+                      data={market7d.sevenDaysChartData?.map((value) => ({
+                        value,
+                      }))}
+                      margin={{ top: 0, bottom: 0 }}
+                    >
+                      <YAxis
+                        type="number"
+                        domain={["dataMin", "dataMax"]}
+                        hide
                       />
-                    </Box>
-                    <Text size="2">
-                      {Math.round(Number(market.longPercentageOfTotalOi))}%
-                    </Text>
-                  </Flex>
-                </Table.Cell>
-                <Table.Cell>
-                  <img
-                    src={market.oracleLogo}
-                    alt={decodeURIComponent(market.marketId)}
-                    style={{
-                      width: 24,
-                      height: 24,
-                      marginLeft: 8,
-                      borderRadius: "50%",
-                    }}
-                  />
-                </Table.Cell>
-                <Table.Cell>/</Table.Cell>
-              </Table.Row>
-            ))}
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#4ade80"
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </Table.Cell>
+                </Table.Row>
+              );
+            })}
         </Table.Body>
       </Table.Root>
     </Box>

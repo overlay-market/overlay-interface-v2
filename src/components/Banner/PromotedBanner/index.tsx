@@ -10,12 +10,18 @@ import { Flex } from "@radix-ui/themes";
 interface PromotedBannerProps {
   Title: string;
   Name: string;
-  Value: string;
+  Value: string | number | undefined;
+  Image: string;
 }
 
-export const PromotedBanner = ({ Title, Name, Value }: PromotedBannerProps) => {
+export const PromotedBanner = ({
+  Title,
+  Name,
+  Value,
+  Image,
+}: PromotedBannerProps) => {
   return (
-    <StyledPromotedBanner>
+    <StyledPromotedBanner style={{ backgroundImage: `url(${Image})` }}>
       <Flex
         direction={"column"}
         justify={"start"}
