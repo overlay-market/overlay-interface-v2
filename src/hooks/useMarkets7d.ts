@@ -103,7 +103,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
         })
       );
 
-      setMarketsData(updatedMarketsData);
+      updatedMarketsData.length > 0 && setMarketsData(updatedMarketsData);
     } catch (error) {
       console.error("Error fetching market data:", error);
     }
