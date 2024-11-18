@@ -18,6 +18,7 @@ import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const TradeWidget: React.FC = () => {
   const { marketId } = useParams();
@@ -34,6 +35,7 @@ const TradeWidget: React.FC = () => {
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
     undefined
   );
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
@@ -112,9 +114,9 @@ const TradeWidget: React.FC = () => {
   return (
     <Flex
       direction={"column"}
-      gap={"24px"}
-      width={"321px"}
-      px={"8px"}
+      gap={{ initial: "16px", sm: "24px" }}
+      width={{ initial: "343px", sm: "321px", xl: "418px" }}
+      px={{ initial: "0px", sm: "8px" }}
       pt={"8px"}
       pb={"20px"}
       flexShrink={"0"}
@@ -132,8 +134,19 @@ const TradeWidget: React.FC = () => {
       />
 
       <CollateralInputComponent />
-      <MainTradeDetails tradeState={tradeState} />
-      <TradeButtonComponent loading={loading} tradeState={tradeState} />
+
+      {isMobile ? (
+        <>
+          <TradeButtonComponent loading={loading} tradeState={tradeState} />
+          <MainTradeDetails tradeState={tradeState} />
+        </>
+      ) : (
+        <>
+          <MainTradeDetails tradeState={tradeState} />
+          <TradeButtonComponent loading={loading} tradeState={tradeState} />
+        </>
+      )}
+
       <AdditionalTradeDetails tradeState={tradeState} />
     </Flex>
   );
