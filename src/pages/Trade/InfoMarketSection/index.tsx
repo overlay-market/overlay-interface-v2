@@ -8,7 +8,7 @@ const InfoMarketSection: React.FC = () => {
     <Flex
       direction="column"
       gap="16px"
-      p={{ initial: "0px 15px 66px", sm: "0px 8px 66px" }}
+      p={{ initial: "20px 15px 66px", sm: "20px 8px 66px" }}
     >
       <Text weight={"bold"} size={"5"}>
         About This Market

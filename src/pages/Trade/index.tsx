@@ -79,7 +79,7 @@ const Trade: React.FC = () => {
 
       <LineSeparator />
 
-      <Flex direction="column" gap="20px">
+      <Flex direction="column">
         <StyledFlex
           height={{ initial: "auto", sm: "561px" }}
           width={"100%"}
