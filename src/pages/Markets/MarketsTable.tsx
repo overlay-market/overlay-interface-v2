@@ -13,6 +13,7 @@ import {
 import ProgressBar from "../../components/ProgressBar";
 // import { MarketChartMap } from "../../constants/markets";
 import { useMarkets7d } from "../../hooks/useMarkets7d";
+import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
@@ -23,6 +24,8 @@ export default function MarketsTable({
 }: MarketsTableProps): JSX.Element {
   const marketIds = marketsData.map((market) => market.marketId);
   const markets7d = useMarkets7d(marketIds);
+  const redirectToTradePage = useRedirectToTradePage();
+
   return (
     <Box>
       <Table.Root
@@ -127,7 +130,9 @@ export default function MarketsTable({
                   key={index}
                   style={{
                     borderBottom: `1px solid ${theme.color.darkBlue}`,
+                    cursor: "pointer",
                   }}
+                  onClick={() => redirectToTradePage(market.marketId)}
                 >
                   <Table.Cell style={{ padding: "8px 16px" }}>
                     <Flex>
