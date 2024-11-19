@@ -20,6 +20,7 @@ import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { TradeWidgetContainer } from "./trade-widget-styles";
+import useDebounce from "../../../hooks/useDebounce";
 
 const TradeWidget: React.FC = () => {
   const { marketId } = useParams();
@@ -38,24 +39,27 @@ const TradeWidget: React.FC = () => {
   );
   const isMobile = useMediaQuery("(max-width: 767px)");
 
+  const debouncedTypedValue = useDebounce(typedValue, 500);
+  const debouncedSelectedLeverage = useDebounce(selectedLeverage, 500);
+
   useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
     setLoading(false);
 
     const fetchTradeState = async () => {
-      if (!typedValue || typedValue === "") {
+      if (!debouncedTypedValue || debouncedTypedValue === "") {
         setTradeState(undefined);
         return;
       }
 
-      if (marketId && address && typedValue !== "") {
+      if (marketId && address && debouncedTypedValue !== "") {
         setLoading(true);
 
         try {
           const tradeState = await sdk.trade.getTradeState(
             marketId,
-            toWei(typedValue),
-            toWei(selectedLeverage),
+            toWei(debouncedTypedValue),
+            toWei(debouncedSelectedLeverage),
             Number(slippageValue),
             isLong,
             address
@@ -82,8 +86,8 @@ const TradeWidget: React.FC = () => {
   }, [
     marketId,
     address,
-    typedValue,
-    selectedLeverage,
+    debouncedTypedValue,
+    debouncedSelectedLeverage,
     chainId,
     isLong,
     slippageValue,

@@ -195,6 +195,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         <GradientOutlineButton
           title={title ?? "Trade"}
           width={"100%"}
+          size={isDisabledTradeButton ? "14px" : "16px"}
           isDisabled={isDisabledTradeButton}
           handleClick={() => {
             setTradeConfig({
