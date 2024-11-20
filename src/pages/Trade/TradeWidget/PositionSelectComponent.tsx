@@ -13,7 +13,7 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals } from "overlay-sdk";
 import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 

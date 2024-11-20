@@ -4,7 +4,7 @@ import { UNIT } from "../../constants/applications";
 import { OpenPositionData, UnwindStateError } from "overlay-sdk";
 import { GradientLoaderButton, GradientOutlineButton } from "../Button";
 import { useState } from "react";
-import useSDK from "../../hooks/useSDK";
+import useSDK from "../../providers/SDKProvider/useSDK";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";

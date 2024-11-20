@@ -10,7 +10,7 @@ import {
 } from "./trade-header-styles";
 import { useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals, toWei } from "overlay-sdk";

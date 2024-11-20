@@ -3,7 +3,7 @@ import {
   GradientOutlineButton,
 } from "../../../components/Button";
 import useAccount from "../../../hooks/useAccount";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
   useTradeActionHandlers,

@@ -1,7 +1,7 @@
 import { Text } from "@radix-ui/themes";
 import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
 import {
   LineSeparator,

@@ -2,7 +2,7 @@ import { Box, Flex, Text } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
 import { InfoCardsGrid, MainCardsGrid } from "./overview-styles";
 import OverviewCard from "./OverviewCard";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
