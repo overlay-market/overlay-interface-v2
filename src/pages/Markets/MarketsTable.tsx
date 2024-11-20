@@ -1,9 +1,8 @@
-import { Box, Flex, Table, Text } from "@radix-ui/themes";
+import { Flex, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import { SelectItem } from "@radix-ui/react-select";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   limitDigitsInDecimals,
   toPercentUnit,
@@ -11,10 +10,10 @@ import {
   TransformedMarketData,
 } from "overlay-sdk";
 import ProgressBar from "../../components/ProgressBar";
-// import { MarketChartMap } from "../../constants/markets";
 import { useMarkets7d } from "../../hooks/useMarkets7d";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
-
+import { Theme } from "@radix-ui/themes";
+import { useState } from "react";
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
@@ -25,9 +24,11 @@ export default function MarketsTable({
   const marketIds = marketsData.map((market) => market.marketId);
   const markets7d = useMarkets7d(marketIds);
   const redirectToTradePage = useRedirectToTradePage();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
   return (
-    <Box>
+    <Theme>
       <Table.Root
         variant="surface"
         style={{
@@ -40,9 +41,9 @@ export default function MarketsTable({
         <Table.Header style={{ verticalAlign: "middle" }}>
           <Table.Row>
             <Table.ColumnHeaderCell>
-              <Box>
-                <span style={{ color: theme.color.grey3 }}>ALL</span>
-                <Select.Root>
+              <Flex align="center" gap="2">
+                <Text style={{ color: theme.color.grey3 }}>ALL</Text>
+                <Select.Root onValueChange={(value) => setSelectedItem(value)}>
                   <Select.Trigger
                     style={{
                       backgroundColor: theme.color.grey4,
@@ -53,58 +54,73 @@ export default function MarketsTable({
                       border: "none",
                       color: theme.color.white,
                       marginLeft: 10,
+                      minWidth: 85,
+                      outline: "none",
+                      cursor: "pointer",
                     }}
                   >
                     <Select.Value placeholder="Filter" />
                     <Select.Icon>
                       <ChevronDownIcon />
                     </Select.Icon>
-                    <Select.Portal>
-                      <Select.Content>
-                        <Select.ScrollUpButton>
-                          <ChevronUpIcon />
-                        </Select.ScrollUpButton>
-                        <Select.Viewport>
-                          <Select.Group>
-                            <Select.Label>Fruits</Select.Label>
-                            <SelectItem value="apple">Apple</SelectItem>
-                            <SelectItem value="banana">Banana</SelectItem>
-                            <SelectItem value="blueberry">Blueberry</SelectItem>
-                            <SelectItem value="grapes">Grapes</SelectItem>
-                            <SelectItem value="pineapple">Pineapple</SelectItem>
-                          </Select.Group>
-
-                          <Select.Separator />
-
-                          <Select.Group>
-                            <Select.Label>Vegetables</Select.Label>
-                            <SelectItem value="aubergine">Aubergine</SelectItem>
-                            <SelectItem value="broccoli">Broccoli</SelectItem>
-                            <SelectItem value="carrot" disabled>
-                              Carrot
-                            </SelectItem>
-                            <SelectItem value="courgette">Courgette</SelectItem>
-                            <SelectItem value="leek">Leek</SelectItem>
-                          </Select.Group>
-
-                          <Select.Separator />
-
-                          <Select.Group>
-                            <Select.Label>Meat</Select.Label>
-                            <SelectItem value="beef">Beef</SelectItem>
-                            <SelectItem value="chicken">Chicken</SelectItem>
-                            <SelectItem value="lamb">Lamb</SelectItem>
-                            <SelectItem value="pork">Pork</SelectItem>
-                          </Select.Group>
-                        </Select.Viewport>
-                        <Select.ScrollDownButton>
-                          <ChevronDownIcon />
-                        </Select.ScrollDownButton>
-                      </Select.Content>
-                    </Select.Portal>
                   </Select.Trigger>
+
+                  <Select.Portal>
+                    <Select.Content
+                      position="popper"
+                      sideOffset={5}
+                      style={{
+                        width: "var(--radix-select-trigger-width)",
+                        maxHeight:
+                          "var(--radix-select-content-available-height)",
+                        backgroundColor: theme.color.grey4,
+                        borderRadius: "6px",
+                        padding: "5px",
+                        boxShadow:
+                          "0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)",
+
+                        cursor: "pointer",
+                        outline: "none",
+                      }}
+                    >
+                      <Select.Viewport>
+                        <Select.Group>
+                          {["All", "Crypto", "Forex", "Stocks"].map((item) => (
+                            <Select.Item
+                              key={item}
+                              value={item.toLowerCase()}
+                              onMouseEnter={() => setHoveredItem(item)}
+                              onMouseLeave={() => setHoveredItem(null)}
+                              style={{
+                                fontSize: 13,
+                                lineHeight: "1",
+                                color: theme.color.white,
+                                borderRadius: "3px",
+                                display: "flex",
+                                alignItems: "center",
+                                height: "25px",
+                                padding: "0 35px 0 10px",
+                                position: "relative",
+                                userSelect: "none",
+                                backgroundColor:
+                                  selectedItem === item.toLowerCase()
+                                    ? "rgba(255, 255, 255, 0.2)"
+                                    : hoveredItem === item
+                                    ? "rgba(255, 255, 255, 0.1)"
+                                    : "transparent",
+                                cursor: "pointer",
+                                outline: "none",
+                              }}
+                            >
+                              <Select.ItemText>{item}</Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.Group>
+                      </Select.Viewport>
+                    </Select.Content>
+                  </Select.Portal>
                 </Select.Root>
-              </Box>
+              </Flex>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>1h</Table.ColumnHeaderCell>
@@ -261,6 +277,6 @@ export default function MarketsTable({
             })}
         </Table.Body>
       </Table.Root>
-    </Box>
+    </Theme>
   );
 }

@@ -27,13 +27,13 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         );
 
   return (
-    <Flex gap="3" ml="50px">
+    <Flex gap="3" ml="50px" mt="5">
       <Box flexGrow="7" flexShrink="1" flexBasis="0%">
         <PromotedBanner
           Title={"CGMI"}
           Name={decodeURIComponent(marketsData[0].marketId)}
           Value={value}
-          Image={marketsData[0].marketLogo}
+          Id={marketsData[0].marketId}
         />
       </Box>
       <Box flexGrow="3" flexShrink="1" flexBasis="0%">

@@ -5,13 +5,11 @@ import Carousel from "./MarketsCarousel";
 import MarketsTable from "./MarketsTable";
 import { TransformedMarketData, formatWeiToParsedNumber } from "overlay-sdk";
 import { useEffect, useState } from "react";
-import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../hooks/useSDK";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
   const [totalSupply, setTotalSupply] = useState<bigint | undefined>();
-  const { chainId: contextChainID } = useMultichainContext();
   const sdk = useSDK();
 
   useEffect(() => {
@@ -28,11 +26,11 @@ const Markets: React.FC = () => {
     };
 
     fetchData();
-  }, [contextChainID]);
+  });
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
-      <MarketsHeader ovSupply={formatWeiToParsedNumber(totalSupply, 18, 4)} />
+      <MarketsHeader ovSupply={formatWeiToParsedNumber(totalSupply, 18, 2)} />
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} />
       <MarketsTable marketsData={marketsData} />

@@ -71,7 +71,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
       {marketsData.map((market, index) => (
         <SwiperSlide key={index} style={{ width: "auto" }}>
           <MarketCards
-            image={market.marketLogo}
+            id={market.marketId}
             currency={market.priceCurrency}
             value={
               market.priceCurrency === "%"
