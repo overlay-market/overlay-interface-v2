@@ -195,7 +195,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         <GradientOutlineButton
           title={title ?? "Trade"}
           width={"100%"}
-          height={"40px"}
+          size={isDisabledTradeButton ? "14px" : "16px"}
           isDisabled={isDisabledTradeButton}
           handleClick={() => {
             setTradeConfig({
@@ -216,7 +216,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           <GradientOutlineButton
             title={"Approve OVL"}
             width={"100%"}
-            height={"40px"}
             handleClick={handleApprove}
           />
         ))}
@@ -235,7 +234,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         <GradientOutlineButton
           title={"Connect Wallet"}
           width={"100%"}
-          height={"40px"}
           handleClick={handleConnect}
         />
       )}

@@ -82,7 +82,6 @@ const UnwindsTable: React.FC = () => {
   return (
     <Flex
       direction={"column"}
-      px={"8px"}
       pt={"16px"}
       pb={"66px"}
       width={"100%"}

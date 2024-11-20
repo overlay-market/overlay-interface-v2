@@ -14,7 +14,7 @@ const NavBar: React.FC = () => {
           sm: `${theme.headerSize.tabletWidth}`,
           md: `${theme.headerSize.width}`,
         }}
-        height={{ initial: `${theme.headerSize.height}`, sm: "100vh" }}
+        height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "100vh" }}
         py={{ initial: "0", sm: "10px" }}
         px={{ initial: "15px", sm: "6px" }}
         position={{ initial: "static", sm: "sticky" }}
@@ -26,7 +26,7 @@ const NavBar: React.FC = () => {
         <Flex
           direction={{ initial: "row", sm: "column" }}
           gap={{ initial: "20px", sm: "8px" }}
-          height={{ initial: `${theme.headerSize.height}`, sm: "90vh" }}
+          height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "90vh" }}
           align={"center"}
         >
           <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />

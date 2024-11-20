@@ -3,7 +3,10 @@ import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
-import { PositionsTableContainer } from "./positions-table-styles";
+import {
+  LineSeparator,
+  PositionsTableContainer,
+} from "./positions-table-styles";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
 import OpenPosition from "./OpenPosition";
@@ -12,6 +15,7 @@ import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -39,10 +43,14 @@ const PositionsTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const isTablet = useMediaQuery("(max-width: 1279px)");
+
   useEffect(() => {
     const fetchOpenPositions = async () => {
-      setPositions(undefined);
-      setPositionsTotalNumber(0);
+      if (!account || !marketId) {
+        setPositions(undefined);
+        setPositionsTotalNumber(0);
+      }
 
       if (marketId && account) {
         setLoading(true);
@@ -82,39 +90,45 @@ const PositionsTable: React.FC = () => {
   }, [positions, currentPage, itemsPerPage, setItemsPerPage]);
 
   return (
-    <PositionsTableContainer>
-      <Text weight={"bold"} size={"5"}>
-        Positions
-      </Text>
+    <>
+      <LineSeparator />
 
-      <StyledTable
-        headerColumns={POSITIONS_COLUMNS}
-        width={"680px"}
-        minWidth={"600px"}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        positionsTotalNumber={positionsTotalNumber}
-        setCurrentPage={setCurrentPage}
-        setItemsPerPage={setItemsPerPage}
-        body={
-          paginatedPositions &&
-          paginatedPositions.map(
-            (position: OpenPositionData, index: number) => (
-              <OpenPosition position={position} key={index} />
+      <PositionsTableContainer>
+        <Text weight={"bold"} size={"5"}>
+          Positions
+        </Text>
+
+        <StyledTable
+          headerColumns={POSITIONS_COLUMNS}
+          width={isTablet ? "100%" : "849px"}
+          minWidth={"654px"}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          positionsTotalNumber={positionsTotalNumber}
+          setCurrentPage={setCurrentPage}
+          setItemsPerPage={setItemsPerPage}
+          body={
+            paginatedPositions &&
+            paginatedPositions.map(
+              (position: OpenPositionData, index: number) => (
+                <OpenPosition position={position} key={index} />
+              )
             )
-          )
-        }
-      />
+          }
+        />
 
-      {loading ? (
-        <Loader />
-      ) : account ? (
-        positions &&
-        positionsTotalNumber === 0 && <Text>No current positions</Text>
-      ) : (
-        <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
-      )}
-    </PositionsTableContainer>
+        {loading ? (
+          <Loader />
+        ) : account ? (
+          positions &&
+          positionsTotalNumber === 0 && <Text>No current positions</Text>
+        ) : (
+          <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
+        )}
+      </PositionsTableContainer>
+
+      <LineSeparator />
+    </>
   );
 };
 

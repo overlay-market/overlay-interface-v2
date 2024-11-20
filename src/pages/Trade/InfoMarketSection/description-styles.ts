@@ -3,15 +3,37 @@ import styled from "styled-components";
 import theme from "../../../theme";
 
 export const DescriptionContainer = styled(Box)`
-  width: 375px;
+  width: 345px;
+  min-width: 345px;
   border-radius: 8px;
-  background: ${theme.color.grey4};
+  background: transparent;
+
+  @media (min-width: ${theme.breakpoints.sm}) {  
+    width: calc( 50% - 8px);
+    max-width: 375px;
+    min-width: 311px;
+    background: ${theme.color.grey4};
+  }
+  @media (min-width: ${theme.breakpoints.md}) {  
+    width: 375px;  
+    min-width: 375px;
+  }
+  @media (min-width: ${theme.breakpoints.xxl}) {  
+    width: 551px;  
+    min-width: 551px;
+  }
 `
 
-export const MarketImg = styled.img`
+export const MarketImg = styled.img`  
+  height: auto;
+  border-radius: 8px; 
   
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  @media (min-width: ${theme.breakpoints.sm}) { 
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
 ` 
 export const TruncatedText = styled(Box)<{isTruncated: boolean}>`
   display: -webkit-box;

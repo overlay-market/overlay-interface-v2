@@ -126,12 +126,15 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
       </Flex>
 
       {attemptingTransaction ? (
-        <GradientLoaderButton title={"Pending confirmation..."} />
+        <GradientLoaderButton
+          height={"46px"}
+          title={"Pending confirmation..."}
+        />
       ) : (
         <GradientSolidButton
           title={"Confirm Trade"}
           width={"100%"}
-          height={"40px"}
+          height={"46px"}
           handleClick={handleTrade}
         />
       )}

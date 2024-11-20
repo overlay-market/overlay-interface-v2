@@ -17,10 +17,18 @@ import { useParams } from "react-router-dom";
 import { limitDigitsInDecimals } from "overlay-sdk";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import useSDK from "../../../providers/SDKProvider/useSDK";
+import theme from "../../../theme";
 
 const TVChartContainer = styled.div`
-  height: 561px;
+  height: 258px;
   width: 100%;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    height: 561px;
+  }
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    height: 643px;
+  }
 `;
 
 export interface ChartContainerProps {

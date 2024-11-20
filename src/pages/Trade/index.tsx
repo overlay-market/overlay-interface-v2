@@ -16,6 +16,7 @@ import { useMarketsActionHandlers } from "../../state/markets/hooks";
 import PositionsTable from "./PositionsTable";
 import InfoMarketSection from "./InfoMarketSection";
 import { ExpandedMarketData } from "overlay-sdk";
+import { LineSeparator, StyledFlex, TradeContainer } from "./trade-styles";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
@@ -73,14 +74,16 @@ const Trade: React.FC = () => {
   }, [marketId, chainId, handleTradeStateReset]);
 
   return (
-    <Flex direction="column" width={"100%"} mb="100px">
+    <TradeContainer direction="column" width={"100%"} mb="100px">
       <TradeHeader />
 
-      <Flex direction="column" gap="20px">
-        <Flex
+      <LineSeparator />
+
+      <Flex direction="column">
+        <StyledFlex
           height={{ initial: "auto", sm: "561px" }}
           width={"100%"}
-          direction={{ initial: "column-reverse", sm: "row" }}
+          direction={{ initial: "column", sm: "row" }}
           align={{ initial: "center", sm: "start" }}
           px={{ initial: "20px", sm: "0" }}
         >
@@ -99,11 +102,11 @@ const Trade: React.FC = () => {
               <Loader />
             </Flex>
           )}
-        </Flex>
+        </StyledFlex>
         <PositionsTable />
         <InfoMarketSection />
       </Flex>
-    </Flex>
+    </TradeContainer>
   );
 };
 

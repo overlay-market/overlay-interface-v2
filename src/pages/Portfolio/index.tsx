@@ -10,11 +10,16 @@ const Portfolio: React.FC = () => {
   return (
     <Flex direction="column" width={"100%"}>
       <HeaderEmptyPlaceholder></HeaderEmptyPlaceholder>
-
-      <Overview />
-      <OpenPositionsTable />
-      <UnwindsTable />
-      <LiquidatesTable />
+      <Flex
+        direction="column"
+        width={"100%"}
+        px={{ initial: "15px", sm: "8px" }}
+      >
+        <Overview />
+        <OpenPositionsTable />
+        <UnwindsTable />
+        <LiquidatesTable />
+      </Flex>
     </Flex>
   );
 };

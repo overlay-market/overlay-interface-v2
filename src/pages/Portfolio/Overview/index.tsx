@@ -52,7 +52,6 @@ const Overview: React.FC = () => {
       direction="column"
       width={"100%"}
       gap={{ initial: "8px", md: "24px" }}
-      p={"8px"}
     >
       <Box py={"20px"}>
         <Text weight={"bold"} size={"5"}>

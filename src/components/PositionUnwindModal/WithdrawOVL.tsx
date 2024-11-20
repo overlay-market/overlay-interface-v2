@@ -122,13 +122,16 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
           <GradientOutlineButton
             title={`Withdraw ${UNIT}`}
             width={"100%"}
-            height={"40px"}
+            height={"46px"}
             handleClick={handleWithdraw}
           />
         )}
 
         {attemptingWithdraw && (
-          <GradientLoaderButton title={"Pending confirmation..."} />
+          <GradientLoaderButton
+            height={"46px"}
+            title={"Pending confirmation..."}
+          />
         )}
       </Flex>
     </>
