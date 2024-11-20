@@ -10,7 +10,6 @@ import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
-import { useTradeActionHandlers } from "../../../state/trade/hooks";
 import usePrevious from "../../../hooks/usePrevious";
 
 type UnwindButtonComponentProps = {
@@ -32,7 +31,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
 }) => {
   const sdk = useSDK();
   const addPopup = useAddPopup();
-  const { handleTxnHashUpdate } = useTradeActionHandlers();
   const previousInputValue = usePrevious(inputValue);
   const currentTimeForId = currentTimeParsed();
 
@@ -63,8 +61,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           priceLimit: priceLimit,
         })
         .then((result) => {
-          handleTxnHashUpdate(result.hash);
-
           addPopup(
             {
               txn: {

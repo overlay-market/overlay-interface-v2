@@ -51,7 +51,8 @@ const OpenPositionsTable: React.FC = () => {
             currentPage,
             itemsPerPage,
             undefined,
-            account as Address
+            account as Address,
+            isNewTxnHash
           );
 
           positions && setPositions(positions.data);

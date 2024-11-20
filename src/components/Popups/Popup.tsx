@@ -7,6 +7,7 @@ import { AnimatedFader, PopupContainer } from "./popup-styles";
 import { Flex } from "@radix-ui/themes";
 import TransactionPopup from "./TransactionPopup";
 import theme from "../../theme";
+import { useTradeActionHandlers } from "../../state/trade/hooks";
 
 type PopupProps = {
   removeAfterMs: number | null;
@@ -16,10 +17,14 @@ type PopupProps = {
 
 const Popup: React.FC<PopupProps> = ({ removeAfterMs, content, popKey }) => {
   const removePopup = useRemovePopup();
-  const removeThisPopup = useCallback(
-    () => removePopup(popKey),
-    [popKey, removePopup]
-  );
+  const { handleTxnHashUpdate } = useTradeActionHandlers();
+
+  const removeThisPopup = useCallback(() => {
+    if (content.txn.success) {
+      handleTxnHashUpdate(content.txn.hash);
+    }
+    removePopup(popKey);
+  }, [popKey, removePopup]);
 
   useEffect(() => {
     if (removeAfterMs === null) return undefined;

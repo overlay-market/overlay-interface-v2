@@ -31,8 +31,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const sdk = useSDK();
   const { open } = useWeb3Modal();
   const { currentMarket: market } = useCurrentMarketState();
-  const { handleTradeStateReset, handleTxnHashUpdate } =
-    useTradeActionHandlers();
+  const { handleTradeStateReset } = useTradeActionHandlers();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
@@ -79,7 +78,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           priceLimit: toWei(tradeState.priceInfo.minPrice as string),
         })
         .then((result) => {
-          handleTxnHashUpdate(result.hash);
           addPopup(
             {
               txn: {
@@ -132,7 +130,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         amount: maxUint256,
       })
       .then((result) => {
-        handleTxnHashUpdate(result.hash);
         addPopup(
           {
             txn: {
