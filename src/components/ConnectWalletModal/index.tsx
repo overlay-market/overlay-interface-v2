@@ -17,6 +17,7 @@ const ConnectWalletModal: React.FC = () => {
       title={"Connect Wallet"}
       width={"136px"}
       height={"32px"}
+      size="14px"
       handleClick={handleConnect}
     />
   );

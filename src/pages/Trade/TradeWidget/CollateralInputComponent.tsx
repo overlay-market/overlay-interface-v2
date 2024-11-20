@@ -7,7 +7,7 @@ import {
   useTradeState,
 } from "../../../state/trade/hooks";
 import { useParams } from "react-router-dom";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { toWei } from "overlay-sdk";

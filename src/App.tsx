@@ -3,7 +3,6 @@ import Trade from "./pages/Trade";
 import { Flex } from "@radix-ui/themes";
 import NavBar from "./components/NavBar";
 import Markets from "./pages/Markets";
-import useSDK from "./hooks/useSDK";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
 import useMultichainContext from "./providers/MultichainContextProvider/useMultichainContext";
 import Wallet from "./components/Wallet";
@@ -18,7 +17,6 @@ const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
   useSyncChainQuery(chainIdRef);
 
-  useSDK();
   const { chainId: contextChainID } = useMultichainContext();
 
   return (

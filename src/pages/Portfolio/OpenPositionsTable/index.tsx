@@ -1,6 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
@@ -83,7 +83,6 @@ const OpenPositionsTable: React.FC = () => {
   return (
     <Flex
       direction={"column"}
-      px={"8px"}
       pt={"36px"}
       pb={"66px"}
       width={"100%"}

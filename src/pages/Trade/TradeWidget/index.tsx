@@ -1,4 +1,3 @@
-import { Flex } from "@radix-ui/themes";
 import MainTradeDetails from "./MainTradeDetails";
 import {
   useIsNewTxnHash,
@@ -9,7 +8,7 @@ import AdditionalTradeDetails from "./AdditionalTradeDetails";
 import TradeButtonComponent from "./TradeButtonComponent";
 import PositionSelectComponent from "./PositionSelectComponent";
 import CollateralInputComponent from "./CollateralInputComponent";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useState } from "react";
 import { Address } from "viem";
@@ -18,6 +17,9 @@ import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { TradeWidgetContainer } from "./trade-widget-styles";
+import useDebounce from "../../../hooks/useDebounce";
 
 const TradeWidget: React.FC = () => {
   const { marketId } = useParams();
@@ -34,25 +36,29 @@ const TradeWidget: React.FC = () => {
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
     undefined
   );
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
+  const debouncedTypedValue = useDebounce(typedValue, 500);
+  const debouncedSelectedLeverage = useDebounce(selectedLeverage, 500);
 
   useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
     setLoading(false);
 
     const fetchTradeState = async () => {
-      if (!typedValue || typedValue === "") {
+      if (!debouncedTypedValue || debouncedTypedValue === "") {
         setTradeState(undefined);
         return;
       }
 
-      if (marketId && address && typedValue !== "") {
+      if (marketId && address && debouncedTypedValue !== "") {
         setLoading(true);
 
         try {
           const tradeState = await sdk.trade.getTradeState(
             marketId,
-            toWei(typedValue),
-            toWei(selectedLeverage),
+            toWei(debouncedTypedValue),
+            toWei(debouncedSelectedLeverage),
             Number(slippageValue),
             isLong,
             address
@@ -79,8 +85,8 @@ const TradeWidget: React.FC = () => {
   }, [
     marketId,
     address,
-    typedValue,
-    selectedLeverage,
+    debouncedTypedValue,
+    debouncedSelectedLeverage,
     chainId,
     isLong,
     slippageValue,
@@ -110,11 +116,11 @@ const TradeWidget: React.FC = () => {
   };
 
   return (
-    <Flex
+    <TradeWidgetContainer
       direction={"column"}
-      gap={"24px"}
-      width={"321px"}
-      px={"8px"}
+      gap={{ initial: "16px", sm: "24px" }}
+      width={{ initial: "343px", sm: "321px" }}
+      px={{ initial: "0px", sm: "8px" }}
       pt={"8px"}
       pb={"20px"}
       flexShrink={"0"}
@@ -132,10 +138,21 @@ const TradeWidget: React.FC = () => {
       />
 
       <CollateralInputComponent />
-      <MainTradeDetails tradeState={tradeState} />
-      <TradeButtonComponent loading={loading} tradeState={tradeState} />
+
+      {isMobile ? (
+        <>
+          <TradeButtonComponent loading={loading} tradeState={tradeState} />
+          <MainTradeDetails tradeState={tradeState} />
+        </>
+      ) : (
+        <>
+          <MainTradeDetails tradeState={tradeState} />
+          <TradeButtonComponent loading={loading} tradeState={tradeState} />
+        </>
+      )}
+
       <AdditionalTradeDetails tradeState={tradeState} />
-    </Flex>
+    </TradeWidgetContainer>
   );
 };
 

@@ -11,6 +11,7 @@ type GradientButtonProps = {
   title: string;
   width?: string;
   height?: string;
+  size?: string;
   isDisabled?: boolean;
   handleClick?: () => void;
 };
@@ -18,7 +19,8 @@ type GradientButtonProps = {
 export const GradientOutlineButton: React.FC<GradientButtonProps> = ({
   title,
   width,
-  height,
+  height = "52px",
+  size = "16px",
   isDisabled = false,
   handleClick,
 }) => {
@@ -28,7 +30,7 @@ export const GradientOutlineButton: React.FC<GradientButtonProps> = ({
       height={height}
       disabled={isDisabled}
       onClick={handleClick}
-      style={{ fontSize: "12px" }}
+      style={{ fontSize: size }}
     >
       <ButtonTitle disabled={isDisabled}>{title}</ButtonTitle>
     </GradientOutlineBtnWrapper>
@@ -38,7 +40,8 @@ export const GradientOutlineButton: React.FC<GradientButtonProps> = ({
 export const GradientSolidButton: React.FC<GradientButtonProps> = ({
   title,
   width,
-  height,
+  height = "52px",
+  size = "16px",
   isDisabled = false,
   handleClick,
 }) => {
@@ -48,6 +51,7 @@ export const GradientSolidButton: React.FC<GradientButtonProps> = ({
       height={height}
       disabled={isDisabled}
       onClick={handleClick}
+      style={{ fontSize: size }}
     >
       <Text style={{ color: `${theme.color.black}` }}>{title}</Text>
     </GradientSolidBtnWrapper>
@@ -57,13 +61,14 @@ export const GradientSolidButton: React.FC<GradientButtonProps> = ({
 export const GradientLoaderButton: React.FC<GradientButtonProps> = ({
   title,
   width,
-  height,
+  height = "52px",
+  size = "14px",
 }) => {
   return (
     <GradientLoaderBtnWrapper
       width={width}
       height={height}
-      style={{ fontSize: "12px" }}
+      style={{ fontSize: size }}
     >
       <ButtonTitle disabled={true}>{title}</ButtonTitle>
     </GradientLoaderBtnWrapper>

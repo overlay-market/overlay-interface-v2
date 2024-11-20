@@ -10,7 +10,7 @@ import {
 } from "./trade-header-styles";
 import { useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals, toWei } from "overlay-sdk";
@@ -121,75 +121,53 @@ const TradeHeader: React.FC = () => {
         <MarketsList />
 
         <MarketInfoContainer>
-          <Flex
-            width={"114px"}
-            height={"100%"}
-            justify={"center"}
-            direction="column"
-            p={"12px"}
-            flexShrink={"0"}
-            style={{
-              borderRight: `1px solid ${theme.color.darkBlue}`,
-            }}
+          <StyledFlex
+            width={{ initial: "109px", sm: "167px", lg: "119px" }}
+            p={{ initial: "8px 0px 8px 15px", sm: "12px 15px", md: "12px" }}
           >
             <Text weight="light" style={{ fontSize: "10px" }}>
               Price
             </Text>
             <Text>{currencyPrice}</Text>
-          </Flex>
+          </StyledFlex>
 
-          <StyledFlex>
-            <Flex
-              width={"97px"}
-              height={"100%"}
-              direction={"column"}
-              justify={"center"}
-              p={"12px"}
+          <StyledFlex
+            width={{ initial: "92px", sm: "167px", lg: "97px" }}
+            p={{ initial: "8px 0px", sm: "12px" }}
+            align={{ initial: "start", sm: "end" }}
+          >
+            <Text weight="light" style={{ fontSize: "10px" }}>
+              Funding
+            </Text>
+            <Text
               style={{
-                borderRight: `1px solid ${theme.color.darkBlue}`,
+                color: isFundingRatePositive
+                  ? theme.color.red2
+                  : theme.color.green2,
               }}
             >
-              <Text weight="light" style={{ fontSize: "10px" }}>
-                Funding
-              </Text>
-              <Text
-                style={{
-                  color: isFundingRatePositive
-                    ? theme.color.red2
-                    : theme.color.green2,
-                }}
-              >
-                {isFundingRatePositive ? `+` : ``}
-                {funding ? `${funding}%` : `-`}
-              </Text>
-            </Flex>
+              {isFundingRatePositive ? `+` : ``}
+              {funding ? `${funding}%` : `-`}
+            </Text>
+          </StyledFlex>
 
-            <Flex
-              width={"195px"}
-              height={"100%"}
-              direction={"column"}
-              justify={"center"}
-              p={"12px"}
-              align={"end"}
-              style={{
-                borderRight: `1px solid ${theme.color.darkBlue}`,
-              }}
-            >
-              <Text weight="light" style={{ fontSize: "10px" }}>
-                OI balance
+          <StyledFlex
+            width={{ initial: "157px", sm: "336px", lg: "195px" }}
+            justify={"center"}
+            align={"end"}
+            p={{ initial: "8px 15px 8px 0px", sm: "12px" }}
+          >
+            <Text weight="light" style={{ fontSize: "10px" }}>
+              OI balance
+            </Text>
+            <Flex gap={"4px"} align={"center"}>
+              <Text style={{ color: theme.color.red2 }}>
+                {shortPercentageOfTotalOi}%
               </Text>
-              <Flex gap={"4px"} align={"center"}>
-                <Text style={{ color: theme.color.red2 }}>
-                  {shortPercentageOfTotalOi}%
-                </Text>
-                <ProgressBar
-                  max={100}
-                  value={Number(shortPercentageOfTotalOi)}
-                />
-                <Text style={{ color: theme.color.green2 }}>
-                  {longPercentageOfTotalOi}%
-                </Text>
-              </Flex>
+              <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
+              <Text style={{ color: theme.color.green2 }}>
+                {longPercentageOfTotalOi}%
+              </Text>
             </Flex>
           </StyledFlex>
         </MarketInfoContainer>

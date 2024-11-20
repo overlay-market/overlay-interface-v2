@@ -3,7 +3,7 @@ import {
   GradientOutlineButton,
   GradientSolidButton,
 } from "../../../components/Button";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useMemo, useState } from "react";
 import { OpenPositionData, toWei } from "overlay-sdk";
 import { Address } from "viem";
@@ -117,7 +117,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         <GradientSolidButton
           title={"Unwind"}
           width={"100%"}
-          height={"40px"}
+          height={"46px"}
           handleClick={handleUnwind}
           isDisabled={isPendingTime}
         />
@@ -127,13 +127,18 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         <GradientOutlineButton
           title={title}
           width={"100%"}
-          height={"40px"}
+          height={"46px"}
+          size={"14px"}
           isDisabled={isDisabledUnwindButton}
         />
       )}
 
       {attemptingUnwind && (
-        <GradientLoaderButton title={"Pending confirmation..."} />
+        <GradientLoaderButton
+          height={"46px"}
+          size={"14px"}
+          title={"Pending confirmation..."}
+        />
       )}
     </>
   );

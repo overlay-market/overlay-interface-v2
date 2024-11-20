@@ -4,7 +4,7 @@ import { UNIT } from "../../constants/applications";
 import { OpenPositionData, UnwindStateError } from "overlay-sdk";
 import { GradientLoaderButton, GradientOutlineButton } from "../Button";
 import { useState } from "react";
-import useSDK from "../../hooks/useSDK";
+import useSDK from "../../providers/SDKProvider/useSDK";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
@@ -122,13 +122,16 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
           <GradientOutlineButton
             title={`Withdraw ${UNIT}`}
             width={"100%"}
-            height={"40px"}
+            height={"46px"}
             handleClick={handleWithdraw}
           />
         )}
 
         {attemptingWithdraw && (
-          <GradientLoaderButton title={"Pending confirmation..."} />
+          <GradientLoaderButton
+            height={"46px"}
+            title={"Pending confirmation..."}
+          />
         )}
       </Flex>
     </>

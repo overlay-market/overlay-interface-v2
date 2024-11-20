@@ -2,7 +2,7 @@ import { Box, Flex, Text } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
 import { InfoCardsGrid, MainCardsGrid } from "./overview-styles";
 import OverviewCard from "./OverviewCard";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
@@ -52,7 +52,6 @@ const Overview: React.FC = () => {
       direction="column"
       width={"100%"}
       gap={{ initial: "8px", md: "24px" }}
-      p={"8px"}
     >
       <Box py={"20px"}>
         <Text weight={"bold"} size={"5"}>
