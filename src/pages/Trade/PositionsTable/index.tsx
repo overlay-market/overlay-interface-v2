@@ -37,9 +37,7 @@ const PositionsTable: React.FC = () => {
   const [positions, setPositions] = useState<OpenPositionData[] | undefined>(
     undefined
   );
-  const [paginatedPositions, setPaginatedPositions] = useState<
-    OpenPositionData[] | undefined
-  >(undefined);
+
   const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -63,16 +61,19 @@ const PositionsTable: React.FC = () => {
         setLoading(true);
         try {
           const positions = await sdk.openPositions.transformOpenPositions(
-            undefined,
-            undefined,
+            currentPage,
+            itemsPerPage,
             marketId,
             account as Address,
             isNewTxnHash || isNewMarketId
           );
 
           positions && setPositions(positions.data);
-          const positionsLength = positions && positions.data.length;
-          positionsLength && setPositionsTotalNumber(positionsLength);
+          positions && setPositionsTotalNumber(positions.total);
+          if (!positions) {
+            setPositions(undefined);
+            setPositionsTotalNumber(0);
+          }
         } catch (error) {
           console.error("Error fetching open positions:", error);
         } finally {
@@ -82,20 +83,17 @@ const PositionsTable: React.FC = () => {
     };
 
     fetchOpenPositions();
-  }, [chainId, marketId, account, isNewTxnHash, isNewMarketId]);
-
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    if (positions && positions.length > 0) {
-      const paginatedData = positions.slice(startIndex, endIndex);
-      setPaginatedPositions(paginatedData);
-    }
-    if (!positions) {
-      setPaginatedPositions(undefined);
-    }
-  }, [positions, currentPage, itemsPerPage, setItemsPerPage]);
+  }, [
+    chainId,
+    marketId,
+    account,
+    isNewTxnHash,
+    isNewMarketId,
+    currentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    setCurrentPage,
+  ]);
 
   return (
     <>
@@ -116,12 +114,10 @@ const PositionsTable: React.FC = () => {
           setCurrentPage={setCurrentPage}
           setItemsPerPage={setItemsPerPage}
           body={
-            paginatedPositions &&
-            paginatedPositions.map(
-              (position: OpenPositionData, index: number) => (
-                <OpenPosition position={position} key={index} />
-              )
-            )
+            positions &&
+            positions.map((position: OpenPositionData, index: number) => (
+              <OpenPosition position={position} key={index} />
+            ))
           }
         />
 
