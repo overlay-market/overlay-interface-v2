@@ -2,7 +2,6 @@ import { Flex, Text } from "@radix-ui/themes";
 import Modal from "../Modal";
 import theme from "../../theme";
 import { useEffect, useState } from "react";
-import useSDK from "../../hooks/useSDK";
 import useAccount from "../../hooks/useAccount";
 import {
   OpenPositionData,
@@ -16,6 +15,7 @@ import UnwindPosition from "./UnwindPosition";
 import PositionNotFound from "./PositionNotFound";
 import WithdrawOVL from "./WithdrawOVL";
 import { useTradeState } from "../../state/trade/hooks";
+import useSDK from "../../providers/SDKProvider/useSDK";
 
 type PositionUnwindModalProps = {
   open: boolean;

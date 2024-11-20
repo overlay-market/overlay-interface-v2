@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useParams } from "react-router-dom";
-import useSDK from "../../hooks/useSDK";
+import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import Loader from "../../components/Loader";
 import {
