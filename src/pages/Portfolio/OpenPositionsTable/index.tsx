@@ -1,6 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
@@ -48,8 +48,8 @@ const OpenPositionsTable: React.FC = () => {
         setLoading(true);
         try {
           const positions = await sdk.openPositions.transformOpenPositions(
-            currentPage,
-            itemsPerPage,
+            undefined,
+            undefined,
             undefined,
             account as Address
           );

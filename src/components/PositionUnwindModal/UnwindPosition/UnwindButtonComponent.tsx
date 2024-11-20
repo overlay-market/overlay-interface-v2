@@ -3,7 +3,7 @@ import {
   GradientOutlineButton,
   GradientSolidButton,
 } from "../../../components/Button";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useMemo, useState } from "react";
 import { OpenPositionData, toWei } from "overlay-sdk";
 import { Address } from "viem";

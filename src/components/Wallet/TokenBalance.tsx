@@ -4,7 +4,7 @@ import Loader from "../Loader";
 import NumberSpring from "../NumberSpring";
 import theme from "../../theme";
 import { useEffect, useState } from "react";
-import useSDK from "../../hooks/useSDK";
+import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../hooks/useAccount";
 import { useIsNewTxnHash } from "../../state/trade/hooks";
