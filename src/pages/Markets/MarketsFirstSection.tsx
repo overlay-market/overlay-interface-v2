@@ -1,5 +1,5 @@
 import { Box, Flex } from "@radix-ui/themes";
-import { OptionalLinkBanner } from "../../components/Banner/OptionalLinkBanner";
+// import { OptionalLinkBanner } from "../../components/Banner/OptionalLinkBanner";
 import { PromotedBanner } from "../../components/Banner/PromotedBanner";
 import {
   limitDigitsInDecimals,
@@ -37,12 +37,20 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         />
       </Box>
       <Box flexGrow="3" flexShrink="1" flexBasis="0%">
+        <PromotedBanner
+          Title={"CGMI"}
+          Name={decodeURIComponent(marketsData[5].marketId)}
+          Value={value}
+          Id={marketsData[5].marketId}
+        />
+      </Box>
+      {/* <Box flexGrow="3" flexShrink="1" flexBasis="0%">
         <OptionalLinkBanner
           Title={"Governance"}
           Name={decodeURIComponent(marketsData[1].marketId)}
           Link={"Vote Now"}
         />
-      </Box>
+      </Box> */}
     </Flex>
   );
 };

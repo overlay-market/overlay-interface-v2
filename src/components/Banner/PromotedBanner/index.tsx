@@ -7,6 +7,7 @@ import {
 import theme from "../../../theme";
 import { Flex } from "@radix-ui/themes";
 import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
+import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 
 interface PromotedBannerProps {
   Title: string;
@@ -21,9 +22,14 @@ export const PromotedBanner = ({
   Value,
   Id,
 }: PromotedBannerProps) => {
+  const redirectToTradePage = useRedirectToTradePage();
   return (
     <StyledPromotedBanner
-      style={{ backgroundImage: `url(${MARKETS_FULL_LOGOS[Id]})` }}
+      style={{
+        backgroundImage: `url(${MARKETS_FULL_LOGOS[Id]})`,
+        cursor: "pointer",
+      }}
+      onClick={() => redirectToTradePage(Id)}
     >
       <Flex
         direction={"column"}
