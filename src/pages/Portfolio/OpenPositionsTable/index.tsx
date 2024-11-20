@@ -48,8 +48,8 @@ const OpenPositionsTable: React.FC = () => {
         setLoading(true);
         try {
           const positions = await sdk.openPositions.transformOpenPositions(
-            undefined,
-            undefined,
+            currentPage,
+            itemsPerPage,
             undefined,
             account as Address
           );
