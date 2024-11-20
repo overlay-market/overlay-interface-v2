@@ -2,7 +2,7 @@ import { Flex, Text, Box } from "@radix-ui/themes";
 import theme from "../../theme";
 import { MarketInfoContainer } from "../Trade/TradeHeader/trade-header-styles";
 
-const MarketsHeader = ({ ovSupply }: { ovSupply: bigint | undefined }) => {
+const MarketsHeader = ({ ovSupply }: { ovSupply: number | undefined }) => {
   return (
     <MarketInfoContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>

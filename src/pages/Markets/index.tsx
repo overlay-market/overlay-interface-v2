@@ -3,7 +3,7 @@ import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
 import MarketsTable from "./MarketsTable";
-import { TransformedMarketData } from "overlay-sdk";
+import { TransformedMarketData, formatWeiToParsedNumber } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../hooks/useSDK";
@@ -32,7 +32,7 @@ const Markets: React.FC = () => {
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
-      <MarketsHeader ovSupply={totalSupply} />
+      <MarketsHeader ovSupply={formatWeiToParsedNumber(totalSupply, 18, 4)} />
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} />
       <MarketsTable marketsData={marketsData} />
