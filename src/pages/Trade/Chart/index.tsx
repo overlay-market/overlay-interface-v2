@@ -13,10 +13,10 @@ import moment from "moment";
 import { getMarketChartUrl } from "./helpers";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import useSDK from "../../../hooks/useSDK";
 import { useParams } from "react-router-dom";
 import { limitDigitsInDecimals } from "overlay-sdk";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 
 const TVChartContainer = styled.div`
   height: 561px;

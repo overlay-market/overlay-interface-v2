@@ -3,7 +3,7 @@ import theme from "../../../theme";
 import { InfoIcon } from "../../../assets/icons/svg-icons";
 import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import useSDK from "../../../hooks/useSDK";
+import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useTradeState } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
