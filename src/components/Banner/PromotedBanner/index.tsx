@@ -6,22 +6,25 @@ import {
 } from "../banners-styles";
 import theme from "../../../theme";
 import { Flex } from "@radix-ui/themes";
+import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
 
 interface PromotedBannerProps {
   Title: string;
   Name: string;
   Value: string | number | undefined;
-  Image: string;
+  Id: string;
 }
 
 export const PromotedBanner = ({
   Title,
   Name,
   Value,
-  Image,
+  Id,
 }: PromotedBannerProps) => {
   return (
-    <StyledPromotedBanner style={{ backgroundImage: `url(${Image})` }}>
+    <StyledPromotedBanner
+      style={{ backgroundImage: `url(${MARKETS_FULL_LOGOS[Id]})` }}
+    >
       <Flex
         direction={"column"}
         justify={"start"}
