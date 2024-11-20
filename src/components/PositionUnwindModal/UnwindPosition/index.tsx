@@ -56,9 +56,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   }, [unwindState]);
 
   useEffect(() => {
-    if (debouncedSelectedPercent) {
-      setUnwindPercentage(debouncedSelectedPercent);
-    }
+    setUnwindPercentage(debouncedSelectedPercent);
   }, [debouncedSelectedPercent]);
 
   const maxAmount: number = useMemo(() => Number(value) ?? 0, [value]);
