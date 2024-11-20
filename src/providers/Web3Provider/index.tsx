@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ConnectionProvider from "../ConnectionProvider";
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { arbitrumSepolia } from "wagmi/chains";
+import SDKProvider from "../SDKProvider";
 
 const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string;
 
@@ -20,7 +21,9 @@ const Web3Provider: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <ConnectionProvider>{children}</ConnectionProvider>
+        <ConnectionProvider>
+          <SDKProvider>{children}</SDKProvider>
+        </ConnectionProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
