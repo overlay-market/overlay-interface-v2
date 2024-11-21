@@ -26,7 +26,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
       modules={[Navigation, Pagination]}
       style={{
         height: "auto",
-        margin: "50px 0",
+        margin: "50px 0px 0px 0px",
         padding: "0 50px",
       }}
       spaceBetween={10}
