@@ -1,4 +1,4 @@
-import { Flex, Text, Box } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import { MarketHeaderContainer, StyledFlex } from "./market-header-styles";
 
 const MarketsHeader = ({ ovSupply }: { ovSupply: number | undefined }) => {
