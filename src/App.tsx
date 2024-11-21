@@ -12,6 +12,7 @@ import Popups from "./components/Popups";
 import { DEFAULT_MARKET_ID } from "./constants/applications";
 import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
+import SDKProvider from "./providers/SDKProvider";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -21,25 +22,27 @@ const App = () => {
 
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
-      <Theme>
-        <AppContainer>
-          <Popups />
-          <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
-            <NavBar />
-            <Wallet />
-            <Routes>
-              <Route path="/" element={<Navigate to="/markets" />} />
-              <Route path="/markets" element={<Markets />} />
-              <Route
-                path="/trade"
-                element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
-              />
-              <Route path="/trade/:marketId" element={<Trade />} />
-              <Route path="/portfolio" element={<Portfolio />} />
-            </Routes>
-          </Flex>
-        </AppContainer>
-      </Theme>
+      <SDKProvider>
+        <Theme>
+          <AppContainer>
+            <Popups />
+            <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
+              <NavBar />
+              <Wallet />
+              <Routes>
+                <Route path="/" element={<Navigate to="/markets" />} />
+                <Route path="/markets" element={<Markets />} />
+                <Route
+                  path="/trade"
+                  element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
+                />
+                <Route path="/trade/:marketId" element={<Trade />} />
+                <Route path="/portfolio" element={<Portfolio />} />
+              </Routes>
+            </Flex>
+          </AppContainer>
+        </Theme>
+      </SDKProvider>
     </MultichainContextProvider>
   );
 };
