@@ -37,7 +37,3 @@ body {
   min-height: 100vh;
   max-width: 100vw;
 }
-
-#root {
-  margin: 0 auto;
-}
