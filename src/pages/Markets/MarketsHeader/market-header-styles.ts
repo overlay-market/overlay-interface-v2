@@ -16,3 +16,12 @@ export const MarketHeaderContainer = styled(Flex)`
     justify-content: start;
   }
 `;
+
+export const StyledFlex = styled(Flex)`
+  height: 100%;
+  flex-direction: column;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    border-right: 1px solid ${theme.color.darkBlue};
+  }
+`;
