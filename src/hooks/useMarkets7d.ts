@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { MARKET_CHART_URL } from "../constants/applications";
 
@@ -8,7 +8,7 @@ interface MarketDataPoint {
   priceOneDayAgo: number;
   priceOneHourAgo: number;
   priceSevenDaysAgo: number;
-  prices:  number[];
+  prices: number[];
 }
 
 interface MarketDataWithOpenPrice {
@@ -22,33 +22,47 @@ interface MarketDataWithOpenPrice {
 
 export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
   const [marketsData, setMarketsData] = useState<MarketDataWithOpenPrice[]>([]);
-  const marketIdsRef = useRef(marketIds);
+  const [marketAddressMapping, setMarketAddressMapping] = useState<Record<string, string>>({});
 
+  // Memoized version of marketIds to avoid unnecessary re-fetches
+  const stableMarketIds = useMemo(() => marketIds, [marketIds]);
+
+  // Fetch the market address mapping once
   useEffect(() => {
-    const fetchMarketData = async () => {
+    const fetchMarketAddressMapping = async () => {
+      try {
+        const response2 = await axios.get("https://api.overlay.market/data/api/markets");
+        const mapping: Record<string, string> = {};
+
+        response2.data[421614].forEach((item: { marketId: string; chains: { deploymentAddress: string }[] }) => {
+          mapping[item.marketId] = item.chains[0]?.deploymentAddress.toLowerCase();
+        });
+
+        setMarketAddressMapping(mapping);
+      } catch (error) {
+        console.error("Error fetching response2 data:", error);
+      }
+    };
+
+    fetchMarketAddressMapping();
+  }, []);
+
+  // Fetch marketsPricesOverview whenever marketIds or the mapping changes
+  useEffect(() => {
+    const fetchMarketsPricesOverview = async () => {
+      if (Object.keys(marketAddressMapping).length === 0 || stableMarketIds.length === 0) return;
+
       try {
         const responseOverview = await axios.get<MarketDataPoint[]>(
           `${MARKET_CHART_URL.SEPOLIA}/marketsPricesOverview`
         );
         const chartDataArray = responseOverview.data;
 
-        const response2 = await axios.get(
-          `https://api.overlay.market/data/api/markets`
-        );
-
-        console.log({responseOverview, response2})
-
-        const updatedMarketsData = marketIdsRef.current.map((marketId) => {
+        const updatedMarketsData = stableMarketIds.map((marketId) => {
           try {
-            const marketAddressSepolia = response2.data[421614]
-            .find(
-              (item: {marketId: string}) =>
-                item.marketId === marketId
-            )
-            ?.chains[0]
-            ?.deploymentAddress.toLowerCase();
+            const marketAddressSepolia = marketAddressMapping[marketId];
+            const chartData = chartDataArray.find((item) => item.marketAddress === marketAddressSepolia);
 
-            const chartData = chartDataArray.filter((item) => item.marketAddress === marketAddressSepolia)[0]
             if (!chartData) {
               throw new Error(`No chart data available for ${marketId}`);
             }
@@ -56,13 +70,16 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
             return {
               marketId,
               latestPrice: chartData.latestPrice,
-              oneHourChange: 100 * (chartData.latestPrice - chartData.priceOneHourAgo) / chartData.priceOneHourAgo,
-              twentyFourHourChange: 100 * (chartData.latestPrice - chartData.priceOneDayAgo) / chartData.priceOneDayAgo,
-              sevenDayChange: 100 * (chartData.latestPrice - chartData.priceSevenDaysAgo) / chartData.priceSevenDaysAgo,
+              oneHourChange:
+                (100 * (chartData.latestPrice - chartData.priceOneHourAgo)) / chartData.priceOneHourAgo,
+              twentyFourHourChange:
+                (100 * (chartData.latestPrice - chartData.priceOneDayAgo)) / chartData.priceOneDayAgo,
+              sevenDayChange:
+                (100 * (chartData.latestPrice - chartData.priceSevenDaysAgo)) / chartData.priceSevenDaysAgo,
               sevenDaysChartData: chartData.prices,
             };
           } catch (err) {
-            console.error(`Error fetching market data for ${marketId}:`, err);
+            console.error(`Error processing market data for ${marketId}:`, err);
             return {
               marketId,
               latestPrice: 0,
@@ -71,32 +88,24 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
               sevenDayChange: 0,
             };
           }
-        })
+        });
 
-        updatedMarketsData.length > 0 && setMarketsData(updatedMarketsData);
+        if (updatedMarketsData.length > 0) {
+          setMarketsData((prevMarketsData) =>
+            JSON.stringify(prevMarketsData) !== JSON.stringify(updatedMarketsData) ? updatedMarketsData : prevMarketsData
+          );
+        }
       } catch (error) {
-        console.error("Error fetching market data:", error);
+        console.error("Error fetching market prices overview:", error);
       }
     };
 
-    fetchMarketData();
+    fetchMarketsPricesOverview();
 
-    const intervalId = setInterval(fetchMarketData, 300000); // 5 minutes
+    const intervalId = setInterval(fetchMarketsPricesOverview, 300000); // 5 minutes interval
 
     return () => clearInterval(intervalId);
-  }, [marketIds]);
-
-  useEffect(() => {
-    marketIdsRef.current = marketIds;
-  }, [marketIds]);
-
-  // useEffect(() => {
-  //   fetchMarketData();
-
-  //   const intervalId = setInterval(fetchMarketData, 300000); // 5 minutes
-
-  //   return () => clearInterval(intervalId);
-  // }, [fetchMarketData]);
+  }, [marketAddressMapping, stableMarketIds]);
 
   return marketsData;
 }

@@ -139,7 +139,6 @@ export default function MarketsTable({
                 (m) => m.marketId === market.marketId
               );
 
-              if (!market7d) return null;
 
               return (
                 <Table.Row
@@ -182,32 +181,32 @@ export default function MarketsTable({
                   <Table.Cell
                     style={{
                       color:
-                        (market7d.oneHourChange ?? 0) >= 0
+                        (market7d?.oneHourChange ?? 0) >= 0
                           ? theme.color.green2
                           : theme.color.red2,
                     }}
                   >
-                    {market7d.oneHourChange?.toFixed(2)}%
+                    {market7d?.oneHourChange?.toFixed(2)}%
                   </Table.Cell>
                   <Table.Cell
                     style={{
                       color:
-                        (market7d.sevenDayChange ?? 0) >= 0
+                        (market7d?.sevenDayChange ?? 0) >= 0
                           ? theme.color.green2
                           : theme.color.red2,
                     }}
                   >
-                    {market7d.sevenDayChange?.toFixed(2)}%
+                    {market7d?.sevenDayChange?.toFixed(2)}%
                   </Table.Cell>
                   <Table.Cell
                     style={{
                       color:
-                        (market7d.twentyFourHourChange ?? 0) >= 0
+                        (market7d?.twentyFourHourChange ?? 0) >= 0
                           ? theme.color.green2
                           : theme.color.red2,
                     }}
                   >
-                    {market7d.twentyFourHourChange?.toFixed(2)}%
+                    {market7d?.twentyFourHourChange?.toFixed(2)}%
                   </Table.Cell>
                   <Table.Cell style={{ color: theme.color.green2 }}>
                     <span
@@ -253,7 +252,7 @@ export default function MarketsTable({
                     <LineChart
                       width={100}
                       height={30}
-                      data={market7d.sevenDaysChartData?.map((value) => ({
+                      data={market7d?.sevenDaysChartData?.map((value) => ({
                         value,
                       }))}
                       margin={{ top: 0, bottom: 0 }}

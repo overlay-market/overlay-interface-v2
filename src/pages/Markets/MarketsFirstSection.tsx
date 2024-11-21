@@ -31,23 +31,23 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
       <Box flexGrow="7" flexShrink="1" flexBasis="0%">
         <PromotedBanner
           Title={"CGMI"}
-          Name={decodeURIComponent(marketsData[0].marketId)}
+          Name={decodeURIComponent(marketsData[0]?.marketId ?? "")}
           Value={value}
-          Id={marketsData[0].marketId}
+          Id={marketsData[0]?.marketId ?? ""}
         />
       </Box>
       <Box flexGrow="3" flexShrink="1" flexBasis="0%">
         <PromotedBanner
           Title={"CGMI"}
-          Name={decodeURIComponent(marketsData[5].marketId)}
+          Name={decodeURIComponent(marketsData[5]?.marketId ?? "")}
           Value={value}
-          Id={marketsData[5].marketId}
+          Id={marketsData[5]?.marketId ?? ""}
         />
       </Box>
       {/* <Box flexGrow="3" flexShrink="1" flexBasis="0%">
         <OptionalLinkBanner
           Title={"Governance"}
-          Name={decodeURIComponent(marketsData[1].marketId)}
+          Name={decodeURIComponent(marketsData[1].marketId ?? "")}
           Link={"Vote Now"}
         />
       </Box> */}

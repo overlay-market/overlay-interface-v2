@@ -5,12 +5,14 @@ import Carousel from "./MarketsCarousel";
 import MarketsTable from "./MarketsTable";
 import { TransformedMarketData, formatWeiToParsedNumber } from "overlay-sdk";
 import { useEffect, useState } from "react";
-import useSDK from "../../hooks/useSDK";
+import useSDK from "../../providers/SDKProvider/useSDK";
+import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
   const [totalSupply, setTotalSupply] = useState<bigint | undefined>();
   const sdk = useSDK();
+  const { chainId } = useMultichainContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +28,11 @@ const Markets: React.FC = () => {
     };
 
     fetchData();
-  });
+
+    // const intervalId = setInterval(fetchData, 60000); // 5 minutes
+
+    // return () => clearInterval(intervalId);
+  }, [chainId]);
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
