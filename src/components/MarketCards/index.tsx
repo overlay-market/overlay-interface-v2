@@ -4,21 +4,37 @@ import {
   CardsValue,
   CardsTitle,
 } from "./market-cards-styles";
+import { Skeleton } from "@radix-ui/themes";
+import { MARKETS_FULL_LOGOS } from "../../constants/markets";
+import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 
 interface MarketCardsProps {
-  value: string;
+  value: string | number | undefined;
   title: string;
-  image: string;
+  id: string;
+  currency: string;
 }
 
-const MarketCards = ({ value, title, image }: MarketCardsProps) => {
+const MarketCards = ({ value, title, id, currency }: MarketCardsProps) => {
+  const redirectToTradePage = useRedirectToTradePage();
   return (
-    <CustomCard style={{ backgroundImage: `url(${image})` }}>
-      <CardContent direction="column" align="center">
-        <CardsValue>{value}</CardsValue>
-        <CardsTitle>{title}</CardsTitle>
-      </CardContent>
-    </CustomCard>
+    <Skeleton loading={false}>
+      <CustomCard
+        style={{
+          backgroundImage: `url(${MARKETS_FULL_LOGOS[id]})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          cursor: "pointer",
+          width: 200,
+        }}
+        onClick={() => redirectToTradePage(id)}
+      >
+        <CardContent direction="column" align="center">
+          <CardsValue>{currency + value}</CardsValue>
+          <CardsTitle>{title}</CardsTitle>
+        </CardContent>
+      </CustomCard>
+    </Skeleton>
   );
 };
 

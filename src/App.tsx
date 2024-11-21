@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Trade from "./pages/Trade";
-import { Flex } from "@radix-ui/themes";
+import { Flex, Theme } from "@radix-ui/themes";
 import NavBar from "./components/NavBar";
 import Markets from "./pages/Markets";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
@@ -21,23 +21,25 @@ const App = () => {
 
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
-      <AppContainer>
-        <Popups />
-        <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
-          <NavBar />
-          <Wallet />
-          <Routes>
-            <Route path="/" element={<Navigate to="/markets" />} />
-            <Route path="/markets" element={<Markets />} />
-            <Route
-              path="/trade"
-              element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
-            />
-            <Route path="/trade/:marketId" element={<Trade />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-          </Routes>
-        </Flex>
-      </AppContainer>
+      <Theme>
+        <AppContainer>
+          <Popups />
+          <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
+            <NavBar />
+            <Wallet />
+            <Routes>
+              <Route path="/" element={<Navigate to="/markets" />} />
+              <Route path="/markets" element={<Markets />} />
+              <Route
+                path="/trade"
+                element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
+              />
+              <Route path="/trade/:marketId" element={<Trade />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+            </Routes>
+          </Flex>
+        </AppContainer>
+      </Theme>
     </MultichainContextProvider>
   );
 };
