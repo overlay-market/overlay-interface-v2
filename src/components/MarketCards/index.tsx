@@ -25,6 +25,7 @@ const MarketCards = ({ value, title, id, currency }: MarketCardsProps) => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           cursor: "pointer",
+          width: 200,
         }}
         onClick={() => redirectToTradePage(id)}
       >

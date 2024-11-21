@@ -29,44 +29,10 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
         margin: "50px 0px 0px 0px",
         padding: "0 50px",
       }}
-      spaceBetween={10}
+      spaceBetween={12}
       slidesPerView="auto"
       loop={false}
       centeredSlides={false}
-      breakpoints={{
-        320: {
-          slidesPerView: 2,
-          spaceBetween: 10,
-        },
-        480: {
-          slidesPerView: 2,
-          spaceBetween: 15,
-        },
-        768: {
-          slidesPerView: 3,
-          spaceBetween: 0,
-        },
-        1024: {
-          slidesPerView: 4,
-          spaceBetween: 0,
-        },
-        1280: {
-          slidesPerView: 5,
-          spaceBetween: 0,
-        },
-        1440: {
-          slidesPerView: 6,
-          spaceBetween: 0,
-        },
-        1700: {
-          slidesPerView: 7,
-          spaceBetween: 0,
-        },
-        1900: {
-          slidesPerView: 8,
-          spaceBetween: 0,
-        },
-      }}
     >
       {marketsData.map((market, index) => (
         <SwiperSlide key={index} style={{ width: "auto" }}>
@@ -86,6 +52,27 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
           />
         </SwiperSlide>
       ))}
+      {marketsData.length < 11 &&
+        marketsData.map((market, index) => (
+          <SwiperSlide key={index} style={{ width: "auto" }}>
+            <MarketCards
+              id={market.marketId}
+              currency={market.priceCurrency}
+              value={
+                market.priceCurrency === "%"
+                  ? toPercentUnit(market.price)
+                  : toScientificNumber(
+                      Number(market.price) < 100000
+                        ? limitDigitsInDecimals(market.price)
+                        : Math.floor(Number(market.price)).toLocaleString(
+                            "en-US"
+                          )
+                    )
+              }
+              title={decodeURIComponent(market.marketId)}
+            />
+          </SwiperSlide>
+        ))}
     </Swiper>
   );
 };
