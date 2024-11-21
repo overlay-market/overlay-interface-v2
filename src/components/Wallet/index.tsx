@@ -1,9 +1,9 @@
 import { Box, Flex } from "@radix-ui/themes";
-import { GradientOutlineButton } from "../Button";
+// import { GradientOutlineButton } from "../Button";
 import theme from "../../theme";
 import Web3Status from "./Web3Status";
 import ChainSwitch from "./ChainSwitch";
-import HeaderMenu from "../HeaderMenu";
+// import HeaderMenu from "../HeaderMenu";
 
 const Wallet: React.FC = () => {
   return (
@@ -25,7 +25,7 @@ const Wallet: React.FC = () => {
         justify={"end"}
         pr={"20px"}
       >
-        <GradientOutlineButton
+        {/* <GradientOutlineButton
           title={"Buy OV"}
           width={"78px"}
           height={"29px"}
@@ -33,9 +33,9 @@ const Wallet: React.FC = () => {
           handleClick={() => {
             console.log("buy OV!");
           }}
-        />
+        /> */}
         <ChainSwitch />
-        <HeaderMenu />
+        {/* <HeaderMenu /> */}
         <Web3Status />
       </Flex>
     </Box>
