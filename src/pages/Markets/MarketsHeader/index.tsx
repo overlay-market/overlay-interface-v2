@@ -1,16 +1,16 @@
 import { Flex, Text, Box } from "@radix-ui/themes";
-import { MarketHeaderContainer } from "./market-header-styles";
+import { MarketHeaderContainer, StyledFlex } from "./market-header-styles";
 
 const MarketsHeader = ({ ovSupply }: { ovSupply: number | undefined }) => {
   return (
     <MarketHeaderContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>
-        <Flex width={"150px"} justify={"center"} direction="column" ml={"5"}>
+        <StyledFlex width={"150px"} justify={"center"} direction="column" ml={"5"}>
           <Text>OV PRICE</Text>
           <Text>$~~</Text>
-        </Flex>
+        </StyledFlex>
 
-        <Flex
+        <StyledFlex
           width={"114px"}
           height={"100%"}
           justify={"center"}
@@ -19,11 +19,11 @@ const MarketsHeader = ({ ovSupply }: { ovSupply: number | undefined }) => {
         >
           <Text>OV SUPPLY</Text>
           <Text>{ovSupply?.toString()}</Text>
-        </Flex>
+        </StyledFlex>
 
-        <Box width={"150px"} display={"none"}>
+        <StyledFlex width={"150px"} display={"none"}>
           <Text>GOV</Text>
-        </Box>
+        </StyledFlex>
       </Flex>
     </MarketHeaderContainer>
   );
