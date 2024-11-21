@@ -3,13 +3,12 @@ import axios from "axios";
 import { MARKET_CHART_URL } from "../constants/applications";
 
 interface MarketDataPoint {
-  _id: string;
   latestPrice: number;
-  priceSevenDaysAgo: number;
-  marketId: string;
-  priceOneHourAgo: number;
+  marketAddress: string;
   priceOneDayAgo: number;
-  sevenDaysChartData: number[];
+  priceOneHourAgo: number;
+  priceSevenDaysAgo: number;
+  prices:  number[];
 }
 
 interface MarketDataWithOpenPrice {
@@ -17,7 +16,8 @@ interface MarketDataWithOpenPrice {
   latestPrice?: number;
   oneHourChange?: number;
   twentyFourHourChange?: number;
-  sevenDayChange?: number[];
+  sevenDayChange?: number;
+  sevenDaysChartData?: number[];
 }
 
 export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
@@ -27,46 +27,51 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
   useEffect(() => {
     const fetchMarketData = async () => {
       try {
-        const updatedMarketsData = await Promise.all(
-          marketIdsRef.current.map(async (marketId) => {
-            try {
-              const responseOverview = await axios.get<MarketDataPoint[]>(
-                `${MARKET_CHART_URL.SEPOLIA}/marketsPricesOverview`
-              );
-
-              const chartData = responseOverview.data;
-
-              console.log("chartData", chartData);
-
-              if (chartData.length === 0) {
-                throw new Error(`No chart data available for ${marketId}`);
-              }
-
-              const latestDataPoint =
-                chartData[chartData.length - 1]?.latestPrice;
-              const oneHourDataPoint =
-                chartData[chartData.length - 1]?.priceOneHourAgo;
-              const twentyFourHoursDataPoint =
-                chartData[chartData.length - 1]?.priceOneDayAgo;
-              const sevenDaysChartData = chartData.map(
-                (dataPoint) => dataPoint.latestPrice
-              );
-
-              return {
-                marketId,
-                latestPrice: latestDataPoint,
-                oneHourChange: oneHourDataPoint,
-                twentyFourHourChange: twentyFourHoursDataPoint,
-                sevenDayChange: sevenDaysChartData,
-              };
-            } catch (err) {
-              console.error(`Error fetching market data for ${marketId}:`, err);
-              return {
-                marketId,
-              };
-            }
-          })
+        const responseOverview = await axios.get<MarketDataPoint[]>(
+          `${MARKET_CHART_URL.SEPOLIA}/marketsPricesOverview`
         );
+        const chartDataArray = responseOverview.data;
+
+        const response2 = await axios.get(
+          `https://api.overlay.market/data/api/markets`
+        );
+
+        console.log({responseOverview, response2})
+
+        const updatedMarketsData = marketIdsRef.current.map((marketId) => {
+          try {
+            const marketAddressSepolia = response2.data[421614]
+            .find(
+              (item: {marketId: string}) =>
+                item.marketId === marketId
+            )
+            ?.chains[0]
+            ?.deploymentAddress.toLowerCase();
+
+            const chartData = chartDataArray.filter((item) => item.marketAddress === marketAddressSepolia)[0]
+            if (!chartData) {
+              throw new Error(`No chart data available for ${marketId}`);
+            }
+
+            return {
+              marketId,
+              latestPrice: chartData.latestPrice,
+              oneHourChange: 100 * (chartData.latestPrice - chartData.priceOneHourAgo) / chartData.priceOneHourAgo,
+              twentyFourHourChange: 100 * (chartData.latestPrice - chartData.priceOneDayAgo) / chartData.priceOneDayAgo,
+              sevenDayChange: 100 * (chartData.latestPrice - chartData.priceSevenDaysAgo) / chartData.priceSevenDaysAgo,
+              sevenDaysChartData: chartData.prices,
+            };
+          } catch (err) {
+            console.error(`Error fetching market data for ${marketId}:`, err);
+            return {
+              marketId,
+              latestPrice: 0,
+              oneHourChange: 0,
+              twentyFourHourChange: 0,
+              sevenDayChange: 0,
+            };
+          }
+        })
 
         updatedMarketsData.length > 0 && setMarketsData(updatedMarketsData);
       } catch (error) {
@@ -79,7 +84,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
     const intervalId = setInterval(fetchMarketData, 300000); // 5 minutes
 
     return () => clearInterval(intervalId);
-  }, [marketIdsRef]);
+  }, [marketIds]);
 
   useEffect(() => {
     marketIdsRef.current = marketIds;
