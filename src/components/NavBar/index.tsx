@@ -4,8 +4,10 @@ import theme from "../../theme";
 import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
 import { LinksWrapper, MobileNavBar } from "./navbar-styles";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 const NavBar: React.FC = () => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
   return (
     <>
       <Box
@@ -20,7 +22,9 @@ const NavBar: React.FC = () => {
         position={{ initial: "static", sm: "sticky" }}
         top={"0"}
         style={{
-          borderRight: `1px solid ${theme.color.darkBlue}`,
+          borderRight: isMobile
+            ? "0px solid transparent" // Remove the border
+            : `1px solid ${theme.color.darkBlue}`,
         }}
       >
         <Flex
