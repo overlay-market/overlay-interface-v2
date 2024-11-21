@@ -35,7 +35,7 @@ export default function MarketsTable({
           background: `${theme.color.background}`,
           border: "none",
           marginLeft: 50,
-          marginTop: 30,
+          marginTop: 24,
         }}
       >
         <Table.Header style={{ verticalAlign: "middle" }}>
