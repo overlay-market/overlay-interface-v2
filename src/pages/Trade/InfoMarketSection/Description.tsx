@@ -106,14 +106,12 @@ const Description: React.FC = () => {
         </Text>
 
         <Flex direction={"column"} position={"relative"} gap={"14px"}>
-          <TruncatedText ref={textRef} isTruncated={isTruncated}>
+          <TruncatedText ref={textRef} istruncated={isTruncated.toString()}>
             {restOfAbstracts?.map((abstract, index) => (
-              <>
-                <Text key={index} style={{ color: theme.color.grey3 }}>
-                  {abstract}
-                </Text>
+              <React.Fragment key={index}>
+                <Text style={{ color: theme.color.grey3 }}>{abstract}</Text>
                 <br />
-              </>
+              </React.Fragment>
             ))}
           </TruncatedText>
           {showToggle && (

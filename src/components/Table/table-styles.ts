@@ -3,9 +3,9 @@ import theme from "../../theme";
 import { Button, Flex } from "@radix-ui/themes";
 import { ChevronDown } from "react-feather";
 
-export const Table = styled.table<{ width?: string, minWidth?: string }>`
+export const Table = styled.table<{ width?: string, minwidth?: string }>`
   width: ${(props) => (props.width ?? '100%')};
-  min-width: ${(props) => (props.minWidth ?? '100%')};
+  min-width: ${(props) => (props.minwidth ?? '100%')};
   border-collapse: collapse;
   margin: 24px 0px;
 `;
@@ -32,9 +32,9 @@ export const StyledCell = styled.td`
   text-align: left;
 `;
 
-export const PaginationButton = styled(Button)<{ active?: boolean, navBtn: boolean }>`
-  background-color: ${({ navBtn }) => (navBtn ? theme.color.grey4 : theme.color.background)};
-  border: ${({ active }) => (active ? `1px solid ${theme.color.grey3}` : '')};
+export const PaginationButton = styled(Button)<{ active?: string, navbutton: boolean }>`
+  background-color: ${({ navbutton }) => (navbutton ? theme.color.grey4 : theme.color.background)};
+  border: ${({ active }) => (active === 'true' ? `1px solid ${theme.color.grey3}` : '')};
   border-radius: 4px;
   color: ${theme.color.grey2};
   width: 28px;

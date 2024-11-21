@@ -4,7 +4,7 @@ import { X } from "react-feather";
 import { StyledClose, StyledContent, StyledOverlay } from "./modal-styles";
 
 type ModalProps = {
-  minHeight?: string | false;
+  minHeight?: string;
   maxHeight?: string;
   width?: string;
   maxWidth?: string;
@@ -22,7 +22,7 @@ type ModalProps = {
 const Modal: React.FC<ModalProps> = ({
   width,
   maxWidth,
-  minHeight = false,
+  minHeight,
   maxHeight,
   fontSizeTitle = "20px",
   textAlignTitle = "center",
@@ -47,11 +47,11 @@ const Modal: React.FC<ModalProps> = ({
         <StyledOverlay />
         <StyledContent
           width={width}
-          maxWidth={maxWidth}
-          minHeight={minHeight}
-          maxHeight={maxHeight}
-          borderColor={borderColor}
-          boxShadow={boxShadow}
+          maxwidth={maxWidth}
+          minheight={minHeight}
+          maxheight={maxHeight}
+          bordercolor={borderColor}
+          boxshadow={boxShadow}
         >
           <Dialog.Title
             style={{
