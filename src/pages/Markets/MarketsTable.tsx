@@ -10,6 +10,7 @@ import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
@@ -23,6 +24,8 @@ export default function MarketsTable({
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   return (
     <Theme>
       <Table.Root
@@ -32,6 +35,7 @@ export default function MarketsTable({
           background: `${theme.color.background}`,
           border: "none",
           marginTop: 24,
+          marginBottom: `${isMobile ? "90px" : "30px"}`
         }}
       >
         <Table.Header style={{ verticalAlign: "middle" }}>
