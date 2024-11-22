@@ -38,14 +38,15 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
 
-  const title: string | undefined = useMemo(() => {
-    if (inputValue === "") return "Unwind";
-    return unwindBtnState;
-  }, [unwindBtnState, inputValue]);
-
   const isPendingTime = useMemo(() => {
     return inputValue !== previousInputValue;
   }, [inputValue, previousInputValue]);
+
+  const title: string | undefined = useMemo(() => {
+    if (inputValue === "") return "Unwind";
+    if (isPendingTime) return "Unwind";
+    return unwindBtnState;
+  }, [unwindBtnState, inputValue]);
 
   const isDisabledUnwindButton = useMemo(() => {
     return title === "Unwind" && inputValue !== "" ? false : true;
