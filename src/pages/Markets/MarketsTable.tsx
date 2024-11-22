@@ -1,4 +1,4 @@
-import { Flex, Table, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
@@ -10,6 +10,7 @@ import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
@@ -23,6 +24,8 @@ export default function MarketsTable({
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   return (
     <Theme>
       <Table.Root
@@ -32,6 +35,7 @@ export default function MarketsTable({
           background: `${theme.color.background}`,
           border: "none",
           marginTop: 24,
+          marginBottom: `${isMobile ? "90px" : "30px"}`
         }}
       >
         <Table.Header style={{ verticalAlign: "middle" }}>
@@ -134,7 +138,7 @@ export default function MarketsTable({
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
-          {marketsData &&
+          {marketsData.length > 0 ?
             marketsData.map((market, index) => {
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
@@ -177,7 +181,9 @@ export default function MarketsTable({
                           : theme.color.red2,
                     }}
                   >
-                    {market7d?.oneHourChange?.toFixed(2)}%
+                    <Skeleton loading={!market7d}>
+                      {market7d?.oneHourChange?.toFixed(2)}%
+                    </Skeleton>
                   </Table.Cell>
                   <Table.Cell
                     style={{
@@ -187,7 +193,9 @@ export default function MarketsTable({
                           : theme.color.red2,
                     }}
                   >
-                    {market7d?.sevenDayChange?.toFixed(2)}%
+                    <Skeleton loading={!market7d}>
+                      {market7d?.sevenDayChange?.toFixed(2)}%
+                    </Skeleton>
                   </Table.Cell>
                   <Table.Cell
                     style={{
@@ -197,7 +205,9 @@ export default function MarketsTable({
                           : theme.color.red2,
                     }}
                   >
-                    {market7d?.twentyFourHourChange?.toFixed(2)}%
+                    <Skeleton loading={!market7d}>
+                      {market7d?.twentyFourHourChange?.toFixed(2)}%
+                    </Skeleton>
                   </Table.Cell>
                   <Table.Cell style={{ color: theme.color.green2 }}>
                     <span
@@ -240,31 +250,51 @@ export default function MarketsTable({
                     />
                   </Table.Cell>
                   <Table.Cell>
-                    <LineChart
-                      width={100}
-                      height={30}
-                      data={market7d?.sevenDaysChartData?.map((value) => ({
-                        value,
-                      }))}
-                      margin={{ top: 0, bottom: 0 }}
-                    >
-                      <YAxis
-                        type="number"
-                        domain={["dataMin", "dataMax"]}
-                        hide
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#4ade80"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
+                    <Skeleton loading={!market7d}>
+                      <LineChart
+                        width={100}
+                        height={30}
+                        data={market7d?.sevenDaysChartData?.map((value) => ({
+                          value,
+                        }))}
+                        margin={{ top: 0, bottom: 0 }}
+                      >
+                        <YAxis
+                          type="number"
+                          domain={["dataMin", "dataMax"]}
+                          hide
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#4ade80"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      </LineChart>
+                    </Skeleton>
                   </Table.Cell>
                 </Table.Row>
               );
-            })}
+            })
+            : 
+            <>
+            {Array.from({ length: 3 }).map(() => (
+              <Table.Row
+                style={{
+                  borderBottom: `1px solid ${theme.color.darkBlue}`,
+                  width: '100%',
+                }}
+              >
+                {Array.from({ length: 9 }).map(() => (
+                    <Table.Cell>
+                      <Skeleton width={"100%"} height={"42px"} />
+                    </Table.Cell>
+                ))}
+              </Table.Row>
+            ))}
+            </>
+          }
         </Table.Body>
       </Table.Root>
     </Theme>
