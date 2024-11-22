@@ -136,12 +136,18 @@ export default function MarketsTable({
               </Flex>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>1h</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>24h</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>7d</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Funding</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Oracle</Table.ColumnHeaderCell>
+            {!isMobile && <Table.ColumnHeaderCell>1h</Table.ColumnHeaderCell>}
+            {!isMobile && <Table.ColumnHeaderCell>24h</Table.ColumnHeaderCell>}
+            {!isMobile && <Table.ColumnHeaderCell>7d</Table.ColumnHeaderCell>}
+            {!isMobile && (
+              <Table.ColumnHeaderCell>Funding</Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell>Oracle</Table.ColumnHeaderCell>
+            )}
             <Table.ColumnHeaderCell>Last 7 Days</Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
@@ -161,7 +167,9 @@ export default function MarketsTable({
                   }}
                   onClick={() => redirectToTradePage(market.marketId)}
                 >
-                  <Table.Cell style={{ padding: "8px 16px" }}>
+                  <Table.Cell
+                    style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
+                  >
                     <Flex>
                       <MarketsLogos
                         src={MARKETS_FULL_LOGOS[market.marketId]}
@@ -169,96 +177,111 @@ export default function MarketsTable({
                         className="rounded-full"
                       />
                       <span style={{ alignSelf: "center", marginLeft: 20 }}>
-                        {decodeURIComponent(market.marketId)}
+                        {isMobile &&
+                        decodeURIComponent(market.marketId).length > 28
+                          ? `${decodeURIComponent(market.marketId).slice(
+                              0,
+                              28
+                            )}...`
+                          : decodeURIComponent(market.marketId)}
                       </span>
                     </Flex>
                   </Table.Cell>
                   <Table.Cell>
                     {formatPriceWithCurrency(
                       market.price ?? 0,
-                      market.priceCurrency
+                      market.priceCurrency,
+                      isMobile ? 3 : 4
                     )}
                   </Table.Cell>
-                  <Table.Cell
-                    style={{
-                      color:
-                        (market7d?.oneHourChange ?? 0) >= 0
-                          ? theme.color.green2
-                          : theme.color.red2,
-                    }}
-                  >
-                    <Skeleton loading={!market7d}>
-                      {market7d?.oneHourChange?.toFixed(2)}%
-                    </Skeleton>
-                  </Table.Cell>
-                  <Table.Cell
-                    style={{
-                      color:
-                        (market7d?.sevenDayChange ?? 0) >= 0
-                          ? theme.color.green2
-                          : theme.color.red2,
-                    }}
-                  >
-                    <Skeleton loading={!market7d}>
-                      {market7d?.sevenDayChange?.toFixed(2)}%
-                    </Skeleton>
-                  </Table.Cell>
-                  <Table.Cell
-                    style={{
-                      color:
-                        (market7d?.twentyFourHourChange ?? 0) >= 0
-                          ? theme.color.green2
-                          : theme.color.red2,
-                    }}
-                  >
-                    <Skeleton loading={!market7d}>
-                      {market7d?.twentyFourHourChange?.toFixed(2)}%
-                    </Skeleton>
-                  </Table.Cell>
-                  <Table.Cell style={{ color: theme.color.green2 }}>
-                    <span
-                      style={{
-                        color:
-                          market.funding && Number(market.funding) < 0
-                            ? theme.color.red2
-                            : theme.color.green2,
-                      }}
-                    >
-                      {market.funding && Number(market.funding) < 0
-                        ? market.funding
-                        : `+${market.funding}`}
-                    </span>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <Flex align="center" gap="2">
-                      <Text size="2" style={{ color: theme.color.red2 }}>
-                        {Math.round(Number(market.shortPercentageOfTotalOi))}%
-                      </Text>
-                      <ProgressBar
-                        max={100}
-                        value={Number(market.shortPercentageOfTotalOi)}
-                      />
-                      <Text size="2" style={{ color: theme.color.green2 }}>
-                        {Math.round(Number(market.longPercentageOfTotalOi))}%
-                      </Text>
-                    </Flex>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <img
-                      src={market.oracleLogo}
-                      alt={decodeURIComponent(market.marketId)}
-                      style={{
-                        width: 24,
-                        height: 24,
-                        marginLeft: 8,
-                        borderRadius: "50%",
-                      }}
-                    />
-                  </Table.Cell>
+                  {!isMobile && (
+                    <>
+                      <Table.Cell
+                        style={{
+                          color:
+                            (market7d?.oneHourChange ?? 0) >= 0
+                              ? theme.color.green2
+                              : theme.color.red2,
+                        }}
+                      >
+                        <Skeleton loading={!market7d}>
+                          {market7d?.oneHourChange?.toFixed(2)}%
+                        </Skeleton>
+                      </Table.Cell>
+                      <Table.Cell
+                        style={{
+                          color:
+                            (market7d?.sevenDayChange ?? 0) >= 0
+                              ? theme.color.green2
+                              : theme.color.red2,
+                        }}
+                      >
+                        <Skeleton loading={!market7d}>
+                          {market7d?.sevenDayChange?.toFixed(2)}%
+                        </Skeleton>
+                      </Table.Cell>
+                      <Table.Cell
+                        style={{
+                          color:
+                            (market7d?.twentyFourHourChange ?? 0) >= 0
+                              ? theme.color.green2
+                              : theme.color.red2,
+                        }}
+                      >
+                        <Skeleton loading={!market7d}>
+                          {market7d?.twentyFourHourChange?.toFixed(2)}%
+                        </Skeleton>
+                      </Table.Cell>
+                      <Table.Cell style={{ color: theme.color.green2 }}>
+                        <span
+                          style={{
+                            color:
+                              market.funding && Number(market.funding) < 0
+                                ? theme.color.red2
+                                : theme.color.green2,
+                          }}
+                        >
+                          {market.funding && Number(market.funding) < 0
+                            ? market.funding
+                            : `+${market.funding}`}
+                        </span>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <Flex align="center" gap="2">
+                          <Text size="2" style={{ color: theme.color.red2 }}>
+                            {Math.round(
+                              Number(market.shortPercentageOfTotalOi)
+                            )}
+                            %
+                          </Text>
+                          <ProgressBar
+                            max={100}
+                            value={Number(market.shortPercentageOfTotalOi)}
+                          />
+                          <Text size="2" style={{ color: theme.color.green2 }}>
+                            {Math.round(Number(market.longPercentageOfTotalOi))}
+                            %
+                          </Text>
+                        </Flex>
+                      </Table.Cell>
+                      <Table.Cell>
+                        <img
+                          src={market.oracleLogo}
+                          alt={decodeURIComponent(market.marketId)}
+                          style={{
+                            width: 24,
+                            height: 24,
+                            marginLeft: 8,
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </Table.Cell>
+                    </>
+                  )}
                   <Table.Cell>
                     <Skeleton loading={!market7d}>
                       <LineChart
-                        width={100}
+                        width={isMobile ? 80 : 100}
                         height={30}
                         data={market7d?.sevenDaysChartData?.map((value) => ({
                           value,
@@ -292,7 +315,7 @@ export default function MarketsTable({
                     width: "100%",
                   }}
                 >
-                  {Array.from({ length: 9 }).map(() => (
+                  {Array.from({ length: isMobile ? 3 : 9 }).map(() => (
                     <Table.Cell>
                       <Skeleton width={"100%"} height={"42px"} />
                     </Table.Cell>
