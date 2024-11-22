@@ -22,8 +22,9 @@ export const MobileNavBar = styled(Box)`
   background: ${theme.color.background};
   z-index: 1000;
   box-shadow: rgb(0 0 0 / 40%) 0px 0px 12px 0px;
+  left: 0;
 
   @media (min-width: ${theme.breakpoints.sm}) {
     display: none;
   }
-`
+`;
