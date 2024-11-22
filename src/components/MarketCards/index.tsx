@@ -9,13 +9,12 @@ import { MARKETS_FULL_LOGOS } from "../../constants/markets";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 
 interface MarketCardsProps {
-  value: string | number | undefined;
+  priceWithCurrency: string;
   title: string;
   id: string;
-  currency: string;
 }
 
-const MarketCards = ({ value, title, id, currency }: MarketCardsProps) => {
+const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
   const redirectToTradePage = useRedirectToTradePage();
   return (
     <Skeleton loading={false}>
@@ -30,7 +29,7 @@ const MarketCards = ({ value, title, id, currency }: MarketCardsProps) => {
         onClick={() => redirectToTradePage(id)}
       >
         <CardContent direction="column" align="center">
-          <CardsValue>{currency + value}</CardsValue>
+          <CardsValue>{priceWithCurrency}</CardsValue>
           <CardsTitle>{title}</CardsTitle>
         </CardContent>
       </CustomCard>

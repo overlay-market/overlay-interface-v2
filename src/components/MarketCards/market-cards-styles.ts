@@ -7,6 +7,7 @@ export const CustomCard = styled(Flex)`
   width: 100%;
   max-width: 200px;
   border-radius: 20px;
+  border: 1px solid rgba(236, 236, 236, 0.15);
   background-size: cover;
   background-position: center;
   position: relative;
@@ -14,7 +15,7 @@ export const CustomCard = styled(Flex)`
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 
   @media (max-width: 480px) {
     max-width: 150px;

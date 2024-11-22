@@ -3,17 +3,13 @@ import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-  TransformedMarketData,
-} from "overlay-sdk";
+import { TransformedMarketData } from "overlay-sdk";
 import ProgressBar from "../../components/ProgressBar";
 import { useMarkets7d } from "../../hooks/useMarkets7d";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
+import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
@@ -171,16 +167,7 @@ export default function MarketsTable({
                     </Flex>
                   </Table.Cell>
                   <Table.Cell>
-                    {market.priceCurrency}
-                    {market.priceCurrency === "%"
-                      ? toPercentUnit(market.price)
-                      : toScientificNumber(
-                          Number(market.price) < 100000
-                            ? limitDigitsInDecimals(market.price)
-                            : Math.floor(Number(market.price)).toLocaleString(
-                                "en-US"
-                              )
-                        )}
+                    {formatPriceWithCurrency(market.price ?? 0, market.priceCurrency)}
                   </Table.Cell>
                   <Table.Cell
                     style={{
