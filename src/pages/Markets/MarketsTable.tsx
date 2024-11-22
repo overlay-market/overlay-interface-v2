@@ -177,7 +177,9 @@ export default function MarketsTable({
                           : theme.color.red2,
                     }}
                   >
-                    {market7d?.oneHourChange?.toFixed(2)}%
+                    <Skeleton loading={!market7d}>
+                      {market7d?.oneHourChange?.toFixed(2)}%
+                    </Skeleton>
                   </Table.Cell>
                   <Table.Cell
                     style={{
@@ -187,7 +189,9 @@ export default function MarketsTable({
                           : theme.color.red2,
                     }}
                   >
-                    {market7d?.sevenDayChange?.toFixed(2)}%
+                    <Skeleton loading={!market7d}>
+                      {market7d?.sevenDayChange?.toFixed(2)}%
+                    </Skeleton>
                   </Table.Cell>
                   <Table.Cell
                     style={{
@@ -197,7 +201,9 @@ export default function MarketsTable({
                           : theme.color.red2,
                     }}
                   >
-                    {market7d?.twentyFourHourChange?.toFixed(2)}%
+                    <Skeleton loading={!market7d}>
+                      {market7d?.twentyFourHourChange?.toFixed(2)}%
+                    </Skeleton>
                   </Table.Cell>
                   <Table.Cell style={{ color: theme.color.green2 }}>
                     <span
@@ -240,27 +246,29 @@ export default function MarketsTable({
                     />
                   </Table.Cell>
                   <Table.Cell>
-                    <LineChart
-                      width={100}
-                      height={30}
-                      data={market7d?.sevenDaysChartData?.map((value) => ({
-                        value,
-                      }))}
-                      margin={{ top: 0, bottom: 0 }}
-                    >
-                      <YAxis
-                        type="number"
-                        domain={["dataMin", "dataMax"]}
-                        hide
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#4ade80"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    </LineChart>
+                    <Skeleton loading={!market7d}>
+                      <LineChart
+                        width={100}
+                        height={30}
+                        data={market7d?.sevenDaysChartData?.map((value) => ({
+                          value,
+                        }))}
+                        margin={{ top: 0, bottom: 0 }}
+                      >
+                        <YAxis
+                          type="number"
+                          domain={["dataMin", "dataMax"]}
+                          hide
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#4ade80"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      </LineChart>
+                    </Skeleton>
                   </Table.Cell>
                 </Table.Row>
               );
