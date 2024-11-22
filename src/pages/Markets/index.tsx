@@ -11,7 +11,9 @@ import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
-  const [totalSupplyChange, setTotalSupplyChange] = useState<string | undefined>();
+  const [totalSupplyChange, setTotalSupplyChange] = useState<
+    string | undefined
+  >();
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
 
@@ -21,7 +23,8 @@ const Markets: React.FC = () => {
         const activeMarkets = await sdk.markets.transformMarketsData();
         const supplyChange = await sdk.ov.totalSupplyDayChange();
 
-        supplyChange && setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
+        supplyChange &&
+          setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
         activeMarkets && setMarketsData(activeMarkets);
       } catch (error) {
         console.error("Error fetching markets:", error);

@@ -1,15 +1,17 @@
 import { Box, Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
-import theme from "../../theme";
+import theme from "../../../theme";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { TransformedMarketData } from "overlay-sdk";
-import ProgressBar from "../../components/ProgressBar";
-import { useMarkets7d } from "../../hooks/useMarkets7d";
-import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
+import ProgressBar from "../../../components/ProgressBar";
+import { useMarkets7d } from "../../../hooks/useMarkets7d";
+import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
-import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
+import { MarketsLogos } from "./markets-table-styles";
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
@@ -157,13 +159,8 @@ export default function MarketsTable({
                 >
                   <Table.Cell style={{ padding: "8px 16px" }}>
                     <Flex>
-                      <img
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                        src={market.marketLogo}
+                      <MarketsLogos
+                        src={MARKETS_FULL_LOGOS[market.marketId]}
                         alt={decodeURIComponent(market.marketId)}
                         className="rounded-full"
                       />
