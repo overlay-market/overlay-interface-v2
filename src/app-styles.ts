@@ -5,7 +5,6 @@ import theme from "./theme";
 export const AppContainer = styled(Flex)`
   width: 100vw;
   padding-right: 16px;
-  padding-left: 16px;
   min-height: 100vh;
   background: ${theme.color.background};
 
