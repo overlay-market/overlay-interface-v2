@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { MarketHeaderContainer, StyledFlex } from "./market-header-styles";
 
-const MarketsHeader = ({ ovSupply }: { ovSupply: number | undefined }) => {
+const MarketsHeader = ({ ovSupplyChange }: { ovSupplyChange: string | undefined }) => {
   return (
     <MarketHeaderContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>
@@ -18,7 +18,10 @@ const MarketsHeader = ({ ovSupply }: { ovSupply: number | undefined }) => {
           p={"12px"}
         >
           <Text>OV SUPPLY</Text>
-          <Text>{ovSupply?.toString()}</Text>
+          <div>
+            <Text>{ovSupplyChange}</Text>
+            <Text> 24h</Text>
+          </div>
         </StyledFlex>
 
         <StyledFlex width={"150px"} display={"none"}>

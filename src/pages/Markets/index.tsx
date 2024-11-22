@@ -3,14 +3,15 @@ import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
 import MarketsTable from "./MarketsTable";
-import { TransformedMarketData, formatWeiToParsedNumber } from "overlay-sdk";
+import { TransformedMarketData } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
+import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
-  const [totalSupply, setTotalSupply] = useState<bigint | undefined>();
+  const [totalSupplyChange, setTotalSupplyChange] = useState<string | undefined>();
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
 
@@ -18,9 +19,9 @@ const Markets: React.FC = () => {
     const fetchData = async () => {
       try {
         const activeMarkets = await sdk.markets.transformMarketsData();
-        const ovSupply = await sdk.ov.totalSupply();
+        const supplyChange = await sdk.ov.totalSupplyDayChange();
 
-        ovSupply && setTotalSupply(ovSupply);
+        supplyChange && setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
         activeMarkets && setMarketsData(activeMarkets);
       } catch (error) {
         console.error("Error fetching markets:", error);
@@ -36,7 +37,7 @@ const Markets: React.FC = () => {
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
-      <MarketsHeader ovSupply={formatWeiToParsedNumber(totalSupply, 18, 2)} />
+      <MarketsHeader ovSupplyChange={totalSupplyChange} />
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} />
       <MarketsTable marketsData={marketsData} />
