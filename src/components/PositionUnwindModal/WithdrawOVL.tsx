@@ -8,6 +8,7 @@ import useSDK from "../../providers/SDKProvider/useSDK";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
+import { useTradeActionHandlers } from "../../state/trade/hooks";
 
 type WithdrawOVLProps = {
   position: OpenPositionData;
@@ -23,6 +24,7 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
   const sdk = useSDK();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
+  const { handleTxnHashUpdate } = useTradeActionHandlers();
 
   const [attemptingWithdraw, setAttemptingWithdraw] = useState(false);
 
@@ -51,6 +53,7 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
             },
             result.hash
           );
+          handleTxnHashUpdate(result.hash);
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);

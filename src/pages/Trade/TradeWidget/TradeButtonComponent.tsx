@@ -31,7 +31,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const sdk = useSDK();
   const { open } = useWeb3Modal();
   const { currentMarket: market } = useCurrentMarketState();
-  const { handleTradeStateReset } = useTradeActionHandlers();
+  const { handleTradeStateReset, handleTxnHashUpdate } =
+    useTradeActionHandlers();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
@@ -89,6 +90,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             },
             result.hash
           );
+          handleTxnHashUpdate(result.hash);
           handleTradeStateReset();
         })
         .catch((error: Error) => {

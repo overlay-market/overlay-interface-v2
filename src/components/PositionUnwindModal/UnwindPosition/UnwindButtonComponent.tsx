@@ -11,6 +11,7 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import usePrevious from "../../../hooks/usePrevious";
+import { useTradeActionHandlers } from "../../../state/trade/hooks";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -33,6 +34,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const addPopup = useAddPopup();
   const previousInputValue = usePrevious(inputValue);
   const currentTimeForId = currentTimeParsed();
+  const { handleTxnHashUpdate } = useTradeActionHandlers();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
 
@@ -72,6 +74,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
             },
             result.hash
           );
+          handleTxnHashUpdate(result.hash);
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);
