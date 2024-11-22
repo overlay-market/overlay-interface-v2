@@ -27,10 +27,10 @@ export default function MarketsTable({
     <Theme>
       <Table.Root
         variant="surface"
+        ml={{ xs: "16px" }}
         style={{
           background: `${theme.color.background}`,
           border: "none",
-          marginLeft: 50,
           marginTop: 24,
         }}
       >
@@ -50,9 +50,14 @@ export default function MarketsTable({
                       border: "none",
                       color: theme.color.white,
                       marginLeft: 10,
-                      minWidth: 85,
+                      minWidth: 95,
                       outline: "none",
                       cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "10px",
                     }}
                   >
                     <Select.Value placeholder="Filter" />
@@ -134,7 +139,6 @@ export default function MarketsTable({
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
-
 
               return (
                 <Table.Row
