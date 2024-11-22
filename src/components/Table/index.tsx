@@ -77,7 +77,7 @@ const StyledTable: React.FC<TableProps> = ({
             <PaginationButton
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              navbutton={true}
+              navbutton={"true"}
             >
               <Flex>
                 <ChevronLeft />
@@ -95,7 +95,7 @@ const StyledTable: React.FC<TableProps> = ({
                       key={pageIndex}
                       onClick={() => handlePageClick(page)}
                       active={(page === currentPage).toString()}
-                      navbutton={false}
+                      navbutton={"false"}
                     >
                       {page}
                     </PaginationButton>
@@ -118,7 +118,7 @@ const StyledTable: React.FC<TableProps> = ({
                       key={pageIndex}
                       onClick={() => handlePageClick(page)}
                       active={(page === currentPage).toString()}
-                      navbutton={false}
+                      navbutton={"false"}
                     >
                       {page}
                     </PaginationButton>
@@ -145,7 +145,7 @@ const StyledTable: React.FC<TableProps> = ({
                       key={pageIndex}
                       onClick={() => handlePageClick(page)}
                       active={(page === currentPage).toString()}
-                      navbutton={false}
+                      navbutton={"false"}
                     >
                       {page}
                     </PaginationButton>
@@ -173,7 +173,7 @@ const StyledTable: React.FC<TableProps> = ({
             <PaginationButton
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              navbutton={true}
+              navbutton={"true"}
             >
               <Flex>
                 <ChevronRight />
