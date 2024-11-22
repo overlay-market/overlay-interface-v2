@@ -95,6 +95,11 @@ const PositionsTable: React.FC = () => {
     setCurrentPage,
   ]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+    setItemsPerPage(10);
+  }, [chainId, marketId]);
+
   return (
     <>
       <LineSeparator />
@@ -121,7 +126,7 @@ const PositionsTable: React.FC = () => {
           }
         />
 
-        {loading ? (
+        {loading && !positions ? (
           <Loader />
         ) : account ? (
           positions &&
