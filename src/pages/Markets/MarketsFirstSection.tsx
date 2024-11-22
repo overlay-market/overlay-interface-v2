@@ -27,7 +27,15 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         );
 
   return (
-    <Flex gap="3" ml="50px" mt="5">
+    <Flex
+      gap="3"
+      ml={{ xs: "16px" }}
+      mt="5"
+      direction={{
+        initial: "column",
+        xs: "row",
+      }}
+    >
       <Box flexGrow="7" flexShrink="1" flexBasis="0%">
         <PromotedBanner
           Title={"CGMI"}
@@ -45,11 +53,11 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         />
       </Box>
       {/* <Box flexGrow="3" flexShrink="1" flexBasis="0%">
-        <OptionalLinkBanner
-          Title={"Governance"}
-          Name={decodeURIComponent(marketsData[1].marketId ?? "")}
-          Link={"Vote Now"}
-        />
+      <OptionalLinkBanner
+      Title={"Governance"}
+      Name={decodeURIComponent(marketsData[1].marketId ?? "")}
+      Link={"Vote Now"}
+      />
       </Box> */}
     </Flex>
   );

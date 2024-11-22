@@ -31,10 +31,10 @@ export default function MarketsTable({
     <Theme>
       <Table.Root
         variant="surface"
+        ml={{ xs: "16px" }}
         style={{
           background: `${theme.color.background}`,
           border: "none",
-          marginLeft: 50,
           marginTop: 24,
         }}
       >
@@ -138,7 +138,6 @@ export default function MarketsTable({
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
-
 
               return (
                 <Table.Row

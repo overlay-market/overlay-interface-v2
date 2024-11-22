@@ -11,6 +11,7 @@ import {
   toScientificNumber,
   TransformedMarketData,
 } from "overlay-sdk";
+import { Box } from "@radix-ui/themes";
 
 interface CarouselProps {
   marketsData: TransformedMarketData[];
@@ -22,38 +23,19 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
   }
 
   return (
-    <Swiper
-      modules={[Navigation, Pagination]}
-      style={{
-        height: "auto",
-        margin: "50px 0px 0px 0px",
-        padding: "0 50px",
-      }}
-      spaceBetween={12}
-      slidesPerView="auto"
-      loop={false}
-      centeredSlides={false}
-    >
-      {marketsData.map((market, index) => (
-        <SwiperSlide key={index} style={{ width: "auto" }}>
-          <MarketCards
-            id={market.marketId}
-            currency={market.priceCurrency}
-            value={
-              market.priceCurrency === "%"
-                ? toPercentUnit(market.price)
-                : toScientificNumber(
-                    Number(market.price) < 100000
-                      ? limitDigitsInDecimals(market.price)
-                      : Math.floor(Number(market.price)).toLocaleString("en-US")
-                  )
-            }
-            title={decodeURIComponent(market.marketId)}
-          />
-        </SwiperSlide>
-      ))}
-      {marketsData.length < 11 &&
-        marketsData.map((market, index) => (
+    <Box ml={{ xs: "16px" }}>
+      <Swiper
+        modules={[Navigation, Pagination]}
+        style={{
+          height: "auto",
+          marginTop: "50px",
+        }}
+        spaceBetween={12}
+        slidesPerView="auto"
+        loop={false}
+        centeredSlides={false}
+      >
+        {marketsData.map((market, index) => (
           <SwiperSlide key={index} style={{ width: "auto" }}>
             <MarketCards
               id={market.marketId}
@@ -73,7 +55,29 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
             />
           </SwiperSlide>
         ))}
-    </Swiper>
+        {marketsData.length < 11 &&
+          marketsData.map((market, index) => (
+            <SwiperSlide key={index} style={{ width: "auto" }}>
+              <MarketCards
+                id={market.marketId}
+                currency={market.priceCurrency}
+                value={
+                  market.priceCurrency === "%"
+                    ? toPercentUnit(market.price)
+                    : toScientificNumber(
+                        Number(market.price) < 100000
+                          ? limitDigitsInDecimals(market.price)
+                          : Math.floor(Number(market.price)).toLocaleString(
+                              "en-US"
+                            )
+                      )
+                }
+                title={decodeURIComponent(market.marketId)}
+              />
+            </SwiperSlide>
+          ))}
+      </Swiper>
+    </Box>
   );
 };
 

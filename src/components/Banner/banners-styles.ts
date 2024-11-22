@@ -31,7 +31,7 @@ const BaseBanner = styled(Flex)`
   }
 
   @media (max-width: 480px) {
-    min-height: 120px;
+    min-height: 150px;
     padding: 10px;
   }
 `;
