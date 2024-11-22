@@ -14,15 +14,11 @@ export const TradeHeaderContainer = styled(Flex)`
   position: relative;
     
   @media (min-width: ${theme.breakpoints.sm}) {
-    border-bottom: 1px solid ${theme.color.darkBlue};
+    border-bottom: none;
   }
   
   @media (min-width: ${theme.breakpoints.lg}) {
     flex-direction: row;
-  }
-
-  @media (min-width: ${theme.breakpoints.xxl}) {
-    border-bottom: none;
   }
 `;
 
@@ -33,7 +29,6 @@ export const MarketInfoContainer = styled(Flex)`
  
   @media (min-width:  ${theme.breakpoints.sm}) {    
     height: ${theme.headerSize.height};
-    border-top: 1px solid ${theme.color.darkBlue};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
@@ -49,3 +44,32 @@ export const StyledFlex = styled(Flex)`
     border-right: 1px solid ${theme.color.darkBlue};
   }
 `;
+
+
+export const BalanceFlex = styled(Flex)`
+  @media (min-width: ${theme.breakpoints.lg}) {
+    border-right: 1px solid ${theme.color.darkBlue};
+    height: 100%;
+  }
+`;
+
+
+export const LineSeparator = styled(Flex)`
+  @media (min-width: ${theme.breakpoints.sm}) {
+    height: 0;
+    width: calc(100% - ${theme.headerSize.tabletWidth});
+    position: absolute;
+    top: calc(${theme.headerSize.height} * 2);
+    left: ${theme.headerSize.tabletWidth};
+    border-bottom: 1px solid ${theme.color.darkBlue};
+  }
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    width: calc(100% - ${theme.headerSize.width});
+    left: ${theme.headerSize.width};
+    border-bottom: 1px solid ${theme.color.darkBlue};
+  }
+  @media (min-width: ${theme.breakpoints.lg}) {
+    border-bottom: none;
+  }
+`

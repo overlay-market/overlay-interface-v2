@@ -3,6 +3,8 @@ import theme from "../../../theme";
 import ProgressBar from "../../../components/ProgressBar";
 import MarketsList from "./MarketsList";
 import {
+  BalanceFlex,
+  LineSeparator,
   MarketInfoContainer,
   ResponsiveEmptyPlaceholder,
   StyledFlex,
@@ -151,7 +153,7 @@ const TradeHeader: React.FC = () => {
             </Text>
           </StyledFlex>
 
-          <Flex
+          <BalanceFlex
             direction={"column"}
             width={{ initial: "157px", sm: "336px", lg: "195px" }}
             height={"100%"}
@@ -171,9 +173,10 @@ const TradeHeader: React.FC = () => {
                 {longPercentageOfTotalOi}%
               </Text>
             </Flex>
-          </Flex>
+          </BalanceFlex>
         </MarketInfoContainer>
       </TradeHeaderContainer>
+      <LineSeparator />
     </>
   );
 };
