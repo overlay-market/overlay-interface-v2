@@ -1,4 +1,4 @@
-import { Flex, Table, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
@@ -134,7 +134,7 @@ export default function MarketsTable({
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
-          {marketsData &&
+          {marketsData.length > 0 ?
             marketsData.map((market, index) => {
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
@@ -264,7 +264,25 @@ export default function MarketsTable({
                   </Table.Cell>
                 </Table.Row>
               );
-            })}
+            })
+            : 
+            <>
+            {Array.from({ length: 3 }).map(() => (
+              <Table.Row
+                style={{
+                  borderBottom: `1px solid ${theme.color.darkBlue}`,
+                  width: '100%',
+                }}
+              >
+                {Array.from({ length: 9 }).map(() => (
+                    <Table.Cell>
+                      <Skeleton width={"100%"} height={"42px"} />
+                    </Table.Cell>
+                ))}
+              </Table.Row>
+            ))}
+            </>
+          }
         </Table.Body>
       </Table.Root>
     </Theme>

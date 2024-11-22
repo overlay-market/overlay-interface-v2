@@ -7,7 +7,7 @@ import "swiper/css/pagination";
 import MarketCards from "../../components/MarketCards";
 import { TransformedMarketData } from "overlay-sdk";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
-import { Box, Text } from "@radix-ui/themes";
+import { Box, Skeleton, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 
 interface CarouselProps {
@@ -15,13 +15,10 @@ interface CarouselProps {
 }
 
 const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
-  if (!marketsData || marketsData.length === 0) {
-    return null;
-  }
-
   return (
     <Box ml={{ xs: "16px" }} mt={"32px"}>
       <Text style={{ color: theme.color.grey3 }}>FEATURED</Text>
+      <Skeleton height='257px' loading={marketsData.length < 1} />
       <Swiper
         modules={[Navigation, Pagination]}
         style={{
@@ -32,6 +29,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
         slidesPerView="auto"
         loop={false}
         centeredSlides={false}
+        enabled={marketsData.length > 0}
       >
         {marketsData.map((market, index) => (
           <SwiperSlide key={index} style={{ width: "auto" }}>

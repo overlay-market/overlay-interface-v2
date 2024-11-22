@@ -1,4 +1,4 @@
-import { Box, Flex } from "@radix-ui/themes";
+import { Box, Flex, Skeleton } from "@radix-ui/themes";
 // import { OptionalLinkBanner } from "../../components/Banner/OptionalLinkBanner";
 import { PromotedBanner } from "../../components/Banner/PromotedBanner";
 import { TransformedMarketData } from "overlay-sdk";
@@ -9,10 +9,6 @@ interface FirstSectionProps {
 }
 
 export const FirstSection = ({ marketsData }: FirstSectionProps) => {
-  if (!marketsData || marketsData.length === 0) {
-    return null;
-  }
-
   return (
     <Flex
       gap="3"
@@ -23,22 +19,26 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         xs: "row",
       }}
     >
-      <Box flexGrow="7" flexShrink="1" flexBasis="0%">
-        <PromotedBanner
-          Title={"CGMI"}
-          Name={decodeURIComponent(marketsData[0]?.marketId ?? "")}
-          Value={formatPriceWithCurrency(marketsData[0]?.price ?? 0, marketsData[0]?.priceCurrency, 3)}
-          Id={marketsData[0]?.marketId ?? ""}
-        />
-      </Box>
-      <Box flexGrow="3" flexShrink="1" flexBasis="0%">
-        <PromotedBanner
-          Title={"CGMI"}
-          Name={decodeURIComponent(marketsData[5]?.marketId ?? "")}
-          Value={formatPriceWithCurrency(marketsData[5]?.price ?? 0, marketsData[5]?.priceCurrency, 3)}
-          Id={marketsData[5]?.marketId ?? ""}
-        />
-      </Box>
+      <Skeleton loading={marketsData.length < 0 + 1}>
+        <Box flexGrow="7" flexShrink="1" flexBasis="0%">
+          <PromotedBanner
+            Title={"CGMI"}
+            Name={decodeURIComponent(marketsData[0]?.marketId ?? "")}
+            Value={formatPriceWithCurrency(marketsData[0]?.price ?? 0, marketsData[0]?.priceCurrency, 3)}
+            Id={marketsData[0]?.marketId ?? ""}
+          />
+        </Box>
+      </Skeleton>
+      <Skeleton loading={marketsData.length < 5 + 1}>
+        <Box flexGrow="3" flexShrink="1" flexBasis="0%">
+          <PromotedBanner
+            Title={"CGMI"}
+            Name={decodeURIComponent(marketsData[5]?.marketId ?? "")}
+            Value={formatPriceWithCurrency(marketsData[5]?.price ?? 0, marketsData[5]?.priceCurrency, 3)}
+            Id={marketsData[5]?.marketId ?? ""}
+          />
+        </Box>
+      </Skeleton>
       {/* <Box flexGrow="3" flexShrink="1" flexBasis="0%">
       <OptionalLinkBanner
       Title={"Governance"}
