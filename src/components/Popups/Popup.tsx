@@ -16,10 +16,10 @@ type PopupProps = {
 
 const Popup: React.FC<PopupProps> = ({ removeAfterMs, content, popKey }) => {
   const removePopup = useRemovePopup();
-  const removeThisPopup = useCallback(
-    () => removePopup(popKey),
-    [popKey, removePopup]
-  );
+
+  const removeThisPopup = useCallback(() => {
+    removePopup(popKey);
+  }, [popKey, removePopup]);
 
   useEffect(() => {
     if (removeAfterMs === null) return undefined;

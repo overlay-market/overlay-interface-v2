@@ -35,12 +35,12 @@ export const MarketImg = styled.img`
     border-top-right-radius: 8px;
   }
 ` 
-export const TruncatedText = styled(Box)<{isTruncated: boolean}>`
+export const TruncatedText = styled(Box)<{istruncated: string}>`
   display: -webkit-box;
-  -webkit-line-clamp: ${(props) => (props.isTruncated ? '7' : 'unset')};
+  -webkit-line-clamp: ${(props) => (props.istruncated === 'true' ? '7' : 'unset')};
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: normal;
-  max-height:  ${(props) => (props.isTruncated ? 'calc(2em * 7)' : 'none')};
+  max-height:  ${(props) => (props.istruncated === 'true' ? 'calc(2em * 7)' : 'none')};
 `

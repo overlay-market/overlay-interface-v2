@@ -3,6 +3,8 @@ import theme from "../../../theme";
 import ProgressBar from "../../../components/ProgressBar";
 import MarketsList from "./MarketsList";
 import {
+  BalanceFlex,
+  LineSeparator,
   MarketInfoContainer,
   ResponsiveEmptyPlaceholder,
   StyledFlex,
@@ -123,7 +125,7 @@ const TradeHeader: React.FC = () => {
         <MarketInfoContainer>
           <StyledFlex
             width={{ initial: "109px", sm: "167px", lg: "119px" }}
-            p={{ initial: "8px 0px 8px 15px", sm: "12px 15px", md: "12px" }}
+            p={{ initial: "8px 0px 8px 4px", sm: "12px 15px", md: "12px" }}
           >
             <Text weight="light" style={{ fontSize: "10px" }}>
               Price
@@ -151,11 +153,13 @@ const TradeHeader: React.FC = () => {
             </Text>
           </StyledFlex>
 
-          <StyledFlex
+          <BalanceFlex
+            direction={"column"}
             width={{ initial: "157px", sm: "336px", lg: "195px" }}
+            height={"100%"}
             justify={"center"}
             align={"end"}
-            p={{ initial: "8px 15px 8px 0px", sm: "12px" }}
+            p={{ initial: "8px 4px 8px 0px", sm: "12px" }}
           >
             <Text weight="light" style={{ fontSize: "10px" }}>
               OI balance
@@ -169,9 +173,10 @@ const TradeHeader: React.FC = () => {
                 {longPercentageOfTotalOi}%
               </Text>
             </Flex>
-          </StyledFlex>
+          </BalanceFlex>
         </MarketInfoContainer>
       </TradeHeaderContainer>
+      <LineSeparator />
     </>
   );
 };

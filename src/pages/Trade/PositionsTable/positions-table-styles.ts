@@ -5,7 +5,7 @@ import theme from "../../../theme";
 export const PositionsTableContainer = styled(Flex)`
   flex-direction: column;
   width: 100%;
-  padding: 16px 15px 66px;
+  padding: 16px 4px 66px;
   
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 16px 8px 66px;
@@ -14,7 +14,7 @@ export const PositionsTableContainer = styled(Flex)`
 
 export const LineSeparator = styled(Flex)`
   height: 0;
-  margin: 0 15px;
+  margin: 0 4px;
   padding-top: 8px;
   border-bottom: 1px solid ${theme.color.darkBlue};
 

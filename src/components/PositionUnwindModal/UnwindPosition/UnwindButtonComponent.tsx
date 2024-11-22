@@ -10,8 +10,8 @@ import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
-import { useTradeActionHandlers } from "../../../state/trade/hooks";
 import usePrevious from "../../../hooks/usePrevious";
+import { useTradeActionHandlers } from "../../../state/trade/hooks";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -32,20 +32,21 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
 }) => {
   const sdk = useSDK();
   const addPopup = useAddPopup();
-  const { handleTxnHashUpdate } = useTradeActionHandlers();
   const previousInputValue = usePrevious(inputValue);
   const currentTimeForId = currentTimeParsed();
+  const { handleTxnHashUpdate } = useTradeActionHandlers();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
-
-  const title: string | undefined = useMemo(() => {
-    if (inputValue === "") return "Unwind";
-    return unwindBtnState;
-  }, [unwindBtnState, inputValue]);
 
   const isPendingTime = useMemo(() => {
     return inputValue !== previousInputValue;
   }, [inputValue, previousInputValue]);
+
+  const title: string | undefined = useMemo(() => {
+    if (inputValue === "") return "Unwind";
+    if (isPendingTime) return "Unwind";
+    return unwindBtnState;
+  }, [unwindBtnState, inputValue]);
 
   const isDisabledUnwindButton = useMemo(() => {
     return title === "Unwind" && inputValue !== "" ? false : true;
@@ -63,8 +64,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           priceLimit: priceLimit,
         })
         .then((result) => {
-          handleTxnHashUpdate(result.hash);
-
           addPopup(
             {
               txn: {
@@ -76,6 +75,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
             },
             result.hash
           );
+          handleTxnHashUpdate(result.hash);
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);

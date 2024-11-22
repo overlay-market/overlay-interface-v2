@@ -2,7 +2,7 @@ import { Text } from "@radix-ui/themes";
 import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   LineSeparator,
   PositionsTableContainer,
@@ -16,6 +16,7 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import usePrevious from "../../../hooks/usePrevious";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -36,14 +37,18 @@ const PositionsTable: React.FC = () => {
   const [positions, setPositions] = useState<OpenPositionData[] | undefined>(
     undefined
   );
-  const [paginatedPositions, setPaginatedPositions] = useState<
-    OpenPositionData[] | undefined
-  >(undefined);
+
   const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const isTablet = useMediaQuery("(max-width: 1279px)");
+
+  const previousMarketId = usePrevious(marketId);
+
+  const isNewMarketId = useMemo(() => {
+    return marketId !== previousMarketId;
+  }, [marketId, previousMarketId]);
 
   useEffect(() => {
     const fetchOpenPositions = async () => {
@@ -56,15 +61,19 @@ const PositionsTable: React.FC = () => {
         setLoading(true);
         try {
           const positions = await sdk.openPositions.transformOpenPositions(
-            undefined,
-            undefined,
+            currentPage,
+            itemsPerPage,
             marketId,
-            account as Address
+            account as Address,
+            isNewTxnHash || isNewMarketId
           );
 
           positions && setPositions(positions.data);
-          const positionsLength = positions && positions.data.length;
-          positionsLength && setPositionsTotalNumber(positionsLength);
+          positions && setPositionsTotalNumber(positions.total);
+          if (!positions) {
+            setPositions(undefined);
+            setPositionsTotalNumber(0);
+          }
         } catch (error) {
           console.error("Error fetching open positions:", error);
         } finally {
@@ -74,20 +83,22 @@ const PositionsTable: React.FC = () => {
     };
 
     fetchOpenPositions();
-  }, [chainId, marketId, account, isNewTxnHash]);
+  }, [
+    chainId,
+    marketId,
+    account,
+    isNewTxnHash,
+    isNewMarketId,
+    currentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    setCurrentPage,
+  ]);
 
   useEffect(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-
-    if (positions && positions.length > 0) {
-      const paginatedData = positions.slice(startIndex, endIndex);
-      setPaginatedPositions(paginatedData);
-    }
-    if (!positions) {
-      setPaginatedPositions(undefined);
-    }
-  }, [positions, currentPage, itemsPerPage, setItemsPerPage]);
+    setCurrentPage(1);
+    setItemsPerPage(10);
+  }, [chainId, marketId]);
 
   return (
     <>
@@ -108,16 +119,14 @@ const PositionsTable: React.FC = () => {
           setCurrentPage={setCurrentPage}
           setItemsPerPage={setItemsPerPage}
           body={
-            paginatedPositions &&
-            paginatedPositions.map(
-              (position: OpenPositionData, index: number) => (
-                <OpenPosition position={position} key={index} />
-              )
-            )
+            positions &&
+            positions.map((position: OpenPositionData, index: number) => (
+              <OpenPosition position={position} key={index} />
+            ))
           }
         />
 
-        {loading ? (
+        {loading && !positions ? (
           <Loader />
         ) : account ? (
           positions &&
