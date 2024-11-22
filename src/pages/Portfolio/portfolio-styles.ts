@@ -4,35 +4,37 @@ import theme from "../../theme";
 
 export const HeaderEmptyPlaceholder = styled(Box)`
   height: 0;
-  margin: 0 15px;
+  margin: 0 3px;
   border-bottom: 1px solid ${theme.color.darkBlue};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 100%;
     margin: 0;
     height: ${theme.headerSize.height};
-  }
-  
-  @media (min-width: ${theme.breakpoints.xxl}) {
     border-bottom: none;
   }
 `;
 
 export const PortfolioContainer = styled(Flex)`
   @media (min-width: ${theme.breakpoints.xxl}) {
-    margin-left: 60px;
-    margin-right: 60px;
+    padding-left: 60px;
+    padding-right: 60px;
   }
 `
 
 export const LineSeparator = styled(Flex)`
-  @media (min-width: ${theme.breakpoints.xxl}) {
+  @media (min-width: ${theme.breakpoints.sm}) {
     height: 0;
-    width: calc(100vw - ${theme.headerSize.width});
+    width: calc(100% - ${theme.headerSize.tabletWidth});
     position: absolute;
     top: ${theme.headerSize.height};
-    margin-left: -60px;
-    margin-right: -60px;
+    left: ${theme.headerSize.tabletWidth};
     border-bottom: 1px solid ${theme.color.darkBlue};
+  }
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    width: calc(100% - ${theme.headerSize.width});
+    left: ${theme.headerSize.width};
+   
   }
 `
