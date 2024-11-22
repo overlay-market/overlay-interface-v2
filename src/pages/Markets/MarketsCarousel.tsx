@@ -7,7 +7,8 @@ import "swiper/css/pagination";
 import MarketCards from "../../components/MarketCards";
 import { TransformedMarketData } from "overlay-sdk";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
-import { Box } from "@radix-ui/themes";
+import { Box, Text } from "@radix-ui/themes";
+import theme from "../../theme";
 
 interface CarouselProps {
   marketsData: TransformedMarketData[];
@@ -19,12 +20,13 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
   }
 
   return (
-    <Box ml={{ xs: "16px" }}>
+    <Box ml={{ xs: "16px" }} mt={"32px"}>
+      <Text style={{ color: theme.color.grey3 }}>FEATURED</Text>
       <Swiper
         modules={[Navigation, Pagination]}
         style={{
           height: "auto",
-          margin: "50px 0px 0px 0px",
+          marginTop: "4px",
         }}
         spaceBetween={12}
         slidesPerView="auto"
@@ -35,7 +37,11 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
           <SwiperSlide key={index} style={{ width: "auto" }}>
             <MarketCards
               id={market.marketId}
-              priceWithCurrency={formatPriceWithCurrency(market.price ?? 0, market.priceCurrency, 3)}
+              priceWithCurrency={formatPriceWithCurrency(
+                market.price ?? 0,
+                market.priceCurrency,
+                3
+              )}
               title={decodeURIComponent(market.marketId)}
             />
           </SwiperSlide>
@@ -45,11 +51,15 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
             <SwiperSlide key={index} style={{ width: "auto" }}>
               <MarketCards
                 id={market.marketId}
-                priceWithCurrency={formatPriceWithCurrency(market.price ?? 0, market.priceCurrency, 3)}
+                priceWithCurrency={formatPriceWithCurrency(
+                  market.price ?? 0,
+                  market.priceCurrency,
+                  3
+                )}
                 title={decodeURIComponent(market.marketId)}
               />
             </SwiperSlide>
-        ))}
+          ))}
       </Swiper>
     </Box>
   );
