@@ -15,6 +15,7 @@ import { MarketsLogos } from "./markets-table-styles";
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 export default function MarketsTable({
   marketsData,
@@ -25,6 +26,8 @@ export default function MarketsTable({
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
 
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   return (
     <Theme>
       <Table.Root
@@ -34,6 +37,7 @@ export default function MarketsTable({
           background: `${theme.color.background}`,
           border: "none",
           marginTop: 24,
+          marginBottom: `${isMobile ? "90px" : "30px"}`,
         }}
       >
         <Table.Header style={{ verticalAlign: "middle" }}>
