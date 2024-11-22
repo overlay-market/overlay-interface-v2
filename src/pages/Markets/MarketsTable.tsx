@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Table, Text } from "@radix-ui/themes";
+import { Box, Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../theme";
 import * as Select from "@radix-ui/react-select";
@@ -39,88 +39,94 @@ export default function MarketsTable({
             <Table.ColumnHeaderCell>
               <Flex align="center" gap="2">
                 <Text style={{ color: theme.color.grey3 }}>ALL</Text>
-                <Select.Root onValueChange={(value) => setSelectedItem(value)}>
-                  <Select.Trigger
-                    style={{
-                      backgroundColor: theme.color.grey4,
-                      borderRadius: 16,
-                      padding: "4px 15px",
-                      minHeight: 35,
-                      boxShadow: "0 2px 10px var(--black-a7)",
-                      border: "none",
-                      color: theme.color.white,
-                      marginLeft: 10,
-                      minWidth: 95,
-                      outline: "none",
-                      cursor: "pointer",
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      gap: "10px",
-                    }}
+                <Box display={"none"}>
+                  <Select.Root
+                    onValueChange={(value) => setSelectedItem(value)}
                   >
-                    <Select.Value placeholder="Filter" />
-                    <Select.Icon>
-                      <ChevronDownIcon />
-                    </Select.Icon>
-                  </Select.Trigger>
-
-                  <Select.Portal>
-                    <Select.Content
-                      position="popper"
-                      sideOffset={5}
+                    <Select.Trigger
                       style={{
-                        width: "var(--radix-select-trigger-width)",
-                        maxHeight:
-                          "var(--radix-select-content-available-height)",
                         backgroundColor: theme.color.grey4,
-                        borderRadius: "6px",
-                        padding: "5px",
-                        boxShadow:
-                          "0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)",
-
-                        cursor: "pointer",
+                        borderRadius: 16,
+                        padding: "4px 15px",
+                        minHeight: 35,
+                        boxShadow: "0 2px 10px var(--black-a7)",
+                        border: "none",
+                        color: theme.color.white,
+                        marginLeft: 10,
+                        minWidth: 95,
                         outline: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "10px",
                       }}
                     >
-                      <Select.Viewport>
-                        <Select.Group>
-                          {["All", "Crypto", "Forex", "Stocks"].map((item) => (
-                            <Select.Item
-                              key={item}
-                              value={item.toLowerCase()}
-                              onMouseEnter={() => setHoveredItem(item)}
-                              onMouseLeave={() => setHoveredItem(null)}
-                              style={{
-                                fontSize: 13,
-                                lineHeight: "1",
-                                color: theme.color.white,
-                                borderRadius: "3px",
-                                display: "flex",
-                                alignItems: "center",
-                                height: "25px",
-                                padding: "0 35px 0 10px",
-                                position: "relative",
-                                userSelect: "none",
-                                backgroundColor:
-                                  selectedItem === item.toLowerCase()
-                                    ? "rgba(255, 255, 255, 0.2)"
-                                    : hoveredItem === item
-                                    ? "rgba(255, 255, 255, 0.1)"
-                                    : "transparent",
-                                cursor: "pointer",
-                                outline: "none",
-                              }}
-                            >
-                              <Select.ItemText>{item}</Select.ItemText>
-                            </Select.Item>
-                          ))}
-                        </Select.Group>
-                      </Select.Viewport>
-                    </Select.Content>
-                  </Select.Portal>
-                </Select.Root>
+                      <Select.Value placeholder="Filter" />
+                      <Select.Icon>
+                        <ChevronDownIcon />
+                      </Select.Icon>
+                    </Select.Trigger>
+
+                    <Select.Portal>
+                      <Select.Content
+                        position="popper"
+                        sideOffset={5}
+                        style={{
+                          width: "var(--radix-select-trigger-width)",
+                          maxHeight:
+                            "var(--radix-select-content-available-height)",
+                          backgroundColor: theme.color.grey4,
+                          borderRadius: "6px",
+                          padding: "5px",
+                          boxShadow:
+                            "0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)",
+
+                          cursor: "pointer",
+                          outline: "none",
+                        }}
+                      >
+                        <Select.Viewport>
+                          <Select.Group>
+                            {["All", "Crypto", "Forex", "Stocks"].map(
+                              (item) => (
+                                <Select.Item
+                                  key={item}
+                                  value={item.toLowerCase()}
+                                  onMouseEnter={() => setHoveredItem(item)}
+                                  onMouseLeave={() => setHoveredItem(null)}
+                                  style={{
+                                    fontSize: 13,
+                                    lineHeight: "1",
+                                    color: theme.color.white,
+                                    borderRadius: "3px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    height: "25px",
+                                    padding: "0 35px 0 10px",
+                                    position: "relative",
+                                    userSelect: "none",
+                                    backgroundColor:
+                                      selectedItem === item.toLowerCase()
+                                        ? "rgba(255, 255, 255, 0.2)"
+                                        : hoveredItem === item
+                                        ? "rgba(255, 255, 255, 0.1)"
+                                        : "transparent",
+                                    cursor: "pointer",
+                                    outline: "none",
+                                  }}
+                                >
+                                  <Select.ItemText>{item}</Select.ItemText>
+                                </Select.Item>
+                              )
+                            )}
+                          </Select.Group>
+                        </Select.Viewport>
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select.Root>
+                </Box>
               </Flex>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
@@ -134,7 +140,7 @@ export default function MarketsTable({
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
-          {marketsData.length > 0 ?
+          {marketsData.length > 0 ? (
             marketsData.map((market, index) => {
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
@@ -167,7 +173,10 @@ export default function MarketsTable({
                     </Flex>
                   </Table.Cell>
                   <Table.Cell>
-                    {formatPriceWithCurrency(market.price ?? 0, market.priceCurrency)}
+                    {formatPriceWithCurrency(
+                      market.price ?? 0,
+                      market.priceCurrency
+                    )}
                   </Table.Cell>
                   <Table.Cell
                     style={{
@@ -273,24 +282,24 @@ export default function MarketsTable({
                 </Table.Row>
               );
             })
-            : 
+          ) : (
             <>
-            {Array.from({ length: 3 }).map(() => (
-              <Table.Row
-                style={{
-                  borderBottom: `1px solid ${theme.color.darkBlue}`,
-                  width: '100%',
-                }}
-              >
-                {Array.from({ length: 9 }).map(() => (
+              {Array.from({ length: 3 }).map(() => (
+                <Table.Row
+                  style={{
+                    borderBottom: `1px solid ${theme.color.darkBlue}`,
+                    width: "100%",
+                  }}
+                >
+                  {Array.from({ length: 9 }).map(() => (
                     <Table.Cell>
                       <Skeleton width={"100%"} height={"42px"} />
                     </Table.Cell>
-                ))}
-              </Table.Row>
-            ))}
+                  ))}
+                </Table.Row>
+              ))}
             </>
-          }
+          )}
         </Table.Body>
       </Table.Root>
     </Theme>
