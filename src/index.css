@@ -22,11 +22,24 @@
     --gray-12: #ECECEC;
   }
 
+  .rt-Skeleton {
+    animation: rt-skeleton-pulse2 2000ms infinite alternate-reverse !important;
+  }
+
   .rt-BaseMenuViewport {
     padding: 0 !important; /* Force removal of padding */
   }
 
   
+}
+
+@keyframes rt-skeleton-pulse2 {
+  from {
+      background-color: #2f2e37;
+  }
+  to {
+      background-color: #111017;
+  }
 }
 
 body {
