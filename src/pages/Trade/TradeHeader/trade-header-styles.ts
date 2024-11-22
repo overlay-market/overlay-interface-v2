@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 export const ResponsiveEmptyPlaceholder = styled(Box)`
   height: 0;
-  margin: 0 15px;
+  margin: 0 4px;
   border-bottom: 1px solid ${theme.color.darkBlue};
 `;
 

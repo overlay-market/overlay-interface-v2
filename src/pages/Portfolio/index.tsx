@@ -19,7 +19,7 @@ const Portfolio: React.FC = () => {
       <Flex
         direction="column"
         width={"100%"}
-        px={{ initial: "15px", sm: "8px" }}
+        px={{ initial: "4px", sm: "8px" }}
       >
         <Overview />
         <OpenPositionsTable />
