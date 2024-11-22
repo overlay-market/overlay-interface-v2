@@ -18,7 +18,7 @@
     "@web3modal/wagmi": "^5.1.11",
     "axios": "^1.7.7",
     "moment": "^2.30.1",
-    "overlay-sdk": "https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.0-alpha/overlay-sdk-dist.tar.gz",
+    "overlay-sdk": "https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.1-alpha/overlay-sdk-dist.tar.gz",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-select": "^2.1.2",
     "lucide-react": "^0.451.0",
