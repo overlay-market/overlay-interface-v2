@@ -5,12 +5,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import MarketCards from "../../components/MarketCards";
-import {
-  limitDigitsInDecimals,
-  toPercentUnit,
-  toScientificNumber,
-  TransformedMarketData,
-} from "overlay-sdk";
+import { TransformedMarketData } from "overlay-sdk";
+import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
 
 interface CarouselProps {
   marketsData: TransformedMarketData[];
@@ -38,16 +34,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
         <SwiperSlide key={index} style={{ width: "auto" }}>
           <MarketCards
             id={market.marketId}
-            currency={market.priceCurrency}
-            value={
-              market.priceCurrency === "%"
-                ? toPercentUnit(market.price)
-                : toScientificNumber(
-                    Number(market.price) < 100000
-                      ? limitDigitsInDecimals(market.price)
-                      : Math.floor(Number(market.price)).toLocaleString("en-US")
-                  )
-            }
+            priceWithCurrency={formatPriceWithCurrency(market.price ?? 0, market.priceCurrency, 3)}
             title={decodeURIComponent(market.marketId)}
           />
         </SwiperSlide>
@@ -57,18 +44,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
           <SwiperSlide key={index} style={{ width: "auto" }}>
             <MarketCards
               id={market.marketId}
-              currency={market.priceCurrency}
-              value={
-                market.priceCurrency === "%"
-                  ? toPercentUnit(market.price)
-                  : toScientificNumber(
-                      Number(market.price) < 100000
-                        ? limitDigitsInDecimals(market.price)
-                        : Math.floor(Number(market.price)).toLocaleString(
-                            "en-US"
-                          )
-                    )
-              }
+              priceWithCurrency={formatPriceWithCurrency(market.price ?? 0, market.priceCurrency, 3)}
               title={decodeURIComponent(market.marketId)}
             />
           </SwiperSlide>

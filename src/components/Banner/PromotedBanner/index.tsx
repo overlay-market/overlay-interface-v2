@@ -39,7 +39,7 @@ export const PromotedBanner = ({
       >
         <SubtitleText>{Title}</SubtitleText>
         <TitleText style={{ color: theme.color.grey1 }}>{Name}</TitleText>
-        <CardsValue>${Value}</CardsValue>
+        <CardsValue>{Value}</CardsValue>
       </Flex>
     </StyledPromotedBanner>
   );
