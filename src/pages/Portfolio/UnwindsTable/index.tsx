@@ -54,12 +54,11 @@ const UnwindsTable: React.FC = () => {
           );
 
           unwinds && setUnwindPositions(unwinds.data);
+          unwinds && setPositionsTotalNumber(unwinds.total);
           if (!unwinds) {
             setUnwindPositions(undefined);
             setPositionsTotalNumber(0);
           }
-          const positionsLength = unwinds && unwinds.total;
-          positionsLength && setPositionsTotalNumber(positionsLength);
         } catch (error) {
           console.error("Error fetching unwind positions:", error);
         } finally {

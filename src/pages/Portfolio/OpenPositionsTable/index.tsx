@@ -51,16 +51,16 @@ const OpenPositionsTable: React.FC = () => {
             currentPage,
             itemsPerPage,
             undefined,
-            account as Address
+            account as Address,
+            isNewTxnHash
           );
 
           positions && setPositions(positions.data);
+          positions && setPositionsTotalNumber(positions.total);
           if (!positions) {
             setPositions(undefined);
             setPositionsTotalNumber(0);
           }
-          const positionsLength = positions && positions.total;
-          positionsLength && setPositionsTotalNumber(positionsLength);
         } catch (error) {
           console.error("Error fetching open positions:", error);
         } finally {

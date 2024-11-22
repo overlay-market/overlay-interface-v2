@@ -85,7 +85,7 @@ const Trade: React.FC = () => {
           width={"100%"}
           direction={{ initial: "column", sm: "row" }}
           align={{ initial: "center", sm: "start" }}
-          px={{ initial: "20px", sm: "0" }}
+          px={{ initial: "4px", sm: "0" }}
         >
           {currentMarket ? (
             <>

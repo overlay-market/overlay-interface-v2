@@ -23,7 +23,7 @@ const MarketsList: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
 
   return (
-    <Box ref={ref}>
+    <Box ref={ref} width={{ initial: "100%", sm: "260px" }}>
       <MarketsListContainer onClick={toggleDropdown}>
         <Flex justify={"start"} align={"center"} gap={"10px"}>
           <Avatar

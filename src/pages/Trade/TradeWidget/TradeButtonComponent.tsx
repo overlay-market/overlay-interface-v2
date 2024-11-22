@@ -79,7 +79,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           priceLimit: toWei(tradeState.priceInfo.minPrice as string),
         })
         .then((result) => {
-          handleTxnHashUpdate(result.hash);
           addPopup(
             {
               txn: {
@@ -91,6 +90,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             },
             result.hash
           );
+          handleTxnHashUpdate(result.hash);
           handleTradeStateReset();
         })
         .catch((error: Error) => {
@@ -132,7 +132,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         amount: maxUint256,
       })
       .then((result) => {
-        handleTxnHashUpdate(result.hash);
         addPopup(
           {
             txn: {

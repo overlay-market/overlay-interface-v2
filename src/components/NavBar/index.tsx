@@ -16,9 +16,14 @@ const NavBar: React.FC = () => {
           sm: `${theme.headerSize.tabletWidth}`,
           md: `${theme.headerSize.width}`,
         }}
+        minWidth={{
+          initial: "100%",
+          sm: `${theme.headerSize.tabletWidth}`,
+          md: `${theme.headerSize.width}`,
+        }}
         height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "100vh" }}
         py={{ initial: "0", sm: "10px" }}
-        px={{ initial: "15px", sm: "6px" }}
+        px={{ initial: "3px", sm: "6px" }}
         position={{ initial: "static", sm: "sticky" }}
         top={"0"}
         style={{

@@ -52,12 +52,11 @@ const LiquidatesTable: React.FC = () => {
             );
 
           liquidates && setLiquidatePositions(liquidates.data);
+          liquidates && setPositionsTotalNumber(liquidates.total);
           if (!liquidates) {
             setLiquidatePositions(undefined);
             setPositionsTotalNumber(0);
           }
-          const positionsLength = liquidates && liquidates.total;
-          positionsLength && setPositionsTotalNumber(positionsLength);
         } catch (error) {
           console.error("Error fetching liquidated positions:", error);
         } finally {

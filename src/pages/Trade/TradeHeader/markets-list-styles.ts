@@ -19,8 +19,8 @@ export const MarketsListContainer = styled(Flex)`
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  padding-left: 15px;
-  padding-right: 27px;
+  padding-left: 4px;
+  padding-right: 16px;
   cursor: pointer;
 
   @media (min-width: ${theme.breakpoints.sm}) {

@@ -62,7 +62,13 @@ export const useTradeActionHandlers = (): {
 
   const handleTxnHashUpdate = useCallback(
     (txnHash: string) => {
-      dispatch(updateTxnHash({ txnHash }))
+      const timeout = setTimeout(() => {
+        dispatch(updateTxnHash({ txnHash }))
+      }, 5000);
+  
+      return () => {
+        clearTimeout(timeout);
+      };      
     },
     [dispatch]
   );

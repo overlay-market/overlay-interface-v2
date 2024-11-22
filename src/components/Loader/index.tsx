@@ -1,10 +1,9 @@
 import { StyledSVG } from "./loader-styles";
 
 type LoaderProps = {
-  size?: string;
-  stroke?: string;
-  [k: string]: any;
-};
+  size?: string; // Custom size for the loader
+  stroke?: string; // Custom stroke color
+} & React.SVGProps<SVGSVGElement>;
 
 /**
  * Takes in custom size and stroke for circle color, default to primary color as fill,
