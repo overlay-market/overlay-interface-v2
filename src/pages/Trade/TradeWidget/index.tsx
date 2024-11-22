@@ -1,4 +1,3 @@
-import { Flex } from "@radix-ui/themes";
 import MainTradeDetails from "./MainTradeDetails";
 import {
   useIsNewTxnHash,

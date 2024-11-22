@@ -16,8 +16,12 @@
     "@reduxjs/toolkit": "^2.2.7",
     "@tanstack/react-query": "^5.59.0",
     "@web3modal/wagmi": "^5.1.11",
+    "axios": "^1.7.7",
     "moment": "^2.30.1",
-    "overlay-sdk": "https://gitpkg.vercel.app/overlay-market/overlay-sdk/packages/overlay-sdk?release-0.0.1",
+    "overlay-sdk": "https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.1-alpha/overlay-sdk-dist.tar.gz",
+    "@radix-ui/react-icons": "^1.3.0",
+    "@radix-ui/react-select": "^2.1.2",
+    "lucide-react": "^0.451.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
@@ -28,7 +32,9 @@
     "redux-localstorage-simple": "^2.5.1",
     "styled-components": "^6.1.13",
     "viem": "^2.17.5",
-    "wagmi": "^2.12.16"
+    "wagmi": "^2.12.16",
+    "react-swiper": "^0.1.5",
+    "swiper": "^11.1.14"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
