@@ -17,6 +17,7 @@ import ETHDominance from "../assets/images/markets-full-logos/eth-dom.png";
 import BTCFrog from "../assets/images/markets-full-logos/btc-frogs.png";
 import NodeMonkes from "../assets/images/markets-full-logos/node-monkes.png";
 import ETHSOL from "../assets/images/markets-full-logos/eth-sol.png";
+import INK from "../assets/images/markets-full-logos/ink.jpeg";
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -28,7 +29,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Bitcoin%20Frogs": BTCFrog,
   NodeMonkes: NodeMonkes,
   "Quantum%20Cats": QuantumCats,
-  Ink: undefined,
+  Ink: INK,
   "ETH%20%2F%20SOL": ETHSOL,
   "AI%20Index": AiIndex,
   "Frogs%20vs%20Dogs%20-%20Meme%20War": FrogsVsDogs,
