@@ -8,7 +8,7 @@ import Overview from "./Overview";
 
 const Portfolio: React.FC = () => {
   return (
-    <Flex direction="column" width={"100%"}>
+    <Flex direction="column" width={"100%"} overflowX={"hidden"}>
       <HeaderEmptyPlaceholder></HeaderEmptyPlaceholder>
       <Flex
         direction="column"
