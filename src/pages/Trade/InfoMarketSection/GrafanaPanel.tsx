@@ -4,7 +4,7 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 
 const GrafanaPanel: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
-  const snapshotUrl = `https://grafana.overlay.market/stats-snapshot/${currentMarket?.id ?? ""}?kiosk`; // whole dashboard
+  const snapshotUrl = `https://grafana.overlay.market/stats-snapshot/${currentMarket?.id.toLowerCase() ?? ""}?kiosk`; // whole dashboard
 
   return (
     <Flex

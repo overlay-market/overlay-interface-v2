@@ -54,7 +54,7 @@ export default {
     const {binSize, binUnit} = getBinSizeAndUnit(resolution)
 
     const urlParameters = {
-      market: symbolInfo?.marketAddress,
+      market: symbolInfo?.marketAddress.toLowerCase(),
       binSize: binSize,
       binUnit: binUnit,
       from: from * 1000,

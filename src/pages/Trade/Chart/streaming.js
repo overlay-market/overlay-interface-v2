@@ -12,7 +12,7 @@ export const subscribeOnStream = (symbolInfo, resolution, onRealtimeCallback, su
   const {binSize, binUnit} = getBinSizeAndUnit(resolution)
 
   const urlParameters = {
-    market: symbolInfo?.marketAddress,
+    market: symbolInfo?.marketAddress.toLowerCase(),
     binSize: binSize,
     binUnit: binUnit,
   }
