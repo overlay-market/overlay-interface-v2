@@ -16,7 +16,7 @@ import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
-import { useOpenWalletModal } from "../../../components/ConnectWalletModal/utils";
+import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -29,6 +29,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 }) => {
   const { address } = useAccount();
   const sdk = useSDK();
+  const { openModal } = useModalHelper();
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
@@ -224,7 +225,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         <GradientOutlineButton
           title={"Connect Wallet"}
           width={"100%"}
-          handleClick={useOpenWalletModal}
+          handleClick={openModal}
         />
       )}
     </>

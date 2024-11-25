@@ -1,11 +1,10 @@
-import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { useModal } from "connectkit";
 
-export const useOpenWalletModal = async () => {
-    const { open } = useWeb3Modal();
-
-    try {
-        await open();
-    } catch (error) {
-        console.error("Failed to connect:", error);
-    }
-}
+export const useModalHelper = () => {
+    const { setOpen } = useModal();
+  
+    const openModal = () => setOpen(true);
+    const closeModal = () => setOpen(false);
+  
+    return { openModal, closeModal };
+};
