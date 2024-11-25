@@ -6,6 +6,7 @@ import { AlertTriangle } from "react-feather";
 import TokenBalance from "./TokenBalance";
 import ConnectWalletModal from "../ConnectWalletModal";
 import useAccount from "../../hooks/useAccount";
+import { useOpenWalletModal } from "../ConnectWalletModal/utils";
 
 const Web3Status: React.FC = () => {
   const { address: account } = useAccount();
@@ -24,7 +25,7 @@ const Web3Status: React.FC = () => {
     </Flex>
   ) : account ? (
     <Flex direction="column">
-      <Text weight={"bold"}>{ensName ?? shortenAddress(String(account))}</Text>
+      <Text onClick={useOpenWalletModal} style={{cursor: "pointer"}} weight={"bold"}>{ensName ?? shortenAddress(String(account))}</Text>
       <TokenBalance />
     </Flex>
   ) : (
