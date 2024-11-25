@@ -86,7 +86,7 @@ const LiquidatesTable: React.FC = () => {
       }}
     >
       <Text weight={"bold"} size={"5"}>
-        Liquidates
+        Liquidations
       </Text>
 
       <StyledTable
