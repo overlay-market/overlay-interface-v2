@@ -8,7 +8,6 @@ import {
   NETWORK_ICONS,
   SUPPORTED_CHAINID,
 } from "../../constants/chains";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import theme from "../../theme";
 import {
   ChainLogo,
@@ -21,6 +20,7 @@ import {
 import NavLinksSection from "../NavBar/NavLinksSection";
 import SocialLinksSection from "../NavBar/SocialLinksSection";
 import { NAVBAR_MODE } from "../../constants/applications";
+import { useOpenWalletModal } from "../ConnectWalletModal/utils";
 
 const networkLabel = (chainId: number) => {
   const isTestnet = [
@@ -46,16 +46,6 @@ const HeaderMenu = () => {
 
   const handleWalletDisconnect = () => {
     disconnect();
-  };
-
-  const { open: openConnectWalletModal } = useWeb3Modal();
-
-  const handleWalletConnect = async () => {
-    try {
-      await openConnectWalletModal();
-    } catch (error) {
-      console.error("Failed to connect:", error);
-    }
   };
 
   return (
@@ -91,7 +81,7 @@ const HeaderMenu = () => {
             <div>Disconnect Wallet</div>
           </DropdownItem>
         ) : (
-          <DropdownItem onClick={handleWalletConnect}>
+          <DropdownItem onClick={useOpenWalletModal}>
             <Text>Connect Wallet</Text>
           </DropdownItem>
         )}

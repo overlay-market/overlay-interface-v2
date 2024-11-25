@@ -11,12 +11,12 @@ import {
 } from "../../../state/trade/hooks";
 import { useCallback, useMemo, useState } from "react";
 import { toWei, TradeStateData } from "overlay-sdk";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
+import { useOpenWalletModal } from "../../../components/ConnectWalletModal/utils";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -29,7 +29,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 }) => {
   const { address } = useAccount();
   const sdk = useSDK();
-  const { open } = useWeb3Modal();
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
@@ -53,14 +52,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     typedValue && !loading && (title === "Trade" || title === "Approve OVL")
       ? false
       : true;
-
-  const handleConnect = async () => {
-    try {
-      await open();
-    } catch (error) {
-      console.error("Failed to connect:", error);
-    }
-  };
 
   const handleTrade = async () => {
     if (market && tradeState) {
@@ -174,7 +165,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     const errorCode: number | string =
       errorObj.cause?.cause?.code || errorObj.code;
 
-    let errorMessage =
+    const errorMessage =
       errorObj.cause?.shortMessage || errorObj.cause?.cause?.shortMessage;
     return { errorCode, errorMessage };
   };
@@ -233,7 +224,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         <GradientOutlineButton
           title={"Connect Wallet"}
           width={"100%"}
-          handleClick={handleConnect}
+          handleClick={useOpenWalletModal}
         />
       )}
     </>
