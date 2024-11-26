@@ -4,6 +4,7 @@ import Loader from '../../components/Loader';
 import { useAccount, useSignTypedData } from 'wagmi';
 import { useOpenWalletModal } from '../../components/ConnectWalletModal/utils';
 import { shortenAddress } from '../../utils/web3';
+import { isAddress } from 'viem'
 
 const Referrals = () => {
   const { address: traderAddress } = useAccount();
@@ -12,8 +13,10 @@ const Referrals = () => {
   const [fetchingSignature, setFetchingSignature] = useState(false);
   const [affiliateAddress, setAffiliateAddress] = useState('');
   const [traderSignedUpTo, setTraderSignedUpTo] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const referralApiBaseUrl = "https://api.overlay.market/referral";
+  // const referralApiBaseUrl = "https://api.overlay.market/referral";
+  const referralApiBaseUrl = "http://localhost:3000";
 
   // Check trader status
   const checkTraderStatus = async (address: string) => {
@@ -58,7 +61,9 @@ const Referrals = () => {
       });
   
       if (!response.ok) {
-        throw new Error(`Failed to post signature: ${response.statusText}`);
+        const result = await response.json();
+        setErrorMessage(`Failed to post signature: ${result?.message ?? "Unable to get error message"}`)
+        throw new Error(`Failed to post signature: ${JSON.stringify(result)}`);
       }
   
       const result = await response.json();
@@ -95,7 +100,13 @@ const Referrals = () => {
         message: {affiliate},
       })
     } catch (error) {
-      console.error('Error fetching affiliate status:', error);
+      const errorWithDetails = error as { details?: string }
+      if (errorWithDetails?.details) {
+        setErrorMessage(`${errorWithDetails.details}`)
+      } else {
+        setErrorMessage("unable to get error, see console")
+      }
+      console.error('Error fetching signature:', error);
     } finally {
       setFetchingSignature(false);
     }
@@ -104,6 +115,10 @@ const Referrals = () => {
 
   const handleSubmit = async () => {
     if (!affiliateAddress || !traderAddress) return;
+    if (!isAddress(affiliateAddress)) {
+      setErrorMessage('Enter a valid address')
+      return
+    }
     const signature = await fetchSignature(affiliateAddress);
     console.log({signature})
     signature && await postSignature(signature, affiliateAddress);
@@ -127,6 +142,11 @@ const Referrals = () => {
             style={{ marginLeft: '10px', padding: '5px' }}
           />
         </label>
+        {errorMessage && (
+          <p style={{ color: 'red' }}>
+            {errorMessage}
+          </p>
+        )}
       </div>
       {!traderAddress
         ? <GradientSolidButton
