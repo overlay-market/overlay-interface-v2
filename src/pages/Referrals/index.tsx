@@ -3,6 +3,7 @@ import { GradientSolidButton } from '../../components/Button';
 import Loader from '../../components/Loader';
 import { useAccount, useSignTypedData } from 'wagmi';
 import { useOpenWalletModal } from '../../components/ConnectWalletModal/utils';
+import { shortenAddress } from '../../utils/web3';
 
 const Referrals = () => {
   const { address: traderAddress } = useAccount();
@@ -10,7 +11,7 @@ const Referrals = () => {
   const [loading, setLoading] = useState(false);
   const [fetchingSignature, setFetchingSignature] = useState(false);
   const [affiliateAddress, setAffiliateAddress] = useState('');
-  const [isTraderSignedUp, setIsTraderSignedUp] = useState(false);
+  const [traderSignedUpTo, setTraderSignedUpTo] = useState('');
 
   const referralApiBaseUrl = "https://api.overlay.market/referral";
 
@@ -22,8 +23,8 @@ const Referrals = () => {
       if (!response.ok) {
         throw new Error(`Failed to fetch trader status: ${response.statusText}`);
       }
-      const { exists } = await response.json();
-      setIsTraderSignedUp(exists);
+      const { affiliate }: {exists: boolean, affiliate: string} = await response.json();
+      setTraderSignedUpTo(affiliate)
     } catch (error) {
       console.error('Error checking trader status:', error);
     } finally {
@@ -63,6 +64,7 @@ const Referrals = () => {
       const result = await response.json();
       if (result.createdAt) {
         console.log('submitted')
+        setTraderSignedUpTo(affiliate)
         // TODO create toast notification
       }
     } catch (error) {
@@ -110,9 +112,9 @@ const Referrals = () => {
   return (
     <div style={{ padding: '20px' }}>
       <h1>Referrals</h1>
-      {isTraderSignedUp && (
+      {traderSignedUpTo && (
         <p style={{ color: 'red' }}>
-          You are already signed up for the referral program.
+          You are already signed up for the referral program to {shortenAddress(traderSignedUpTo)}
         </p>
       )}
       <div style={{ marginBottom: '20px' }}>
@@ -132,9 +134,9 @@ const Referrals = () => {
             width='300px'
             handleClick={useOpenWalletModal}
           />
-        : isTraderSignedUp
+        : traderSignedUpTo !== ''
           ? <GradientSolidButton
-              title="Already Signed Up"
+              title={`Already Signed Up`}
               isDisabled={true}
               width="300px"
             />
