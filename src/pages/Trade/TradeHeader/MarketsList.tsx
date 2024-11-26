@@ -1,19 +1,18 @@
-import {
-  Flex,
-  Text,
-  Box,
-  ChevronDownIcon,
-  Avatar,
-  ScrollArea,
-} from "@radix-ui/themes";
+import { Flex, Box, ChevronDownIcon, ScrollArea } from "@radix-ui/themes";
 import theme from "../../../theme";
 import useOutsideClick from "../../../hooks/useOutsideClick";
 import React, { useState, Fragment } from "react";
 import { useMarketsState } from "../../../state/markets/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import MarketItem from "./MarketItem";
-import { HeaderMarketName, MarketsListContainer } from "./markets-list-styles";
+import {
+  HeaderMarketName,
+  CurrentMarketLogo,
+  MarketsListContainer,
+} from "./markets-list-styles";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
+import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const MarketsList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,19 +20,18 @@ const MarketsList: React.FC = () => {
   const toggleDropdown = () => setIsOpen((prev) => !prev);
   const { markets } = useMarketsState();
   const { currentMarket } = useCurrentMarketState();
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
     <Box ref={ref} width={{ initial: "100%", sm: "260px" }}>
       <MarketsListContainer onClick={toggleDropdown}>
         <Flex justify={"start"} align={"center"} gap={"10px"}>
-          <Avatar
-            radius="large"
-            src={currentMarket?.marketLogo}
-            variant="solid"
-            size="2"
-            fallback={<Text style={{ fontSize: "6px" }}>{`logo`}</Text>}
-            color="gray"
-          />
+          {currentMarket && (
+            <CurrentMarketLogo
+              src={MARKETS_FULL_LOGOS[currentMarket.marketId]}
+              alt={currentMarket.marketName}
+            />
+          )}
           <HeaderMarketName>{currentMarket?.marketName}</HeaderMarketName>
         </Flex>
 
@@ -54,7 +52,7 @@ const MarketsList: React.FC = () => {
           style={{
             background: theme.color.background,
             zIndex: 10,
-            borderTop: `1px solid ${theme.color.darkBlue}`,
+            borderTop: isMobile ? `1px solid ${theme.color.darkBlue}` : ``,
           }}
         >
           <ScrollArea type="auto" scrollbars="vertical" style={{ height: 530 }}>
@@ -71,7 +69,7 @@ const MarketsList: React.FC = () => {
                   return (
                     <Fragment key={market.id}>
                       <MarketItem
-                        marketLogo={market.marketLogo}
+                        marketLogo={MARKETS_FULL_LOGOS[market.marketId]}
                         marketName={market.marketName}
                         currencyPrice={currencyPrice}
                         marketId={market.marketId}
