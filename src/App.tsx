@@ -14,6 +14,7 @@ import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from './utils/scrollToTop'
+import Referrals from './pages/Referrals';
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -40,6 +41,7 @@ const App = () => {
                 />
                 <Route path="/trade/:marketId" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/referrals" element={<Referrals />} />
               </Routes>
             </Flex>
           </AppContainer>
