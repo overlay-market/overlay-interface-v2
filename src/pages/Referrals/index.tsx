@@ -14,9 +14,9 @@ const Referrals = () => {
   const [affiliateAddress, setAffiliateAddress] = useState('');
   const [traderSignedUpTo, setTraderSignedUpTo] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [succeededToSignUp, setSucceededToSignUp] = useState(false);
 
-  // const referralApiBaseUrl = "https://api.overlay.market/referral";
-  const referralApiBaseUrl = "http://localhost:3000";
+  const referralApiBaseUrl = "https://api.overlay.market/referral";
 
   // Check trader status
   const checkTraderStatus = async (address: string) => {
@@ -69,7 +69,7 @@ const Referrals = () => {
       const result = await response.json();
       if (result.createdAt) {
         console.log('submitted')
-        setTraderSignedUpTo(affiliate)
+        setSucceededToSignUp(true)
         // TODO create toast notification
       }
     } catch (error) {
@@ -114,6 +114,7 @@ const Referrals = () => {
   };
 
   const handleSubmit = async () => {
+    setErrorMessage(null)
     if (!affiliateAddress || !traderAddress) return;
     if (!isAddress(affiliateAddress)) {
       setErrorMessage('Enter a valid address')
@@ -148,30 +149,39 @@ const Referrals = () => {
           </p>
         )}
       </div>
-      {!traderAddress
-        ? <GradientSolidButton
-            title="Connect Wallet"
-            width='300px'
-            handleClick={useOpenWalletModal}
-          />
-        : traderSignedUpTo !== ''
+      {!succeededToSignUp &&
+        (!traderAddress
           ? <GradientSolidButton
-              title={`Already Signed Up`}
-              isDisabled={true}
-              width="300px"
+              title="Connect Wallet"
+              width='300px'
+              handleClick={useOpenWalletModal}
             />
-          : affiliateAddress === ''
+          : traderSignedUpTo !== ''
             ? <GradientSolidButton
-                title="Enter Affiliate Address"
+                title={`Already Signed Up`}
                 isDisabled={true}
-                width='300px'
+                width="300px"
               />
-            : <GradientSolidButton
-                title="Submit"
-                width='300px'
-                isDisabled={fetchingSignature}
-                handleClick={handleSubmit}
-              />
+            : affiliateAddress === ''
+              ? <GradientSolidButton
+                  title="Enter Affiliate Address"
+                  isDisabled={true}
+                  width='300px'
+                />
+              : <GradientSolidButton
+                  title="Submit"
+                  width='300px'
+                  isDisabled={fetchingSignature}
+                  handleClick={handleSubmit}
+                />
+          )
+      }
+      {succeededToSignUp &&
+        <GradientSolidButton
+          title="🎉 Success 🎉"
+          isDisabled={true}
+          width='300px'
+        />
       }
       {(loading || fetchingSignature) && <Loader />}
     </div>
