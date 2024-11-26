@@ -5,8 +5,12 @@ import { useAccount, useSignTypedData } from 'wagmi';
 import { useOpenWalletModal } from '../../components/ConnectWalletModal/utils';
 import { shortenAddress } from '../../utils/web3';
 import { isAddress } from 'viem'
+import { useSearchParams } from "react-router-dom";
 
 const Referrals = () => {
+  const [searchParams] = useSearchParams();
+  const referralAddressFromURL = searchParams.get("referrer");
+
   const { address: traderAddress } = useAccount();
   const { signTypedDataAsync } = useSignTypedData()
   const [loading, setLoading] = useState(false);
@@ -17,6 +21,12 @@ const Referrals = () => {
   const [succeededToSignUp, setSucceededToSignUp] = useState(false);
 
   const referralApiBaseUrl = "https://api.overlay.market/referral";
+
+  useEffect(() => {
+    if (referralAddressFromURL) {
+      setAffiliateAddress(referralAddressFromURL);
+    }
+  }, [referralAddressFromURL]);
 
   // Check trader status
   const checkTraderStatus = async (address: string) => {
