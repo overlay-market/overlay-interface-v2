@@ -9,8 +9,12 @@ export const AppContainer = styled(Flex)`
   min-height: 100vh;
   background: ${theme.color.background};
 
+  @media (pointer: coarse) {
+    width: 100vw !important;
+  }
+
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: calc(100vw - 20px);
+    width: calc(100vw - 16px);
     padding-right: 20px;
     padding-left: 0px;
   }

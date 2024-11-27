@@ -12,7 +12,7 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
   return (
     <Flex
       gap="3"
-      ml={{ xs: "16px" }}
+      ml={{ sm: "16px", xs: "0" }}
       mt="5"
       direction={{
         initial: "column",
@@ -24,7 +24,11 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
           <PromotedBanner
             Title={"CGMI"}
             Name={decodeURIComponent(marketsData[0]?.marketId ?? "")}
-            Value={formatPriceWithCurrency(marketsData[0]?.price ?? 0, marketsData[0]?.priceCurrency, 3)}
+            Value={formatPriceWithCurrency(
+              marketsData[0]?.price ?? 0,
+              marketsData[0]?.priceCurrency,
+              3
+            )}
             Id={marketsData[0]?.marketId ?? ""}
           />
         </Box>
@@ -34,7 +38,11 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
           <PromotedBanner
             Title={"CGMI"}
             Name={decodeURIComponent(marketsData[5]?.marketId ?? "")}
-            Value={formatPriceWithCurrency(marketsData[5]?.price ?? 0, marketsData[5]?.priceCurrency, 3)}
+            Value={formatPriceWithCurrency(
+              marketsData[5]?.price ?? 0,
+              marketsData[5]?.priceCurrency,
+              3
+            )}
             Id={marketsData[5]?.marketId ?? ""}
           />
         </Box>
