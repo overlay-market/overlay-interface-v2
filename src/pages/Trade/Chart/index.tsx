@@ -220,6 +220,13 @@ const Chart: React.FC = () => {
           });
         }
 
+        tvWidget
+          .activeChart()
+          .onIntervalChanged()
+          .subscribe(null, () => {
+            priceScale.setAutoScale(true);
+          });
+
         //add horizontal line with long Price
         const longPriceLine = tvWidget
           .activeChart()
@@ -282,8 +289,6 @@ const Chart: React.FC = () => {
         const currentTime = Date.now() / 1000;
         const chart = tvWidgetRef.current?.activeChart();
 
-        chart.removeEntity(longPriceLineRef.current);
-
         const newLongPriceLine = chart.createMultipointShape(
           [{ time: currentTime, price: ask }],
           {
@@ -306,7 +311,10 @@ const Chart: React.FC = () => {
           }
         );
 
-        longPriceLineRef.current = newLongPriceLine as EntityId;
+        if (newLongPriceLine) {
+          chart.removeEntity(longPriceLineRef.current);
+          longPriceLineRef.current = newLongPriceLine as EntityId;
+        }
       }
     };
 
@@ -322,8 +330,6 @@ const Chart: React.FC = () => {
       if (tvWidgetRef.current && shortPriceLineRef.current && bid) {
         const currentTime = Date.now() / 1000;
         const chart = tvWidgetRef.current?.activeChart();
-
-        chart.removeEntity(shortPriceLineRef.current);
 
         const newShortPriceLine = chart.createMultipointShape(
           [{ time: currentTime, price: bid }],
@@ -346,7 +352,11 @@ const Chart: React.FC = () => {
             },
           }
         );
-        shortPriceLineRef.current = newShortPriceLine;
+
+        if (newShortPriceLine) {
+          chart.removeEntity(shortPriceLineRef.current);
+          shortPriceLineRef.current = newShortPriceLine as EntityId;
+        }
       }
     };
 
