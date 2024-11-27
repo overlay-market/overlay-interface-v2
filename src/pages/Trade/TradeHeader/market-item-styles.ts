@@ -30,3 +30,12 @@ export const MarketPrice = styled(Box)`
   text-align: right;
   flex-shrink: 0;
 `;
+
+export const MarketLogo = styled.img`
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 0.5px solid rgba(236, 236, 236, 0.15);
+  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+`;
