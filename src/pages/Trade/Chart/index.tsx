@@ -14,10 +14,9 @@ import { getMarketChartUrl } from "./helpers";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useParams } from "react-router-dom";
-import { limitDigitsInDecimals } from "overlay-sdk";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
-import useSDK from "../../../providers/SDKProvider/useSDK";
 import theme from "../../../theme";
+import useBidAndAsk from "./utils/useBidAndAsk";
 
 const TVChartContainer = styled.div`
   height: 258px;
@@ -53,50 +52,39 @@ const Chart: React.FC = () => {
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
   const { marketId } = useParams();
   const { chainId } = useMultichainContext();
-  const sdk = useSDK();
-
   const { currentMarket: market } = useCurrentMarketState();
 
-  const [ask, setAsk] = useState<number | undefined>(undefined);
-  const [bid, setBid] = useState<number | undefined>(undefined);
+  const { bid, ask } = useBidAndAsk(marketId);
+
+  const [longPrice, setLongPrice] = useState<number | undefined>(undefined);
+  const [shortPrice, setShortPrice] = useState<number | undefined>(undefined);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    setLongPrice(undefined);
+    setShortPrice(undefined);
+  }, [marketId, chainId]);
 
-    const fetchBidAndAsk = async () => {
-      if (marketId) {
-        try {
-          const bidAndAsk = await sdk.trade.getBidAndAsk(marketId, 8);
-
-          const ask =
-            bidAndAsk &&
-            limitDigitsInDecimals(bidAndAsk.ask as number).replaceAll(",", "");
-          const bid =
-            bidAndAsk &&
-            limitDigitsInDecimals(bidAndAsk.bid as number).replaceAll(",", "");
-
-          setAsk(Number(ask));
-          setBid(Number(bid));
-        } catch (error) {
-          console.error("Error fetching bid and ask:", error);
-        }
-      }
-    };
-
-    fetchBidAndAsk();
-    interval = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
-  }, [marketId, chainId, sdk]);
+  useEffect(() => {
+    if (
+      longPrice === undefined &&
+      shortPrice === undefined &&
+      bid !== undefined &&
+      ask !== undefined
+    ) {
+      setLongPrice(ask);
+      setShortPrice(bid);
+    }
+  }, [bid, ask, longPrice, shortPrice]);
 
   const tvWidgetRef = useRef<IChartingLibraryWidget | null>(null);
   const longPriceLineRef = useRef<EntityId | null>(null);
   const shortPriceLineRef = useRef<EntityId | null>(null);
 
   useEffect(() => {
-    if (market && ask && bid && chainId !== undefined) {
+    if (market && longPrice && shortPrice && chainId !== undefined) {
       const fractionDigitsAmount = Math.max(
-        String(bid + ". ").split(".")[1].length,
-        String(ask + ". ").split(".")[1].length
+        String(shortPrice + ". ").split(".")[1].length,
+        String(longPrice + ". ").split(".")[1].length
       );
 
       const defaultProps: Omit<ChartContainerProps, "container"> = {
@@ -218,12 +206,12 @@ const Chart: React.FC = () => {
           const priceRangeDifferenceOffset = priceRangeDifference * 0.1;
 
           const offsetTop =
-            ask >= priceRangeTo - priceRangeDifferenceOffset
-              ? ask + priceRangeDifferenceOffset
+            longPrice >= priceRangeTo - priceRangeDifferenceOffset
+              ? longPrice + priceRangeDifferenceOffset
               : null;
           const offsetBottom =
-            bid <= priceRangeFrom + priceRangeDifferenceOffset
-              ? bid - priceRangeDifferenceOffset
+            shortPrice <= priceRangeFrom + priceRangeDifferenceOffset
+              ? shortPrice - priceRangeDifferenceOffset
               : null;
 
           priceScale.setVisiblePriceRange({
@@ -235,7 +223,7 @@ const Chart: React.FC = () => {
         //add horizontal line with long Price
         const longPriceLine = tvWidget
           .activeChart()
-          .createMultipointShape([{ time: currentTime, price: ask }], {
+          .createMultipointShape([{ time: currentTime, price: longPrice }], {
             shape: "horizontal_line",
             lock: true,
             disableSelection: true,
@@ -258,7 +246,7 @@ const Chart: React.FC = () => {
         //add horizontal line with short Price
         const shortPriceLine = tvWidget
           .activeChart()
-          .createMultipointShape([{ time: currentTime, price: bid }], {
+          .createMultipointShape([{ time: currentTime, price: shortPrice }], {
             shape: "horizontal_line",
             lock: true,
             disableSelection: true,
@@ -283,7 +271,7 @@ const Chart: React.FC = () => {
         tvWidget.remove();
       };
     }
-  }, [market, chainId, ask, bid]);
+  }, [market, chainId, longPrice, shortPrice]);
 
   // Effect to update the longPrice shape
   useEffect(() => {
