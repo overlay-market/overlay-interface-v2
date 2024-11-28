@@ -53,7 +53,7 @@ export const GradientSolidBtnWrapper = styled(Button)<{
   height: ${({ height }) => (height ? height : "auto")};
   background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
   font-weight: 600;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   
   &:hover {
     box-shadow:  ${({ disabled }) => (disabled ? 'none' : '0px 0px 12px 3px #ffffff73')};

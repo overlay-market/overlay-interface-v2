@@ -10,7 +10,6 @@ import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
-import usePrevious from "../../../hooks/usePrevious";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
 
 type UnwindButtonComponentProps = {
@@ -19,6 +18,7 @@ type UnwindButtonComponentProps = {
   inputValue: string;
   unwindPercentage: number;
   priceLimit: bigint;
+  isPendingTime: boolean;
   handleDismiss: () => void;
 };
 
@@ -28,25 +28,21 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   inputValue,
   unwindPercentage,
   priceLimit,
+  isPendingTime,
   handleDismiss,
 }) => {
   const sdk = useSDK();
   const addPopup = useAddPopup();
-  const previousInputValue = usePrevious(inputValue);
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
 
-  const isPendingTime = useMemo(() => {
-    return inputValue !== previousInputValue;
-  }, [inputValue, previousInputValue]);
-
   const title: string | undefined = useMemo(() => {
     if (inputValue === "") return "Unwind";
     if (isPendingTime) return "Unwind";
     return unwindBtnState;
-  }, [unwindBtnState, inputValue]);
+  }, [unwindBtnState, inputValue, isPendingTime]);
 
   const isDisabledUnwindButton = useMemo(() => {
     return title === "Unwind" && inputValue !== "" ? false : true;
