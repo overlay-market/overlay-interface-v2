@@ -3,6 +3,7 @@ import useAccount from './useAccount'
 import useMultichainContext from '../providers/MultichainContextProvider/useMultichainContext'
 import useChainSelect from './useChainSelect'
 import usePrevious from './usePrevious'
+import { CHAIN_ID_LOCAL_STORAGE_KEY } from '../components/Wallet/ChainSwitch'
 
 const useSyncChainQuery = (chainIdRef: React.MutableRefObject<number | undefined>) => {
   const account = useAccount()
@@ -12,7 +13,16 @@ const useSyncChainQuery = (chainIdRef: React.MutableRefObject<number | undefined
   const prevAccountAddress = usePrevious(account.address)
 
   const selectChain = useChainSelect()
-  
+
+  // Sync chainId changes to localStorage
+  useEffect(() => {
+    console.log("Sync chainId changes to localStorage usesync", {chainIdMultichainContext, current: localStorage.getItem(CHAIN_ID_LOCAL_STORAGE_KEY)})
+    if (chainIdMultichainContext) {
+      localStorage.setItem(CHAIN_ID_LOCAL_STORAGE_KEY, chainIdMultichainContext.toString());
+    }
+  }, [chainIdMultichainContext]);
+
+  // Handle chain switching logic on reconnect
   useEffect(() => {
     if (account.address && !prevAccountAddress && prevConnectedChainId && account.chainId !== prevConnectedChainId) {
       chainIdRef.current = prevConnectedChainId as number

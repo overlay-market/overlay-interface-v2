@@ -158,6 +158,17 @@ export default function MarketsTable({
                 (m) => m.marketId === market.marketId
               );
 
+              const lineColor =
+                market7d &&
+                market7d.sevenDaysChartData &&
+                market7d.sevenDaysChartData.length > 0
+                  ? market7d.sevenDaysChartData[
+                      market7d.sevenDaysChartData.length - 1
+                    ] > market7d.sevenDaysChartData[0]
+                    ? theme.color.green2
+                    : theme.color.red2
+                  : theme.color.grey3;
+
               return (
                 <Table.Row
                   key={index}
@@ -296,7 +307,7 @@ export default function MarketsTable({
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke="#4ade80"
+                          stroke={lineColor}
                           strokeWidth={2}
                           dot={false}
                         />
