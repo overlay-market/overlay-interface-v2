@@ -134,6 +134,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           },
           result.hash
         );
+        handleTxnHashUpdate(result.hash);
       })
       .catch((error: Error) => {
         const { errorCode, errorMessage } = handleError(error);
