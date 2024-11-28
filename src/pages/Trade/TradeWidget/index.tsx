@@ -39,7 +39,11 @@ const TradeWidget: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const debouncedTypedValue = useDebounce(typedValue, 500);
-  const debouncedSelectedLeverage = useDebounce(selectedLeverage, 500);
+  const [leverageInputValue, setLeverageInputValue] = useState<string | null>(
+    null
+  );
+  const debouncedSelectedLeverage = useDebounce(leverageInputValue, 500);
+  const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
 
   useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
@@ -58,7 +62,7 @@ const TradeWidget: React.FC = () => {
           const tradeState = await sdk.trade.getTradeState(
             marketId,
             toWei(debouncedTypedValue),
-            toWei(debouncedSelectedLeverage),
+            toWei(selectedLeverage),
             Number(slippageValue),
             isLong,
             address
@@ -86,7 +90,7 @@ const TradeWidget: React.FC = () => {
     marketId,
     address,
     debouncedTypedValue,
-    debouncedSelectedLeverage,
+    selectedLeverage,
     chainId,
     isLong,
     slippageValue,
@@ -112,8 +116,16 @@ const TradeWidget: React.FC = () => {
   }, [market]);
 
   const handleLeverageInput = (newValue: number[]) => {
-    handleLeverageSelect(newValue[0].toString());
+    const stringValue = newValue[0].toString();
+    setLeverageInputValue(stringValue);
+    setDisplayedLeverage(stringValue);
   };
+
+  useEffect(() => {
+    if (debouncedSelectedLeverage !== null) {
+      handleLeverageSelect(debouncedSelectedLeverage);
+    }
+  }, [debouncedSelectedLeverage]);
 
   return (
     <TradeWidgetContainer
@@ -132,7 +144,7 @@ const TradeWidget: React.FC = () => {
         min={1}
         max={capLeverage ?? 1}
         step={0.1}
-        value={Number(selectedLeverage)}
+        value={Number(displayedLeverage)}
         valueUnit={"x"}
         handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
       />
