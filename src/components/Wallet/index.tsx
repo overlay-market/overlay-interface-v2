@@ -1,8 +1,8 @@
 import { Box, Flex } from "@radix-ui/themes";
 // import { GradientOutlineButton } from "../Button";
 import theme from "../../theme";
-import Web3Status from "./Web3Status";
 import ChainSwitch from "./ChainSwitch";
+import ConnectWalletModal from "../ConnectWalletModal";
 // import HeaderMenu from "../HeaderMenu";
 
 const Wallet: React.FC = () => {
@@ -36,7 +36,7 @@ const Wallet: React.FC = () => {
         /> */}
         <ChainSwitch />
         {/* <HeaderMenu /> */}
-        <Web3Status />
+        <ConnectWalletModal />
       </Flex>
     </Box>
   );

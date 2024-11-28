@@ -20,7 +20,7 @@ import {
 import NavLinksSection from "../NavBar/NavLinksSection";
 import SocialLinksSection from "../NavBar/SocialLinksSection";
 import { NAVBAR_MODE } from "../../constants/applications";
-import { useOpenWalletModal } from "../ConnectWalletModal/utils";
+import { useModalHelper } from "../ConnectWalletModal/utils";
 
 const networkLabel = (chainId: number) => {
   const isTestnet = [
@@ -43,6 +43,7 @@ const HeaderMenu = () => {
   const [open, setOpen] = useState(false);
   const { address: account, chainId } = useAccount();
   const { disconnect } = useDisconnect();
+  const { openModal } = useModalHelper();
 
   const handleWalletDisconnect = () => {
     disconnect();
@@ -81,7 +82,7 @@ const HeaderMenu = () => {
             <div>Disconnect Wallet</div>
           </DropdownItem>
         ) : (
-          <DropdownItem onClick={useOpenWalletModal}>
+          <DropdownItem onClick={openModal}>
             <Text>Connect Wallet</Text>
           </DropdownItem>
         )}
