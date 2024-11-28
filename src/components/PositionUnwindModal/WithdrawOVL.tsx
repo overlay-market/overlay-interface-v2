@@ -53,7 +53,7 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
             },
             result.hash
           );
-          handleTxnHashUpdate(result.hash);
+          handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);
