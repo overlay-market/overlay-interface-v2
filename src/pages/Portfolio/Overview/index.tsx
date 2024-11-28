@@ -11,6 +11,7 @@ import useMultichainContext from "../../../providers/MultichainContextProvider/u
 import OverviewChart from "./OverviewChart";
 import { UNIT } from "../../../constants/applications";
 import { IntervalType, OverviewData } from "overlay-sdk";
+import usePrevious from "../../../hooks/usePrevious";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
@@ -22,6 +23,11 @@ const Overview: React.FC = () => {
     undefined
   );
   const [selectedInterval, setSelectedInterval] = useState<IntervalType>("1M");
+  const previousSelectedInterval = usePrevious(selectedInterval);
+
+  const isNewSelectedInterval = useMemo(() => {
+    return selectedInterval !== previousSelectedInterval;
+  }, [selectedInterval, previousSelectedInterval]);
 
   useEffect(() => {
     const fetchOverviewDetails = async () => {
@@ -29,7 +35,8 @@ const Overview: React.FC = () => {
         try {
           const overviewData = await sdk.accountDetails.getOverview(
             selectedInterval,
-            account as Address
+            account as Address,
+            isNewTxnHash || isNewSelectedInterval
           );
           overviewData && setOverviewData(overviewData);
         } catch (error) {
@@ -39,7 +46,7 @@ const Overview: React.FC = () => {
     };
 
     fetchOverviewDetails();
-  }, [account, chainId, isNewTxnHash, selectedInterval]);
+  }, [account, chainId, isNewTxnHash, selectedInterval, isNewSelectedInterval]);
 
   const isOver1000OpenPositions = useMemo(() => {
     if (overviewData) {
