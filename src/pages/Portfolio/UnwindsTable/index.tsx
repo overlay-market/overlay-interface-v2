@@ -50,7 +50,8 @@ const UnwindsTable: React.FC = () => {
             currentPage,
             itemsPerPage,
             undefined,
-            account as Address
+            account as Address,
+            isNewTxnHash
           );
 
           unwinds && setUnwindPositions(unwinds.data);

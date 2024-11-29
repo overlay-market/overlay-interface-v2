@@ -82,7 +82,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             },
             result.hash
           );
-          handleTxnHashUpdate(result.hash);
+          handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
           handleTradeStateReset();
         })
         .catch((error: Error) => {
@@ -135,6 +135,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           },
           result.hash
         );
+        handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
       })
       .catch((error: Error) => {
         const { errorCode, errorMessage } = handleError(error);
