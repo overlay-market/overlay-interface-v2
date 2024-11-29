@@ -283,7 +283,6 @@ export default function MarketsTable({
                             width: 24,
                             height: 24,
                             marginLeft: 8,
-                            borderRadius: "50%",
                           }}
                         />
                       </Table.Cell>
