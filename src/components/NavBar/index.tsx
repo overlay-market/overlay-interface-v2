@@ -35,7 +35,7 @@ const NavBar: React.FC = () => {
         <Flex
           direction={{ initial: "row", sm: "column" }}
           gap={{ initial: "20px", sm: "8px" }}
-          height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "90vh" }}
+          height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "97vh" }}
           align={"center"}
         >
           <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
