@@ -280,7 +280,6 @@ export default function MarketsTable({
                           src={market.oracleLogo}
                           alt={decodeURIComponent(market.marketId)}
                           style={{
-                            width: 24,
                             height: 24,
                             marginLeft: 8,
                           }}
