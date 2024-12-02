@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
 import { DefaultTxnSettings, resetTradeState, selectLeverage, selectPositionSide, setSlippage, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
+import useSDK from "../../providers/SDKProvider/useSDK";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
@@ -17,10 +18,11 @@ export const useTradeActionHandlers = (): {
   handleLeverageSelect: (selectedLeverage: string) => void;
   handlePositionSideSelect: (isLong: boolean) => void;
   handleSlippageSet: (slippageValue: DefaultTxnSettings | string) => void;
-  handleTxnHashUpdate: (txnHash: string) => void;
+  handleTxnHashUpdate: (txnHash: string, txnBlockNumber: number) => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
+  const sdk = useSDK();
 
   const handleAmountInput = useCallback(
     (typedValue: string) => {
@@ -60,15 +62,19 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   )
 
-  const handleTxnHashUpdate = useCallback(
-    (txnHash: string) => {
-      const timeout = setTimeout(() => {
-        dispatch(updateTxnHash({ txnHash }))
-      }, 5000);
+  const handleTxnHashUpdate =  useCallback(
+    async (txnHash: string, txnBlockNumber: number) => {
+      const checkSubgraphBlock = async () => {
+        const lastSubgraphBlock = await sdk.core.getLastSubgraphProcessedBlock();
+
+        if (lastSubgraphBlock > txnBlockNumber) {
+          dispatch(updateTxnHash({ txnHash }));
+        } else {
+          setTimeout(checkSubgraphBlock, 1000);
+        }
+      };
   
-      return () => {
-        clearTimeout(timeout);
-      };      
+      checkSubgraphBlock();          
     },
     [dispatch]
   );

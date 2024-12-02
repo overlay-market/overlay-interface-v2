@@ -2,25 +2,33 @@ import { wagmiConfig } from "./wagmi";
 import { PropsWithChildren } from "react";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ConnectionProvider from "../ConnectionProvider";
-import { createWeb3Modal } from "@web3modal/wagmi/react";
-import { arbitrumSepolia } from "wagmi/chains";
-
-const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string;
+import { ConnectKitProvider } from "connectkit";
 
 const Web3Provider: React.FC<PropsWithChildren> = ({ children }) => {
   const queryClient = new QueryClient();
 
-  createWeb3Modal({
-    wagmiConfig,
-    projectId,
-    defaultChain: arbitrumSepolia,
-  });
-
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
-        <ConnectionProvider>{children}</ConnectionProvider>
+        <ConnectKitProvider 
+          options={{
+            disclaimer: (
+              <>
+                Perpetuals are not available to anyone residents of, or are located, incorporated, or having a registered agent in, the United States or a restricted territory as defined in Overlay's {" "}
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://overlay.market/#/tos"
+                >
+                  Terms of Service
+                </a>{" "}
+                (the "TOS"). By connecting your wallet, you agree to the TOS.
+              </>
+            ),
+          }}
+        >
+          {children}
+        </ConnectKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

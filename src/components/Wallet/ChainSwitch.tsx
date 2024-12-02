@@ -13,6 +13,8 @@ import {
   DropdownItem,
 } from "./chain-switch-styles";
 
+export const CHAIN_ID_LOCAL_STORAGE_KEY = 'selectedChainId';
+
 const ChainSwitch = () => {
   const { chainId, setSelectedChainId } = useMultichainContext();
   const chainSelect = useChainSelect();
@@ -25,6 +27,7 @@ const ChainSwitch = () => {
       } else {
         setSelectedChainId(targetChainId);
         chainSelect(targetChainId);
+        localStorage.setItem(CHAIN_ID_LOCAL_STORAGE_KEY, targetChainId.toString());
         sessionStorage.setItem("chainId", String(targetChainId));
       }
       setOpen(false);

@@ -13,6 +13,7 @@ import UnwindPositionDetails from "./UnwindPositionDetails";
 import UnwindButtonComponent from "./UnwindButtonComponent";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import useDebounce from "../../../hooks/useDebounce";
+import usePrevious from "../../../hooks/usePrevious";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
@@ -37,7 +38,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   const [selectedPercent, setSelectedPercent] = useState<number>(0);
   const debouncedSelectedPercent = useDebounce(selectedPercent, 500);
 
-  const { value, currentPrice, unwindBtnState } = useMemo(() => {
+  const { value, currentPrice, fractionValue, unwindBtnState } = useMemo(() => {
     const value = unwindState.value
       ? Number(unwindState.value).toString()
       : undefined;
@@ -47,10 +48,12 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           position.priceCurrency
         )
       : undefined;
+    const fractionValue = unwindState.fractionValue.toString();
     const unwindBtnState = unwindState.unwindState ?? undefined;
     return {
       value,
       currentPrice,
+      fractionValue,
       unwindBtnState,
     };
   }, [unwindState]);
@@ -59,24 +62,36 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
     setUnwindPercentage(debouncedSelectedPercent);
   }, [debouncedSelectedPercent]);
 
+  const previousFractionValue = usePrevious(fractionValue);
+
+  const isPendingTime = useMemo(() => {
+    if (
+      Number(fractionValue) === 0 &&
+      Number(previousFractionValue) === 0 &&
+      Number(inputValue) === 0
+    )
+      return false;
+    return fractionValue === previousFractionValue;
+  }, [fractionValue, previousFractionValue]);
+
   const maxAmount: number = useMemo(() => Number(value) ?? 0, [value]);
 
   const handleQuickInput = (percentage: number) => {
     if (percentage < 0 || percentage > 100) {
       setPercentageValue("0");
       setInputValue("0");
-      setUnwindPercentage(0);
+      setSelectedPercent(0);
     } else if (percentage === 100) {
       setPercentageValue("100");
       setInputValue(maxAmount.toString());
-      setUnwindPercentage(1);
+      setSelectedPercent(1);
     } else {
       const percentageDecimal = percentage / 100;
       setInputValue(
         calculatePercentage(maxAmount, percentageDecimal).toString()
       );
       setPercentageValue(percentage.toString());
-      setUnwindPercentage(percentageDecimal);
+      setSelectedPercent(percentageDecimal);
     }
   };
 
@@ -91,10 +106,10 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         return;
       } else if (exactAmount > 0 && exactAmount < maxAmount) {
         const percentageDecimal = exactAmount / maxAmount;
-        const percentage = formatDecimalToPercentage(percentageDecimal);
+        const percentage = formatDecimalToPercentage(percentageDecimal)!;
         setInputValue(input);
         setSelectedPercent(percentageDecimal);
-        if (percentage) setPercentageValue(percentage.toFixed(18));
+        setPercentageValue(percentage.toFixed(18));
       } else if (exactAmount === maxAmount) {
         setInputValue(input);
         setPercentageValue("100");
@@ -175,6 +190,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           unwindPercentage={unwindPercentage}
           priceLimit={unwindState.priceLimit}
           unwindBtnState={unwindBtnState}
+          isPendingTime={isPendingTime}
           handleDismiss={handleDismiss}
         />
       </Flex>
