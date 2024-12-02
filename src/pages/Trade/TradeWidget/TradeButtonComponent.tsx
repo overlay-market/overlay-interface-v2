@@ -17,6 +17,7 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
+import { useArcxAnalytics } from "@0xarc-io/analytics";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -27,7 +28,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   loading,
   tradeState,
 }) => {
-  const { address } = useAccount();
+  const { address, chainId } = useAccount();
   const sdk = useSDK();
   const { openModal } = useModalHelper();
   const { currentMarket: market } = useCurrentMarketState();
@@ -43,6 +44,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     showConfirm: false,
     attemptingTransaction: false,
   });
+  const arcxAnalytics = useArcxAnalytics()
 
   const title: string | undefined = useMemo(() => {
     if (!tradeState) return undefined;
@@ -84,6 +86,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           );
           handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
           handleTradeStateReset();
+          arcxAnalytics?.transaction({
+            transactionHash: result.hash,
+            account: address,
+            chainId,
+            metadata: {
+              action: TransactionType.BUILD_OVL_POSITION,
+            },
+          })
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);

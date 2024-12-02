@@ -11,6 +11,8 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
+import { useArcxAnalytics } from "@0xarc-io/analytics";
+import useAccount from "../../../hooks/useAccount";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -35,6 +37,8 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
+  const arcxAnalytics = useArcxAnalytics()
+  const { address, chainId } = useAccount();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
 
@@ -72,6 +76,14 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
             result.hash
           );
           handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
+          arcxAnalytics?.transaction({
+            transactionHash: result.hash,
+            account: address,
+            chainId,
+            metadata: {
+              action: TransactionType.BUILD_OVL_POSITION,
+            },
+          })
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);
@@ -102,7 +114,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     const errorCode: number | string =
       errorObj.cause?.cause?.code || errorObj.code;
 
-    let errorMessage =
+    const errorMessage =
       errorObj.cause?.shortMessage || errorObj.cause?.cause?.shortMessage;
     return { errorCode, errorMessage };
   };
