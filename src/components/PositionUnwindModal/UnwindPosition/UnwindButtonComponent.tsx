@@ -81,7 +81,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
             account: address,
             chainId,
             metadata: {
-              action: TransactionType.BUILD_OVL_POSITION,
+              action: TransactionType.UNWIND_OVL_POSITION,
             },
           })
         })
