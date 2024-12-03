@@ -13,8 +13,10 @@ import { DEFAULT_MARKET_ID } from "./constants/applications";
 import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
-import ScrollToTop from './utils/scrollToTop'
+import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
+import { Global } from "@emotion/react";
+import { globalScrollbarStyles } from "./app-styles";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -26,6 +28,7 @@ const App = () => {
     <MultichainContextProvider initialChainId={contextChainID as number}>
       <SDKProvider>
         <Theme>
+          <Global styles={globalScrollbarStyles} />
           <AppContainer>
             <Trackers.WalletConnectionTracker />
             <ScrollToTop />
