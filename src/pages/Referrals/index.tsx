@@ -70,6 +70,11 @@ const Referrals = () => {
     if (traderAddress) {
       checkTraderStatus(traderAddress);
     }
+    if (!traderAddress) {
+      setAffiliateAddress("");
+      setTraderSignedUpTo("");
+      setSucceededToSignUp(false);
+    }
   }, [traderAddress]);
 
   const postSignature = async (signature: string, affiliate: string) => {
