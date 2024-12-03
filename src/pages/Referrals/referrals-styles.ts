@@ -1,4 +1,4 @@
-import { Flex } from "@radix-ui/themes"
+import { Flex, Text } from "@radix-ui/themes"
 import styled from "styled-components"
 import theme from "../../theme"
 
@@ -28,6 +28,18 @@ export const GradientBorderBox = styled(Flex)`
   } 
 `;
 
+export const ContentContainer = styled(Flex)`
+  flex-direction: column;
+  width: 343px;
+  gap: 20px;
+  padding: 0;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    width: 424px;
+    padding: 32px;
+  } 
+`;
+
 export const StyledInput = styled.input`
   width: 100%;
   padding: 16px;
@@ -43,8 +55,17 @@ export const StyledInput = styled.input`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  
+
   &::placeholder {
     color: #6c7180;
   }
+`;
+
+export const GradientText = styled(Text)`
+  width: fit-content;
+  background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-fill-color: transparent;
 `;
