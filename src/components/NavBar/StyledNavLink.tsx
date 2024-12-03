@@ -27,6 +27,7 @@ const StyledNavLink: React.FC<StyledNavLinkProps> = ({ link, mode }) => {
                 justify="center"
                 align="center"
                 gap="4px"
+                height={"100%"}
               >
                 {isActive ? link.activeIcon : link.icon}
                 {isActive ? (

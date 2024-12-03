@@ -146,7 +146,7 @@ export default function MarketsTable({
               <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
             )}
             {!isMobile && (
-              <Table.ColumnHeaderCell>Oracle</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell style={{textAlign: 'center'}}>Oracle</Table.ColumnHeaderCell>
             )}
             <Table.ColumnHeaderCell>Last 7 Days</Table.ColumnHeaderCell>
           </Table.Row>
@@ -275,15 +275,13 @@ export default function MarketsTable({
                           </Text>
                         </Flex>
                       </Table.Cell>
-                      <Table.Cell>
+                      <Table.Cell style={{textAlign: 'center'}}>
                         <img
                           src={market.oracleLogo}
                           alt={decodeURIComponent(market.marketId)}
                           style={{
-                            width: 24,
-                            height: 24,
-                            marginLeft: 8,
-                            borderRadius: "50%",
+                            maxWidth: 24,
+                            maxHeight: 24,
                           }}
                         />
                       </Table.Cell>

@@ -13,8 +13,9 @@ import { DEFAULT_MARKET_ID } from "./constants/applications";
 import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
-import ScrollToTop from './utils/scrollToTop'
-import Referrals from './pages/Referrals';
+import ScrollToTop from "./utils/scrollToTop";
+import Referrals from "./pages/Referrals";
+import Trackers from "./components/Trackers";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -27,6 +28,7 @@ const App = () => {
       <SDKProvider>
         <Theme>
           <AppContainer>
+            <Trackers.WalletConnectionTracker />
             <ScrollToTop />
             <Popups />
             <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
