@@ -28,4 +28,23 @@ export const GradientBorderBox = styled(Flex)`
   } 
 `;
 
-
+export const StyledInput = styled.input`
+  width: 100%;
+  padding: 16px;
+  outline: none;
+  border: none;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: ${theme.color.grey2};
+  background-color: ${theme.color.grey4};
+  font-size: 14px;
+  font-weight: 600;
+  font-family: Inter;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  
+  &::placeholder {
+    color: #6c7180;
+  }
+`;

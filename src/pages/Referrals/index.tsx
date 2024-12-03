@@ -7,7 +7,11 @@ import { isAddress } from "viem";
 import { useSearchParams } from "react-router-dom";
 import { useModalHelper } from "../../components/ConnectWalletModal/utils";
 import { Flex, Text } from "@radix-ui/themes";
-import { GradientBorderBox, LineSeparator } from "./referrals-styles";
+import {
+  GradientBorderBox,
+  LineSeparator,
+  StyledInput,
+} from "./referrals-styles";
 import theme from "../../theme";
 
 const Referrals = () => {
@@ -186,6 +190,19 @@ const Referrals = () => {
             >
               Affiliate Address
             </Text>
+
+            <StyledInput
+              type="text"
+              value={affiliateAddress}
+              onChange={(e) => setAffiliateAddress(e.target.value)}
+              placeholder="Enter Affiliate Address"
+            />
+
+            <GradientSolidButton
+              title="Connect Wallet"
+              height={"49px"}
+              handleClick={openModal}
+            />
           </Flex>
         </GradientBorderBox>
       </Flex>
@@ -212,11 +229,11 @@ const Referrals = () => {
     //   </div>
     //   {!succeededToSignUp &&
     //     (!traderAddress ? (
-    //       <GradientSolidButton
-    //         title="Connect Wallet"
-    //         width="300px"
-    //         handleClick={openModal}
-    //       />
+    // <GradientSolidButton
+    //   title="Connect Wallet"
+    //   width="300px"
+    //   handleClick={openModal}
+    // />
     //     ) : traderSignedUpTo !== "" ? (
     //       <GradientSolidButton
     //         title={`Already Signed Up`}
