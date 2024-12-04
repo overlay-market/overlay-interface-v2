@@ -18,6 +18,7 @@ import BTCFrog from "../assets/images/markets-full-logos/btc-frogs.png";
 import NodeMonkes from "../assets/images/markets-full-logos/node-monkes.png";
 import ETHSOL from "../assets/images/markets-full-logos/eth-sol.png";
 import INK from "../assets/images/markets-full-logos/ink.jpeg";
+import ChessVideo from "../assets/videos/FuturisticChessMatch.mp4"
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -41,3 +42,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Magnus%20Carlsen": MagnusCarlsen,
   "Electric%20Vehicle%20Commodity%20Index": EvIndex,
 };
+
+export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
+  "Hikaru%20Nakamura": ChessVideo,
+}
