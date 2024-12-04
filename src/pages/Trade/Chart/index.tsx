@@ -286,12 +286,10 @@ const Chart: React.FC = () => {
         tvWidget.remove();
       };
     }
-  }, [market, chainId, longPrice, shortPrice]);
+  }, [market, chainId, longPrice, shortPrice, isMobile]);
 
   // Effect to update the longPrice shape
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const updateLongPriceShape = () => {
       if (tvWidgetRef.current && longPriceLineRef.current && ask) {
         const currentTime = Date.now() / 1000;
@@ -326,14 +324,12 @@ const Chart: React.FC = () => {
       }
     };
 
-    interval = setInterval(updateLongPriceShape, TRADE_POLLING_INTERVAL);
+    const interval = setInterval(updateLongPriceShape, TRADE_POLLING_INTERVAL);
     return () => clearInterval(interval);
   }, [ask]);
 
   // Effect to update the shortPrice shape
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const updateShortPriceShape = () => {
       if (tvWidgetRef.current && shortPriceLineRef.current && bid) {
         const currentTime = Date.now() / 1000;
@@ -368,7 +364,7 @@ const Chart: React.FC = () => {
       }
     };
 
-    interval = setInterval(updateShortPriceShape, TRADE_POLLING_INTERVAL);
+    const interval = setInterval(updateShortPriceShape, TRADE_POLLING_INTERVAL);
     return () => clearInterval(interval);
   }, [bid]);
 
