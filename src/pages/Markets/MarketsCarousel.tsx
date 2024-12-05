@@ -32,21 +32,9 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
           centeredSlides={false}
           enabled={marketsData.length > 0}
         >
-          {marketsData.map((market, index) => (
-            <SwiperSlide key={index} style={{ width: "auto" }}>
-              <MarketCards
-                id={market.marketId}
-                priceWithCurrency={formatPriceWithCurrency(
-                  market.price ?? 0,
-                  market.priceCurrency,
-                  3
-                )}
-                title={decodeURIComponent(market.marketId)}
-              />
-            </SwiperSlide>
-          ))}
-          {marketsData.length < 11 &&
-            marketsData.map((market, index) => (
+          {marketsData
+            .filter((_, index) => index !== 0 && index !== 5)
+            .map((market, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
                 <MarketCards
                   id={market.marketId}
@@ -59,6 +47,22 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
                 />
               </SwiperSlide>
             ))}
+          {marketsData.length < 11 &&
+            marketsData
+              .filter((_, index) => index !== 0 && index !== 5)
+              .map((market, index) => (
+                <SwiperSlide key={index} style={{ width: "auto" }}>
+                  <MarketCards
+                    id={market.marketId}
+                    priceWithCurrency={formatPriceWithCurrency(
+                      market.price ?? 0,
+                      market.priceCurrency,
+                      3
+                    )}
+                    title={decodeURIComponent(market.marketId)}
+                  />
+                </SwiperSlide>
+              ))}
         </Swiper>
       )}
     </Box>
