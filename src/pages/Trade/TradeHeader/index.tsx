@@ -136,7 +136,6 @@ const TradeHeader: React.FC = () => {
           <StyledFlex
             width={{ initial: "92px", sm: "167px", lg: "97px" }}
             p={{ initial: "8px 0px", sm: "12px" }}
-            align={{ initial: "start", sm: "end" }}
           >
             <Text weight="light" style={{ fontSize: "10px" }}>
               Funding
