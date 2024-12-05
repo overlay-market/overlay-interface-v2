@@ -19,17 +19,17 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         xs: "row",
       }}
     >
-      <Skeleton loading={marketsData.length < 0 + 1}>
+      <Skeleton loading={marketsData.length < 14 + 1}>
         <Box flexGrow="7" flexShrink="1" flexBasis="0%">
           <PromotedBanner
             Title={"CGMI"}
-            Name={decodeURIComponent(marketsData[0]?.marketId ?? "")}
+            Name={decodeURIComponent(marketsData[14]?.marketId ?? "")}
             Value={formatPriceWithCurrency(
-              marketsData[0]?.price ?? 0,
-              marketsData[0]?.priceCurrency,
+              marketsData[14]?.price ?? 0,
+              marketsData[14]?.priceCurrency,
               3
             )}
-            Id={marketsData[0]?.marketId ?? ""}
+            Id={marketsData[14]?.marketId ?? ""}
           />
         </Box>
       </Skeleton>
