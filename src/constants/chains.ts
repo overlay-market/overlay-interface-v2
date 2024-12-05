@@ -46,12 +46,11 @@ export const VIEM_CHAINS: { [key: number]: Chain} = {
   [SUPPORTED_CHAINID.IMOLA]: imola,
 };
 
-export const NETWORK_ICONS: { [chainId in SUPPORTED_CHAINID | number]: string } =
-  {
-    [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
-    [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
-    [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
-  };
+export const NETWORK_ICONS: { [chainId in SUPPORTED_CHAINID | number]: string } = {
+  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
+  [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
+  [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
+};
 
 
 export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
