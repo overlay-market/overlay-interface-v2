@@ -19,20 +19,26 @@ export const MarketsListContainer = styled(Flex)`
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  padding-left: 4px;
-  padding-right: 16px;
+  padding-left: 15px;
+  padding-right: 15px;
   cursor: pointer;
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: 260px;
+    width: 334px;
     padding-left: 16px;
     padding-right: 16px;
+    border-right: 1px solid ${theme.color.darkBlue};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
-    border-right: 1px solid ${theme.color.darkBlue};
+    width: 260px;
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    width: 272px;
+    padding-left: 0;
   }
 `
 

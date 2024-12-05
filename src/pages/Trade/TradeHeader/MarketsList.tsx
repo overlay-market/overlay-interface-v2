@@ -12,7 +12,6 @@ import {
 } from "./markets-list-styles";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const MarketsList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +19,6 @@ const MarketsList: React.FC = () => {
   const toggleDropdown = () => setIsOpen((prev) => !prev);
   const { markets } = useMarketsState();
   const { currentMarket } = useCurrentMarketState();
-  const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
     <Box ref={ref} width={{ initial: "100%", sm: "260px" }}>
@@ -52,7 +50,7 @@ const MarketsList: React.FC = () => {
           style={{
             background: theme.color.background,
             zIndex: 10,
-            borderTop: isMobile ? `1px solid ${theme.color.darkBlue}` : ``,
+            borderTop: `1px solid ${theme.color.darkBlue}`,
           }}
         >
           <ScrollArea type="auto" scrollbars="vertical" style={{ height: 530 }}>
