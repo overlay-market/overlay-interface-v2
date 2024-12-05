@@ -150,6 +150,7 @@ const TradeHeader: React.FC = () => {
           align={"end"}
           pr={"12px"}
           pl={"10px"}
+          ml={{ sm: "auto", lg: "0" }}
         >
           <Text weight="light" style={{ fontSize: "10px" }}>
             OI balance
