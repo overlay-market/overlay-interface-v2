@@ -61,9 +61,6 @@ export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
 };
 
 export const CHAIN_LIST_ORDER: { [x: number]: number } = {
-  [1]: SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
   [2]: SUPPORTED_CHAINID.BARTIO,
-  [3]: SUPPORTED_CHAINID.IMOLA,
-  
 };
  
