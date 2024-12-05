@@ -9,7 +9,7 @@ import { MARKETS_FULL_LOGOS, MARKETS_VIDEOS } from "../../../constants/markets";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 
 interface PromotedBannerProps {
-  Title: string;
+  Title?: string;
   Name: string;
   Value: string | number | undefined;
   Id: string;
@@ -28,9 +28,11 @@ export const PromotedBanner = ({
   return (
     <StyledPromotedBanner
       style={{
-        backgroundImage: `${!videoSrc ? "url(" + MARKETS_FULL_LOGOS[Id] + ")" : "none"}`,
-        position: 'relative',
-        cursor: 'pointer',
+        backgroundImage: `${
+          !videoSrc ? "url(" + MARKETS_FULL_LOGOS[Id] + ")" : "none"
+        }`,
+        position: "relative",
+        cursor: "pointer",
         overflow: "hidden",
       }}
       onClick={() => redirectToTradePage(Id)}
@@ -57,10 +59,10 @@ export const PromotedBanner = ({
           src={imageSrc}
           alt=""
           style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
             top: 0,
             left: 0,
             zIndex: -1,
@@ -71,7 +73,7 @@ export const PromotedBanner = ({
         direction={"column"}
         justify={"start"}
         align={"start"}
-        width={"100%"}        
+        width={"100%"}
         style={{ position: "relative", zIndex: 1 }} // Keep content above the video
       >
         <SubtitleText>{Title}</SubtitleText>
