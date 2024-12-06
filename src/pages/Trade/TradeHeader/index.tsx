@@ -148,7 +148,7 @@ const TradeHeader: React.FC = () => {
           height={"100%"}
           justify={"center"}
           align={"end"}
-          pr={"12px"}
+          pr={{ initial: "12px", sm: "20px", lg: "12px" }}
           pl={"10px"}
           ml={{ sm: "auto", lg: "0" }}
         >
