@@ -34,8 +34,6 @@ const TradeHeader: React.FC = () => {
     useState<string>("0");
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchPrice = async () => {
       if (marketId) {
         try {
@@ -54,8 +52,8 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchPrice();
-    interval = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, typedValue, selectedLeverage, isLong, chainId, sdk]);
 
   useEffect(() => {
@@ -70,8 +68,6 @@ const TradeHeader: React.FC = () => {
   }, [price, market]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchFunding = async () => {
       if (marketId) {
         try {
@@ -84,13 +80,11 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchFunding();
-    interval = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, chainId, sdk]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchOiBalance = async () => {
       if (marketId) {
         try {
@@ -106,8 +100,8 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchOiBalance();
-    interval = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, chainId, sdk]);
 
   const isFundingRatePositive = useMemo(() => {
