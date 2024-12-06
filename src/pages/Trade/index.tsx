@@ -16,7 +16,7 @@ import { useMarketsActionHandlers } from "../../state/markets/hooks";
 import PositionsTable from "./PositionsTable";
 import InfoMarketSection from "./InfoMarketSection";
 import { ExpandedMarketData } from "overlay-sdk";
-import { LineSeparator, StyledFlex, TradeContainer } from "./trade-styles";
+import { StyledFlex, TradeContainer } from "./trade-styles";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
@@ -76,8 +76,6 @@ const Trade: React.FC = () => {
   return (
     <TradeContainer direction="column" width={"100%"} mb="100px">
       <TradeHeader />
-
-      <LineSeparator />
 
       <Flex direction="column">
         <StyledFlex
