@@ -53,11 +53,14 @@ export const StyledPromotedBanner = styled(BaseBanner)``;
 export const TitleText = styled(Text)`
   font-size: clamp(18px, 4vw, 24px);
   font-weight: 600;
+  color: ${theme.color.grey1};
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.5);
 `;
 
 export const SubtitleText = styled(Text)`
   font-size: clamp(14px, 3vw, 12px);
   font-weight: 500;
+  color: ${theme.color.grey1};
 `;
 
 export const CardsValue = styled.h2`
