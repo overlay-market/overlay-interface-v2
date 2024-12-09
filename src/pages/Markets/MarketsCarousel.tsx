@@ -9,12 +9,16 @@ import { TransformedMarketData } from "overlay-sdk";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
 import { Box, Skeleton, Text } from "@radix-ui/themes";
 import theme from "../../theme";
+import { MARKETSORDER, EXCLUDEDMARKETS } from "../../constants/markets";
 
 interface CarouselProps {
   marketsData: TransformedMarketData[];
 }
 
 const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
+  const orderedMarketsData = marketsData.sort((a, b) => {
+    return MARKETSORDER.indexOf(a.marketId) - MARKETSORDER.indexOf(b.marketId);
+  });
   return (
     <Box ml={{ xs: "16px" }} mt={"32px"}>
       <Text style={{ color: theme.color.grey3 }}>FEATURED</Text>
@@ -31,9 +35,10 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
           loop={false}
           centeredSlides={false}
           enabled={marketsData.length > 0}
+          mousewheel={true}
         >
-          {marketsData
-            .filter((_, index) => index !== 0 && index !== 5)
+          {orderedMarketsData
+            .filter((market) => !EXCLUDEDMARKETS.includes(market.marketId))
             .map((market, index) => (
               <SwiperSlide key={index} style={{ width: "auto" }}>
                 <MarketCards
@@ -49,7 +54,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
             ))}
           {marketsData.length < 11 &&
             marketsData
-              .filter((_, index) => index !== 0 && index !== 5)
+              .filter((market) => !EXCLUDEDMARKETS.includes(market.marketId))
               .map((market, index) => (
                 <SwiperSlide key={index} style={{ width: "auto" }}>
                   <MarketCards
