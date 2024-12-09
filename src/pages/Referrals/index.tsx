@@ -30,7 +30,7 @@ const Referrals: React.FC = () => {
   const { signTypedDataAsync } = useSignTypedData();
   const [loading, setLoading] = useState(false);
   const [checkingTraderStatus, setCheckingTraderStatus] = useState(false);
-  const [checkingAffiliateStatus, setCheckingAffiliateStatus] = useState(false);
+  const [checkingAffiliateStatus, setCheckingAffiliateStatus] = useState(true);
   const [fetchingSignature, setFetchingSignature] = useState(false);
   const [affiliateAddress, setAffiliateAddress] = useState("");
   const [traderSignedUpTo, setTraderSignedUpTo] = useState("");
@@ -102,7 +102,6 @@ const Referrals: React.FC = () => {
           await checkTraderStatus(traderAddress);
         }
       } else {
-        setAffiliateAddress("");
         setTraderSignedUpTo("");
         setSucceededToSignUp(false);
         setIsAffiliate(false);
@@ -277,6 +276,7 @@ const Referrals: React.FC = () => {
                           <StyledInput
                             type="text"
                             value={affiliateAddress}
+                            disabled={fetchingSignature || loading}
                             onChange={(e) =>
                               setAffiliateAddress(e.target.value)
                             }
