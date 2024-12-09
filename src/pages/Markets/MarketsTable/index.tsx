@@ -146,7 +146,9 @@ export default function MarketsTable({
               <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
             )}
             {!isMobile && (
-              <Table.ColumnHeaderCell style={{textAlign: 'center'}}>Oracle</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell style={{ textAlign: "center" }}>
+                Oracle
+              </Table.ColumnHeaderCell>
             )}
             <Table.ColumnHeaderCell>Last 7 Days</Table.ColumnHeaderCell>
           </Table.Row>
@@ -154,6 +156,7 @@ export default function MarketsTable({
         <Table.Body style={{ verticalAlign: "middle" }}>
           {marketsData.length > 0 ? (
             marketsData.map((market, index) => {
+              if (index === 0 || index === 5) return null;
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
@@ -275,7 +278,7 @@ export default function MarketsTable({
                           </Text>
                         </Flex>
                       </Table.Cell>
-                      <Table.Cell style={{textAlign: 'center'}}>
+                      <Table.Cell style={{ textAlign: "center" }}>
                         <img
                           src={market.oracleLogo}
                           alt={decodeURIComponent(market.marketId)}
