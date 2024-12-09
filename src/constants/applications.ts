@@ -5,6 +5,8 @@ export enum MARKET_CHART_URL {
   DEFAULT = "https://api.overlay.market/charts/v1/charts",
 }
 
+export const REFERRAL_API_BASE_URL = "https://api.overlay.market/referral";
+
 export const DEFAULT_MARKET_ID = encodeURIComponent("BTC Dominance");
 
 export const TRADE_POLLING_INTERVAL = 30000;

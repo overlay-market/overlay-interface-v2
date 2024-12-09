@@ -19,6 +19,7 @@ import {
 import theme from "../../theme";
 import Loader from "../../components/Loader";
 import AliasSubmit from "./AliasSubmit";
+import { REFERRAL_API_BASE_URL } from "../../constants/applications";
 
 const Referrals: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -38,8 +39,6 @@ const Referrals: React.FC = () => {
   const [isAffiliate, setIsAffiliate] = useState(false);
   const [alias, setAlias] = useState<string | null>(null);
 
-  const referralApiBaseUrl = "https://api.overlay.market/referral";
-
   useEffect(() => {
     if (referralAddressFromURL) {
       setAffiliateAddress(referralAddressFromURL);
@@ -55,7 +54,7 @@ const Referrals: React.FC = () => {
     setCheckingAffiliateStatus(true);
     try {
       const response = await fetch(
-        referralApiBaseUrl + `/affiliates/${address}`
+        REFERRAL_API_BASE_URL + `/affiliates/${address}`
       );
       if (!response.ok) {
         throw new Error(
@@ -78,7 +77,7 @@ const Referrals: React.FC = () => {
     setCheckingTraderStatus(true);
     try {
       const response = await fetch(
-        referralApiBaseUrl + `/signatures/check/${address}`
+        REFERRAL_API_BASE_URL + `/signatures/check/${address}`
       );
       if (!response.ok) {
         throw new Error(
@@ -121,7 +120,7 @@ const Referrals: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(referralApiBaseUrl + `/signatures`, {
+      const response = await fetch(REFERRAL_API_BASE_URL + `/signatures`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
