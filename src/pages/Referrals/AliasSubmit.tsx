@@ -42,11 +42,13 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
 
   useEffect(() => {
     const regex = /^[a-zA-Z0-9]{3,8}$/;
-    if (!regex.test(debouncedAliasValue) && debouncedAliasValue !== "") {
-      setErrorMessage("Input must be 3-8 alphanumeric characters");
-    } else {
-      setErrorMessage(null);
-      checkAliasAvailability(debouncedAliasValue.toLowerCase());
+    if (debouncedAliasValue !== "") {
+      if (!regex.test(debouncedAliasValue)) {
+        setErrorMessage("Input must be 3-8 alphanumeric characters");
+      } else {
+        setErrorMessage(null);
+        checkAliasAvailability(debouncedAliasValue.toLowerCase());
+      }
     }
   }, [debouncedAliasValue]);
 
@@ -136,8 +138,8 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
       }
 
       const result = await response.json();
-      console.log({ response, result }, result.alias);
-      if (result.alias) {
+
+      if (result.alias && result.createdAt) {
         setSucceededToSubmit(true);
         setRegisteredAlias(result.alias);
       }
@@ -176,7 +178,9 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${window.location.href}?referrer=${alias}`);
+    navigator.clipboard.writeText(
+      `${window.location.href}?referrer=${registeredAlias}`
+    );
     showToast();
   };
 
@@ -189,7 +193,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
               <Flex direction={"column"} align={"center"} gap="8px">
                 <Text weight={"medium"}>Your affiliate alias is active</Text>
                 <Text weight={"medium"}>
-                  Your alias:{" "}
+                  Your alias{" "}
                   <GradientText weight={"medium"}>
                     {alias.toUpperCase()}
                   </GradientText>
@@ -207,7 +211,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
             </ContentContainer>
           )}
           {!alias && (
-            <ContentContainer height={"276px"}>
+            <ContentContainer height={debouncedAliasValue && "276px"}>
               <Text
                 size={{ initial: "2", sm: "4" }}
                 weight={"bold"}
@@ -276,11 +280,22 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
             Success!
           </Text>
           <Flex direction={"column"} align={"center"} gap="8px">
-            <Text weight={"medium"} size="3">
-              Your alias{" "}
-              <GradientText weight={"medium"}>{registeredAlias}</GradientText>{" "}
+            <Text weight={"medium"} size="3" align={"center"}>
+              Alias{" "}
+              <GradientText weight={"medium"}>
+                {registeredAlias?.toUpperCase()}
+              </GradientText>{" "}
               has been successfully registered!
             </Text>
+          </Flex>
+          <Flex gap={"8px"}>
+            <Text weight={"medium"}>Your referral link</Text>
+            <CopyLink onClick={handleCopyLink}>
+              <CopyGradientIcon />
+            </CopyLink>
+            <Toast visible={toastVisible.toString()}>
+              Link copied to clipboard
+            </Toast>
           </Flex>
         </ContentContainer>
       )}
