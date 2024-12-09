@@ -14,6 +14,8 @@ import useDebounce from "../../hooks/useDebounce";
 import { REFERRAL_API_BASE_URL } from "../../constants/applications";
 import { useAccount, useSignTypedData } from "wagmi";
 import { isAddress } from "viem";
+import { CopyGradientIcon } from "../../assets/icons/svg-icons";
+import { CopyLink, Toast } from "./alias-submit-styles";
 
 type AliasSubmitProps = {
   alias: string | null;
@@ -29,6 +31,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
   const [fetchingSignature, setFetchingSignature] = useState(false);
   const [registeringAlias, setRegisteringAlias] = useState(false);
   const [succeededToSubmit, setSucceededToSubmit] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
   const [registeredAlias, setRegisteredAlias] = useState(alias);
   const debouncedAliasValue = useDebounce(aliasValue, 500);
 
@@ -164,6 +167,19 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
     setSuccessMessage(null);
   };
 
+  const showToast = (duration = 3000) => {
+    setToastVisible(true);
+
+    setTimeout(() => {
+      setToastVisible(false);
+    }, duration);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(`${window.location.href}?referrer=${alias}`);
+    showToast();
+  };
+
   return (
     <>
       {!succeededToSubmit && (
@@ -171,14 +187,22 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
           {alias && (
             <ContentContainer>
               <Flex direction={"column"} align={"center"} gap="8px">
-                <Text weight={"medium"}>Your affiliate alias is active!</Text>
+                <Text weight={"medium"}>Your affiliate alias is active</Text>
                 <Text weight={"medium"}>
                   Your alias:{" "}
                   <GradientText weight={"medium"}>
                     {alias.toUpperCase()}
                   </GradientText>
                 </Text>
-                <Text weight={"medium"}>Your referral link</Text>
+                <Flex gap={"8px"}>
+                  <Text weight={"medium"}>Your referral link</Text>
+                  <CopyLink onClick={handleCopyLink}>
+                    <CopyGradientIcon />
+                  </CopyLink>
+                  <Toast visible={toastVisible.toString()}>
+                    Link copied to clipboard
+                  </Toast>
+                </Flex>
               </Flex>
             </ContentContainer>
           )}
