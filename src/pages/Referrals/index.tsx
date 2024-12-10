@@ -29,6 +29,7 @@ const Referrals: React.FC = () => {
   const { address: traderAddress, isConnecting } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [checkingTraderStatus, setCheckingTraderStatus] = useState(false);
   const [checkingAffiliateStatus, setCheckingAffiliateStatus] = useState(false);
   const [fetchingSignature, setFetchingSignature] = useState(false);
@@ -111,6 +112,7 @@ const Referrals: React.FC = () => {
         setIsAffiliate(false);
         setAlias(null);
       }
+      setInitialLoading(false);
     };
 
     checkStatus();
@@ -229,7 +231,10 @@ const Referrals: React.FC = () => {
         height={"100%"}
         pt={{ initial: "60px", sm: "0" }}
       >
-        {(isConnecting || checkingAffiliateStatus || checkingTraderStatus) && (
+        {isConnecting ||
+        checkingAffiliateStatus ||
+        checkingTraderStatus ||
+        initialLoading ? (
           <GradientBorderBox>
             <ContentContainer
               align={"center"}
@@ -239,8 +244,7 @@ const Referrals: React.FC = () => {
               <Loader />
             </ContentContainer>
           </GradientBorderBox>
-        )}
-        {!isConnecting && !checkingAffiliateStatus && !checkingTraderStatus && (
+        ) : (
           <GradientBorderBox>
             {isAffiliate ? (
               <AliasSubmit alias={alias} />
