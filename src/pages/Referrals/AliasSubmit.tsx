@@ -192,14 +192,11 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
             <ContentContainer>
               <Flex direction={"column"} align={"center"} gap="8px">
                 <Text weight={"medium"}>Your affiliate alias is active</Text>
-                <Text weight={"medium"}>
-                  Your alias{" "}
-                  <GradientText weight={"medium"}>
-                    {alias.toUpperCase()}
-                  </GradientText>
-                </Text>
+                <GradientText weight={"medium"} size={"4"}>
+                  {alias.toUpperCase()}
+                </GradientText>
                 <Flex gap={"8px"}>
-                  <Text weight={"medium"}>Your referral link</Text>
+                  <Text weight={"medium"}>Copy referral link</Text>
                   <CopyLink onClick={handleCopyLink}>
                     <CopyGradientIcon />
                   </CopyLink>
