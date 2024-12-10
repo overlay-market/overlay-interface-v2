@@ -47,7 +47,8 @@ const Referrals: React.FC = () => {
 
   useEffect(() => {
     setErrorMessage(null);
-  }, [affiliateAddress]);
+    setTraderSignedUpTo("");
+  }, [affiliateAddress, traderAddress]);
 
   // Check affiliate status
   const checkAffiliateStatus = async (address: string) => {
