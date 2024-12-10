@@ -30,7 +30,7 @@ const Referrals: React.FC = () => {
   const { signTypedDataAsync } = useSignTypedData();
   const [loading, setLoading] = useState(false);
   const [checkingTraderStatus, setCheckingTraderStatus] = useState(false);
-  const [checkingAffiliateStatus, setCheckingAffiliateStatus] = useState(true);
+  const [checkingAffiliateStatus, setCheckingAffiliateStatus] = useState(false);
   const [fetchingSignature, setFetchingSignature] = useState(false);
   const [affiliateAddress, setAffiliateAddress] = useState("");
   const [traderSignedUpTo, setTraderSignedUpTo] = useState("");
@@ -52,6 +52,7 @@ const Referrals: React.FC = () => {
   // Check affiliate status
   const checkAffiliateStatus = async (address: string) => {
     setCheckingAffiliateStatus(true);
+    let affiliateStatus = false;
     try {
       const response = await fetch(
         REFERRAL_API_BASE_URL + `/affiliates/${address}`
@@ -65,11 +66,13 @@ const Referrals: React.FC = () => {
         await response.json();
       setIsAffiliate(isValid);
       setAlias(alias);
+      affiliateStatus = isValid;
     } catch (error) {
       console.error("Error checking affiliate status:", error);
     } finally {
       setCheckingAffiliateStatus(false);
     }
+    return affiliateStatus;
   };
 
   // Check trader status
@@ -97,8 +100,8 @@ const Referrals: React.FC = () => {
   useEffect(() => {
     const checkStatus = async () => {
       if (traderAddress) {
-        await checkAffiliateStatus(traderAddress);
-        if (!isAffiliate && !checkingAffiliateStatus) {
+        const affiliateStatus = await checkAffiliateStatus(traderAddress);
+        if (!affiliateStatus) {
           await checkTraderStatus(traderAddress);
         }
       } else {
