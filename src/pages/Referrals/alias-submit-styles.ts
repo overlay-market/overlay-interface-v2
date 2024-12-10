@@ -27,8 +27,9 @@ export const CopyLink = styled(Box)`
 
 export const Toast = styled.div<{visible: string}>`
   position: fixed;
-  bottom: 20px;
-  left: 52.5%;
+  bottom: 110px;
+  width: 160px;
+  left: 50%;
   transform: translateX(-50%);
   background-color: ${theme.color.grey7};
   color: ${theme.color.grey2};
@@ -40,4 +41,9 @@ export const Toast = styled.div<{visible: string}>`
   visibility: ${({ visible }) => (visible === 'true' ? 'visible' : 'hidden')};
   transition: opacity 0.3s ease, visibility 0.3s ease;
   z-index: 1000;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    bottom: 20px;
+    left: 52.5%;
+  } 
 `;
