@@ -13,7 +13,7 @@ const MarketsHeader = ({
   ovSupplyChange: string | undefined;
 }) => {
   const { chainId } = useMultichainContext();
-  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OV" :  "OVL"
+  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OV" : "OVL";
   return (
     <MarketHeaderContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>
@@ -27,7 +27,10 @@ const MarketsHeader = ({
           <Text>$~~</Text>
         </StyledFlex>
 
-	@@ -17,15 +30,15 @@ const MarketsHeader = ({ ovSupplyChange }: { ovSupplyChange: string | undefined
+        <StyledFlex
+          width={"114px"}
+          height={"100%"}
+          justify={"center"}
           direction="column"
           p={"12px"}
         >
