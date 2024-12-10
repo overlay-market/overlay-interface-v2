@@ -35,7 +35,16 @@ const ChainSwitch = () => {
     [setSelectedChainId, chainSelect]
   );
 
-  return (
+  return (Object.keys(CHAIN_LIST_ORDER).length === 1
+    ?
+    <Flex align={"center"}>
+      {chainId ? (
+        <ChainLogo src={NETWORK_ICONS[chainId as number]} />
+      ) : (
+        <div>⚠️</div>
+      )}
+    </Flex>
+    : 
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <DropdownMenu.Trigger>
         <Flex align={"center"} style={{ cursor: "pointer" }}>

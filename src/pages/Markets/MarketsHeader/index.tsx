@@ -4,12 +4,16 @@ import {
   StyledFlex,
   StyledText,
 } from "./market-header-styles";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import { SUPPORTED_CHAINID } from "../../../constants/chains";
 
 const MarketsHeader = ({
   ovSupplyChange,
 }: {
   ovSupplyChange: string | undefined;
 }) => {
+  const { chainId } = useMultichainContext();
+  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OV" :  "OVL"
   return (
     <MarketHeaderContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>
@@ -19,18 +23,15 @@ const MarketsHeader = ({
           direction="column"
           ml={"5"}
         >
-          <StyledText>OV PRICE</StyledText>
+          <StyledText>{tokenTicker} PRICE</StyledText>
           <Text>$~~</Text>
         </StyledFlex>
 
-        <StyledFlex
-          width={"114px"}
-          height={"100%"}
-          justify={"center"}
+	@@ -17,15 +30,15 @@ const MarketsHeader = ({ ovSupplyChange }: { ovSupplyChange: string | undefined
           direction="column"
           p={"12px"}
         >
-          <StyledText>OV SUPPLY</StyledText>
+          <StyledText>{tokenTicker} SUPPLY</StyledText>
           <div>
             <Text>{ovSupplyChange}</Text>
             <Text> 24h</Text>

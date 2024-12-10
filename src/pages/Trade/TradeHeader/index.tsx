@@ -4,9 +4,7 @@ import ProgressBar from "../../../components/ProgressBar";
 import MarketsList from "./MarketsList";
 import {
   BalanceFlex,
-  LineSeparator,
   MarketInfoContainer,
-  ResponsiveEmptyPlaceholder,
   StyledFlex,
   TradeHeaderContainer,
 } from "./trade-header-styles";
@@ -36,8 +34,6 @@ const TradeHeader: React.FC = () => {
     useState<string>("0");
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchPrice = async () => {
       if (marketId) {
         try {
@@ -56,8 +52,8 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchPrice();
-    interval = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, typedValue, selectedLeverage, isLong, chainId, sdk]);
 
   useEffect(() => {
@@ -72,8 +68,6 @@ const TradeHeader: React.FC = () => {
   }, [price, market]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchFunding = async () => {
       if (marketId) {
         try {
@@ -86,13 +80,11 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchFunding();
-    interval = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, chainId, sdk]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchOiBalance = async () => {
       if (marketId) {
         try {
@@ -108,8 +100,8 @@ const TradeHeader: React.FC = () => {
     };
 
     fetchOiBalance();
-    interval = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, chainId, sdk]);
 
   const isFundingRatePositive = useMemo(() => {
@@ -117,67 +109,58 @@ const TradeHeader: React.FC = () => {
   }, [funding]);
 
   return (
-    <>
-      <ResponsiveEmptyPlaceholder></ResponsiveEmptyPlaceholder>
-      <TradeHeaderContainer>
-        <MarketsList />
+    <TradeHeaderContainer>
+      <MarketsList />
 
-        <MarketInfoContainer>
-          <StyledFlex
-            width={{ initial: "109px", sm: "167px", lg: "119px" }}
-            p={{ initial: "8px 0px 8px 4px", sm: "12px 15px", md: "12px" }}
-          >
-            <Text weight="light" style={{ fontSize: "10px" }}>
-              Price
-            </Text>
-            <Text>{currencyPrice}</Text>
-          </StyledFlex>
+      <MarketInfoContainer>
+        <StyledFlex width={{ initial: "109px", sm: "167px", lg: "119px" }}>
+          <Text weight="light" style={{ fontSize: "10px" }}>
+            Price
+          </Text>
+          <Text>{currencyPrice}</Text>
+        </StyledFlex>
 
-          <StyledFlex
-            width={{ initial: "92px", sm: "167px", lg: "97px" }}
-            p={{ initial: "8px 0px", sm: "12px" }}
-            align={{ initial: "start", sm: "end" }}
+        <StyledFlex width={{ initial: "72px", sm: "167px", lg: "97px" }}>
+          <Text weight="light" style={{ fontSize: "10px" }}>
+            Funding
+          </Text>
+          <Text
+            style={{
+              color: isFundingRatePositive
+                ? theme.color.red2
+                : theme.color.green2,
+            }}
           >
-            <Text weight="light" style={{ fontSize: "10px" }}>
-              Funding
-            </Text>
-            <Text
-              style={{
-                color: isFundingRatePositive
-                  ? theme.color.red2
-                  : theme.color.green2,
-              }}
-            >
-              {isFundingRatePositive ? `+` : ``}
-              {funding ? `${funding}%` : `-`}
-            </Text>
-          </StyledFlex>
+            {isFundingRatePositive ? `+` : ``}
+            {funding ? `${funding}%` : `-`}
+          </Text>
+        </StyledFlex>
 
-          <BalanceFlex
-            direction={"column"}
-            width={{ initial: "157px", sm: "336px", lg: "195px" }}
-            height={"100%"}
-            justify={"center"}
-            align={"end"}
-            p={{ initial: "8px 4px 8px 0px", sm: "12px" }}
-          >
-            <Text weight="light" style={{ fontSize: "10px" }}>
-              OI balance
+        <BalanceFlex
+          direction={"column"}
+          width={{ initial: "184px", sm: "336px", lg: "195px" }}
+          height={"100%"}
+          justify={"center"}
+          align={"end"}
+          pr={{ initial: "12px", sm: "20px", lg: "12px" }}
+          pl={"10px"}
+          ml={{ sm: "auto", lg: "0" }}
+        >
+          <Text weight="light" style={{ fontSize: "10px" }}>
+            OI balance
+          </Text>
+          <Flex gap={"4px"} align={"center"}>
+            <Text style={{ color: theme.color.red2 }}>
+              {shortPercentageOfTotalOi}%
             </Text>
-            <Flex gap={"4px"} align={"center"}>
-              <Text style={{ color: theme.color.red2 }}>
-                {shortPercentageOfTotalOi}%
-              </Text>
-              <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
-              <Text style={{ color: theme.color.green2 }}>
-                {longPercentageOfTotalOi}%
-              </Text>
-            </Flex>
-          </BalanceFlex>
-        </MarketInfoContainer>
-      </TradeHeaderContainer>
-      <LineSeparator />
-    </>
+            <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
+            <Text style={{ color: theme.color.green2 }}>
+              {longPercentageOfTotalOi}%
+            </Text>
+          </Flex>
+        </BalanceFlex>
+      </MarketInfoContainer>
+    </TradeHeaderContainer>
   );
 };
 

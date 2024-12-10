@@ -116,20 +116,16 @@ const Chart: React.FC = () => {
           defaultProps.interval as ChartingLibraryWidgetOptions["interval"],
         container: chartContainerRef.current,
         locale: "en",
-        disabled_features: isMobile 
+        disabled_features: isMobile
           ? [
-            "left_toolbar",
-            "control_bar",
-            "timeframes_toolbar",
-            "header_symbol_search",
-            "symbol_search_hot_key",
-            "header_compare",
-          ]
-          : [
-            "header_symbol_search",
-            "symbol_search_hot_key",
-            "header_compare",
-          ],
+              "left_toolbar",
+              "control_bar",
+              "timeframes_toolbar",
+              "header_symbol_search",
+              "symbol_search_hot_key",
+              "header_compare",
+            ]
+          : ["header_symbol_search", "symbol_search_hot_key", "header_compare"],
         charts_storage_url: defaultProps.chartsStorageUrl,
         charts_storage_api_version: defaultProps.chartsStorageApiVersion,
         client_id: defaultProps.clientId,
@@ -324,8 +320,11 @@ const Chart: React.FC = () => {
       }
     };
 
-    const interval = setInterval(updateLongPriceShape, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(
+      updateLongPriceShape,
+      TRADE_POLLING_INTERVAL
+    );
+    return () => clearInterval(intervalId);
   }, [ask]);
 
   // Effect to update the shortPrice shape
@@ -364,8 +363,11 @@ const Chart: React.FC = () => {
       }
     };
 
-    const interval = setInterval(updateShortPriceShape, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(
+      updateShortPriceShape,
+      TRADE_POLLING_INTERVAL
+    );
+    return () => clearInterval(intervalId);
   }, [bid]);
 
   return <TVChartContainer ref={chartContainerRef} />;
