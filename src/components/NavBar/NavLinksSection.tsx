@@ -9,10 +9,10 @@ import {
   TradeIcon,
   TradeActiveIcon,
 } from "../../assets/icons/navBar-icons/trade";
-// import {
-//   RocketIcon,
-//   RocketActiveIcon,
-// } from "../../assets/icons/navBar-icons/rocket";
+import {
+  RocketIcon,
+  RocketActiveIcon,
+} from "../../assets/icons/navBar-icons/rocket";
 // import {
 //   PowercardIcon,
 //   PowercardActiveIcon,
@@ -65,6 +65,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       label: "Portfolio",
       icon: <BackpackIcon />,
       activeIcon: <BackpackActiveIcon />,
+      showOnMobile: true,
+    },
+    {
+      to: "/referrals",
+      label: "Referrals",
+      icon: <RocketIcon />, // TODO change icon
+      activeIcon: <RocketActiveIcon />, // TODO change icon
       showOnMobile: true,
     },
     // {
