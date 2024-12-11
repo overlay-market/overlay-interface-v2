@@ -16,6 +16,7 @@ import { useAccount, useSignTypedData } from "wagmi";
 import { isAddress } from "viem";
 import { CopyGradientIcon } from "../../assets/icons/svg-icons";
 import { CopyLink, Toast } from "./alias-submit-styles";
+import { useLocation } from "react-router-dom";
 
 type AliasSubmitProps = {
   alias: string | null;
@@ -24,6 +25,7 @@ type AliasSubmitProps = {
 const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
   const { address: affiliateAddress } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
+  const location = useLocation();
 
   const [aliasValue, setAliasValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -179,7 +181,9 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(
-      `${window.location.href}?referrer=${registeredAlias?.toLowerCase()}`
+      `${window.location.origin}${
+        location.pathname
+      }?referrer=${registeredAlias?.toLowerCase()}`
     );
     showToast();
   };
