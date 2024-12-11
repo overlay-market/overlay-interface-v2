@@ -286,7 +286,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
             </Text>
           </Flex>
           <Flex gap={"8px"}>
-            <Text weight={"medium"}>Your referral link</Text>
+            <Text weight={"medium"}>Copy referral link</Text>
             <CopyLink onClick={handleCopyLink}>
               <CopyGradientIcon />
             </CopyLink>
