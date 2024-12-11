@@ -33,7 +33,7 @@ const Referrals: React.FC = () => {
   const [checkingTraderStatus, setCheckingTraderStatus] = useState(false);
   const [checkingAffiliateStatus, setCheckingAffiliateStatus] = useState(false);
   const [fetchingSignature, setFetchingSignature] = useState(false);
-  const [affiliateAddress, setAffiliateAddress] = useState("");
+  const [affiliate, setAffiliate] = useState("");
   const [traderSignedUpTo, setTraderSignedUpTo] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [succeededToSignUp, setSucceededToSignUp] = useState(false);
@@ -42,14 +42,14 @@ const Referrals: React.FC = () => {
 
   useEffect(() => {
     if (referralAddressFromURL) {
-      setAffiliateAddress(referralAddressFromURL);
+      setAffiliate(referralAddressFromURL);
     }
   }, [referralAddressFromURL]);
 
   useEffect(() => {
     setErrorMessage(null);
     setTraderSignedUpTo("");
-  }, [affiliateAddress, traderAddress]);
+  }, [affiliate, traderAddress]);
 
   // Check affiliate status
   const checkAffiliateStatus = async (address: string) => {
@@ -82,8 +82,9 @@ const Referrals: React.FC = () => {
     setCheckingTraderStatus(true);
     try {
       const response = await fetch(
-        REFERRAL_API_BASE_URL + `/signatures/check/${address}`
+        REFERRAL_API_BASE_URL + `/signatures/check/${address.toLowerCase()}`
       );
+
       if (!response.ok) {
         throw new Error(
           `Failed to fetch trader status: ${response.statusText}`
@@ -197,14 +198,14 @@ const Referrals: React.FC = () => {
 
   const handleSubmit = async () => {
     setErrorMessage(null);
-    if (!affiliateAddress || !traderAddress) return;
-    if (!isAddress(affiliateAddress)) {
+    if (!affiliate || !traderAddress) return;
+    if (!isAddress(affiliate)) {
       setErrorMessage("Invalid affiliate address");
       return;
     }
-    const signature = await fetchSignature(affiliateAddress);
+    const signature = await fetchSignature(affiliate);
     console.log({ signature });
-    signature && (await postSignature(signature, affiliateAddress));
+    signature && (await postSignature(signature, affiliate));
   };
 
   return (
@@ -283,11 +284,9 @@ const Referrals: React.FC = () => {
                         <Flex direction={"column"} gap="8px">
                           <StyledInput
                             type="text"
-                            value={affiliateAddress}
+                            value={affiliate}
                             disabled={fetchingSignature || loading}
-                            onChange={(e) =>
-                              setAffiliateAddress(e.target.value)
-                            }
+                            onChange={(e) => setAffiliate(e.target.value)}
                             placeholder="Enter Affiliate Address"
                           />
 
@@ -317,7 +316,7 @@ const Referrals: React.FC = () => {
                           <GradientSolidButton
                             title="Submit"
                             height={"49px"}
-                            isDisabled={affiliateAddress === ""}
+                            isDisabled={affiliate === ""}
                             handleClick={handleSubmit}
                           />
                         )}
