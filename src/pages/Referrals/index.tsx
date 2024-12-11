@@ -56,16 +56,7 @@ const Referrals: React.FC = () => {
     setCheckingAffiliateStatus(true);
     let affiliateStatus = false;
     try {
-      const response = await fetch(
-        REFERRAL_API_BASE_URL + `/affiliates/${address.toLowerCase()}`
-      );
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch affiliate status: ${response.statusText}`
-        );
-      }
-      const { isValid, alias }: { isValid: boolean; alias: string | null } =
-        await response.json();
+      const { isValid, alias } = await getAffiliateAlias(address);
       setIsAffiliate(isValid);
       setAlias(alias);
       affiliateStatus = isValid;
@@ -92,7 +83,13 @@ const Referrals: React.FC = () => {
       }
       const { affiliate }: { exists: boolean; affiliate: string } =
         await response.json();
-      setTraderSignedUpTo(affiliate);
+
+      const { alias } = await getAffiliateAlias(affiliate);
+      if (alias) {
+        setTraderSignedUpTo(alias);
+      } else {
+        setTraderSignedUpTo(shortenAddress(affiliate, 7));
+      }
     } catch (error) {
       console.error("Error checking trader status:", error);
     } finally {
@@ -137,6 +134,25 @@ const Referrals: React.FC = () => {
     }
   };
 
+  const getAffiliateAlias = async (address: string) => {
+    try {
+      const response = await fetch(
+        REFERRAL_API_BASE_URL + `/affiliates/${address.toLowerCase()}`
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch affiliate status: ${response.statusText}`
+        );
+      }
+      const { isValid, alias }: { isValid: boolean; alias: string | null } =
+        await response.json();
+      return { isValid, alias };
+    } catch (error) {
+      console.error("Error getting affiliate status", error);
+      return { isValid: false, alias: null };
+    }
+  };
+
   const postSignature = async (signature: string, affiliate: string) => {
     if (!traderAddress) {
       console.error("Trader address is missing");
@@ -170,7 +186,11 @@ const Referrals: React.FC = () => {
 
       if (result.createdAt && result.affiliate) {
         setSucceededToSignUp(true);
-        setTraderSignedUpTo(result.affiliate);
+        if (result.affiliateAlias) {
+          setTraderSignedUpTo(result.affiliateAlias);
+        } else {
+          setTraderSignedUpTo(shortenAddress(result.affiliate, 7));
+        }
         // TODO create toast notification
       }
     } catch (error) {
@@ -295,7 +315,7 @@ const Referrals: React.FC = () => {
                             to{" "}
                           </Text>
                           <GradientText weight={"medium"}>
-                            {shortenAddress(traderSignedUpTo, 7)}
+                            {traderSignedUpTo}
                           </GradientText>
                         </Flex>
                         <GradientSolidButton
@@ -374,7 +394,7 @@ const Referrals: React.FC = () => {
                         You signed up for the referral program to
                       </Text>
                       <GradientText weight={"medium"}>
-                        {shortenAddress(traderSignedUpTo, 7)}
+                        {traderSignedUpTo}
                       </GradientText>
                     </Flex>
                   </ContentContainer>
