@@ -1,12 +1,29 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { MarketHeaderContainer, StyledFlex } from "./market-header-styles";
+import {
+  MarketHeaderContainer,
+  StyledFlex,
+  StyledText,
+} from "./market-header-styles";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
+import { SUPPORTED_CHAINID } from "../../../constants/chains";
 
-const MarketsHeader = ({ ovSupplyChange }: { ovSupplyChange: string | undefined }) => {
+const MarketsHeader = ({
+  ovSupplyChange,
+}: {
+  ovSupplyChange: string | undefined;
+}) => {
+  const { chainId } = useMultichainContext();
+  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OV" : "OVL";
   return (
     <MarketHeaderContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>
-        <StyledFlex width={"150px"} justify={"center"} direction="column" ml={"5"}>
-          <Text>OV PRICE</Text>
+        <StyledFlex
+          width={"150px"}
+          justify={"center"}
+          direction="column"
+          ml={"5"}
+        >
+          <StyledText>{tokenTicker} PRICE</StyledText>
           <Text>$~~</Text>
         </StyledFlex>
 
@@ -17,7 +34,7 @@ const MarketsHeader = ({ ovSupplyChange }: { ovSupplyChange: string | undefined 
           direction="column"
           p={"12px"}
         >
-          <Text>OV SUPPLY</Text>
+          <StyledText>{tokenTicker} SUPPLY</StyledText>
           <div>
             <Text>{ovSupplyChange}</Text>
             <Text> 24h</Text>
@@ -25,7 +42,7 @@ const MarketsHeader = ({ ovSupplyChange }: { ovSupplyChange: string | undefined 
         </StyledFlex>
 
         <StyledFlex width={"150px"} display={"none"}>
-          <Text>GOV</Text>
+          <StyledText>GOV</StyledText>
         </StyledFlex>
       </Flex>
     </MarketHeaderContainer>

@@ -32,8 +32,6 @@ const PositionSelectComponent: React.FC = () => {
   const [currencyBid, setCurrencyBid] = useState<string>("-");
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchBidAndAsk = async () => {
       if (marketId) {
         try {
@@ -48,8 +46,8 @@ const PositionSelectComponent: React.FC = () => {
     };
 
     fetchBidAndAsk();
-    interval = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, chainId, sdk]);
 
   useEffect(() => {

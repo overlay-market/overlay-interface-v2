@@ -15,12 +15,10 @@ export enum SUPPORTED_CHAINID {
   BARTIO = 80084,
 }
 
-export const DEFAULT_NET = SUPPORTED_CHAINID[421614]
-export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.ARBITRUM_SEPOLIA
+export const DEFAULT_NET = SUPPORTED_CHAINID[80084]
+export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.BARTIO
 
 export const WORKING_CHAINS = [
-  SUPPORTED_CHAINID[SUPPORTED_CHAINID.ARBITRUM_SEPOLIA], 
-  SUPPORTED_CHAINID[SUPPORTED_CHAINID.IMOLA], 
   SUPPORTED_CHAINID[SUPPORTED_CHAINID.BARTIO],
 ]
  
@@ -48,12 +46,11 @@ export const VIEM_CHAINS: { [key: number]: Chain} = {
   [SUPPORTED_CHAINID.IMOLA]: imola,
 };
 
-export const NETWORK_ICONS: { [chainId in SUPPORTED_CHAINID | number]: string } =
-  {
-    [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
-    [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
-    [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
-  };
+export const NETWORK_ICONS: { [chainId in SUPPORTED_CHAINID | number]: string } = {
+  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
+  [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
+  [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
+};
 
 
 export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
@@ -63,9 +60,6 @@ export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
 };
 
 export const CHAIN_LIST_ORDER: { [x: number]: number } = {
-  [1]: SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
   [2]: SUPPORTED_CHAINID.BARTIO,
-  [3]: SUPPORTED_CHAINID.IMOLA,
-  
 };
  

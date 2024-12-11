@@ -18,6 +18,7 @@ import BTCFrog from "../assets/images/markets-full-logos/btc-frogs.png";
 import NodeMonkes from "../assets/images/markets-full-logos/node-monkes.png";
 import ETHSOL from "../assets/images/markets-full-logos/eth-sol.png";
 import INK from "../assets/images/markets-full-logos/ink.jpeg";
+import ChessVideo from "../assets/videos/FuturisticChessMatch.mp4";
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -41,3 +42,31 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Magnus%20Carlsen": MagnusCarlsen,
   "Electric%20Vehicle%20Commodity%20Index": EvIndex,
 };
+
+export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
+  "Hikaru%20Nakamura": ChessVideo,
+};
+
+export const MARKETSORDER = [
+  "Counter-Strike%202%20Skins",
+  "Rifles%20-%20CS2%20Skins",
+  "Knives%20-%20CS2%20Skins",
+  "Knives%20vs%20Rifles%20-%20CS2%20Skins",
+  "BTC%20Dominance",
+  "ETH%20Dominance",
+  "AI%20Index",
+  "ETH%20%2F%20SOL",
+  "Quantum%20Cats",
+  "Bitcoin%20Frogs",
+  "NodeMonkes",
+  "Ink",
+  "Real%20Estate%20Dominance",
+  "SUPER%20%2F%20ETH",
+  "Hikaru%20Nakamura",
+  "Magnus%20Carlsen",
+  "Cats%20vs%20Dogs%20-%20Meme%20War",
+  "Cats%20vs%20Frogs%20-%20Meme%20War",
+  "Frogs%20vs%20Dogs%20-%20Meme%20War",
+];
+
+export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
