@@ -57,7 +57,7 @@ const Referrals: React.FC = () => {
     let affiliateStatus = false;
     try {
       const response = await fetch(
-        REFERRAL_API_BASE_URL + `/affiliates/${address}`
+        REFERRAL_API_BASE_URL + `/affiliates/${address.toLowerCase()}`
       );
       if (!response.ok) {
         throw new Error(
@@ -150,8 +150,8 @@ const Referrals: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          trader: traderAddress,
-          affiliate,
+          trader: traderAddress?.toLowerCase(),
+          affiliate: affiliate.toLowerCase(),
           signature,
         }),
       });
@@ -193,12 +193,16 @@ const Referrals: React.FC = () => {
   const fetchSignature = async (affiliate: string) => {
     setFetchingSignature(true);
     let signature;
+    const message = {
+      affiliate: affiliate.toLowerCase(),
+    };
+
     try {
       signature = await signTypedDataAsync({
         domain,
         types,
         primaryType,
-        message: { affiliate },
+        message,
       });
     } catch (error) {
       const errorWithDetails = error as { details?: string };
@@ -314,7 +318,11 @@ const Referrals: React.FC = () => {
                         <Flex direction={"column"} gap="8px">
                           <StyledInput
                             type="text"
-                            value={affiliate}
+                            value={
+                              isAddress(affiliate)
+                                ? affiliate
+                                : affiliate.toUpperCase()
+                            }
                             disabled={fetchingSignature || loading}
                             onChange={(e) => setAffiliate(e.target.value)}
                             placeholder="Enter Affiliate Address"
