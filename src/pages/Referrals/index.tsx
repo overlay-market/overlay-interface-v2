@@ -243,9 +243,16 @@ const Referrals: React.FC = () => {
     if (!affiliate || !traderAddress) return;
 
     let affiliateAddress: string | null = null;
+    let isAffiliateValid = true;
 
     if (isAddress(affiliate)) {
       affiliateAddress = affiliate;
+      const { isValid } = await getAffiliateAlias(affiliate);
+
+      if (!isValid) {
+        setErrorMessage("Affiliate not found");
+        isAffiliateValid = isValid;
+      }
     } else {
       const fetchedAffiliateAddress = await getAffiliateAddress(affiliate);
 
@@ -256,7 +263,7 @@ const Referrals: React.FC = () => {
       }
     }
 
-    if (affiliateAddress) {
+    if (affiliateAddress && isAffiliateValid) {
       const signature = await fetchSignature(affiliateAddress);
       signature && (await postSignature(signature, affiliateAddress));
     }
