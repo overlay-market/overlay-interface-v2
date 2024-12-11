@@ -351,7 +351,9 @@ const Referrals: React.FC = () => {
                                 : affiliate.toUpperCase()
                             }
                             disabled={fetchingSignature || loading}
-                            onChange={(e) => setAffiliate(e.target.value)}
+                            onChange={(e) =>
+                              setAffiliate(e.target.value.trim())
+                            }
                             placeholder="Enter Affiliate Address"
                           />
 

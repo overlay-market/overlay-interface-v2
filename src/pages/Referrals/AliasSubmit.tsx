@@ -232,7 +232,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
                   type="text"
                   disabled={fetchingSignature || registeringAlias}
                   value={aliasValue.toUpperCase()}
-                  onChange={(e) => setAliasValue(e.target.value)}
+                  onChange={(e) => setAliasValue(e.target.value.trim())}
                   placeholder="Enter 3-8 alphanumeric chars"
                 />
 
