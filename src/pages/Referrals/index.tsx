@@ -119,6 +119,24 @@ const Referrals: React.FC = () => {
     checkStatus();
   }, [traderAddress]);
 
+  const getAffiliateAddress = async (alias: string) => {
+    try {
+      const response = await fetch(
+        REFERRAL_API_BASE_URL + `/affiliates/aliases/${alias}`
+      );
+
+      if (response.status === 404) {
+        return null;
+      }
+      if (response.status === 200 && alias !== "") {
+        const result = await response.json();
+        return result.address;
+      }
+    } catch (error) {
+      console.error("Error getting affiliate", error);
+    }
+  };
+
   const postSignature = async (signature: string, affiliate: string) => {
     if (!traderAddress) {
       console.error("Trader address is missing");
