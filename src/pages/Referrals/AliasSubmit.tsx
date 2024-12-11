@@ -157,13 +157,13 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
       return;
     }
     const signature = await fetchSignature(
-      affiliateAddress,
+      affiliateAddress.toLowerCase(),
       debouncedAliasValue.toLowerCase()
     );
     signature &&
       (await registerAlias(
         signature,
-        affiliateAddress,
+        affiliateAddress.toLowerCase(),
         debouncedAliasValue.toLowerCase()
       ));
     setSuccessMessage(null);
@@ -179,7 +179,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(
-      `${window.location.href}?referrer=${registeredAlias}`
+      `${window.location.href}?referrer=${registeredAlias?.toLowerCase()}`
     );
     showToast();
   };
