@@ -314,8 +314,10 @@ const Referrals: React.FC = () => {
                             You are already signed up for the referral program
                             to{" "}
                           </Text>
-                          <GradientText weight={"medium"}>
-                            {traderSignedUpTo}
+                          <GradientText weight={"medium"} size={"4"}>
+                            {isAddress(traderSignedUpTo)
+                              ? traderSignedUpTo
+                              : traderSignedUpTo.toUpperCase()}
                           </GradientText>
                         </Flex>
                         <GradientSolidButton
@@ -393,8 +395,10 @@ const Referrals: React.FC = () => {
                       <Text weight={"medium"} size="3">
                         You signed up for the referral program to
                       </Text>
-                      <GradientText weight={"medium"}>
-                        {traderSignedUpTo}
+                      <GradientText weight={"medium"} size={"4"}>
+                        {isAddress(traderSignedUpTo)
+                          ? traderSignedUpTo
+                          : traderSignedUpTo.toUpperCase()}
                       </GradientText>
                     </Flex>
                   </ContentContainer>
