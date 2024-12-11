@@ -122,7 +122,7 @@ const Referrals: React.FC = () => {
   const getAffiliateAddress = async (alias: string) => {
     try {
       const response = await fetch(
-        REFERRAL_API_BASE_URL + `/affiliates/aliases/${alias}`
+        REFERRAL_API_BASE_URL + `/affiliates/aliases/${alias.toLowerCase()}`
       );
 
       if (response.status === 404) {
@@ -217,13 +217,25 @@ const Referrals: React.FC = () => {
   const handleSubmit = async () => {
     setErrorMessage(null);
     if (!affiliate || !traderAddress) return;
-    if (!isAddress(affiliate)) {
-      setErrorMessage("Invalid affiliate address");
-      return;
+
+    let affiliateAddress: string | null = null;
+
+    if (isAddress(affiliate)) {
+      affiliateAddress = affiliate;
+    } else {
+      const fetchedAffiliateAddress = await getAffiliateAddress(affiliate);
+
+      if (fetchedAffiliateAddress) {
+        affiliateAddress = fetchedAffiliateAddress;
+      } else {
+        setErrorMessage("Invalid affiliate");
+      }
     }
-    const signature = await fetchSignature(affiliate);
-    console.log({ signature });
-    signature && (await postSignature(signature, affiliate));
+
+    if (affiliateAddress) {
+      const signature = await fetchSignature(affiliateAddress);
+      signature && (await postSignature(signature, affiliateAddress));
+    }
   };
 
   return (
