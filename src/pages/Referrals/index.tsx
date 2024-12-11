@@ -290,15 +290,13 @@ const Referrals: React.FC = () => {
         checkingAffiliateStatus ||
         checkingTraderStatus ||
         initialLoading ? (
-          <GradientBorderBox>
-            <ContentContainer
-              align={"center"}
-              justify={"center"}
-              height={"224px"}
-            >
-              <Loader />
-            </ContentContainer>
-          </GradientBorderBox>
+          <ContentContainer
+            align={"center"}
+            justify={"center"}
+            height={"224px"}
+          >
+            <Loader />
+          </ContentContainer>
         ) : (
           <GradientBorderBox>
             {isAffiliate ? (
