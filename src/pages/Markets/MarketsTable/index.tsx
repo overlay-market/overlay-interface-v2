@@ -156,7 +156,6 @@ export default function MarketsTable({
         <Table.Body style={{ verticalAlign: "middle" }}>
           {marketsData.length > 0 ? (
             marketsData.map((market, index) => {
-              if (index === 0 || index === 5) return null;
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
