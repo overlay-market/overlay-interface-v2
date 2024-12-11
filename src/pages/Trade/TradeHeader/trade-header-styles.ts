@@ -23,10 +23,9 @@ export const TradeHeaderContainer = styled(Flex)`
   }
 
   @media (min-width: ${theme.breakpoints.xxl}) {
-    margin-left: -60px;
-    margin-right: -28px;
+    margin-left: -16px;
     padding-left: 60px;
-    width: calc(100% + 20px + 60px + 28px);
+    width: calc(100% + 20px + 16px);
   }
 `;
 
