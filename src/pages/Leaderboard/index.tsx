@@ -5,7 +5,7 @@ import UserPointsSection from "./UserPointsSection";
 import LeaderboardTable from "./LeaderboardTable";
 import PointsUpdateSection from "./PointsUpdateSection";
 import useAccount from "../../hooks/useAccount";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LEADERBOARD_POINTS_API } from "../../constants/applications";
 
 const Leaderboard: React.FC = () => {
@@ -44,6 +44,12 @@ const Leaderboard: React.FC = () => {
     fetchData();
   }, [account]);
 
+  const prevWeekDetails = useMemo<any>(() => {
+    if (pointsData) {
+      return pointsData.previousWeekDetails;
+    }
+  }, [pointsData]);
+
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
       <Flex
@@ -72,7 +78,7 @@ const Leaderboard: React.FC = () => {
           gap={"12px"}
         >
           <UserPointsSection />
-          <PointsUpdateSection />
+          <PointsUpdateSection pointsUpdatedAt={prevWeekDetails?.sessionEnd} />
         </Flex>
 
         <LeaderboardTable />

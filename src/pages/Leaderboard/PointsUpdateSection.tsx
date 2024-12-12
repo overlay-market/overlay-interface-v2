@@ -4,9 +4,13 @@ import theme from "../../theme";
 import Loader from "../../components/Loader";
 import moment from "moment";
 
-const PointsUpdateSection: React.FC = () => {
-  const pointsUpdatedAt = "2011-10-10T14:48:00";
+type PointsUpdateSectionProps = {
+  pointsUpdatedAt: string;
+};
 
+const PointsUpdateSection: React.FC<PointsUpdateSectionProps> = ({
+  pointsUpdatedAt,
+}) => {
   return (
     <Flex
       p={"8px"}
