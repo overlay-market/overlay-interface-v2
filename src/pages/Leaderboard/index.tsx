@@ -4,8 +4,46 @@ import { LineSeparator } from "./leaderboard-styles";
 import UserPointsSection from "./UserPointsSection";
 import LeaderboardTable from "./LeaderboardTable";
 import PointsUpdateSection from "./PointsUpdateSection";
+import useAccount from "../../hooks/useAccount";
+import { useEffect, useState } from "react";
+import { LEADERBOARD_POINTS_API } from "../../constants/applications";
 
 const Leaderboard: React.FC = () => {
+  const { address: account } = useAccount();
+
+  const [pointsData, setPointsData] = useState<any>({});
+  const [fetchingPointsData, setFetchingPointsData] = useState(false);
+
+  const INITIAL_NUMBER_OF_ROWS = 10;
+
+  const getPointsData = async () => {
+    setFetchingPointsData(true);
+    try {
+      const response = await fetch(
+        LEADERBOARD_POINTS_API +
+          `/${INITIAL_NUMBER_OF_ROWS}${account ? `/${account}` : ""}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch points data: ${response.statusText}`);
+      }
+      const data = await response.json();
+      setPointsData(data);
+    } catch (error) {
+      console.error("Error in getting points data:", error);
+    } finally {
+      setFetchingPointsData(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await getPointsData();
+    };
+
+    fetchData();
+  }, [account]);
+
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
       <Flex
