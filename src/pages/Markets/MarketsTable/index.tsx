@@ -2,7 +2,7 @@ import { Box, Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../../theme";
 import * as Select from "@radix-ui/react-select";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { TransformedMarketData } from "overlay-sdk";
 import ProgressBar from "../../../components/ProgressBar";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
@@ -16,6 +16,13 @@ interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import * as React from "react";
+
+type SortableKeys =
+  | "funding"
+  | "oneHourChange"
+  | "twentyFourHourChange"
+  | "sevenDayChange";
 
 export default function MarketsTable({
   marketsData,
@@ -25,8 +32,46 @@ export default function MarketsTable({
   const redirectToTradePage = useRedirectToTradePage();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortableKeys;
+    direction: "ascending" | "descending";
+  } | null>(null);
 
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const sortedData = React.useMemo(() => {
+    const sortableItems = [...marketsData];
+    if (sortConfig?.key) {
+      sortableItems.sort((a, b) => {
+        let aValue, bValue;
+        if (sortConfig.key === "funding") {
+          aValue = parseFloat(String(a.funding ?? "0"));
+          bValue = parseFloat(String(b.funding ?? "0"));
+        } else {
+          const aMarket7d = markets7d.find((m) => m.marketId === a.marketId);
+          const bMarket7d = markets7d.find((m) => m.marketId === b.marketId);
+          aValue = aMarket7d?.[sortConfig.key] ?? 0;
+          bValue = bMarket7d?.[sortConfig.key] ?? 0;
+        }
+        if (aValue < bValue) {
+          return sortConfig.direction === "ascending" ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "ascending" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [marketsData, markets7d, sortConfig]);
+
+  const requestSort = (key: SortableKeys) => {
+    let direction: "ascending" | "descending" = "ascending";
+    if (sortConfig?.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
+    }
+    setSortConfig({ key, direction });
+  };
 
   return (
     <Theme>
@@ -136,11 +181,65 @@ export default function MarketsTable({
               </Flex>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
-            {!isMobile && <Table.ColumnHeaderCell>1h</Table.ColumnHeaderCell>}
-            {!isMobile && <Table.ColumnHeaderCell>24h</Table.ColumnHeaderCell>}
-            {!isMobile && <Table.ColumnHeaderCell>7d</Table.ColumnHeaderCell>}
             {!isMobile && (
-              <Table.ColumnHeaderCell>Funding</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("oneHourChange")}
+                style={{ cursor: "pointer" }}
+              >
+                1h{" "}
+                {sortConfig?.key === "oneHourChange" &&
+                  (sortConfig.direction === "ascending" ? (
+                    <ChevronDownIcon />
+                  ) : (
+                    <ChevronUpIcon />
+                  ))}
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("twentyFourHourChange")}
+                style={{
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                24h
+                {sortConfig?.key === "twentyFourHourChange" &&
+                  (sortConfig.direction === "ascending" ? (
+                    <ChevronDownIcon />
+                  ) : (
+                    <ChevronUpIcon />
+                  ))}
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("sevenDayChange")}
+                style={{ cursor: "pointer" }}
+              >
+                7d{" "}
+                {sortConfig?.key === "sevenDayChange" &&
+                  (sortConfig.direction === "ascending" ? (
+                    <ChevronDownIcon />
+                  ) : (
+                    <ChevronUpIcon />
+                  ))}
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("funding")}
+                style={{ cursor: "pointer" }}
+              >
+                Funding{" "}
+                {sortConfig?.key === "funding" &&
+                  (sortConfig.direction === "ascending" ? (
+                    <ChevronDownIcon />
+                  ) : (
+                    <ChevronUpIcon />
+                  ))}
+              </Table.ColumnHeaderCell>
             )}
             {!isMobile && (
               <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
@@ -154,8 +253,8 @@ export default function MarketsTable({
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
-          {marketsData.length > 0 ? (
-            marketsData.map((market, index) => {
+          {sortedData.length > 0 ? (
+            sortedData.map((market, index) => {
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
