@@ -10,7 +10,6 @@ export const StyledFlex = styled(Flex)`
 
 export const TradeContainer = styled(Flex)`
   @media (min-width: ${theme.breakpoints.xxl}) {
-    padding-left: 60px;
-    padding-right: 28px;
+    padding-left: 16px;
   }
-`
+`;

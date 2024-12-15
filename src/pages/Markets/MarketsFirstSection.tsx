@@ -22,7 +22,6 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
       <Skeleton loading={marketsData.length < 14 + 1}>
         <Box flexGrow="7" flexShrink="1" flexBasis="0%">
           <PromotedBanner
-            Title={"CGMI"}
             Name={decodeURIComponent(marketsData[14]?.marketId ?? "")}
             Value={formatPriceWithCurrency(
               marketsData[14]?.price ?? 0,
@@ -36,7 +35,6 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
       <Skeleton loading={marketsData.length < 5 + 1}>
         <Box flexGrow="3" flexShrink="1" flexBasis="0%">
           <PromotedBanner
-            Title={"CGMI"}
             Name={decodeURIComponent(marketsData[5]?.marketId ?? "")}
             Value={formatPriceWithCurrency(
               marketsData[5]?.price ?? 0,
