@@ -7,13 +7,19 @@ import { GradientText, Link } from "./user-points-section-styles";
 import { LEADERBOARD_LEARN_MORE_LINK } from "../../constants/links";
 import { useModalHelper } from "../../components/ConnectWalletModal/utils";
 
-const UserPointsSection: React.FC = () => {
+type UserPointsSectionProps = {
+  userPoints?: number;
+  isLoading: boolean;
+};
+
+const UserPointsSection: React.FC<UserPointsSectionProps> = ({
+  userPoints,
+  isLoading,
+}) => {
   const { address: account } = useAccount();
   const { openModal } = useModalHelper();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const userPoints = 10;
-  const isLoading = false;
   return (
     <Flex
       direction={"column"}
