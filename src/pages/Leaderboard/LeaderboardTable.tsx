@@ -1,4 +1,6 @@
 import {
+  BgRow,
+  CurrentUserRankingRow,
   StyledCell,
   StyledHeader,
   StyledRow,
@@ -10,12 +12,17 @@ import { Flex, Text } from "@radix-ui/themes";
 import { shortenAddress } from "../../utils/web3";
 import { getRandomColors, getRandomName } from "../../utils/boringAvatars";
 import Avatar from "boring-avatars";
+import theme from "../../theme";
 
 type LeaderboardTableProps = {
   ranks?: UserData[];
+  currentUserData?: UserData;
 };
 
-const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ ranks }) => {
+const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
+  ranks,
+  currentUserData,
+}) => {
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
@@ -37,6 +44,44 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ ranks }) => {
           <StyledHeader textalign={"right"}>Total Points</StyledHeader>
         </tr>
       </thead>
+
+      {currentUserData && (
+        <tbody>
+          <CurrentUserRankingRow>
+            <StyledCell
+              textalign="center"
+              weight={"400"}
+              width={isMobile ? "36px" : "60px"}
+            >
+              {currentUserData.rank}
+            </StyledCell>
+            <StyledCell
+              textalign="left"
+              style={{ paddingLeft: isMobile ? "12px" : "20px" }}
+            >
+              <Flex align={"baseline"} gap={"8px"}>
+                <Text>{isMobile ? `Your rank` : `Your current rank`}</Text>
+                <Text
+                  style={{ color: theme.color.grey8 }}
+                  weight={"regular"}
+                  size={"1"}
+                >
+                  {shortenAddress(currentUserData._id)}
+                </Text>
+              </Flex>
+            </StyledCell>
+            {!isMobile && (
+              <StyledCell textalign="right">
+                {currentUserData.previousWeekPoints}
+              </StyledCell>
+            )}
+            <StyledCell textalign="right">
+              {currentUserData.totalPoints}
+            </StyledCell>
+          </CurrentUserRankingRow>
+          <BgRow></BgRow>
+        </tbody>
+      )}
 
       <tbody>
         {ranks &&

@@ -83,6 +83,9 @@ const Leaderboard: React.FC = () => {
     if (account && pointsData && initialUserData === undefined) {
       fetchUserData();
     }
+    if (!account) {
+      setCurrentUserData(undefined);
+    }
   }, [account, pointsData, initialUserData]);
 
   return (
@@ -119,7 +122,7 @@ const Leaderboard: React.FC = () => {
           <PointsUpdateSection pointsUpdatedAt={prevWeekDetails?.sessionEnd} />
         </Flex>
 
-        <LeaderboardTable ranks={ranks} />
+        <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
       </Flex>
     </Flex>
   );
