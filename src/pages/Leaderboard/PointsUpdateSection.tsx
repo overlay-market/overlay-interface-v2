@@ -5,7 +5,7 @@ import Loader from "../../components/Loader";
 import moment from "moment";
 
 type PointsUpdateSectionProps = {
-  pointsUpdatedAt: string;
+  pointsUpdatedAt?: string;
 };
 
 const PointsUpdateSection: React.FC<PointsUpdateSectionProps> = ({
