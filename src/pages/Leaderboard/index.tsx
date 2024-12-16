@@ -65,6 +65,12 @@ const Leaderboard: React.FC = () => {
     }
   }, [pointsData]);
 
+  const ranks = useMemo<UserData[] | undefined>(() => {
+    if (pointsData) {
+      return pointsData.leaderboardTable;
+    }
+  }, [pointsData]);
+
   useEffect(() => {
     const fetchUserData = async () => {
       const data = await getPointsData(0, account);
@@ -113,7 +119,7 @@ const Leaderboard: React.FC = () => {
           <PointsUpdateSection pointsUpdatedAt={prevWeekDetails?.sessionEnd} />
         </Flex>
 
-        <LeaderboardTable />
+        <LeaderboardTable ranks={ranks} />
       </Flex>
     </Flex>
   );
