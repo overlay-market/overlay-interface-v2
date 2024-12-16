@@ -13,6 +13,8 @@ import { shortenAddress } from "../../utils/web3";
 import { getRandomColors, getRandomName } from "../../utils/boringAvatars";
 import Avatar from "boring-avatars";
 import theme from "../../theme";
+import Loader from "../../components/Loader";
+import useAccount from "../../hooks/useAccount";
 
 type LeaderboardTableProps = {
   ranks?: UserData[];
@@ -23,6 +25,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   ranks,
   currentUserData,
 }) => {
+  const { address: account } = useAccount();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
@@ -45,7 +48,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
         </tr>
       </thead>
 
-      {currentUserData && (
+      {account && (
         <tbody>
           <CurrentUserRankingRow>
             <StyledCell
@@ -53,7 +56,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               weight={"400"}
               width={isMobile ? "36px" : "60px"}
             >
-              {currentUserData.rank}
+              {currentUserData?.rank ?? "N/A"}
             </StyledCell>
             <StyledCell
               textalign="left"
@@ -66,17 +69,17 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                   weight={"regular"}
                   size={"1"}
                 >
-                  {shortenAddress(currentUserData._id)}
+                  {shortenAddress(account)}
                 </Text>
               </Flex>
             </StyledCell>
             {!isMobile && (
               <StyledCell textalign="right">
-                {currentUserData.previousWeekPoints}
+                {currentUserData?.previousWeekPoints ?? "0"}
               </StyledCell>
             )}
             <StyledCell textalign="right">
-              {currentUserData.totalPoints}
+              {currentUserData?.totalPoints ?? "0"}
             </StyledCell>
           </CurrentUserRankingRow>
           <BgRow></BgRow>
@@ -84,6 +87,20 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
       )}
 
       <tbody>
+        {!ranks && (
+          <tr>
+            <td colSpan={4}>
+              <Flex
+                justify={"center"}
+                width={"100%"}
+                height={"100px"}
+                align={"center"}
+              >
+                <Loader />
+              </Flex>
+            </td>
+          </tr>
+        )}
         {ranks &&
           ranks.map((rank, index) => (
             <StyledRow key={rank._id}>
