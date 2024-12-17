@@ -5,10 +5,14 @@ import UserPointsSection from "./UserPointsSection";
 import LeaderboardTable from "./LeaderboardTable";
 import PointsUpdateSection from "./PointsUpdateSection";
 import useAccount from "../../hooks/useAccount";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LEADERBOARD_POINTS_API } from "../../constants/applications";
 import { LeaderboardPointsData, PrevWeekDetails, UserData } from "./types";
 import { Address } from "viem";
+import Loader from "../../components/Loader";
+
+const INITIAL_NUMBER_OF_ROWS = 10;
+const ROWS_PER_LOAD = 20;
 
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
@@ -20,8 +24,12 @@ const Leaderboard: React.FC = () => {
     undefined
   );
   const [fetchingPointsData, setFetchingPointsData] = useState(false);
-
-  const INITIAL_NUMBER_OF_ROWS = 10;
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadedNumberOfRows, setLoadedNumberOfRows] = useState(
+    INITIAL_NUMBER_OF_ROWS
+  );
+  const observerRef = useRef<HTMLDivElement>(null);
 
   const getPointsData = async (numberOfRows: number, account?: Address) => {
     setFetchingPointsData(true);
@@ -88,6 +96,53 @@ const Leaderboard: React.FC = () => {
     }
   }, [account, pointsData, initialUserData]);
 
+  const loadMoreData = async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+
+    const data = await getPointsData(loadedNumberOfRows + ROWS_PER_LOAD);
+
+    if (data) {
+      setPointsData(data);
+      setLoadedNumberOfRows((prev) => prev + ROWS_PER_LOAD);
+    }
+
+    if (data && data.leaderboardTable.length >= data.totalUsers) {
+      setHasMore(false);
+    }
+
+    setLoading(false);
+  };
+
+  const observer = useRef<IntersectionObserver>();
+  const isFirstTrigger = useRef(true);
+
+  useEffect(() => {
+    observer.current = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (isFirstTrigger.current) {
+          isFirstTrigger.current = false;
+          return;
+        }
+
+        if (entry.isIntersecting && hasMore) {
+          loadMoreData();
+        }
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+    const currentRef = observerRef.current;
+    if (currentRef) observer.current.observe(currentRef);
+
+    return () => {
+      if (currentRef) observer.current?.unobserve(currentRef);
+    };
+  }, [hasMore, loadedNumberOfRows]);
+
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
       <Flex
@@ -123,6 +178,18 @@ const Leaderboard: React.FC = () => {
         </Flex>
 
         <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
+
+        {loading && (
+          <Flex
+            justify={"center"}
+            width={"100%"}
+            height={"30px"}
+            align={"center"}
+          >
+            <Loader />
+          </Flex>
+        )}
+        <Flex ref={observerRef} width={"10px"} height={"10px"} />
       </Flex>
     </Flex>
   );
