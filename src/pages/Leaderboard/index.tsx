@@ -10,6 +10,7 @@ import { LEADERBOARD_POINTS_API } from "../../constants/applications";
 import { LeaderboardPointsData, PrevWeekDetails, UserData } from "./types";
 import { Address } from "viem";
 import Loader from "../../components/Loader";
+import { debounce } from "../../utils/debounce";
 
 const INITIAL_NUMBER_OF_ROWS = 10;
 const ROWS_PER_LOAD = 20;
@@ -118,6 +119,10 @@ const Leaderboard: React.FC = () => {
   const isFirstTrigger = useRef(true);
 
   useEffect(() => {
+    const loadMoreDataDebounced = debounce(() => {
+      loadMoreData();
+    }, 200);
+
     observer.current = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
@@ -127,7 +132,7 @@ const Leaderboard: React.FC = () => {
         }
 
         if (entry.isIntersecting && hasMore) {
-          loadMoreData();
+          loadMoreDataDebounced();
         }
       },
       {
