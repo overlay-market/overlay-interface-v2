@@ -15,7 +15,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return new OverlaySDK({
       chainId: chainId ? chainId as number : DEFAULT_CHAINID as number,
       rpcUrls: {
-        [SUPPORTED_CHAINID.BARTIO]: 'https://bera-testnet.nodeinfra.com',
+        [SUPPORTED_CHAINID.BARTIO]: import.meta.env.VITE_BARTIO_RPC,
       },      
       web3Provider: walletClient as any,
     });
