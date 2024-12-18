@@ -17,9 +17,11 @@ import { Address } from "viem";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
 import { useGetEnsName } from "../../utils/viemEnsUtils";
+import { GradientText } from "./user-points-section-styles";
 
 const INITIAL_NUMBER_OF_ROWS = 10;
 const ROWS_PER_LOAD = 20;
+const comingSoon = true;
 
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
@@ -190,12 +192,55 @@ const Leaderboard: React.FC = () => {
       </Flex>
       <LineSeparator />
 
+      {comingSoon && (
+        <Flex
+          position="fixed"
+          top="0"
+          left="0"
+          width="100%"
+          height="100%"
+          style={{
+            zIndex: "1000",
+            pointerEvents: "none",
+          }}
+          justify="center"
+          align="center"
+        >
+          <Flex
+            style={{
+              background: "black",
+              padding: "24px",
+              borderRadius: "8px",
+              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+            }}
+            maxWidth="80%"
+            direction="column"
+            align="center"
+            gap="16px"
+          >
+            <GradientText
+              size={{ initial: "5", sm: "6" }}
+              style={{
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            >
+              Coming Soon
+            </GradientText>
+            <Text size="2" style={{textAlign: "center"}}>
+              This feature is currently under development. Stay tuned!
+            </Text>
+          </Flex>
+        </Flex>
+      )}
+
       <Flex
         direction={"column"}
         gap={{ initial: "24px", sm: "28px", md: "32px" }}
         pt={"16px"}
         pl={{ initial: "4px", sm: "16px", md: "12px" }}
         pr={{ initial: "4px", sm: "0px" }}
+        style={comingSoon ? { filter: "blur(5px)" } : {}}
       >
         <Flex
           direction={{ initial: "column", sm: "row" }}
