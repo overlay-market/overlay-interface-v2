@@ -7,10 +7,16 @@ import PointsUpdateSection from "./PointsUpdateSection";
 import useAccount from "../../hooks/useAccount";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LEADERBOARD_POINTS_API } from "../../constants/applications";
-import { LeaderboardPointsData, PrevWeekDetails, UserData } from "./types";
+import {
+  ExtendedUserData,
+  LeaderboardPointsData,
+  PrevWeekDetails,
+  UserData,
+} from "./types";
 import { Address } from "viem";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
+import { useGetEnsName } from "../../utils/viemEnsUtils";
 
 const INITIAL_NUMBER_OF_ROWS = 10;
 const ROWS_PER_LOAD = 20;
@@ -18,12 +24,14 @@ const ROWS_PER_LOAD = 20;
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
 
+  const getEnsName = useGetEnsName();
+
   const [pointsData, setPointsData] = useState<
     LeaderboardPointsData | undefined
   >(undefined);
-  const [currentUserData, setCurrentUserData] = useState<UserData | undefined>(
-    undefined
-  );
+  const [currentUserData, setCurrentUserData] = useState<
+    ExtendedUserData | undefined
+  >(undefined);
   const [fetchingPointsData, setFetchingPointsData] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -81,13 +89,33 @@ const Leaderboard: React.FC = () => {
   }, [pointsData]);
 
   useEffect(() => {
+    const resolveUsername = async (user: ExtendedUserData) => {
+      const username = await getEnsName(user._id as Address);
+      const resolvedUser = {
+        ...user,
+        username: username ?? undefined,
+      };
+
+      setCurrentUserData(resolvedUser);
+    };
+
     const fetchUserData = async () => {
       const data = await getPointsData(0, account);
-      data && setCurrentUserData(data.user);
+      if (data && data.user) {
+        const user = {
+          ...data.user,
+          username: undefined,
+        };
+        resolveUsername(user);
+      }
     };
 
     if (account && initialUserData !== undefined) {
-      setCurrentUserData(initialUserData);
+      const user = {
+        ...initialUserData,
+        username: undefined,
+      };
+      resolveUsername(user);
     }
     if (account && pointsData && initialUserData === undefined) {
       fetchUserData();

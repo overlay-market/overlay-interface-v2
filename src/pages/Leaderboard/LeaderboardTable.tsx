@@ -7,7 +7,7 @@ import {
   Table,
 } from "./leaderboard-table-styles";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
-import { UserData } from "./types";
+import { ExtendedUserData } from "./types";
 import { Flex, Text } from "@radix-ui/themes";
 import { shortenAddress } from "../../utils/web3";
 import { getRandomColors, getRandomName } from "../../utils/boringAvatars";
@@ -17,8 +17,8 @@ import Loader from "../../components/Loader";
 import useAccount from "../../hooks/useAccount";
 
 type LeaderboardTableProps = {
-  ranks?: UserData[];
-  currentUserData?: UserData;
+  ranks?: ExtendedUserData[];
+  currentUserData?: ExtendedUserData;
 };
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
@@ -69,7 +69,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                   weight={"regular"}
                   size={"1"}
                 >
-                  {shortenAddress(account)}
+                  {currentUserData?.username ?? shortenAddress(account)}
                 </Text>
               </Flex>
             </StyledCell>
