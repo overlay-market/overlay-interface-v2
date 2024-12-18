@@ -18,3 +18,39 @@ export const InfoIcon: FC = () => (
     />
   </svg>
 );
+
+export const ClockIcon: FC = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g clipPath="url(#clip0_2105_6488)">
+      <path
+        d="M7.99867 14.6668C4.31677 14.6668 1.33203 11.682 1.33203 8.00016C1.33203 4.31826 4.3168 1.3335 7.99867 1.3335C10.9838 1.3335 13.4825 3.29542 14.332 6.00016H12.6653"
+        stroke="white"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 5.3335V8.00016L9.33333 9.3335"
+        stroke="white"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14.6367 8.66667C14.6565 8.44727 14.6667 8.22487 14.6667 8M10 14.6667C10.2277 14.5917 10.4502 14.5043 10.6667 14.4052M13.8604 11.3333C13.989 11.0856 14.1037 10.8289 14.2033 10.5641M12.1283 13.4861C12.3579 13.2961 12.5754 13.0905 12.7792 12.871"
+        stroke="white"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_2105_6488">
+        <rect width="16" height="16" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);

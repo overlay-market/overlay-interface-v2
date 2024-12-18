@@ -15,3 +15,5 @@ export enum NAVBAR_MODE {
   BURGER = "burger",
   DEFAULT = "default",
 }
+
+export const LEADERBOARD_POINTS_API = 'https://api.overlay.market/point-system/points/leaderboard'

@@ -13,8 +13,9 @@ import { DEFAULT_MARKET_ID } from "./constants/applications";
 import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
-import ScrollToTop from './utils/scrollToTop'
+import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
+import Leaderboard from "./pages/Leaderboard";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -42,6 +43,7 @@ const App = () => {
                 />
                 <Route path="/trade/:marketId" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
               </Routes>
             </Flex>
           </AppContainer>
