@@ -8,7 +8,7 @@ import {
 } from "./leaderboard-table-styles";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { ExtendedUserData } from "./types";
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Text, Avatar as UserAvatar } from "@radix-ui/themes";
 import { shortenAddress } from "../../utils/web3";
 import { getRandomColors, getRandomName } from "../../utils/boringAvatars";
 import Avatar from "boring-avatars";
@@ -116,13 +116,33 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 style={{ paddingLeft: isMobile ? "12px" : "20px" }}
               >
                 <Flex align={"center"} gap={"8px"}>
-                  <Avatar
-                    size={isMobile ? 28 : 36}
-                    variant="bauhaus"
-                    name={getRandomName()}
-                    colors={getRandomColors()}
-                  />
-                  <Text>{shortenAddress(rank._id)}</Text>
+                  {rank.avatar ? (
+                    <UserAvatar
+                      src={rank.avatar}
+                      radius="full"
+                      style={{
+                        width: isMobile ? "28px" : "36px",
+                        height: isMobile ? "28px" : "36px",
+                      }}
+                      fallback={
+                        <Avatar
+                          size={isMobile ? 28 : 36}
+                          variant="bauhaus"
+                          name={getRandomName()}
+                          colors={getRandomColors()}
+                        />
+                      }
+                    />
+                  ) : (
+                    <Avatar
+                      size={isMobile ? 28 : 36}
+                      variant="bauhaus"
+                      name={getRandomName()}
+                      colors={getRandomColors()}
+                    />
+                  )}
+
+                  <Text>{rank.username ?? shortenAddress(rank._id)}</Text>
                 </Flex>
               </StyledCell>
               {!isMobile && (
