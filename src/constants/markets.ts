@@ -49,9 +49,6 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 
 export const MARKETSORDER = [
   "Counter-Strike%202%20Skins",
-  "Rifles%20-%20CS2%20Skins",
-  "Knives%20-%20CS2%20Skins",
-  "Knives%20vs%20Rifles%20-%20CS2%20Skins",
   "BTC%20Dominance",
   "ETH%20Dominance",
   "AI%20Index",
@@ -65,8 +62,11 @@ export const MARKETSORDER = [
   "Hikaru%20Nakamura",
   "Magnus%20Carlsen",
   "Cats%20vs%20Dogs%20-%20Meme%20War",
+  "Rifles%20-%20CS2%20Skins",
   "Cats%20vs%20Frogs%20-%20Meme%20War",
+  "Knives%20-%20CS2%20Skins",
   "Frogs%20vs%20Dogs%20-%20Meme%20War",
+  "Knives%20vs%20Rifles%20-%20CS2%20Skins",
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
