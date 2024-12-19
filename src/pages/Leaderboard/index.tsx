@@ -16,15 +16,17 @@ import {
 import { Address } from "viem";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
-import { useGetEnsName } from "../../utils/viemEnsUtils";
+import { useGetEnsName, useResolveEnsProfiles } from "../../utils/viemEnsUtils";
 
 const INITIAL_NUMBER_OF_ROWS = 10;
 const ROWS_PER_LOAD = 20;
+const ROWS_PER_RESOLVE_PROFILES = 10;
 
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
 
   const getEnsName = useGetEnsName();
+  const resolveEnsProfiles = useResolveEnsProfiles();
 
   const [pointsData, setPointsData] = useState<
     LeaderboardPointsData | undefined
@@ -32,12 +34,17 @@ const Leaderboard: React.FC = () => {
   const [currentUserData, setCurrentUserData] = useState<
     ExtendedUserData | undefined
   >(undefined);
+  const [ranks, setRanks] = useState<ExtendedUserData[] | undefined>(undefined);
   const [fetchingPointsData, setFetchingPointsData] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingProfiles, setLoadingProfiles] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loadedNumberOfRows, setLoadedNumberOfRows] = useState(
     INITIAL_NUMBER_OF_ROWS
   );
+  const [fetchedRanksCounter, setFetchedRanksCounter] = useState(0);
+  const [resolvedProfilesCounter, setResolvedProfilesCounter] = useState(0);
+
   const observerRef = useRef<HTMLDivElement>(null);
 
   const getPointsData = async (numberOfRows: number, account?: Address) => {
@@ -82,12 +89,7 @@ const Leaderboard: React.FC = () => {
     }
   }, [pointsData]);
 
-  const ranks = useMemo<UserData[] | undefined>(() => {
-    if (pointsData) {
-      return pointsData.leaderboardTable;
-    }
-  }, [pointsData]);
-
+  //resolving for current user data
   useEffect(() => {
     const resolveUsername = async (user: ExtendedUserData) => {
       const username = await getEnsName(user._id as Address);
@@ -125,8 +127,69 @@ const Leaderboard: React.FC = () => {
     }
   }, [account, pointsData, initialUserData]);
 
+  //process of new loaded leaderboardTable data
+  useEffect(() => {
+    if (pointsData) {
+      const newFetchedData =
+        pointsData.leaderboardTable.slice(fetchedRanksCounter);
+      const extendedFetchedRanks = newFetchedData.map((data) => {
+        return {
+          ...data,
+          username: undefined,
+          avatar: undefined,
+        };
+      });
+      if (ranks) {
+        const combinedRanks = [...ranks, ...extendedFetchedRanks];
+        setRanks(combinedRanks);
+        setFetchedRanksCounter(combinedRanks.length);
+      } else {
+        setRanks(extendedFetchedRanks);
+        setFetchedRanksCounter(extendedFetchedRanks.length);
+      }
+    }
+  }, [pointsData, loadedNumberOfRows]);
+
+  const fetchEnsProfiles = async (ranksToBeResolved: ExtendedUserData[]) => {
+    setLoadingProfiles(true);
+    try {
+      const newResolvedRanks = await resolveEnsProfiles(ranksToBeResolved);
+
+      if (ranks) {
+        const updatedRanks = [...ranks];
+
+        updatedRanks.splice(
+          resolvedProfilesCounter,
+          ROWS_PER_RESOLVE_PROFILES,
+          ...newResolvedRanks
+        );
+        setRanks(updatedRanks);
+      }
+    } catch (error) {
+      console.error("Error resolving ENS profiles:", error);
+    } finally {
+      setLoadingProfiles(false);
+    }
+  };
+
+  //Ens profiles resolving for new fetched ranks
+  useEffect(() => {
+    if (resolvedProfilesCounter < fetchedRanksCounter) {
+      if (ranks) {
+        const ranksToBeResolved = ranks.slice(
+          resolvedProfilesCounter,
+          resolvedProfilesCounter + ROWS_PER_RESOLVE_PROFILES
+        );
+        fetchEnsProfiles(ranksToBeResolved);
+        setResolvedProfilesCounter((prev) => {
+          return prev + ROWS_PER_RESOLVE_PROFILES;
+        });
+      }
+    }
+  }, [fetchedRanksCounter, resolvedProfilesCounter, ranks]);
+
   const loadMoreData = async () => {
-    if (loading || !hasMore) return;
+    if (loading || loadingProfiles || !hasMore) return;
     setLoading(true);
 
     const data = await getPointsData(loadedNumberOfRows + ROWS_PER_LOAD);
