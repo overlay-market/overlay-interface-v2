@@ -3,16 +3,10 @@ import { mainnet } from "viem/chains";
 import { normalize } from 'viem/ens'
 import useSDK from "../providers/SDKProvider/useSDK";
 import { SUPPORTED_CHAINID } from "../constants/chains";
+import { ExtendedUserData } from "../pages/Leaderboard/types";
 
 type GetEnsNameFunction = (address: Address) => Promise<GetEnsNameReturnType>;
 type GetEnsAvatarFunction = (name: string) => Promise<GetEnsAvatarReturnType>;
-
-type ExtendedUserData = {
-  _id: string; 
-  username?: string; 
-  avatar?: string; 
-  [key: string]: any; 
-};
 type ResolveEnsProfilesFunction = (users: ExtendedUserData[]) => Promise<ExtendedUserData[]>;
 
 const publicClient: PublicClient = createPublicClient({
