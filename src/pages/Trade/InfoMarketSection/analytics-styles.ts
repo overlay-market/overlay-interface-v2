@@ -7,6 +7,7 @@ export const InfoBox = styled(Box)`
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  height: 58px;
   padding: 16px;
   border-radius: 8px;
   background: ${theme.color.grey4};
@@ -14,10 +15,12 @@ export const InfoBox = styled(Box)`
   @media (min-width: ${theme.breakpoints.sm}) {      
     flex-direction: column;
     align-items: start;
+    height: 97px;
   }
   @media (min-width: ${theme.breakpoints.md}) {     
     flex-direction: row;
     align-items: center;
+    height: 70px;
   }
 `
 
