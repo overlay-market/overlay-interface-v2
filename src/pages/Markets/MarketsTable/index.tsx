@@ -43,23 +43,47 @@ export default function MarketsTable({
     const sortableItems = [...marketsData];
     if (sortConfig?.key) {
       sortableItems.sort((a, b) => {
-        let aValue, bValue;
-        if (sortConfig.key === "funding") {
-          aValue = parseFloat(String(a.funding ?? "0"));
-          bValue = parseFloat(String(b.funding ?? "0"));
-        } else {
-          const aMarket7d = markets7d.find((m) => m.marketId === a.marketId);
-          const bMarket7d = markets7d.find((m) => m.marketId === b.marketId);
-          aValue = aMarket7d?.[sortConfig.key] ?? 0;
-          bValue = bMarket7d?.[sortConfig.key] ?? 0;
+        let aValue = 0,
+          bValue = 0;
+        const aMarket7d = markets7d.find((m) => m.marketId === a.marketId);
+        const bMarket7d = markets7d.find((m) => m.marketId === b.marketId);
+
+        console.log({ aMarket7d });
+        console.log({ bMarket7d });
+
+        switch (sortConfig.key) {
+          case "funding":
+            aValue = parseFloat(String(a.funding ?? "0"));
+            bValue = parseFloat(String(b.funding ?? "0"));
+            break;
+          case "oneHourChange":
+            aValue = parseFloat(aMarket7d?.oneHourChange?.toString() ?? "0");
+            bValue = parseFloat(bMarket7d?.oneHourChange?.toString() ?? "0");
+            break;
+          case "twentyFourHourChange":
+            aValue = parseFloat(
+              aMarket7d?.twentyFourHourChange?.toString() ?? "0"
+            );
+            bValue = parseFloat(
+              bMarket7d?.twentyFourHourChange?.toString() ?? "0"
+            );
+            break;
+          case "sevenDayChange":
+            aValue = parseFloat(aMarket7d?.sevenDayChange?.toString() ?? "0");
+            bValue = parseFloat(bMarket7d?.sevenDayChange?.toString() ?? "0");
+            break;
         }
-        if (aValue < bValue) {
-          return sortConfig.direction === "ascending" ? 1 : -1;
-        }
-        if (aValue > bValue) {
-          return sortConfig.direction === "ascending" ? -1 : 1;
-        }
-        return 0;
+
+        console.log(`Sorting ${sortConfig.key}:`, aValue, bValue);
+        return aValue < bValue
+          ? sortConfig.direction === "ascending"
+            ? 1
+            : -1
+          : aValue > bValue
+          ? sortConfig.direction === "ascending"
+            ? -1
+            : 1
+          : 0;
       });
     }
     return sortableItems;
@@ -339,7 +363,7 @@ export default function MarketsTable({
                   <Table.Cell
                     style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                   >
-                    <Flex>
+                    <Flex style={{ alignItems: "center" }}>
                       <MarketsLogos
                         src={MARKETS_FULL_LOGOS[market.marketId]}
                         alt={decodeURIComponent(market.marketId)}
@@ -380,18 +404,6 @@ export default function MarketsTable({
                       <Table.Cell
                         style={{
                           color:
-                            (market7d?.sevenDayChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
-                        }}
-                      >
-                        <Skeleton loading={!market7d}>
-                          {market7d?.sevenDayChange?.toFixed(2)}%
-                        </Skeleton>
-                      </Table.Cell>
-                      <Table.Cell
-                        style={{
-                          color:
                             (market7d?.twentyFourHourChange ?? 0) >= 0
                               ? theme.color.green2
                               : theme.color.red2,
@@ -399,6 +411,18 @@ export default function MarketsTable({
                       >
                         <Skeleton loading={!market7d}>
                           {market7d?.twentyFourHourChange?.toFixed(2)}%
+                        </Skeleton>
+                      </Table.Cell>
+                      <Table.Cell
+                        style={{
+                          color:
+                            (market7d?.sevenDayChange ?? 0) >= 0
+                              ? theme.color.green2
+                              : theme.color.red2,
+                        }}
+                      >
+                        <Skeleton loading={!market7d}>
+                          {market7d?.sevenDayChange?.toFixed(2)}%
                         </Skeleton>
                       </Table.Cell>
                       <Table.Cell style={{ color: theme.color.green2 }}>
