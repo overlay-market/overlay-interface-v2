@@ -2,6 +2,7 @@ import { Flex, Text } from "@radix-ui/themes";
 import React from "react";
 import Description from "./Description";
 import GrafanaPanel from "./GrafanaPanel";
+import Analytics from "./Analytics";
 
 const InfoMarketSection: React.FC = () => {
   return (
@@ -20,7 +21,14 @@ const InfoMarketSection: React.FC = () => {
         align={"start"}
         gap="16px"
       >
-        <Description />
+        <Flex
+          direction={{ initial: "column", sm: "row", md: "column" }}
+          width={"100%"}
+        >
+          <Description />
+          <Analytics />
+        </Flex>
+
         <GrafanaPanel />
       </Flex>
     </Flex>
