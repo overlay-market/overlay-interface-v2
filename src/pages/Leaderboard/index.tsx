@@ -189,7 +189,7 @@ const Leaderboard: React.FC = () => {
   }, [fetchedRanksCounter, resolvedProfilesCounter, ranks]);
 
   const loadMoreData = async () => {
-    if (loading || loadingProfiles || !hasMore) return;
+    if (loading || !hasMore) return;
     setLoading(true);
 
     const data = await getPointsData(loadedNumberOfRows + ROWS_PER_LOAD);
@@ -209,11 +209,11 @@ const Leaderboard: React.FC = () => {
   const observer = useRef<IntersectionObserver>();
   const isFirstTrigger = useRef(true);
 
-  useEffect(() => {
-    const loadMoreDataDebounced = debounce(() => {
-      loadMoreData();
-    }, 200);
+  const loadMoreDataDebounced = debounce(() => {
+    loadMoreData();
+  }, 200);
 
+  useEffect(() => {
     observer.current = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
@@ -238,6 +238,24 @@ const Leaderboard: React.FC = () => {
       if (currentRef) observer.current?.unobserve(currentRef);
     };
   }, [hasMore, loadedNumberOfRows]);
+
+  useEffect(() => {
+    const checkContentHeight = () => {
+      const viewportHeight = window.innerHeight;
+      const observerRefTop = observerRef.current?.offsetTop;
+
+      if (observerRefTop && hasMore && observerRefTop < viewportHeight) {
+        loadMoreDataDebounced();
+      }
+    };
+
+    if (fetchedRanksCounter > 0) {
+      checkContentHeight();
+    }
+
+    window.addEventListener("resize", checkContentHeight);
+    return () => window.removeEventListener("resize", checkContentHeight);
+  }, [hasMore, fetchedRanksCounter]);
 
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
