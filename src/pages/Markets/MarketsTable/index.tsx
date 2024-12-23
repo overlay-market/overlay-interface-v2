@@ -54,10 +54,10 @@ export default function MarketsTable({
           bValue = bMarket7d?.[sortConfig.key] ?? 0;
         }
         if (aValue < bValue) {
-          return sortConfig.direction === "ascending" ? -1 : 1;
+          return sortConfig.direction === "ascending" ? 1 : -1;
         }
         if (aValue > bValue) {
-          return sortConfig.direction === "ascending" ? 1 : -1;
+          return sortConfig.direction === "ascending" ? -1 : 1;
         }
         return 0;
       });
@@ -66,10 +66,15 @@ export default function MarketsTable({
   }, [marketsData, markets7d, sortConfig]);
 
   const requestSort = (key: SortableKeys) => {
-    let direction: "ascending" | "descending" = "ascending";
-    if (sortConfig?.key === key && sortConfig.direction === "ascending") {
-      direction = "descending";
+    let direction: "ascending" | "descending";
+
+    if (sortConfig?.key === key) {
+      direction =
+        sortConfig.direction === "ascending" ? "descending" : "ascending";
+    } else {
+      direction = "ascending";
     }
+
     setSortConfig({ key, direction });
   };
 
@@ -184,15 +189,29 @@ export default function MarketsTable({
             {!isMobile && (
               <Table.ColumnHeaderCell
                 onClick={() => requestSort("oneHourChange")}
-                style={{ cursor: "pointer" }}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
               >
-                1h{" "}
-                {sortConfig?.key === "oneHourChange" &&
-                  (sortConfig.direction === "ascending" ? (
-                    <ChevronDownIcon />
-                  ) : (
-                    <ChevronUpIcon />
-                  ))}
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>1h</span>
+                  {sortConfig?.key === "oneHourChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
               </Table.ColumnHeaderCell>
             )}
             {!isMobile && (
@@ -200,45 +219,83 @@ export default function MarketsTable({
                 onClick={() => requestSort("twentyFourHourChange")}
                 style={{
                   cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
+                  minWidth: "100px",
+                  width: "100px",
                 }}
               >
-                24h
-                {sortConfig?.key === "twentyFourHourChange" &&
-                  (sortConfig.direction === "ascending" ? (
-                    <ChevronDownIcon />
-                  ) : (
-                    <ChevronUpIcon />
-                  ))}
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>24h</span>
+                  {sortConfig?.key === "twentyFourHourChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
               </Table.ColumnHeaderCell>
             )}
             {!isMobile && (
               <Table.ColumnHeaderCell
                 onClick={() => requestSort("sevenDayChange")}
-                style={{ cursor: "pointer" }}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
               >
-                7d{" "}
-                {sortConfig?.key === "sevenDayChange" &&
-                  (sortConfig.direction === "ascending" ? (
-                    <ChevronDownIcon />
-                  ) : (
-                    <ChevronUpIcon />
-                  ))}
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>7d</span>
+                  {sortConfig?.key === "sevenDayChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
               </Table.ColumnHeaderCell>
             )}
             {!isMobile && (
               <Table.ColumnHeaderCell
                 onClick={() => requestSort("funding")}
-                style={{ cursor: "pointer" }}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
               >
-                Funding{" "}
-                {sortConfig?.key === "funding" &&
-                  (sortConfig.direction === "ascending" ? (
-                    <ChevronDownIcon />
-                  ) : (
-                    <ChevronUpIcon />
-                  ))}
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>Funding</span>
+                  {sortConfig?.key === "funding" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
               </Table.ColumnHeaderCell>
             )}
             {!isMobile && (
