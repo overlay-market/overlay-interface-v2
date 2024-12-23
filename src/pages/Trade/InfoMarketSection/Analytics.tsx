@@ -1,6 +1,6 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
-import { InfoBox } from "./analytics-styles";
+import { InfoBox, TextLabel, TextValue } from "./analytics-styles";
 import { CHAIN_SUBGRAPH_URL } from "../../../constants/subgraph";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { gql, request } from "graphql-request";
@@ -91,16 +91,16 @@ const Analytics: React.FC = () => {
   return (
     <Flex direction={"column"} gap={"16px"}>
       <InfoBox>
-        <Text>Total Volume</Text>
-        <Text>{totalVolume}</Text>
+        <TextLabel>Total Volume</TextLabel>
+        <TextValue>{totalVolume}</TextValue>
       </InfoBox>
       <InfoBox>
-        <Text>Tokens locked</Text>
-        <Text>{totalTokensLocked}</Text>
+        <TextLabel>Tokens locked</TextLabel>
+        <TextValue>{totalTokensLocked}</TextValue>
       </InfoBox>
       <InfoBox>
-        <Text>Transactions</Text>
-        <Text>{totalTransactions}</Text>
+        <TextLabel>Transactions</TextLabel>
+        <TextValue>{totalTransactions}</TextValue>
       </InfoBox>
     </Flex>
   );
