@@ -48,9 +48,6 @@ export default function MarketsTable({
         const aMarket7d = markets7d.find((m) => m.marketId === a.marketId);
         const bMarket7d = markets7d.find((m) => m.marketId === b.marketId);
 
-        console.log({ aMarket7d });
-        console.log({ bMarket7d });
-
         switch (sortConfig.key) {
           case "funding":
             aValue = parseFloat(String(a.funding ?? "0"));
@@ -74,7 +71,6 @@ export default function MarketsTable({
             break;
         }
 
-        console.log(`Sorting ${sortConfig.key}:`, aValue, bValue);
         return aValue < bValue
           ? sortConfig.direction === "ascending"
             ? 1
