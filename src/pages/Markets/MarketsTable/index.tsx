@@ -2,7 +2,7 @@ import { Box, Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../../theme";
 import * as Select from "@radix-ui/react-select";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { TransformedMarketData } from "overlay-sdk";
 import ProgressBar from "../../../components/ProgressBar";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
@@ -16,6 +16,13 @@ interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import * as React from "react";
+
+type SortableKeys =
+  | "funding"
+  | "oneHourChange"
+  | "twentyFourHourChange"
+  | "sevenDayChange";
 
 export default function MarketsTable({
   marketsData,
@@ -25,8 +32,71 @@ export default function MarketsTable({
   const redirectToTradePage = useRedirectToTradePage();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortableKeys;
+    direction: "ascending" | "descending";
+  } | null>(null);
 
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
+  const sortedData = React.useMemo(() => {
+    const sortableItems = [...marketsData];
+    if (sortConfig?.key) {
+      sortableItems.sort((a, b) => {
+        let aValue = 0,
+          bValue = 0;
+        const aMarket7d = markets7d.find((m) => m.marketId === a.marketId);
+        const bMarket7d = markets7d.find((m) => m.marketId === b.marketId);
+
+        switch (sortConfig.key) {
+          case "funding":
+            aValue = parseFloat(String(a.funding ?? "0"));
+            bValue = parseFloat(String(b.funding ?? "0"));
+            break;
+          case "oneHourChange":
+            aValue = parseFloat(aMarket7d?.oneHourChange?.toString() ?? "0");
+            bValue = parseFloat(bMarket7d?.oneHourChange?.toString() ?? "0");
+            break;
+          case "twentyFourHourChange":
+            aValue = parseFloat(
+              aMarket7d?.twentyFourHourChange?.toString() ?? "0"
+            );
+            bValue = parseFloat(
+              bMarket7d?.twentyFourHourChange?.toString() ?? "0"
+            );
+            break;
+          case "sevenDayChange":
+            aValue = parseFloat(aMarket7d?.sevenDayChange?.toString() ?? "0");
+            bValue = parseFloat(bMarket7d?.sevenDayChange?.toString() ?? "0");
+            break;
+        }
+
+        return aValue < bValue
+          ? sortConfig.direction === "ascending"
+            ? 1
+            : -1
+          : aValue > bValue
+          ? sortConfig.direction === "ascending"
+            ? -1
+            : 1
+          : 0;
+      });
+    }
+    return sortableItems;
+  }, [marketsData, markets7d, sortConfig]);
+
+  const requestSort = (key: SortableKeys) => {
+    let direction: "ascending" | "descending";
+
+    if (sortConfig?.key === key) {
+      direction =
+        sortConfig.direction === "ascending" ? "descending" : "ascending";
+    } else {
+      direction = "ascending";
+    }
+
+    setSortConfig({ key, direction });
+  };
 
   return (
     <Theme>
@@ -136,11 +206,117 @@ export default function MarketsTable({
               </Flex>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
-            {!isMobile && <Table.ColumnHeaderCell>1h</Table.ColumnHeaderCell>}
-            {!isMobile && <Table.ColumnHeaderCell>24h</Table.ColumnHeaderCell>}
-            {!isMobile && <Table.ColumnHeaderCell>7d</Table.ColumnHeaderCell>}
             {!isMobile && (
-              <Table.ColumnHeaderCell>Funding</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("oneHourChange")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>1h</span>
+                  {sortConfig?.key === "oneHourChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("twentyFourHourChange")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>24h</span>
+                  {sortConfig?.key === "twentyFourHourChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("sevenDayChange")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>7d</span>
+                  {sortConfig?.key === "sevenDayChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("funding")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>Funding</span>
+                  {sortConfig?.key === "funding" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
             )}
             {!isMobile && (
               <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
@@ -154,9 +330,8 @@ export default function MarketsTable({
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
-          {marketsData.length > 0 ? (
-            marketsData.map((market, index) => {
-              if (index === 0 || index === 5) return null;
+          {sortedData.length > 0 ? (
+            sortedData.map((market, index) => {
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
@@ -184,7 +359,7 @@ export default function MarketsTable({
                   <Table.Cell
                     style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                   >
-                    <Flex>
+                    <Flex style={{ alignItems: "center" }}>
                       <MarketsLogos
                         src={MARKETS_FULL_LOGOS[market.marketId]}
                         alt={decodeURIComponent(market.marketId)}
@@ -225,18 +400,6 @@ export default function MarketsTable({
                       <Table.Cell
                         style={{
                           color:
-                            (market7d?.sevenDayChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
-                        }}
-                      >
-                        <Skeleton loading={!market7d}>
-                          {market7d?.sevenDayChange?.toFixed(2)}%
-                        </Skeleton>
-                      </Table.Cell>
-                      <Table.Cell
-                        style={{
-                          color:
                             (market7d?.twentyFourHourChange ?? 0) >= 0
                               ? theme.color.green2
                               : theme.color.red2,
@@ -244,6 +407,18 @@ export default function MarketsTable({
                       >
                         <Skeleton loading={!market7d}>
                           {market7d?.twentyFourHourChange?.toFixed(2)}%
+                        </Skeleton>
+                      </Table.Cell>
+                      <Table.Cell
+                        style={{
+                          color:
+                            (market7d?.sevenDayChange ?? 0) >= 0
+                              ? theme.color.green2
+                              : theme.color.red2,
+                        }}
+                      >
+                        <Skeleton loading={!market7d}>
+                          {market7d?.sevenDayChange?.toFixed(2)}%
                         </Skeleton>
                       </Table.Cell>
                       <Table.Cell style={{ color: theme.color.green2 }}>
