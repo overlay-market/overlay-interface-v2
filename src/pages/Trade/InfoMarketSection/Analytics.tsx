@@ -54,9 +54,11 @@ const Analytics: React.FC = () => {
     const bigIntValue = BigInt(value);
     const divisor = BigInt(1e18);
 
-    return (bigIntValue / divisor).toLocaleString(undefined, {
-      maximumFractionDigits: 0,
-    });
+    return (bigIntValue / divisor)
+      .toLocaleString("en-US", {
+        maximumFractionDigits: 0,
+      })
+      .replaceAll(",", " ");
   };
 
   const totalVolume = useMemo(() => {
@@ -77,12 +79,11 @@ const Analytics: React.FC = () => {
 
   const totalTransactions = useMemo(() => {
     if (analyticsData) {
-      return BigInt(analyticsData[0].totalTransactions).toLocaleString(
-        undefined,
-        {
+      return BigInt(analyticsData[0].totalTransactions)
+        .toLocaleString("en-US", {
           maximumFractionDigits: 0,
-        }
-      );
+        })
+        .replaceAll(",", " ");
     } else {
       return "-";
     }
