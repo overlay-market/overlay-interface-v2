@@ -3,6 +3,7 @@ import React from "react";
 import Description from "./Description";
 import GrafanaPanel from "./GrafanaPanel";
 import Analytics from "./Analytics";
+import { InfoMarketContainer } from "./info-market-section-styles";
 
 const InfoMarketSection: React.FC = () => {
   return (
@@ -21,13 +22,10 @@ const InfoMarketSection: React.FC = () => {
         align={"start"}
         gap="16px"
       >
-        <Flex
-          direction={{ initial: "column", sm: "row", md: "column" }}
-          width={"100%"}
-        >
+        <InfoMarketContainer>
           <Description />
           <Analytics />
-        </Flex>
+        </InfoMarketContainer>
 
         <GrafanaPanel />
       </Flex>

@@ -89,7 +89,7 @@ const Analytics: React.FC = () => {
   }, [analyticsData]);
 
   return (
-    <Flex direction={"column"} gap={"16px"}>
+    <Flex direction={"column"} gap={"16px"} style={{ flex: 1 }}>
       <InfoBox>
         <TextLabel>Total Volume</TextLabel>
         <TextValue>{totalVolume}</TextValue>
