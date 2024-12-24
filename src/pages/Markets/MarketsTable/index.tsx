@@ -37,7 +37,7 @@ export default function MarketsTable({
     direction: "ascending" | "descending";
   } | null>(null);
 
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const sortedData = React.useMemo(() => {
     const sortableItems = [...marketsData];

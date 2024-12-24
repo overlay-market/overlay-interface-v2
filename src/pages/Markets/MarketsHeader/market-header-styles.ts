@@ -7,7 +7,7 @@ export const MarketHeaderContainer = styled(Flex)`
   width: 100%;
   justify-content: space-between;
 
-  @media (max-width: ${theme.breakpoints.sm}) {
+  @media (max-width: 767px) {
     display: none;
   }
 
