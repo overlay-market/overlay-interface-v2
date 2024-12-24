@@ -4,6 +4,7 @@ import Description from "./Description";
 import GrafanaPanel from "./GrafanaPanel";
 import Analytics from "./Analytics";
 import { InfoMarketContainer } from "./info-market-section-styles";
+import RiskParameters from "./RiskParameters";
 
 const InfoMarketSection: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const InfoMarketSection: React.FC = () => {
 
         <GrafanaPanel />
       </Flex>
+      <RiskParameters />
     </Flex>
   );
 };
