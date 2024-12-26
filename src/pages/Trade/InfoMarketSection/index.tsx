@@ -5,8 +5,12 @@ import GrafanaPanel from "./GrafanaPanel";
 import Analytics from "./Analytics";
 import { InfoMarketContainer } from "./info-market-section-styles";
 import RiskParameters from "./RiskParameters";
+import TabsMobile from "./TabsMobile";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const InfoMarketSection: React.FC = () => {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
   return (
     <Flex
       direction="column"
@@ -28,9 +32,11 @@ const InfoMarketSection: React.FC = () => {
           <Analytics />
         </InfoMarketContainer>
 
-        <GrafanaPanel />
+        {!isMobile && <GrafanaPanel />}
       </Flex>
-      <RiskParameters />
+      {!isMobile && <RiskParameters />}
+
+      {isMobile && <TabsMobile />}
     </Flex>
   );
 };
