@@ -103,12 +103,19 @@ const RiskParameters: React.FC = () => {
     const precision = BigInt(1e10);
 
     const scaledValue = (bigIntValue * precision) / divisor;
+    const unscaledValue = Number(scaledValue) / 1e10;
 
-    return (Number(scaledValue) / 1e10)
-      .toLocaleString("en-US", {
-        maximumFractionDigits: 10,
-      })
-      .replaceAll(",", " ");
+    if (unscaledValue < 1) {
+      return unscaledValue.toLocaleString("en-US", {
+        maximumSignificantDigits: 3,
+      });
+    } else {
+      return unscaledValue
+        .toLocaleString("en-US", {
+          maximumFractionDigits: 10,
+        })
+        .replaceAll(",", " ");
+    }
   };
 
   const averageBlockTime = useMemo(() => {
