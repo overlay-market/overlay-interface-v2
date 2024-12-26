@@ -4,6 +4,13 @@ import { CHAIN_SUBGRAPH_URL } from "../../../constants/subgraph";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { gql, request } from "graphql-request";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import {
+  RiskParamsItem,
+  RiskParamsTable,
+  RiskParamsTablesContainer,
+} from "./risk-parameters-styles";
+import theme from "../../../theme";
 
 const document = gql`
   query RiskParams($marketId: String!) {
@@ -61,6 +68,7 @@ const RiskParameters: React.FC = () => {
   const sdk = useSDK();
   const subgraphUrl = CHAIN_SUBGRAPH_URL[sdk.core.chainId];
   const { currentMarket } = useCurrentMarketState();
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const [riskParamsData, setRiskParamsData] = useState<RiskParamsData | null>(
     null
@@ -225,23 +233,63 @@ const RiskParameters: React.FC = () => {
     }
   }, [riskParamsData]);
 
+  const TABLE1: Array<Record<string, string>> = [
+    { k: k },
+    { lmbda: lmbda },
+    { delta: delta },
+    { capPayoff: capPayoff },
+    { capNotional: capNotional },
+  ];
+
+  const TABLE2: Array<Record<string, string>> = [
+    { capLeverage: capLeverage },
+    { liquidationFeeRate: liquidationFeeRate },
+    { tradingFeeRate: tradingFeeRate },
+    { minCollateral: minCollateral },
+    { averageBlockTime: averageBlockTime },
+  ];
+
+  const TABLE3: Array<Record<string, string>> = [
+    { priceDriftUpperLimit: priceDriftUpperLimit },
+    { circuitBreakerWindow: circuitBreakerWindow },
+    { circuitBreakerMintTarget: circuitBreakerMintTarget },
+    { maintenanceMarginFraction: maintenanceMarginFraction },
+    { maintenanceMarginBurnRate: maintenanceMarginBurnRate },
+  ];
+
   return (
-    <Flex direction={"column"} gap={"6px"}>
-      <Text>{averageBlockTime}</Text>
-      <Text>{capLeverage}</Text>
-      <Text>{capNotional}</Text>
-      <Text>{capPayoff}</Text>
-      <Text>{circuitBreakerMintTarget}</Text>
-      <Text>{circuitBreakerWindow}</Text>
-      <Text>{delta}</Text>
-      <Text>{k}</Text>
-      <Text>{liquidationFeeRate}</Text>
-      <Text>{lmbda}</Text>
-      <Text>{maintenanceMarginBurnRate}</Text>
-      <Text>{maintenanceMarginFraction}</Text>
-      <Text>{minCollateral}</Text>
-      <Text>{priceDriftUpperLimit}</Text>
-      <Text>{tradingFeeRate}</Text>
+    <Flex
+      direction={"column"}
+      gap={"24px"}
+      py={{ initial: "16px", sm: "32px" }}
+      width={"100%"}
+    >
+      {!isMobile && (
+        <Text size={"3"} weight={"bold"}>
+          Risk Parameters
+        </Text>
+      )}
+
+      <RiskParamsTablesContainer>
+        {[TABLE1, TABLE2, TABLE3].map((table) => (
+          <RiskParamsTable>
+            {table.map((record) => {
+              const entries = Object.entries(record);
+              const label = entries[0][0];
+              const value = entries[0][1];
+
+              return (
+                <RiskParamsItem>
+                  <Text weight={"bold"} style={{ color: theme.color.grey3 }}>
+                    {label}
+                  </Text>
+                  <Text weight={"medium"}>{value}</Text>
+                </RiskParamsItem>
+              );
+            })}
+          </RiskParamsTable>
+        ))}
+      </RiskParamsTablesContainer>
     </Flex>
   );
 };
