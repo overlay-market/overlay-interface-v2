@@ -16,6 +16,8 @@ export const CustomCard = styled(Flex)`
 
   &:hover {
     transform: scale(1.02);
+    position: relative;
+    left: 2px; 
   }
 `;
 

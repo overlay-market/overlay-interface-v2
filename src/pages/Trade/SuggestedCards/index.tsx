@@ -21,6 +21,7 @@ import { SuggestedCardsContainer } from "./suggested-cards-styles";
 
 const SuggestedCards: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1279px)");
   const { markets } = useMarketsState();
   const { currentMarket } = useCurrentMarketState();
 
@@ -96,6 +97,18 @@ const SuggestedCards: React.FC = () => {
     return result;
   };
 
+  const similarMarketsSectionWidth = useMemo(() => {
+    if (similarMarkets) {
+      if (similarMarkets && similarMarkets.length === 1) {
+        return "217px";
+      } else if (isTablet || similarMarkets.length === 2) {
+        return "364px";
+      } else if (isMobile) {
+        return "100%";
+      } else return "556px";
+    } else return "0px";
+  }, [isTablet, isMobile, similarMarkets]);
+
   return (
     <SuggestedCardsContainer
       direction="column"
@@ -107,7 +120,7 @@ const SuggestedCards: React.FC = () => {
         {similarMarkets && similarMarkets.length > 0 && (
           <Flex
             direction={"column"}
-            width={"600px"}
+            width={similarMarketsSectionWidth}
             flexShrink="0"
             overflowX={"hidden"}
           >
