@@ -69,6 +69,32 @@ const SuggestedCards: React.FC = () => {
     }
   }, [currentCategoryName, marketsData]);
 
+  const extractFirstAbstract = (description: string | undefined): string => {
+    if (!description) return "";
+    const prefixes = [
+      "TL;DR –",
+      "TL:DR –",
+      "TL:DR --",
+      "TL;DR --",
+      "TL;DR:",
+      "TL:DR:",
+      "TL;DR -",
+      "TL:DR -",
+    ];
+    const abstracts = description.split("\\n");
+    const firstAbstract = abstracts[0].trim();
+
+    const matchingPrefix = prefixes.find((prefix) =>
+      firstAbstract.startsWith(prefix)
+    );
+
+    const result = matchingPrefix
+      ? firstAbstract.slice(matchingPrefix.length).trim()
+      : firstAbstract;
+
+    return result;
+  };
+
   return (
     <Flex
       direction="column"
@@ -109,7 +135,7 @@ const SuggestedCards: React.FC = () => {
                         3
                       )}
                       title={market.marketName}
-                      description={market.descriptionText}
+                      description={extractFirstAbstract(market.descriptionText)}
                       h24={"23.55%"}
                       funding={market.parsedDailyFundingRate}
                     />
@@ -152,7 +178,7 @@ const SuggestedCards: React.FC = () => {
                         3
                       )}
                       title={market.marketName}
-                      description={market.descriptionText}
+                      description={extractFirstAbstract(market.descriptionText)}
                       h24={"23.55%"}
                       funding={market.parsedDailyFundingRate}
                     />
