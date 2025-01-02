@@ -17,6 +17,7 @@ import {
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { MarketDataParsed } from "../../../types/marketTypes";
+import { SuggestedCardsContainer } from "./suggested-cards-styles";
 
 const SuggestedCards: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -96,7 +97,7 @@ const SuggestedCards: React.FC = () => {
   };
 
   return (
-    <Flex
+    <SuggestedCardsContainer
       direction="column"
       p={{ initial: "0px 4px 66px", sm: "0px 8px 66px" }}
     >
@@ -104,7 +105,12 @@ const SuggestedCards: React.FC = () => {
       <Flex direction={{ initial: "column", sm: "row" }} gap={"20px"}>
         <Skeleton height="257px" loading={!similarMarkets} />
         {similarMarkets && similarMarkets.length > 0 && (
-          <Flex direction={"column"} width={"600px"} overflowX={"hidden"}>
+          <Flex
+            direction={"column"}
+            width={"600px"}
+            flexShrink="0"
+            overflowX={"hidden"}
+          >
             <Text weight={"bold"} size={"5"}>
               Similar To This Market
             </Text>
@@ -144,7 +150,7 @@ const SuggestedCards: React.FC = () => {
         )}
         <Skeleton height="257px" loading={!orderedMarketsData} />
         {orderedMarketsData && orderedMarketsData.length > 0 && (
-          <Flex direction={"column"} width={"500px"} overflowX={"hidden"}>
+          <Flex direction={"column"} overflowX={"hidden"}>
             <Text weight={"bold"} size={"5"}>
               Top Markets
             </Text>
@@ -183,7 +189,7 @@ const SuggestedCards: React.FC = () => {
           </Flex>
         )}
       </Flex>
-    </Flex>
+    </SuggestedCardsContainer>
   );
 };
 
