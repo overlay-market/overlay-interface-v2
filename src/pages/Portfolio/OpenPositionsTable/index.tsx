@@ -1,4 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
+import { ColorButton } from "../../../components/Button";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
+import ClosePositionsModal from "../../../components/ClosePositionsModal";
 
 const POSITIONS_COLUMNS = [
   "Market",
@@ -39,6 +41,8 @@ const OpenPositionsTable: React.FC = () => {
   const [selectedPositions, setSelectedPositions] = useState<Set<string>>(
     new Set()
   );
+  const [showCheckboxes, setShowCheckboxes] = useState(false);
+  const [showCloseModal, setShowCloseModal] = useState(false);
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
@@ -60,6 +64,14 @@ const OpenPositionsTable: React.FC = () => {
       }
       return newSet;
     });
+  };
+
+  const handleClosePositions = () => {
+    // Implement your close positions logic here
+    console.log("Closing positions:", Array.from(selectedPositions));
+    setShowCloseModal(false);
+    setShowCheckboxes(false);
+    setSelectedPositions(new Set());
   };
 
   useEffect(() => {
@@ -115,9 +127,37 @@ const OpenPositionsTable: React.FC = () => {
         borderBottom: `1px solid ${theme.color.darkBlue}`,
       }}
     >
-      <Text weight={"bold"} size={"5"}>
-        Open Positions
-      </Text>
+      <Flex align="center" justify="between" mb="4">
+        <Text weight={"bold"} size={"5"}>
+          Open Positions
+        </Text>
+        <Flex gap="2">
+          {showCheckboxes ? (
+            <>
+              <ColorButton
+                onClick={() => setShowCheckboxes(false)}
+                width="140px"
+                bgColor={theme.color.grey4}
+                color={theme.color.grey1}
+              >
+                Cancel Selection
+              </ColorButton>
+              <ColorButton
+                onClick={() => setShowCloseModal(true)}
+                width="180px"
+                bgColor={theme.color.red1}
+                disabled={selectedPositions.size === 0}
+              >
+                Close Selected ({selectedPositions.size})
+              </ColorButton>
+            </>
+          ) : (
+            <ColorButton onClick={() => setShowCheckboxes(true)} width="140px">
+              Select Positions
+            </ColorButton>
+          )}
+        </Flex>
+      </Flex>
 
       <StyledTable
         headerColumns={POSITIONS_COLUMNS}
@@ -127,7 +167,7 @@ const OpenPositionsTable: React.FC = () => {
         positionsTotalNumber={positionsTotalNumber}
         setCurrentPage={setCurrentPage}
         setItemsPerPage={setItemsPerPage}
-        showCheckbox={true}
+        showCheckbox={showCheckboxes}
         onSelectAll={handleSelectAll}
         body={
           positions &&
@@ -135,6 +175,7 @@ const OpenPositionsTable: React.FC = () => {
             <OpenPosition
               position={position}
               key={index}
+              showCheckbox={showCheckboxes}
               onCheckboxChange={handlePositionSelect}
               isChecked={selectedPositions.has(position.marketAddress)}
             />
@@ -150,6 +191,13 @@ const OpenPositionsTable: React.FC = () => {
       ) : (
         <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
       )}
+
+      <ClosePositionsModal
+        open={showCloseModal}
+        handleDismiss={() => setShowCloseModal(false)}
+        selectedCount={selectedPositions.size}
+        onConfirm={handleClosePositions}
+      />
     </Flex>
   );
 };
