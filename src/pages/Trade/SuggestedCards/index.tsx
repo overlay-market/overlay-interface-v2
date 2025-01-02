@@ -40,7 +40,7 @@ const SuggestedCards: React.FC = () => {
         return category as CategoryName;
       }
     }
-    return null;
+    return CategoryName.Other;
   };
 
   const filterMarketsByCategory = (
@@ -101,24 +101,21 @@ const SuggestedCards: React.FC = () => {
       p={{ initial: "0px 4px 66px", sm: "0px 8px 66px" }}
     >
       <Text style={{ color: "#8D8F94" }}>SUGGESTED</Text>
-      <Flex gap={"20px"}>
-        <Flex direction={"column"} width={"600px"} overflowX={"hidden"}>
-          <Text weight={"bold"} size={"5"}>
-            Similar To This Market
-          </Text>
-          <Box>
-            <Skeleton
-              height="257px"
-              loading={similarMarkets && similarMarkets.length < 1}
-            />
-            {similarMarkets && similarMarkets.length > 0 && (
+      <Flex direction={{ initial: "column", sm: "row" }} gap={"20px"}>
+        <Skeleton height="257px" loading={!similarMarkets} />
+        {similarMarkets && similarMarkets.length > 0 && (
+          <Flex direction={"column"} width={"600px"} overflowX={"hidden"}>
+            <Text weight={"bold"} size={"5"}>
+              Similar To This Market
+            </Text>
+            <Box>
               <Swiper
                 modules={[Navigation, Pagination, Mousewheel]}
                 style={{
                   height: "280px",
                   paddingTop: "4px",
                 }}
-                spaceBetween={20}
+                spaceBetween={isMobile ? 12 : 20}
                 slidesPerView={"auto"}
                 loop={false}
                 centeredSlides={false}
@@ -142,26 +139,23 @@ const SuggestedCards: React.FC = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-            )}
-          </Box>
-        </Flex>
-        <Flex direction={"column"} width={"500px"} overflowX={"hidden"}>
-          <Text weight={"bold"} size={"5"}>
-            Top Markets
-          </Text>
-          <Box>
-            <Skeleton
-              height="257px"
-              loading={similarMarkets && similarMarkets.length < 1}
-            />
-            {orderedMarketsData && orderedMarketsData.length > 0 && (
+            </Box>
+          </Flex>
+        )}
+        <Skeleton height="257px" loading={!orderedMarketsData} />
+        {orderedMarketsData && orderedMarketsData.length > 0 && (
+          <Flex direction={"column"} width={"500px"} overflowX={"hidden"}>
+            <Text weight={"bold"} size={"5"}>
+              Top Markets
+            </Text>
+            <Box>
               <Swiper
                 modules={[Navigation, Pagination, Mousewheel]}
                 style={{
                   height: "280px",
                   paddingTop: "4px",
                 }}
-                spaceBetween={20}
+                spaceBetween={isMobile ? 12 : 20}
                 slidesPerView={"auto"}
                 loop={false}
                 centeredSlides={false}
@@ -185,9 +179,9 @@ const SuggestedCards: React.FC = () => {
                   </SwiperSlide>
                 ))}
               </Swiper>
-            )}
-          </Box>
-        </Flex>
+            </Box>
+          </Flex>
+        )}
       </Flex>
     </Flex>
   );
