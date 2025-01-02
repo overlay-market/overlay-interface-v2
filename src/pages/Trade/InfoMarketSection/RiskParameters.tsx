@@ -278,15 +278,15 @@ const RiskParameters: React.FC = () => {
       )}
 
       <RiskParamsTablesContainer>
-        {[TABLE1, TABLE2, TABLE3].map((table) => (
-          <RiskParamsTable>
-            {table.map((record) => {
+        {[TABLE1, TABLE2, TABLE3].map((table, tableIndex) => (
+          <RiskParamsTable key={`table-${tableIndex}`}>
+            {table.map((record, recordIndex) => {
               const entries = Object.entries(record);
               const label = entries[0][0];
               const value = entries[0][1];
 
               return (
-                <RiskParamsItem>
+                <RiskParamsItem key={`record-${tableIndex}-${recordIndex}`}>
                   <Text weight={"bold"} style={{ color: theme.color.grey3 }}>
                     {label}
                   </Text>
