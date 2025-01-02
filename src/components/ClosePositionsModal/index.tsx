@@ -1,5 +1,4 @@
 import { Dialog, Button, Flex, Text } from "@radix-ui/themes";
-import theme from "../../theme";
 
 type ClosePositionsModalProps = {
   open: boolean;

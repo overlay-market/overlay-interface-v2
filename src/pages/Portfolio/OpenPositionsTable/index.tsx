@@ -145,7 +145,6 @@ const OpenPositionsTable: React.FC = () => {
               <ColorButton
                 onClick={() => setShowCloseModal(true)}
                 width="180px"
-                bgColor={theme.color.red1}
                 disabled={selectedPositions.size === 0}
               >
                 Close Selected ({selectedPositions.size})
