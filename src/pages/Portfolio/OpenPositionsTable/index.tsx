@@ -36,6 +36,31 @@ const OpenPositionsTable: React.FC = () => {
   const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [selectedPositions, setSelectedPositions] = useState<Set<string>>(
+    new Set()
+  );
+
+  const handleSelectAll = (selectAll: boolean) => {
+    if (selectAll) {
+      setSelectedPositions(
+        new Set(positions?.map((p) => p.marketAddress) || [])
+      );
+    } else {
+      setSelectedPositions(new Set());
+    }
+  };
+
+  const handlePositionSelect = (positionId: string, checked: boolean) => {
+    setSelectedPositions((prev) => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(positionId);
+      } else {
+        newSet.delete(positionId);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     const fetchOpenPositions = async () => {
@@ -102,10 +127,17 @@ const OpenPositionsTable: React.FC = () => {
         positionsTotalNumber={positionsTotalNumber}
         setCurrentPage={setCurrentPage}
         setItemsPerPage={setItemsPerPage}
+        showCheckbox={true}
+        onSelectAll={handleSelectAll}
         body={
           positions &&
           positions.map((position: OpenPositionData, index: number) => (
-            <OpenPosition position={position} key={index} />
+            <OpenPosition
+              position={position}
+              key={index}
+              onCheckboxChange={handlePositionSelect}
+              isChecked={selectedPositions.has(position.marketAddress)}
+            />
           ))
         }
       />

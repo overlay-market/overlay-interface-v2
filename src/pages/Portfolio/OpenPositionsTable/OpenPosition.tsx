@@ -7,9 +7,17 @@ import { OpenPositionData } from "overlay-sdk";
 
 type OpenPositionProps = {
   position: OpenPositionData;
+  showCheckbox?: boolean;
+  onCheckboxChange?: (positionId: string, checked: boolean) => void;
+  isChecked?: boolean;
 };
 
-const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
+const OpenPosition: React.FC<OpenPositionProps> = ({
+  position,
+  showCheckbox = true,
+  onCheckboxChange,
+  isChecked = false,
+}) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);
@@ -21,14 +29,33 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
   const isFundingPositive = Number(position.parsedFunding) > 0;
 
-  const handleItemClick = () => {
-    setSelectedPosition(position);
-    setShowModal(true);
+  const handleItemClick = (event: React.MouseEvent) => {
+    if ((event.target as HTMLElement).tagName !== "INPUT") {
+      setSelectedPosition(position);
+      setShowModal(true);
+    }
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newCheckedState = event.target.checked;
+    if (onCheckboxChange) {
+      onCheckboxChange(position.marketAddress, newCheckedState);
+    }
   };
 
   return (
     <>
       <StyledRow style={{ fontSize: "12px" }} onClick={handleItemClick}>
+        {showCheckbox && (
+          <StyledCell>
+            <input
+              type="checkbox"
+              checked={isChecked}
+              onChange={handleCheckboxChange}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </StyledCell>
+        )}
         <StyledCell>{position.marketName}</StyledCell>
         <StyledCell>{position.size} OVL</StyledCell>
         <StyledCell>

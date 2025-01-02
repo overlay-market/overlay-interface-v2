@@ -1,4 +1,4 @@
-import { Flex, ScrollArea, Text } from "@radix-ui/themes";
+import { Flex, ScrollArea, Text, Checkbox } from "@radix-ui/themes";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import {
   Dropdown,
@@ -9,6 +9,7 @@ import {
   Table,
 } from "./table-styles";
 import theme from "../../theme";
+import { useState } from "react";
 
 const ROWS_PER_PAGE = [10, 20, 50];
 
@@ -22,6 +23,8 @@ type TableProps = {
   setCurrentPage: Function;
   setItemsPerPage: Function;
   body?: React.ReactNode;
+  showCheckbox?: boolean;
+  onSelectAll?: (selectAll: boolean) => void;
 };
 
 const StyledTable: React.FC<TableProps> = ({
@@ -34,8 +37,11 @@ const StyledTable: React.FC<TableProps> = ({
   setCurrentPage,
   setItemsPerPage,
   body,
+  showCheckbox,
+  onSelectAll,
 }) => {
   const totalPages = Math.ceil(positionsTotalNumber / itemsPerPage);
+  const [allSelected, setAllSelected] = useState(false);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -54,12 +60,23 @@ const StyledTable: React.FC<TableProps> = ({
     setCurrentPage(1);
   };
 
+  const handleSelectAll = () => {
+    const newAllSelected = !allSelected;
+    setAllSelected(newAllSelected);
+    onSelectAll && onSelectAll(newAllSelected);
+  };
+
   return (
     <>
       <ScrollArea type="auto" scrollbars="horizontal" size="2">
         <Table width={width} minwidth={minWidth}>
           <thead>
             <tr>
+              {showCheckbox && (
+                <StyledHeader style={{ width: "40px", padding: "0 8px" }}>
+                  <Checkbox onClick={handleSelectAll} checked={allSelected} />
+                </StyledHeader>
+              )}
               {headerColumns.map((column: string, index) => (
                 <StyledHeader key={index}>{column}</StyledHeader>
               ))}
