@@ -58,16 +58,16 @@ const SuggestedCards: React.FC = () => {
   }, [currentMarket]);
 
   const similarMarkets = useMemo(() => {
-    if (currentCategoryName && marketsData) {
+    if (currentCategoryName && marketsData && currentMarket) {
       const filteredMarkets = filterMarketsByCategory(
         marketsData,
         currentCategoryName
-      );
+      ).filter((market) => market.marketId !== currentMarket.marketId);
       return filteredMarkets;
     } else {
       return undefined;
     }
-  }, [currentCategoryName, marketsData]);
+  }, [currentCategoryName, marketsData, currentMarket]);
 
   const extractFirstAbstract = (description: string | undefined): string => {
     if (!description) return "";
