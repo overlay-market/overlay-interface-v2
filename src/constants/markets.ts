@@ -80,6 +80,7 @@ export enum CategoryName {
   OrdinalNft = 'Ordinals',
   Crypto = 'Crypto',
   Chess = 'Chess',
+  Artists = 'Artists',
   Other = 'Other',
 }
 
@@ -116,6 +117,9 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",
     "SUPER%20%2F%20ETH",
+  ],
+  [CategoryName.Artists]: [
+    "Lana%20Del%20Rey",
   ],
   [CategoryName.Other]: [
 
