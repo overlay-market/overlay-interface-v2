@@ -12,6 +12,7 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import ClosePositionsModal from "../../../components/ClosePositionsModal";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const POSITIONS_COLUMNS = [
   "Market",
@@ -44,19 +45,25 @@ const OpenPositionsTable: React.FC = () => {
   const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
 
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
       setSelectedPositions(
-        new Set(positions?.map((p) => p.marketAddress) || [])
+        new Set(positions?.map((p) => p.positionId.toString()) || [])
       );
     } else {
       setSelectedPositions(new Set());
     }
   };
 
-  const handlePositionSelect = (positionId: string, checked: boolean) => {
+  const handlePositionSelect = (
+    position: OpenPositionData,
+    checked: boolean
+  ) => {
     setSelectedPositions((prev) => {
       const newSet = new Set(prev);
+      const positionId = position.positionId.toString();
       if (checked) {
         newSet.add(positionId);
       } else {
@@ -67,8 +74,6 @@ const OpenPositionsTable: React.FC = () => {
   };
 
   const handleClosePositions = () => {
-    // Implement your close positions logic here
-    console.log("Closing positions:", Array.from(selectedPositions));
     setShowCloseModal(false);
     setShowCheckboxes(false);
     setSelectedPositions(new Set());
@@ -131,7 +136,7 @@ const OpenPositionsTable: React.FC = () => {
         <Text weight={"bold"} size={"5"}>
           Open Positions
         </Text>
-        <Flex gap="2">
+        <Flex gap="2" style={{ display: isMobile ? "none" : "flex" }}>
           {showCheckboxes ? (
             <>
               <ColorButton
@@ -170,13 +175,15 @@ const OpenPositionsTable: React.FC = () => {
         onSelectAll={handleSelectAll}
         body={
           positions &&
-          positions.map((position: OpenPositionData, index: number) => (
+          positions.map((position: OpenPositionData) => (
             <OpenPosition
               position={position}
-              key={index}
+              key={position.positionId}
               showCheckbox={showCheckboxes}
-              onCheckboxChange={handlePositionSelect}
-              isChecked={selectedPositions.has(position.marketAddress)}
+              onCheckboxChange={(checked) =>
+                handlePositionSelect(position, checked)
+              }
+              isChecked={selectedPositions.has(position.positionId.toString())}
             />
           ))
         }

@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Text, Checkbox } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
@@ -8,7 +8,7 @@ import { OpenPositionData } from "overlay-sdk";
 type OpenPositionProps = {
   position: OpenPositionData;
   showCheckbox?: boolean;
-  onCheckboxChange?: (positionId: string, checked: boolean) => void;
+  onCheckboxChange?: (checked: boolean) => void;
   isChecked?: boolean;
 };
 
@@ -36,10 +36,9 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     }
   };
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newCheckedState = event.target.checked;
+  const handleCheckboxChange = (checked: boolean) => {
     if (onCheckboxChange) {
-      onCheckboxChange(position.marketAddress, newCheckedState);
+      onCheckboxChange(checked);
     }
   };
 
@@ -47,11 +46,18 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     <>
       <StyledRow style={{ fontSize: "12px" }} onClick={handleItemClick}>
         {showCheckbox && (
-          <StyledCell>
-            <input
-              type="checkbox"
+          <StyledCell
+            style={{
+              width: "40px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Checkbox
               checked={isChecked}
-              onChange={handleCheckboxChange}
+              onCheckedChange={handleCheckboxChange}
+              size="3"
               onClick={(e) => e.stopPropagation()}
             />
           </StyledCell>

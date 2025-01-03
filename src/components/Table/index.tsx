@@ -9,7 +9,7 @@ import {
   Table,
 } from "./table-styles";
 import theme from "../../theme";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ROWS_PER_PAGE = [10, 20, 50];
 
@@ -43,6 +43,12 @@ const StyledTable: React.FC<TableProps> = ({
   const totalPages = Math.ceil(positionsTotalNumber / itemsPerPage);
   const [allSelected, setAllSelected] = useState(false);
 
+  useEffect(() => {
+    if (!showCheckbox) {
+      setAllSelected(false);
+    }
+  }, [showCheckbox]);
+
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
@@ -73,8 +79,17 @@ const StyledTable: React.FC<TableProps> = ({
           <thead>
             <tr>
               {showCheckbox && (
-                <StyledHeader style={{ width: "40px", padding: "0 8px" }}>
-                  <Checkbox onClick={handleSelectAll} checked={allSelected} />
+                <StyledHeader
+                  style={{
+                    width: "40px",
+                    paddingLeft: "10px",
+                  }}
+                >
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={handleSelectAll}
+                    size="3"
+                  />
                 </StyledHeader>
               )}
               {headerColumns.map((column: string, index) => (
