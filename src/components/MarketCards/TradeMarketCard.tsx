@@ -14,7 +14,7 @@ interface TradeMarketCardProps {
   title: string;
   id: string;
   description?: string;
-  h24: string;
+  h24: number;
   funding?: string;
 }
 
@@ -62,9 +62,11 @@ const TradeMarketCard = ({
             <Text
               weight={"bold"}
               size={"1"}
-              style={{ color: theme.color.red1 }}
+              style={{
+                color: h24 >= 0 ? theme.color.green3 : theme.color.red1,
+              }}
             >
-              {h24}
+              {h24.toFixed(2)}%
             </Text>
           </Flex>
           <Flex justify={"between"}>

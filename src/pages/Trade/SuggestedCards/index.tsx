@@ -18,6 +18,7 @@ import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency"
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { MarketDataParsed } from "../../../types/marketTypes";
 import { SuggestedCardsContainer } from "./suggested-cards-styles";
+import { useMarkets7d } from "../../../hooks/useMarkets7d";
 
 const SuggestedCards: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -26,6 +27,15 @@ const SuggestedCards: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
 
   const marketsData = markets && [...markets];
+
+  const marketIds = useMemo(() => {
+    if (marketsData) {
+      return marketsData.map((market) => market.marketId);
+    } else return [];
+  }, [marketsData]);
+
+  const markets7d = useMarkets7d(marketIds);
+
   const orderedMarketsData =
     marketsData &&
     marketsData.sort((a, b) => {
@@ -51,6 +61,13 @@ const SuggestedCards: React.FC = () => {
   ): MarketDataParsed[] => {
     const marketIds = MARKET_CATEGORIES[categoryName];
     return marketsData.filter((market) => marketIds.includes(market.marketId));
+  };
+
+  const getTwentyFourHourChange = (marketId: string): number => {
+    if (markets7d) {
+      const market7d = markets7d.find((market) => market.marketId === marketId);
+      return market7d?.twentyFourHourChange ?? 0;
+    } else return 0;
   };
 
   const currentCategoryName = useMemo(() => {
@@ -152,7 +169,7 @@ const SuggestedCards: React.FC = () => {
                       )}
                       title={market.marketName}
                       description={extractFirstAbstract(market.descriptionText)}
-                      h24={"23.55%"}
+                      h24={getTwentyFourHourChange(market.marketId)}
                       funding={market.parsedDailyFundingRate}
                     />
                   </SwiperSlide>
@@ -192,7 +209,7 @@ const SuggestedCards: React.FC = () => {
                       )}
                       title={market.marketName}
                       description={extractFirstAbstract(market.descriptionText)}
-                      h24={"23.55%"}
+                      h24={getTwentyFourHourChange(market.marketId)}
                       funding={market.parsedDailyFundingRate}
                     />
                   </SwiperSlide>
