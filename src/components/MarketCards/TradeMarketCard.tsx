@@ -8,6 +8,7 @@ import {
   MarketTitle,
 } from "./trade-market-card-styles";
 import theme from "../../theme";
+import PercentWithSign from "./PercentWithSign";
 
 interface TradeMarketCardProps {
   priceWithCurrency: string;
@@ -66,7 +67,7 @@ const TradeMarketCard = ({
                 color: h24 >= 0 ? theme.color.green3 : theme.color.red1,
               }}
             >
-              {h24.toFixed(2)}%
+              <PercentWithSign value={h24} />
             </Text>
           </Flex>
           <Flex justify={"between"}>
@@ -76,9 +77,12 @@ const TradeMarketCard = ({
             <Text
               weight={"bold"}
               size={"1"}
-              style={{ color: theme.color.green3 }}
+              style={{
+                color:
+                  Number(funding) >= 0 ? theme.color.green3 : theme.color.red1,
+              }}
             >
-              {funding}
+              <PercentWithSign value={funding} />
             </Text>
           </Flex>
         </Flex>
