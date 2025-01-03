@@ -17,6 +17,7 @@ import PositionsTable from "./PositionsTable";
 import InfoMarketSection from "./InfoMarketSection";
 import { ExpandedMarketData } from "overlay-sdk";
 import { StyledFlex, TradeContainer } from "./trade-styles";
+import SuggestedCards from "./SuggestedCards";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
@@ -103,6 +104,7 @@ const Trade: React.FC = () => {
         </StyledFlex>
         <PositionsTable />
         <InfoMarketSection />
+        <SuggestedCards />
       </Flex>
     </TradeContainer>
   );
