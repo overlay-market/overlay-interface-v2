@@ -9,6 +9,7 @@ import {
 } from "./trade-market-card-styles";
 import theme from "../../theme";
 import PercentWithSign from "./PercentWithSign";
+import { useLayoutEffect, useRef, useState } from "react";
 
 interface TradeMarketCardProps {
   priceWithCurrency: string;
@@ -28,6 +29,19 @@ const TradeMarketCard = ({
   funding,
 }: TradeMarketCardProps) => {
   const redirectToTradePage = useRedirectToTradePage();
+
+  const titleRef = useRef<HTMLElement | null>(null);
+  const [isLongTitle, setIsLongTitle] = useState(false);
+
+  useLayoutEffect(() => {
+    const titleElement = titleRef.current;
+
+    if (titleElement) {
+      const titleHeight = titleElement.offsetHeight;
+      const lineHeight = parseFloat(getComputedStyle(titleElement).lineHeight);
+      setIsLongTitle(titleHeight > lineHeight);
+    }
+  }, [title, titleRef.current]);
 
   return (
     <CustomCard onClick={() => redirectToTradePage(id)}>
@@ -49,10 +63,12 @@ const TradeMarketCard = ({
           >
             {priceWithCurrency}
           </Text>
-          <MarketTitle weight={"medium"} size={"3"}>
+          <MarketTitle weight={"medium"} size={"3"} ref={titleRef}>
             {title}
           </MarketTitle>
-          <MarketDescription size={"1"}>{description}</MarketDescription>
+          <MarketDescription size={"1"} lineClamp={isLongTitle ? 2 : 3}>
+            {description}
+          </MarketDescription>
         </Flex>
 
         <Flex direction={"column"} gap={"4px"} mt={"auto"}>

@@ -36,11 +36,11 @@ export const MarketTitle = styled(Text)`
   letter-spacing: -0.04em;  
 `;
 
-export const MarketDescription = styled(Text)`
+export const MarketDescription = styled(Text)<{lineClamp?: number}>`
   color: ${theme.color.white1};
   line-height: 16.8px;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: ${({ lineClamp }) => lineClamp};
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
