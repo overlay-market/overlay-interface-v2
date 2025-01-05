@@ -88,6 +88,22 @@ const SuggestedCards: React.FC = () => {
     }
   }, [currentCategoryName, marketsData, currentMarket]);
 
+  const topMarkets = useMemo(() => {
+    if (orderedMarketsData && similarMarkets && currentMarket) {
+      const filteredMarkets = orderedMarketsData
+        .filter((market) => market.marketId !== currentMarket.marketId)
+        .filter(
+          (market) =>
+            !similarMarkets.some(
+              (excludeItem) => excludeItem.marketId === market.marketId
+            )
+        );
+      return filteredMarkets;
+    } else {
+      return undefined;
+    }
+  }, [orderedMarketsData, similarMarkets, currentMarket]);
+
   const extractFirstAbstract = (description: string | undefined): string => {
     if (!description) return "";
     const prefixes = [
@@ -178,8 +194,8 @@ const SuggestedCards: React.FC = () => {
             </Box>
           </Flex>
         )}
-        <Skeleton height="257px" loading={!orderedMarketsData} />
-        {orderedMarketsData && orderedMarketsData.length > 0 && (
+        <Skeleton height="257px" loading={!topMarkets} />
+        {topMarkets && topMarkets.length > 0 && (
           <Flex direction={"column"} overflowX={"hidden"}>
             <Text weight={"bold"} size={"5"}>
               Top Markets
@@ -195,10 +211,10 @@ const SuggestedCards: React.FC = () => {
                 slidesPerView={"auto"}
                 loop={false}
                 centeredSlides={false}
-                enabled={orderedMarketsData.length > 0}
+                enabled={topMarkets.length > 0}
                 mousewheel={true}
               >
-                {orderedMarketsData.map((market, index) => (
+                {topMarkets.map((market, index) => (
                   <SwiperSlide key={index} style={{ width: "172px" }}>
                     <TradeMarketCard
                       id={market.marketId}
