@@ -11,12 +11,13 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { data: walletClient } = useConnectorClient();
 
   const sdk = useMemo(() => {
-
     return new OverlaySDK({
-      chainId: chainId ? chainId as number : DEFAULT_CHAINID as number,
+      chainId: chainId ? (chainId as number) : (DEFAULT_CHAINID as number),
       rpcUrls: {
         [SUPPORTED_CHAINID.BARTIO]: import.meta.env.VITE_BARTIO_RPC,
-      },      
+        [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: import.meta.env
+          .VITE_ARBITRUM_SEPOLIA_RPC,
+      },
       web3Provider: walletClient as any,
     });
   }, [chainId, walletClient]);
