@@ -6,9 +6,9 @@ export const SuggestedCardsContainer = styled(Flex)`
   width: 100%;
   
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: calc(100vw - ${theme.headerSize.tabletWidth} - 20px - 16px);
+    width: calc(100vw - ${theme.headerSize.tabletWidth} - 20px - 20px);
   }
   @media (min-width: ${theme.breakpoints.md}) {
-    width: calc(100vw - ${theme.headerSize.width} - 20px - 16px);
+    width: calc(100vw - ${theme.headerSize.width} - 20px - 20px);
   }
 `;
