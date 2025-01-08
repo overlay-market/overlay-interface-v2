@@ -112,7 +112,7 @@ const RiskParameters: React.FC = () => {
     } else {
       return unscaledValue
         .toLocaleString("en-US", {
-          maximumFractionDigits: 10,
+          maximumFractionDigits: 2,
         })
         .replaceAll(",", " ");
     }
