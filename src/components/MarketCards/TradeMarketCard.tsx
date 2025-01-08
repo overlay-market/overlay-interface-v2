@@ -66,7 +66,7 @@ const TradeMarketCard = ({
           <MarketTitle weight={"medium"} size={"3"} ref={titleRef}>
             {title}
           </MarketTitle>
-          <MarketDescription size={"1"} lineClamp={isLongTitle ? 2 : 3}>
+          <MarketDescription size={"1"} lineclamp={isLongTitle ? 2 : 3}>
             {description}
           </MarketDescription>
         </Flex>
