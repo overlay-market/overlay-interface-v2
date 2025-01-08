@@ -93,7 +93,7 @@ const RiskParameters: React.FC = () => {
     };
 
     fetchData();
-  }, [currentMarket]);
+  }, [currentMarket, subgraphUrl]);
 
   const formatAndTransform = (value: string) => {
     if (value.trim() === "") return "-";
@@ -119,7 +119,7 @@ const RiskParameters: React.FC = () => {
   };
 
   const averageBlockTime = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return riskParamsData[0].averageBlockTime;
     } else {
       return "-";
@@ -127,7 +127,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const capLeverage = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].capLeverage);
     } else {
       return "-";
@@ -135,7 +135,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const capNotional = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].capNotional);
     } else {
       return "-";
@@ -143,7 +143,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const capPayoff = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].capPayoff);
     } else {
       return "-";
@@ -151,7 +151,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const circuitBreakerMintTarget = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].circuitBreakerMintTarget);
     } else {
       return "-";
@@ -159,7 +159,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const circuitBreakerWindow = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return Number(riskParamsData[0].circuitBreakerWindow)
         .toLocaleString("en-US")
         .replaceAll(",", " ");
@@ -169,7 +169,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const delta = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].delta);
     } else {
       return "-";
@@ -177,7 +177,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const k = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return Number(formatAndTransform(riskParamsData[0].k)).toExponential();
     } else {
       return "-";
@@ -185,7 +185,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const liquidationFeeRate = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].liquidationFeeRate);
     } else {
       return "-";
@@ -193,7 +193,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const lmbda = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].lmbda);
     } else {
       return "-";
@@ -201,7 +201,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const maintenanceMarginBurnRate = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].maintenanceMarginBurnRate);
     } else {
       return "-";
@@ -209,7 +209,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const maintenanceMarginFraction = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].maintenanceMarginFraction);
     } else {
       return "-";
@@ -217,7 +217,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const minCollateral = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].minCollateral);
     } else {
       return "-";
@@ -225,7 +225,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const priceDriftUpperLimit = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].priceDriftUpperLimit);
     } else {
       return "-";
@@ -233,7 +233,7 @@ const RiskParameters: React.FC = () => {
   }, [riskParamsData]);
 
   const tradingFeeRate = useMemo(() => {
-    if (riskParamsData) {
+    if (riskParamsData && riskParamsData.length > 0) {
       return formatAndTransform(riskParamsData[0].tradingFeeRate);
     } else {
       return "-";

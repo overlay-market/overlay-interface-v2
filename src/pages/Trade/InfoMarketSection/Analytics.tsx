@@ -46,7 +46,7 @@ const Analytics: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [subgraphUrl]);
 
   const formatAndTransform = (value: string) => {
     if (value.trim() === "") return "-";
@@ -62,7 +62,7 @@ const Analytics: React.FC = () => {
   };
 
   const totalVolume = useMemo(() => {
-    if (analyticsData) {
+    if (analyticsData && analyticsData.length > 0) {
       return formatAndTransform(analyticsData[0].totalVolume);
     } else {
       return "-";
@@ -70,7 +70,7 @@ const Analytics: React.FC = () => {
   }, [analyticsData]);
 
   const totalTokensLocked = useMemo(() => {
-    if (analyticsData) {
+    if (analyticsData && analyticsData.length > 0) {
       return formatAndTransform(analyticsData[0].totalTokensLocked);
     } else {
       return "-";
@@ -78,7 +78,7 @@ const Analytics: React.FC = () => {
   }, [analyticsData]);
 
   const totalTransactions = useMemo(() => {
-    if (analyticsData) {
+    if (analyticsData && analyticsData.length > 0) {
       return BigInt(analyticsData[0].totalTransactions)
         .toLocaleString("en-US", {
           maximumFractionDigits: 0,
