@@ -127,8 +127,8 @@ const TradeHeader: React.FC = () => {
           <Text
             style={{
               color: isFundingRatePositive
-                ? theme.color.red2
-                : theme.color.green2,
+                ? theme.color.green2
+                : theme.color.red2,
             }}
           >
             {isFundingRatePositive ? `+` : ``}

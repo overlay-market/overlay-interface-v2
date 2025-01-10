@@ -27,10 +27,18 @@
   }
 
   .rt-BaseMenuViewport {
-    padding: 0 !important; /* Force removal of padding */
+    padding: 0 !important; 
   }
 
-  
+  .rt-BaseTabListTriggerInner {
+    padding: 0;
+  }
+  .rt-BaseTabListTriggerInnerHidden {
+    padding: 0;
+  }
+  .rt-BaseTabListTrigger:where([data-state='active'], [data-active])::before {
+    background-color: transparent;
+  }
 }
 
 @keyframes rt-skeleton-pulse2 {
