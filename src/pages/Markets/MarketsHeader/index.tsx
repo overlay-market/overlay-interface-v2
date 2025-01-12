@@ -8,12 +8,12 @@ import useMultichainContext from "../../../providers/MultichainContextProvider/u
 import { SUPPORTED_CHAINID } from "../../../constants/chains";
 
 const MarketsHeader = ({
-  ovSupplyChange,
+  ovlSupplyChange,
 }: {
-  ovSupplyChange: string | undefined;
+  ovlSupplyChange: string | undefined;
 }) => {
   const { chainId } = useMultichainContext();
-  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OV" : "OVL";
+  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OVL" : "OVL";
   return (
     <MarketHeaderContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>
@@ -36,7 +36,7 @@ const MarketsHeader = ({
         >
           <StyledText>{tokenTicker} SUPPLY</StyledText>
           <div>
-            <Text>{ovSupplyChange}</Text>
+            <Text>{ovlSupplyChange}</Text>
             <Text> 24h</Text>
           </div>
         </StyledFlex>

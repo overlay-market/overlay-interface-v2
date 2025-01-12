@@ -69,6 +69,7 @@ const TradeWidget: React.FC = () => {
           );
           if (!isCancelled && tradeState) {
             setTradeState(tradeState);
+            console.log("Trade state fetched:", tradeState);
           }
         } catch (error) {
           console.error("Error fetching trade state:", error);

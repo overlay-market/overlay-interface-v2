@@ -128,7 +128,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       attemptingTransaction: true,
     });
 
-    sdk.ov
+    sdk.ovl
       .approve({
         to: market?.id as Address,
         amount: maxUint256,
