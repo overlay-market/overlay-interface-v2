@@ -258,14 +258,14 @@ const Airdrops: React.FC = () => {
         pl={{ initial: "0px", sm: "8px" }}
       >
         <InfoSection />
-        {/* <AddressCheckSection
+        <AddressCheckSection
           addresses={addresses}
           setAddresses={setAddresses}
           handleAddressesCheck={handleAddressesCheck}
           detectedInvalidAddresses={detectedInvalidAddresses}
           setDetectedInvalidAddresses={setDetectedInvalidAddresses}
           loading={loading}
-        /> */}
+        />
         {/* <EligibilitySection airdrops={allAirdrops} addressAirdropRows={addressAirdropRows} totalAmountValues={totalAmountValues} /> */}
       </Flex>
     </AirdropsContainer>
