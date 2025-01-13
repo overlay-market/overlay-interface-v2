@@ -20,6 +20,7 @@ import ETHSOL from "../assets/images/markets-full-logos/eth-sol.png";
 import INK from "../assets/images/markets-full-logos/ink.jpeg";
 import ChessVideo from "../assets/videos/FuturisticChessMatch.mp4";
 import LanaDelRey from "../assets/images/markets-full-logos/lana-del-rey.png";
+import BeraNFT from "../assets/images/markets-full-logos/Bera-Nft-Index.png";
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -43,6 +44,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Magnus%20Carlsen": MagnusCarlsen,
   "Electric%20Vehicle%20Commodity%20Index": EvIndex,
   "Lana%20Del%20Rey": LanaDelRey,
+  "Bera%20NFT%20Index": BeraNFT,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -53,6 +55,7 @@ export const MARKETSORDER = [
   "Counter-Strike%202%20Skins",
   "BTC%20Dominance",
   "ETH%20Dominance",
+  "Bera%20NFT%20Index",
   "AI%20Index",
   "Lana%20Del%20Rey",
   "ETH%20%2F%20SOL",
