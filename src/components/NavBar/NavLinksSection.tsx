@@ -28,6 +28,10 @@ import {
   TrophyActiveIcon,
   TrophyIcon,
 } from "../../assets/icons/navBar-icons/trophy";
+import {
+  AirdropsActiveIcon,
+  AirdropsIcon,
+} from "../../assets/icons/navBar-icons/airdrops";
 // import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export interface NavLinkAsset {
@@ -85,6 +89,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
         isMobile && mode === NAVBAR_MODE.DEFAULT ? "Leaders" : "Leaderboard",
       icon: <TrophyIcon />,
       activeIcon: <TrophyActiveIcon />,
+      showOnMobile: true,
+    },
+    {
+      to: "/airdrops",
+      label: "Airdrops",
+      icon: <AirdropsIcon />,
+      activeIcon: <AirdropsActiveIcon />,
       showOnMobile: true,
     },
     // {
