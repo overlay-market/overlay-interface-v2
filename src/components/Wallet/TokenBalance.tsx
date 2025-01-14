@@ -20,7 +20,7 @@ const TokenBalance: React.FC = () => {
     const fetchBalance = async () => {
       if (account) {
         try {
-          const ovlBalance = await sdk.ov.balance(account, 8);
+          const ovlBalance = await sdk.ovl.balance(account, 8);
           ovlBalance && setOvlBalance(Number(ovlBalance));
         } catch (error) {
           console.error("Error fetching ovlBalance:", error);
@@ -44,7 +44,7 @@ const TokenBalance: React.FC = () => {
       {ovlBalance === undefined ? (
         <Loader size="12px" stroke="white" />
       ) : SUPPORTED_CHAINID.MAINNET === chainId ? (
-        <NumberSpring inputValue={ovlBalance} text="OV" />
+        <NumberSpring inputValue={ovlBalance} text="OVL" />
       ) : (
         <NumberSpring inputValue={ovlBalance} text="OVL" />
       )}

@@ -98,7 +98,8 @@ const Description: React.FC = () => {
       <Flex
         direction={"column"}
         px={{ initial: "0", sm: "16px" }}
-        py={"32px"}
+        pt={{ initial: "16px", sm: "32px" }}
+        pb={{ initial: "8px", sm: "32px" }}
         gap={"8px"}
       >
         <Text weight={"bold"} style={{ color: theme.color.grey3 }}>

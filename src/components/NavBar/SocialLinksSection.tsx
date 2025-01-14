@@ -1,8 +1,8 @@
 import React from "react";
 import { Flex, Link } from "@radix-ui/themes";
 import Xlogo from "../../assets/icons/social-links/X_logo.png";
-import MirrorLogo from "../../assets/icons/social-links/Mirror.png";
 import DiscordLogo from "../../assets/icons/social-links/Discord.png";
+import MediumLogo from "../../assets/icons/social-links/Medium.png";
 import { LINKS } from "../../constants/links";
 
 interface LinkAsset {
@@ -23,9 +23,9 @@ const SOCIAL_LINKS: Array<LinkAsset> = [
     href: LINKS.DISCORD,
   },
   {
-    alt: "MirrorLogo",
-    src: MirrorLogo,
-    href: LINKS.MIRROR,
+    alt: "MediumLogo",
+    src: MediumLogo,
+    href: LINKS.MEDIUM,
   },
 ];
 

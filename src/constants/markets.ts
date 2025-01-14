@@ -20,6 +20,7 @@ import ETHSOL from "../assets/images/markets-full-logos/eth-sol.png";
 import INK from "../assets/images/markets-full-logos/ink.jpeg";
 import ChessVideo from "../assets/videos/FuturisticChessMatch.mp4";
 import LanaDelRey from "../assets/images/markets-full-logos/lana-del-rey.png";
+import BeraNFT from "../assets/images/markets-full-logos/Bera-Nft-Index.png";
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -43,6 +44,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Magnus%20Carlsen": MagnusCarlsen,
   "Electric%20Vehicle%20Commodity%20Index": EvIndex,
   "Lana%20Del%20Rey": LanaDelRey,
+  "Bera%20NFT%20Index": BeraNFT,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -53,6 +55,7 @@ export const MARKETSORDER = [
   "Counter-Strike%202%20Skins",
   "BTC%20Dominance",
   "ETH%20Dominance",
+  "Bera%20NFT%20Index",
   "AI%20Index",
   "Lana%20Del%20Rey",
   "ETH%20%2F%20SOL",
@@ -73,3 +76,55 @@ export const MARKETSORDER = [
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
+
+export enum CategoryName {
+  MemeWar = 'Meme Wars',
+  CounterStrikeSkins = 'Counter-Strike',
+  OrdinalNft = 'Ordinals',
+  Crypto = 'Crypto',
+  Chess = 'Chess',
+  Artists = 'Artists',
+  Other = 'Other',
+}
+
+export type MarketCategoryMap = {
+  [key in CategoryName]: string[];
+};
+
+export const MARKET_CATEGORIES: MarketCategoryMap = {
+  [CategoryName.Chess]: [
+    "Hikaru%20Nakamura",
+    "Magnus%20Carlsen",
+  ],
+  [CategoryName.MemeWar]: [
+    "Cats%20vs%20Dogs%20-%20Meme%20War",
+    "Cats%20vs%20Frogs%20-%20Meme%20War",
+    "Frogs%20vs%20Dogs%20-%20Meme%20War",
+  ],
+  [CategoryName.CounterStrikeSkins]: [
+    "Counter-Strike%202%20Skins",
+    "Rifles%20-%20CS2%20Skins",
+    "Knives%20-%20CS2%20Skins",
+    "Knives%20vs%20Rifles%20-%20CS2%20Skins",
+  ],
+  [CategoryName.OrdinalNft]: [
+    "Quantum%20Cats",
+    "Bitcoin%20Frogs",
+    "NodeMonkes",
+    "Ink",
+  ],
+  [CategoryName.Crypto]: [
+    "BTC%20Dominance",
+    "ETH%20Dominance",
+    "AI%20Index",
+    "ETH%20%2F%20SOL",
+    "Real%20Estate%20Dominance",
+    "SUPER%20%2F%20ETH",
+  ],
+  [CategoryName.Artists]: [
+    "Lana%20Del%20Rey",
+  ],
+  [CategoryName.Other]: [
+
+  ],
+}
