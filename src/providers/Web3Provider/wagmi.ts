@@ -2,7 +2,7 @@ import { http, createConfig } from 'wagmi'
 import { berachainTestnetbArtio } from 'wagmi/chains'
 import { getDefaultConfig } from 'connectkit'
 
-const projectId = "dda9a3559d19c50cf9c8f54edc61ca52"
+const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string
 
 export const wagmiConfig = createConfig(
   getDefaultConfig({
