@@ -21,7 +21,7 @@ const Markets: React.FC = () => {
     const fetchData = async () => {
       try {
         const activeMarkets = await sdk.markets.transformMarketsData();
-        const supplyChange = await sdk.ov.totalSupplyDayChange();
+        const supplyChange = await sdk.ovl.totalSupplyDayChange();
 
         supplyChange &&
           setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
@@ -40,7 +40,7 @@ const Markets: React.FC = () => {
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
-      <MarketsHeader ovSupplyChange={totalSupplyChange} />
+      <MarketsHeader ovlSupplyChange={totalSupplyChange} />
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} />
       <MarketsTable marketsData={marketsData} />
