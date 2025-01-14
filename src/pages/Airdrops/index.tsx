@@ -18,6 +18,7 @@ import {
 } from "../../constants/airdrops";
 import { formatUnits } from "viem";
 import theme from "../../theme";
+import EligibilitySection from "./EligibilitySection";
 
 const Airdrops: React.FC = () => {
   const [addresses, setAddresses] = useState<string>("");
@@ -208,7 +209,9 @@ const Airdrops: React.FC = () => {
             BigInt(0)
           );
 
-          totalValue = formatUnits(totalInWei, 18);
+          totalValue = Number(formatUnits(totalInWei, 18))
+            .toFixed(0)
+            .toString();
         }
 
         airdropMap.set(airdropKey, totalValue);
@@ -266,7 +269,11 @@ const Airdrops: React.FC = () => {
           setDetectedInvalidAddresses={setDetectedInvalidAddresses}
           loading={loading}
         />
-        {/* <EligibilitySection airdrops={allAirdrops} addressAirdropRows={addressAirdropRows} totalAmountValues={totalAmountValues} /> */}
+        <EligibilitySection
+          airdrops={allAirdrops}
+          addressAirdropRows={addressAirdropRows}
+          totalAmountValues={totalAmountValues}
+        />
       </Flex>
     </AirdropsContainer>
   );
