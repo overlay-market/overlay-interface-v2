@@ -156,7 +156,11 @@ const OpenPositionsTable: React.FC = () => {
               </ColorButton>
             </>
           ) : (
-            <ColorButton onClick={() => setShowCheckboxes(true)} width="140px">
+            <ColorButton
+              onClick={() => setShowCheckboxes(true)}
+              width="140px"
+              style={{ display: positionsTotalNumber === 0 ? "none" : "block" }}
+            >
               Select Positions
             </ColorButton>
           )}
@@ -202,6 +206,11 @@ const OpenPositionsTable: React.FC = () => {
         open={showCloseModal}
         handleDismiss={() => setShowCloseModal(false)}
         selectedCount={selectedPositions.size}
+        selectedPositions={
+          positions?.filter((pos) =>
+            selectedPositions.has(pos.positionId.toString())
+          ) || []
+        }
         onConfirm={handleClosePositions}
       />
     </Flex>
