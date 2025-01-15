@@ -1,6 +1,7 @@
 import { Text } from "@radix-ui/themes";
 import React from "react";
-import { GradientText, InfoContainer } from "./info-section-styles";
+import { GradientLink, InfoContainer } from "./info-section-styles";
+import { AIRDROP_LEARN_MORE_LINK } from "../../../constants/airdrops";
 
 const InfoSection: React.FC = () => {
   return (
@@ -11,11 +12,11 @@ const InfoSection: React.FC = () => {
       </Text>
       <Text size={"1"} weight={"medium"}>
         <a
-          href="https://mirror.xyz/0x7999C7f0b9f2259434b7aD130bBe36723a49E14e/Q5OmkZ7eXCZ8AgrDy37IaLfTQouVR9R1U3mmiRDDdz8"
+          href={AIRDROP_LEARN_MORE_LINK}
           target="_blank"
           style={{ textDecoration: "none" }}
         >
-          <GradientText> Want to learn more?</GradientText>
+          <GradientLink> Learn more</GradientLink>
         </a>
       </Text>
     </InfoContainer>

@@ -238,7 +238,12 @@ const Airdrops: React.FC = () => {
   }, [addressResults, getTotalAmountValues]);
 
   return (
-    <AirdropsContainer direction="column" width={"100%"} overflowX={"hidden"}>
+    <AirdropsContainer
+      direction="column"
+      width={"100%"}
+      minHeight={"100vh"}
+      overflowX={"hidden"}
+    >
       <Flex
         justify={{ initial: "center", sm: "start" }}
         align={{ initial: "end", sm: "center" }}
@@ -260,6 +265,7 @@ const Airdrops: React.FC = () => {
         direction="column"
         width={"100%"}
         pl={{ initial: "0px", sm: "20px" }}
+        flexGrow={"1"}
       >
         <TitleSection />
         <AddressCheckSection
@@ -276,8 +282,8 @@ const Airdrops: React.FC = () => {
           addressAirdropRows={addressAirdropRows}
           totalAmountValues={totalAmountValues}
         />
-        {/* <InfoSection /> */}
       </Flex>
+      <InfoSection />
     </AirdropsContainer>
   );
 };
