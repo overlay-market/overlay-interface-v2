@@ -3,12 +3,14 @@ import styled from "styled-components";
 import theme from "../../../theme";
 
 export const InfoContainer = styled(Flex)`
-  gap: 8px;
-  padding-top: 20px;
-  padding-bottom: 32px;
+  justify-content: space-between;
+  padding: 16px;
+  border: solid 1px ${theme.color.darkBlue}; 
+  border-radius: 16px;
+  margin-bottom: 100px;
 
-  @media (min-width: ${theme.breakpoints.md}) {
-    gap: 16px;
+  @media (min-width: ${theme.breakpoints.sm}) {
+    margin-bottom: 20px;
   }
 `
 

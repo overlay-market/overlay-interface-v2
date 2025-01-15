@@ -19,6 +19,7 @@ import {
 import { formatUnits } from "viem";
 import theme from "../../theme";
 import EligibilitySection from "./EligibilitySection";
+import TitleSection from "./TitleSection";
 
 const Airdrops: React.FC = () => {
   const [addresses, setAddresses] = useState<string>("");
@@ -243,7 +244,7 @@ const Airdrops: React.FC = () => {
         align={{ initial: "end", sm: "center" }}
         width={"100%"}
         height={theme.headerSize.height}
-        px={"10px"}
+        px={"8px"}
         display={{ initial: "none", sm: "flex" }}
       >
         <Text
@@ -258,9 +259,9 @@ const Airdrops: React.FC = () => {
       <Flex
         direction="column"
         width={"100%"}
-        pl={{ initial: "0px", sm: "8px" }}
+        pl={{ initial: "0px", sm: "20px" }}
       >
-        <InfoSection />
+        <TitleSection />
         <AddressCheckSection
           addresses={addresses}
           setAddresses={setAddresses}
@@ -269,11 +270,13 @@ const Airdrops: React.FC = () => {
           setDetectedInvalidAddresses={setDetectedInvalidAddresses}
           loading={loading}
         />
+
         <EligibilitySection
           airdrops={allAirdrops}
           addressAirdropRows={addressAirdropRows}
           totalAmountValues={totalAmountValues}
         />
+        {/* <InfoSection /> */}
       </Flex>
     </AirdropsContainer>
   );
