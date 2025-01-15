@@ -15,3 +15,11 @@ export const CHAIN_SUBGRAPH_URL: Record<number, string> = {
   [SUPPORTED_CHAINID.IMOLA]: 'https://subgraph.overlay.market/query/subgraphs/name/overlay/v1-subgraph',
   [SUPPORTED_CHAINID.BARTIO]: 'https://api.goldsky.com/api/public/project_clyiptt06ifuv01ul9xiwfj28/subgraphs/overlay-bartio/prod/gn',
 }
+
+
+export const SABLIER_SUBGRAPH_URL: Record<number, string> = {
+  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]:
+  `https://api.studio.thegraph.com/query/57079/sablier-v2-arbitrum/version/latest`,
+  [SUPPORTED_CHAINID.IMOLA]: 'https://subgraph.overlay.market/query/subgraphs/name/overlay/v1-subgraph',
+  [SUPPORTED_CHAINID.BARTIO]: 'https://api.goldsky.com/api/public/project_clyiptt06ifuv01ul9xiwfj28/subgraphs/overlay-bartio/prod/gn',
+}

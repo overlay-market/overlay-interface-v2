@@ -18,6 +18,7 @@ export enum ClaimId {
 }
 
 export const AIRDROP_CHECKER_API = 'https://api.overlay.market/airdrop-checker/'
+export const SABLIER_VESTING_URL = 'https://app.sablier.com/vesting/stream/'
 
 export type ClaimMap = {[claimId: string]: string}
 
@@ -36,6 +37,8 @@ export const MERKLE_DISTIBUTOR_ADDRESSES: ClaimMap = {
   [ClaimId.TESTING_A]: '0xB5Fd24fB1C311b78626032F6734911c13Ab86E30',
   [ClaimId.TESTING_B]: '0xDC33c6E189cA5EB0aa684A85770582d49B60df60',
   [ClaimId.LB4]: '0x9d16fBEc655bd33bf19DB09621dFBE1A00e3787F',
+  [ClaimId.OVL_TO_OV]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
+  [ClaimId.RETRO]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
 }
 
 export enum AirdropStatus {

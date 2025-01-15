@@ -6,6 +6,7 @@ import {
   AIRDROPS,
   AirdropStatus,
   MERKLE_DISTIBUTOR_ADDRESSES,
+  SABLIER_VESTING_URL,
 } from "../../../constants/airdrops";
 import { AddressRowsType } from "../types";
 import { isAddress } from "viem";
@@ -22,6 +23,11 @@ import {
 } from "./eligibility-section-styles";
 import { CopyIcon, OpenInNewIcon } from "../../../assets/icons/svg-icons";
 import AirdropIdWithTooltip from "./AirdropIdWithTooltip";
+import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
+import { GraphQLClient } from "graphql-request";
+import useAccount from "../../../hooks/useAccount";
+import useSDK from "../../../providers/SDKProvider/useSDK";
+import { SABLIER_SUBGRAPH_URL } from "../../../constants/subgraph";
 
 interface Props {
   airdrops: AirdropMap;
@@ -34,10 +40,37 @@ const EligibilitySection: React.FC<Props> = ({
   addressAirdropRows,
   totalAmountValues,
 }) => {
+  const sdk = useSDK();
+  // const { address: account } = useAccount();
+  // const account = "0xee25a3cb2178ee9d0a96730e9b554aac1ca3a878";
+  const account = "0x55176a12ba096f60810fd74b90d1b1138b595ede";
+
   const [copiedStatus, setCopiedStatus] = useState<
     "Copied" | "Could not copy" | false
   >(false);
   const [copiedAddress, setCopiedAddress] = useState("");
+  const [streamData, setStreamData] = useState<StreamData | null>(null);
+
+  const client = new GraphQLClient(SABLIER_SUBGRAPH_URL[sdk.core.chainId]);
+
+  useEffect(() => {
+    const fetchStreams = async (recipient: string) => {
+      try {
+        const variables = { recipient };
+        const response = await client.request<MyQueryResponse>(
+          queryDocument,
+          variables
+        );
+
+        setStreamData(response.streams);
+      } catch (error) {
+        console.log(error);
+        setStreamData(null);
+      }
+    };
+
+    account && fetchStreams(account.toLowerCase());
+  }, [account, sdk]);
 
   useEffect(() => {
     const timer = setTimeout(() => setCopiedStatus(false), 1000);
@@ -223,6 +256,39 @@ const EligibilitySection: React.FC<Props> = ({
                             }}
                           >
                             Claim
+                            <OpenInNewIcon />
+                          </StyledLink>
+                        )}
+                      </StyledCell>
+                    );
+                  })}
+                </StyledRow>
+              )}
+            {addressAirdropRows &&
+              streamData &&
+              Object.keys(addressAirdropRows).length !== 0 && (
+                <StyledRow>
+                  <StyledCell id="claim" textalign="left">
+                    <Text style={{ color: theme.color.grey3 }}>Streams</Text>
+                  </StyledCell>
+                  {Object.keys(AIRDROPS).map((airdropId) => {
+                    const alias = streamData.find(
+                      (item) =>
+                        item.sender.toLowerCase() ===
+                        MERKLE_DISTIBUTOR_ADDRESSES[airdropId].toLowerCase()
+                    )?.alias;
+                    return (
+                      <StyledCell key={airdropId} textalign="right">
+                        {alias && (
+                          <StyledLink
+                            to={`${SABLIER_VESTING_URL}${alias}`}
+                            target="_blank"
+                            style={{
+                              color: theme.color.blue2,
+                              cursor: "pointer",
+                            }}
+                          >
+                            Stream
                             <OpenInNewIcon />
                           </StyledLink>
                         )}

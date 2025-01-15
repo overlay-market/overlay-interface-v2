@@ -9,6 +9,7 @@ import {
   TableHeaderContent,
   TooltipBox,
 } from "./airdropId-with-tooltip-styles";
+import { UNIT } from "../../../constants/applications";
 
 interface Props {
   airdrop: AirdropType;
@@ -26,7 +27,7 @@ const AirdropIdWithTooltip: React.FC<Props> = ({ airdrop }) => {
     <Tooltip.Root open={open} onOpenChange={handleOpenChange}>
       <Tooltip.Trigger asChild>
         <TableHeaderContent>
-          {airdrop.title} (OV)
+          {airdrop.title} ({UNIT})
           <InfoCircleIcon />
         </TableHeaderContent>
       </Tooltip.Trigger>
