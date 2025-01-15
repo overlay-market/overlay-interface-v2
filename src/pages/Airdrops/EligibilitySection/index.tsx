@@ -14,6 +14,7 @@ import { shortenAddress } from "../../../utils/web3";
 import {
   CopiedBox,
   CopyIconWrapper,
+  GradientText,
   StyledCell,
   StyledHeader,
   StyledLink,
@@ -21,7 +22,10 @@ import {
   Table,
   TotalAmountCell,
 } from "./eligibility-section-styles";
-import { CopyIcon, OpenInNewIcon } from "../../../assets/icons/svg-icons";
+import {
+  GradientCopyIcon,
+  OpenInNewIcon,
+} from "../../../assets/icons/svg-icons";
 import AirdropIdWithTooltip from "./AirdropIdWithTooltip";
 import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
 import { GraphQLClient } from "graphql-request";
@@ -96,15 +100,6 @@ const EligibilitySection: React.FC<Props> = ({
 
   return (
     <Flex direction={"column"} pb="100px">
-      <Flex direction="column" gap="8px" pb="32px">
-        <Text size={"3"} weight={"bold"}>
-          Eligibility
-        </Text>
-        <Text style={{ color: theme.color.blue1 }}>
-          View eligibility for each address here
-        </Text>
-      </Flex>
-
       <ScrollArea
         type="auto"
         scrollbars="horizontal"
@@ -139,10 +134,12 @@ const EligibilitySection: React.FC<Props> = ({
                     >
                       <Text>{displayAddress(address)}</Text>
                       <CopyIconWrapper>
-                        <CopyIcon />
+                        <GradientCopyIcon />
 
                         {copiedStatus && copiedAddress === address && (
-                          <CopiedBox>{copiedStatus}</CopiedBox>
+                          <CopiedBox>
+                            <GradientText>{copiedStatus}</GradientText>
+                          </CopiedBox>
                         )}
                       </CopyIconWrapper>
                     </Flex>
@@ -170,9 +167,7 @@ const EligibilitySection: React.FC<Props> = ({
                     }}
                   >
                     <TotalAmountCell>
-                      <Text style={{ color: theme.color.grey3 }}>
-                        Total amount
-                      </Text>
+                      <Text>Total amount</Text>
                       {Object.keys(airdrops).length === 1 &&
                         (AIRDROPS[Object.keys(airdrops)[0]].status ===
                         AirdropStatus.COMING_SOON ? (
@@ -225,7 +220,7 @@ const EligibilitySection: React.FC<Props> = ({
               Object.keys(addressAirdropRows).length !== 0 && (
                 <StyledRow>
                   <StyledCell id="claim" textalign="left">
-                    <Text style={{ color: theme.color.grey3 }}>Claim OV</Text>
+                    <Text>Claim OV</Text>
                   </StyledCell>
                   {Object.keys(AIRDROPS).map((airdropId) => {
                     return (
@@ -266,7 +261,7 @@ const EligibilitySection: React.FC<Props> = ({
             {streamData && (
               <StyledRow>
                 <StyledCell id="claim" textalign="left">
-                  <Text style={{ color: theme.color.grey3 }}>Streams</Text>
+                  <Text>Streams</Text>
                 </StyledCell>
                 {Object.keys(AIRDROPS).map((airdropId) => {
                   const alias = streamData.find(

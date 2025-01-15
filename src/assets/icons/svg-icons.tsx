@@ -72,6 +72,58 @@ export const CopyIcon: FC = () => (
   </svg>
 );
 
+export const GradientCopyIcon: FC = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 15 15"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g clipPath="url(#clip0_2557_6908)">
+      <path
+        d="M12.5 5H6.25C5.55964 5 5 5.55964 5 6.25V12.5C5 13.1904 5.55964 13.75 6.25 13.75H12.5C13.1904 13.75 13.75 13.1904 13.75 12.5V6.25C13.75 5.55964 13.1904 5 12.5 5Z"
+        stroke="url(#paint0_linear_2557_6908)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2.5 10C1.8125 10 1.25 9.4375 1.25 8.75V2.5C1.25 1.8125 1.8125 1.25 2.5 1.25H8.75C9.4375 1.25 10 1.8125 10 2.5"
+        stroke="url(#paint1_linear_2557_6908)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <linearGradient
+        id="paint0_linear_2557_6908"
+        x1="5"
+        y1="9.375"
+        x2="13.75"
+        y2="9.375"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#FFC955" />
+        <stop offset="1" stopColor="#FF7CD5" />
+      </linearGradient>
+      <linearGradient
+        id="paint1_linear_2557_6908"
+        x1="1.25"
+        y1="5.625"
+        x2="10"
+        y2="5.625"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stopColor="#FFC955" />
+        <stop offset="1" stopColor="#FF7CD5" />
+      </linearGradient>
+      <clipPath id="clip0_2557_6908">
+        <rect width="15" height="15" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
 export const OpenInNewIcon: FC = () => (
   <svg
     width="15"
@@ -91,13 +143,36 @@ export const OpenInNewIcon: FC = () => (
 
 export const InfoCircleIcon: FC = () => (
   <svg
+    width="15"
+    height="15"
+    viewBox="0 0 15 15"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    fill="currentColor"
-    viewBox="0 0 16 16"
   >
-    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />{" "}
-    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />{" "}
+    <g clipPath="url(#clip0_2557_6945)">
+      <path
+        d="M7.5 13.75C10.9518 13.75 13.75 10.9518 13.75 7.5C13.75 4.04822 10.9518 1.25 7.5 1.25C4.04822 1.25 1.25 4.04822 1.25 7.5C1.25 10.9518 4.04822 13.75 7.5 13.75Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.5 10V7.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7.5 5H7.50625"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_2557_6945">
+        <rect width="15" height="15" fill="white" />
+      </clipPath>
+    </defs>
   </svg>
 );

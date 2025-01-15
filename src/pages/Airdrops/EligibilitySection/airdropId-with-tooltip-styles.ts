@@ -7,7 +7,7 @@ export const TableHeaderContent = styled.div`
   align-items: center;
   justify-content: end;
   gap: 4px;
-  color: ${theme.color.grey3};
+  color: ${theme.color.white};
   font-family: Inter;
   cursor: pointer;
 
