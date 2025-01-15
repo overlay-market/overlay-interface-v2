@@ -44,7 +44,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     showConfirm: false,
     attemptingTransaction: false,
   });
-  const arcxAnalytics = useArcxAnalytics()
+  const arcxAnalytics = useArcxAnalytics();
 
   const title: string | undefined = useMemo(() => {
     if (!tradeState) return undefined;
@@ -93,7 +93,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             metadata: {
               action: TransactionType.BUILD_OVL_POSITION,
             },
-          })
+          });
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);
@@ -128,7 +128,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       attemptingTransaction: true,
     });
 
-    sdk.ov
+    sdk.ovl
       .approve({
         to: market?.id as Address,
         amount: maxUint256,
@@ -171,15 +171,31 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   };
 
   const handleError = (error: Error) => {
-    const errorString = JSON.stringify(error);
-    const errorObj = JSON.parse(errorString);
+    try {
+      const errorString = JSON.stringify(error);
+      const errorObj = JSON.parse(errorString);
 
-    const errorCode: number | string =
-      errorObj.cause?.cause?.code || errorObj.code;
+      const errorCode: number | string =
+        errorObj.cause?.cause?.code ||
+        errorObj.cause?.code ||
+        errorObj.code ||
+        "UNKNOWN_ERROR";
 
-    const errorMessage =
-      errorObj.cause?.shortMessage || errorObj.cause?.cause?.shortMessage;
-    return { errorCode, errorMessage };
+      const errorMessage =
+        errorObj.cause?.shortMessage ||
+        errorObj.cause?.cause?.shortMessage ||
+        errorObj.message ||
+        error.message ||
+        "An unknown error occurred";
+
+      return { errorCode, errorMessage };
+    } catch (parseError) {
+      console.error("Error parsing error object:", parseError);
+      return {
+        errorCode: "PARSE_ERROR",
+        errorMessage: error.message || "An unknown error occurred",
+      };
+    }
   };
 
   const handleDismiss = useCallback(() => {

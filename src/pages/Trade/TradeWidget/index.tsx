@@ -69,6 +69,7 @@ const TradeWidget: React.FC = () => {
           );
           if (!isCancelled && tradeState) {
             setTradeState(tradeState);
+            console.log("Trade state fetched:", tradeState);
           }
         } catch (error) {
           console.error("Error fetching trade state:", error);
@@ -132,7 +133,8 @@ const TradeWidget: React.FC = () => {
       direction={"column"}
       gap={{ initial: "16px", sm: "24px" }}
       width={{ initial: "343px", sm: "321px" }}
-      px={{ initial: "0px", sm: "8px" }}
+      pr={"0px"}
+      pl={{ initial: "0px", sm: "16px", lg: "8px" }}
       pt={"8px"}
       pb={"20px"}
       flexShrink={"0"}

@@ -18,8 +18,6 @@ const useBidAndAsk = (marketId: string | undefined): {bid: number | undefined, a
   }, [marketId, chainId]);
   
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
     const fetchBidAndAsk = async () => {
       if (marketId) {
         try {
@@ -41,8 +39,8 @@ const useBidAndAsk = (marketId: string | undefined): {bid: number | undefined, a
     };
 
     fetchBidAndAsk();
-    interval = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
+    const intervalId = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
+    return () => clearInterval(intervalId);
   }, [marketId, chainId, sdk]);
 
   return {bid, ask}

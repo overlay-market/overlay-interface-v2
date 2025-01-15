@@ -7,7 +7,7 @@ import { LinksWrapper, MobileNavBar } from "./navbar-styles";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 const NavBar: React.FC = () => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 767px)");
   return (
     <>
       <Box

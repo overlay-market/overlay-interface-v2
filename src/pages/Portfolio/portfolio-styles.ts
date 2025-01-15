@@ -17,10 +17,9 @@ export const HeaderEmptyPlaceholder = styled(Box)`
 
 export const PortfolioContainer = styled(Flex)`
   @media (min-width: ${theme.breakpoints.xxl}) {
-    padding-left: 60px;
-    padding-right: 60px;
+    padding-left: 16px;
   }
-`
+`;
 
 export const LineSeparator = styled(Flex)`
   @media (min-width: ${theme.breakpoints.sm}) {
@@ -35,6 +34,5 @@ export const LineSeparator = styled(Flex)`
   @media (min-width: ${theme.breakpoints.md}) {
     width: calc(100% - ${theme.headerSize.width});
     left: ${theme.headerSize.width};
-   
   }
-`
+`;

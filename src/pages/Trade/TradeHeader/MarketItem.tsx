@@ -32,7 +32,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
 
   return (
     <MarketInfo
-      width={"260px"}
+      width={"100%"}
       height={"49px"}
       py={"12px"}
       px={"8px"}

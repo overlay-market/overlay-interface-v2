@@ -20,9 +20,13 @@ export const LineSeparator = styled(Flex)`
 
   @media (min-width: ${theme.breakpoints.sm}) {
     margin: 0;
+    margin-right: -20px;
+    width: calc(100% + 20px);
   }
   
   @media (min-width: ${theme.breakpoints.xxl}) {
     padding-top: 24px;
+    margin: 0;
+    width: 100%;
   }
 `

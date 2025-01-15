@@ -19,20 +19,26 @@ export const MarketsListContainer = styled(Flex)`
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  padding-left: 4px;
-  padding-right: 16px;
+  padding-left: 15px;
+  padding-right: 15px;
   cursor: pointer;
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: 260px;
+    width: 334px;
     padding-left: 16px;
     padding-right: 16px;
+    border-right: 1px solid ${theme.color.darkBlue};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
-    border-right: 1px solid ${theme.color.darkBlue};
+    width: 260px;
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    width: 272px;
+    padding-left: 0;
   }
 `
 
@@ -46,5 +52,59 @@ export const CurrentMarketLogo = styled.img`
   @media (min-width: ${theme.breakpoints.md}) {
     width: 34px;
     height: 34px;
+  }
+`;
+
+export const DropdownContainer = styled(Box)`
+  width: 280px;
+  height: 520px;
+  position: absolute;
+  top: ${theme.headerSize.height}
+  left: 0;
+  z-index: 10;
+  background-color: ${theme.color.background};
+  border-top: 1px solid ${theme.color.darkBlue};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    width: 334px;
+    height: 614px;
+  }
+  @media (min-width: ${theme.breakpoints.lg}) {
+    width: 260px;
+    height: 562px;
+  }
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    width: 272px;
+    height: 645px;
+  }
+`;
+
+export const StyledScrollArea = styled.div`
+  height: 520px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${theme.color.background};
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: ${theme.color.grey6};
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: ${theme.color.darkBlue};
+  }
+  @media (min-width: ${theme.breakpoints.sm}) {
+    height: 614px;
+  }
+  @media (min-width: ${theme.breakpoints.lg}) {
+    height: 562px;
+  }
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    height: 645px;
   }
 `;
