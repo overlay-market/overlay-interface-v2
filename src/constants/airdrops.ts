@@ -19,6 +19,7 @@ export enum ClaimId {
 
 export const AIRDROP_CHECKER_API = 'https://api.overlay.market/airdrop-checker/'
 export const SABLIER_VESTING_URL = 'https://app.sablier.com/vesting/stream/'
+export const SABLIER_SUBGRAPH_URL =  `https://api.studio.thegraph.com/query/57079/sablier-v2-arbitrum/version/latest`
 
 export type ClaimMap = {[claimId: string]: string}
 

@@ -6,6 +6,7 @@ import {
   AIRDROPS,
   AirdropStatus,
   MERKLE_DISTIBUTOR_ADDRESSES,
+  SABLIER_SUBGRAPH_URL,
   SABLIER_VESTING_URL,
 } from "../../../constants/airdrops";
 import { AddressRowsType } from "../types";
@@ -29,8 +30,6 @@ import {
 import AirdropIdWithTooltip from "./AirdropIdWithTooltip";
 import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
 import { GraphQLClient } from "graphql-request";
-import useSDK from "../../../providers/SDKProvider/useSDK";
-import { SABLIER_SUBGRAPH_URL } from "../../../constants/subgraph";
 
 interface Props {
   airdrops: AirdropMap;
@@ -43,7 +42,6 @@ const EligibilitySection: React.FC<Props> = ({
   addressAirdropRows,
   totalAmountValues,
 }) => {
-  const sdk = useSDK();
   // const { address: account } = useAccount();
   // const account = "0xee25a3cb2178ee9d0a96730e9b554aac1ca3a878";
   const account = "0x55176a12ba096f60810fd74b90d1b1138b595ede";
@@ -54,7 +52,7 @@ const EligibilitySection: React.FC<Props> = ({
   const [copiedAddress, setCopiedAddress] = useState("");
   const [streamData, setStreamData] = useState<StreamData | null>(null);
 
-  const client = new GraphQLClient(SABLIER_SUBGRAPH_URL[sdk.core.chainId]);
+  const client = new GraphQLClient(SABLIER_SUBGRAPH_URL);
 
   useEffect(() => {
     const fetchStreams = async (recipient: string) => {
@@ -73,7 +71,7 @@ const EligibilitySection: React.FC<Props> = ({
     };
 
     account && fetchStreams(account.toLowerCase());
-  }, [account, sdk]);
+  }, [account]);
 
   useEffect(() => {
     const timer = setTimeout(() => setCopiedStatus(false), 1000);
