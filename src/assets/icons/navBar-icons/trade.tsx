@@ -1,9 +1,9 @@
 import { FC } from "react";
 
-export const TradeIcon: FC = () => (
+export const TradeIcon: FC<{ size?: number }> = ({ size = 16 }) => (
   <svg
-    width="16"
-    height="16"
+    width={size}
+    height={size}
     viewBox="0 0 16 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -17,10 +17,10 @@ export const TradeIcon: FC = () => (
   </svg>
 );
 
-export const TradeActiveIcon: FC = () => (
+export const TradeActiveIcon: FC<{ size?: number }> = ({ size = 16 }) => (
   <svg
-    width="16"
-    height="16"
+    width={size}
+    height={size}
     viewBox="0 0 16 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
