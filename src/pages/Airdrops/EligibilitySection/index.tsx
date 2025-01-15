@@ -25,7 +25,6 @@ import { CopyIcon, OpenInNewIcon } from "../../../assets/icons/svg-icons";
 import AirdropIdWithTooltip from "./AirdropIdWithTooltip";
 import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
 import { GraphQLClient } from "graphql-request";
-import useAccount from "../../../hooks/useAccount";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { SABLIER_SUBGRAPH_URL } from "../../../constants/subgraph";
 
@@ -264,39 +263,37 @@ const EligibilitySection: React.FC<Props> = ({
                   })}
                 </StyledRow>
               )}
-            {addressAirdropRows &&
-              streamData &&
-              Object.keys(addressAirdropRows).length !== 0 && (
-                <StyledRow>
-                  <StyledCell id="claim" textalign="left">
-                    <Text style={{ color: theme.color.grey3 }}>Streams</Text>
-                  </StyledCell>
-                  {Object.keys(AIRDROPS).map((airdropId) => {
-                    const alias = streamData.find(
-                      (item) =>
-                        item.sender.toLowerCase() ===
-                        MERKLE_DISTIBUTOR_ADDRESSES[airdropId].toLowerCase()
-                    )?.alias;
-                    return (
-                      <StyledCell key={airdropId} textalign="right">
-                        {alias && (
-                          <StyledLink
-                            to={`${SABLIER_VESTING_URL}${alias}`}
-                            target="_blank"
-                            style={{
-                              color: theme.color.blue2,
-                              cursor: "pointer",
-                            }}
-                          >
-                            Stream
-                            <OpenInNewIcon />
-                          </StyledLink>
-                        )}
-                      </StyledCell>
-                    );
-                  })}
-                </StyledRow>
-              )}
+            {streamData && (
+              <StyledRow>
+                <StyledCell id="claim" textalign="left">
+                  <Text style={{ color: theme.color.grey3 }}>Streams</Text>
+                </StyledCell>
+                {Object.keys(AIRDROPS).map((airdropId) => {
+                  const alias = streamData.find(
+                    (item) =>
+                      item.sender.toLowerCase() ===
+                      MERKLE_DISTIBUTOR_ADDRESSES[airdropId].toLowerCase()
+                  )?.alias;
+                  return (
+                    <StyledCell key={airdropId} textalign="right">
+                      {alias && (
+                        <StyledLink
+                          to={`${SABLIER_VESTING_URL}${alias}`}
+                          target="_blank"
+                          style={{
+                            color: theme.color.blue2,
+                            cursor: "pointer",
+                          }}
+                        >
+                          Stream
+                          <OpenInNewIcon />
+                        </StyledLink>
+                      )}
+                    </StyledCell>
+                  );
+                })}
+              </StyledRow>
+            )}
           </tbody>
         </Table>
       </ScrollArea>
