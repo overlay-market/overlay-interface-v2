@@ -4,6 +4,7 @@ import {
   ClearAllBtnWrapper,
   ClearAllButton,
   CloseIcon,
+  GradientBorderBox,
   InputAddressesBox,
   InputAddressesBoxContainer,
 } from "./address-check-section-styles";
@@ -34,13 +35,13 @@ const AddressCheckSection: React.FC<Props> = ({
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
-    <>
-      <Flex direction={"column"} gap={"8px"}>
-        <Text size={"3"} weight={"bold"}>
-          Enter addresses
-        </Text>
-        <Text>Enter addresses to check eligibility. One address per line.</Text>
-      </Flex>
+    <GradientBorderBox>
+      <Text size={"4"} weight={"bold"}>
+        Enter addresses
+      </Text>
+      <Text size={"1"} style={{ color: theme.color.grey10 }}>
+        One address per line, ENS is ok
+      </Text>
 
       <InputAddressesBoxContainer>
         <InputAddressesBox
@@ -72,16 +73,17 @@ const AddressCheckSection: React.FC<Props> = ({
         </Flex>
       </InputAddressesBoxContainer>
 
-      <Flex pb={"80px"} pt={"20px"}>
+      <Flex>
         {loading ? (
           <GradientLoaderButton
             title={"Checking addresses ..."}
-            width={isMobile ? "100%" : "200px"}
+            width={isMobile ? "350px" : "360px"}
           />
         ) : (
           <GradientSolidButton
             title="Check addresses"
-            width={isMobile ? "100%" : "200px"}
+            width={isMobile ? "350px" : "360px"}
+            size={"14px"}
             isDisabled={addresses.length === 0}
             handleClick={() => {
               addresses && handleAddressesCheck();
@@ -89,7 +91,7 @@ const AddressCheckSection: React.FC<Props> = ({
           />
         )}
       </Flex>
-    </>
+    </GradientBorderBox>
   );
 };
 

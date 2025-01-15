@@ -2,23 +2,39 @@ import styled from "styled-components";
 import theme from "../../../theme";
 import { Flex } from "@radix-ui/themes";
 
+export const GradientBorderBox = styled(Flex)`
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+  margin-top: 48px;
+  margin-bottom: 28px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 32px;
+    border: solid 1px transparent; 
+    border-radius: 16px;
+    background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
+        linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
+  }
+  
+  @media (min-width: 995px) {
+    width: 847px;
+  }
+`;
+
 export const InputAddressesBoxContainer = styled(Flex)`
   flex-direction: column;
   width: 100%;
-  @media (min-width: 940px) {
-    width: 814px;
-  }
 `
 
 export const InputAddressesBox = styled.textarea`
   width: 100%;
   box-sizing: border-box;
-  height: 300px;
+  height: 102px;
   resize: none;
   border: none;
   border-radius: 8px;
   padding: 16px;
-  margin-top: 16px;
   color: ${theme.color.white};
   background-color: ${theme.color.grey4};
   font-size: 14px;
@@ -26,20 +42,13 @@ export const InputAddressesBox = styled.textarea`
   font-family: Inter;
   &::placeholder {
     font-size: 14px;
-    color: #c4c4c4;
+    font-weight: 600;
+    color: #6C7180;
     line-height: 20px;
     font-family: Inter;
   }
   &:focus-visible {
     outline: none;
-  }
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    height: 280px;
-  }
- 
-  @media (min-width: ${theme.breakpoints.md}) {
-    height: 160px;
   }
 
   overflow-y: auto;

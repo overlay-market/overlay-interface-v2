@@ -25,6 +25,7 @@ const theme = {
     grey7: '#111111',
     grey8: '#90A6BF',
     grey9: '#1F2538',
+    grey10: '#8D8F94',
   },  
   headerSize: {
     width: '88px',
