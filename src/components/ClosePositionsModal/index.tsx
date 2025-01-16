@@ -6,6 +6,10 @@ import useAccount from "../../hooks/useAccount";
 import useSDK from "../../hooks/useSDK";
 import theme from "../../theme";
 import { ColorButton } from "../Button/ColorButton";
+import { useAddPopup } from "../../state/application/hooks";
+import { TransactionType } from "../../constants/transaction";
+import { currentTimeParsed } from "../../utils/currentTime";
+import { useTradeActionHandlers } from "../../state/trade/hooks";
 
 type ClosePositionsModalProps = {
   open: boolean;
@@ -25,11 +29,14 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
   const sdk = useSDK();
   const [isUnwinding, setIsUnwinding] = useState(false);
   const { address: account } = useAccount();
+  const addPopup = useAddPopup();
+  const currentTimeForId = currentTimeParsed();
+  const { handleTxnHashUpdate } = useTradeActionHandlers();
 
   const multipleUnwind = async () => {
     try {
       setIsUnwinding(true);
-      const result = await sdk.market.unwindMultiple({
+      const transactions = await sdk.market.unwindMultiple({
         positions: selectedPositions.map((pos) => ({
           marketAddress: pos.marketAddress,
           positionId: pos.positionId,
@@ -39,10 +46,40 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
         unwindPercentage: 1,
       });
 
-      console.log("Multiple unwind result: ", result);
+      // Handle array of transactions
+      transactions.forEach((tx) => {
+        addPopup(
+          {
+            txn: {
+              hash: tx.hash,
+              success: true,
+              message: "",
+              type: TransactionType.UNWIND_OVL_POSITION,
+            },
+          },
+          tx.hash
+        );
+        handleTxnHashUpdate(tx.hash, 0);
+      });
+
       onConfirm();
-    } catch (error) {
+      handleDismiss();
+    } catch (error: Error | unknown) {
       console.error("Error in multiple unwinding market", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to close positions";
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: TransactionType.UNWIND_OVL_POSITION,
+          },
+        },
+        currentTimeForId
+      );
     } finally {
       setIsUnwinding(false);
     }
