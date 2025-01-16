@@ -1,5 +1,4 @@
 import { Dialog, Flex, Text } from "@radix-ui/themes";
-import Loader from "../Loader";
 import { useState } from "react";
 import { OpenPositionData } from "overlay-sdk";
 import useAccount from "../../hooks/useAccount";
@@ -110,7 +109,7 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
             width="140px"
             disabled={isUnwinding}
           >
-            {isUnwinding ? <Loader /> : "Confirm"}
+            {isUnwinding ? "Pending..." : "Confirm"}
           </ColorButton>
         </Flex>
       </Dialog.Content>
