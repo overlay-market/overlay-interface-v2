@@ -140,7 +140,10 @@ const OpenPositionsTable: React.FC = () => {
           {showCheckboxes ? (
             <>
               <ColorButton
-                onClick={() => setShowCheckboxes(false)}
+                onClick={() => {
+                  setShowCheckboxes(false);
+                  setSelectedPositions(new Set());
+                }}
                 width="140px"
                 bgColor={theme.color.grey4}
                 color={theme.color.grey1}
