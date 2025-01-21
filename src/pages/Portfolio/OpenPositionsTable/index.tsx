@@ -1,4 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
+import { ColorButton } from "../../../components/Button";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
@@ -10,6 +11,8 @@ import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
+import ClosePositionsModal from "../../../components/ClosePositionsModal";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const POSITIONS_COLUMNS = [
   "Market",
@@ -36,6 +39,45 @@ const OpenPositionsTable: React.FC = () => {
   const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [selectedPositions, setSelectedPositions] = useState<Set<string>>(
+    new Set()
+  );
+  const [showCheckboxes, setShowCheckboxes] = useState(false);
+  const [showCloseModal, setShowCloseModal] = useState(false);
+
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
+  const handleSelectAll = (selectAll: boolean) => {
+    if (selectAll) {
+      setSelectedPositions(
+        new Set(positions?.map((p) => p.positionId.toString()) || [])
+      );
+    } else {
+      setSelectedPositions(new Set());
+    }
+  };
+
+  const handlePositionSelect = (
+    position: OpenPositionData,
+    checked: boolean
+  ) => {
+    setSelectedPositions((prev) => {
+      const newSet = new Set(prev);
+      const positionId = position.positionId.toString();
+      if (checked) {
+        newSet.add(positionId);
+      } else {
+        newSet.delete(positionId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleClosePositions = () => {
+    setShowCloseModal(false);
+    setShowCheckboxes(false);
+    setSelectedPositions(new Set());
+  };
 
   useEffect(() => {
     const fetchOpenPositions = async () => {
@@ -90,9 +132,43 @@ const OpenPositionsTable: React.FC = () => {
         borderBottom: `1px solid ${theme.color.darkBlue}`,
       }}
     >
-      <Text weight={"bold"} size={"5"}>
-        Open Positions
-      </Text>
+      <Flex align="center" justify="between" mb="4">
+        <Text weight={"bold"} size={"5"}>
+          Open Positions
+        </Text>
+        <Flex gap="2" style={{ display: isMobile ? "none" : "flex" }}>
+          {showCheckboxes ? (
+            <>
+              <ColorButton
+                onClick={() => {
+                  setShowCheckboxes(false);
+                  setSelectedPositions(new Set());
+                }}
+                width="140px"
+                bgColor={theme.color.grey4}
+                color={theme.color.grey1}
+              >
+                Cancel Selection
+              </ColorButton>
+              <ColorButton
+                onClick={() => setShowCloseModal(true)}
+                width="180px"
+                disabled={selectedPositions.size === 0}
+              >
+                Close Selected ({selectedPositions.size})
+              </ColorButton>
+            </>
+          ) : (
+            <ColorButton
+              onClick={() => setShowCheckboxes(true)}
+              width="140px"
+              style={{ display: positionsTotalNumber === 0 ? "none" : "block" }}
+            >
+              Select Positions
+            </ColorButton>
+          )}
+        </Flex>
+      </Flex>
 
       <StyledTable
         headerColumns={POSITIONS_COLUMNS}
@@ -102,10 +178,20 @@ const OpenPositionsTable: React.FC = () => {
         positionsTotalNumber={positionsTotalNumber}
         setCurrentPage={setCurrentPage}
         setItemsPerPage={setItemsPerPage}
+        showCheckbox={showCheckboxes}
+        onSelectAll={handleSelectAll}
         body={
           positions &&
-          positions.map((position: OpenPositionData, index: number) => (
-            <OpenPosition position={position} key={index} />
+          positions.map((position: OpenPositionData) => (
+            <OpenPosition
+              position={position}
+              key={position.positionId}
+              showCheckbox={showCheckboxes}
+              onCheckboxChange={(checked) =>
+                handlePositionSelect(position, checked)
+              }
+              isChecked={selectedPositions.has(position.positionId.toString())}
+            />
           ))
         }
       />
@@ -118,6 +204,18 @@ const OpenPositionsTable: React.FC = () => {
       ) : (
         <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
       )}
+
+      <ClosePositionsModal
+        open={showCloseModal}
+        handleDismiss={() => setShowCloseModal(false)}
+        selectedCount={selectedPositions.size}
+        selectedPositions={
+          positions?.filter((pos) =>
+            selectedPositions.has(pos.positionId.toString())
+          ) || []
+        }
+        onConfirm={handleClosePositions}
+      />
     </Flex>
   );
 };
