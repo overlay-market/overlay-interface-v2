@@ -182,7 +182,7 @@ const SuggestedCards: React.FC = () => {
                         market.parsedMid ?? 0,
                         market.priceCurrency,
                         Number(market.parsedMid) > 10000 &&
-                          Number(market.priceCurrency) < 1000000
+                          Number(market.parsedMid) < 1000000
                           ? 5
                           : 4
                       )}
@@ -225,7 +225,7 @@ const SuggestedCards: React.FC = () => {
                         market.parsedMid ?? 0,
                         market.priceCurrency,
                         Number(market.parsedMid) > 10000 &&
-                          Number(market.priceCurrency) < 1000000
+                          Number(market.parsedMid) < 1000000
                           ? 5
                           : 4
                       )}
