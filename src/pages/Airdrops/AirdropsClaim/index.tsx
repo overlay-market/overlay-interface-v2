@@ -127,7 +127,10 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
         <AirdropsClaimContent>
           <Flex align={"center"} gap={"8px"}>
             <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
-            <Text size={"7"} style={{ fontWeight: "600" }}>
+            <Text
+              size={{ initial: "6", sm: "7" }}
+              style={{ fontWeight: "600" }}
+            >
               Overlay Airdrop
             </Text>
           </Flex>

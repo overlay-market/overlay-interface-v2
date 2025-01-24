@@ -26,14 +26,15 @@ export const AirdropsClaimWrapper = styled(Flex)`
 export const AirdropsClaimContainer = styled(Flex)`
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: start;
   position: relative;
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   overflow: hidden;
 
-  @media (min-width: ${theme.breakpoints.sm}) {    
+  @media (min-width: ${theme.breakpoints.sm}) { 
+    justify-content: center;   
     height: calc(100% - ${theme.headerSize.height})
   } 
   @media (min-width: ${theme.breakpoints.lg}) {    
@@ -58,10 +59,10 @@ export const MainBgImg = styled(Flex)`
 
 export const HandImg = styled(Flex)`
   position: absolute;
-  top: -11px;
-  left: -40px;
-  width: 196px;
-  height: 196px;
+  top: -10px;
+  left: -34px;
+  width: 176px;
+  height: 176px;
   z-index: 20; 
   background-image: url(${handImgUrl});
   background-size: cover;
@@ -87,7 +88,7 @@ export const CalloutTopImg = styled(Flex)`
   left: 175px;
   width: 176px;
   height: 88px;
-  z-index: 20; 
+  z-index: 60; 
   background-image: url(${calloutTopUrl});
   background-size: cover;
   background-position: center;
@@ -193,14 +194,17 @@ export const AirdropsClaimContent = styled(Flex)`
   flex-direction: column;
   align-items: center;
   width: 343px;
-  padding: 24px 16px 16px;
-  gap: 16px;
+  gap: 8px;
   position: relative;
   z-index: 50;  
   background: transparent;
+  padding-top: 108px;
+  padding-bottom: 240px;
   
   @media (min-width: ${theme.breakpoints.sm}) {    
     width: 580px;
+    gap: 16px;
+    padding: 24px 16px 16px;
     border: solid 1px #AAAAAA; 
     border-radius: 16px;
     background: #0B0F1C;
@@ -256,7 +260,6 @@ export const ShareOnXbutton = styled(Flex)`
   gap: 4px;
   border: 1px solid ${theme.color.grey2};
   background: ${theme.color.background};
-  box-shadow: 0px 0px 220px 0px rgba(255, 124, 213, 0.6);
 
   @media (min-width: ${theme.breakpoints.sm}) {    
    background: transparent;
