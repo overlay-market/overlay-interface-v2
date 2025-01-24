@@ -46,7 +46,10 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
                   priceWithCurrency={formatPriceWithCurrency(
                     market.price ?? 0,
                     market.priceCurrency,
-                    3
+                    Number(market.price) > 10000 &&
+                      Number(market.price) < 1000000
+                      ? 5
+                      : 4
                   )}
                   title={decodeURIComponent(market.marketId)}
                 />

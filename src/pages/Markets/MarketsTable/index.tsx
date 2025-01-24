@@ -380,7 +380,10 @@ export default function MarketsTable({
                     {formatPriceWithCurrency(
                       market.price ?? 0,
                       market.priceCurrency,
-                      isMobile ? 3 : 4
+                      Number(market.price) > 10000 &&
+                        Number(market.price) < 1000000
+                        ? 5
+                        : 4
                     )}
                   </Table.Cell>
                   {!isMobile && (

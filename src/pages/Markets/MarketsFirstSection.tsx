@@ -26,7 +26,10 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
             Value={formatPriceWithCurrency(
               marketsData[14]?.price ?? 0,
               marketsData[14]?.priceCurrency,
-              3
+              Number(marketsData[14]?.price) > 10000 &&
+                Number(marketsData[14]?.price) < 1000000
+                ? 5
+                : 4
             )}
             Id={marketsData[14]?.marketId ?? ""}
           />
@@ -39,7 +42,7 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
             Value={formatPriceWithCurrency(
               marketsData[5]?.price ?? 0,
               marketsData[5]?.priceCurrency,
-              3
+              Number(marketsData[5]?.price) > 100 ? 5 : 4
             )}
             Id={marketsData[5]?.marketId ?? ""}
           />
