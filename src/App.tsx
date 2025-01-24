@@ -16,6 +16,7 @@ import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
+import Airdrops from "./pages/Airdrops";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -44,6 +45,7 @@ const App = () => {
                 <Route path="/trade/:marketId" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/airdrops" element={<Airdrops />} />
               </Routes>
             </Flex>
           </AppContainer>
