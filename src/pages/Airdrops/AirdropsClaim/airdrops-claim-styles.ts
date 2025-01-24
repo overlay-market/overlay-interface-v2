@@ -139,7 +139,7 @@ export const CatImg = styled(Flex)`
   left: calc(50% - 140px);
   width: 335px;
   height: 287px;
-  z-index: 200; 
+  z-index: 20; 
   background-image: url(${catImgUrl});
   background-size: cover;
   background-position: center;
@@ -155,6 +155,7 @@ export const CatImg = styled(Flex)`
   @media (min-width: ${theme.breakpoints.lg}) {    
     bottom: -205px;
     left: calc(50% - 190px);
+    z-index: 100;
   }
 ` 
 
@@ -243,3 +244,41 @@ export const GradientText = styled(Text)`
     line-height: 52px;
   }  
 `;
+
+export const ShareOnXbutton = styled(Flex)`
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 49px;
+  padding: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  gap: 4px;
+  border: 1px solid ${theme.color.grey2};
+  background: ${theme.color.background};
+  box-shadow: 0px 0px 220px 0px rgba(255, 124, 213, 0.6);
+
+  @media (min-width: ${theme.breakpoints.sm}) {    
+   background: transparent;
+   box-shadow: none;
+  } 
+`
+
+export const InfoBox = styled(Flex)`
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  gap: 8px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 16px;
+  background: ${theme.color.background};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border: solid 1px ${theme.color.darkBlue}; 
+  } 
+`

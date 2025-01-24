@@ -12,12 +12,20 @@ import {
   GradientBorderBox,
   GradientText,
   HandImg,
+  InfoBox,
   MainBgImg,
+  ShareOnXbutton,
 } from "./airdrops-claim-styles";
 import theme from "../../../theme";
 import LogoImg from "../../../assets/images/overlay-logo-only-no-background.png";
-import { LineSeparator } from "../EligibilityChecker/eligibility-checker-styles";
-
+import {
+  GradientLink,
+  LineSeparator,
+  StyledLink,
+} from "../EligibilityChecker/eligibility-checker-styles";
+import Xlogo from "../../../assets/images/airdrops/socials-x.png";
+import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
+import { AIRDROP_LEARN_MORE_LINK } from "../../../constants/airdrops";
 type AirdropClaimProps = {};
 
 const AirdropsClaim: React.FC<AirdropClaimProps> = ({}) => {
@@ -67,6 +75,25 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({}) => {
               310,293.13 <span style={{ fontFamily: "Inter" }}>OVL</span>
             </GradientText>
           </GradientBorderBox>
+          <ShareOnXbutton>
+            <Text>Share on</Text>
+            <img src={Xlogo} alt="Xlogo" width={"16px"} height={"16px"} />
+          </ShareOnXbutton>
+
+          <InfoBox>
+            <Text size={"1"} style={{ lineHeight: "14.5px" }} weight={"bold"}>
+              Airdrop 2 campaign is now live.
+            </Text>
+
+            <StyledLink
+              to={AIRDROP_LEARN_MORE_LINK}
+              target="_blank"
+              style={{ textDecoration: "none" }}
+            >
+              <GradientLink> Don’t miss out</GradientLink>
+              <GradientOpenInNewIcon />
+            </StyledLink>
+          </InfoBox>
         </AirdropsClaimContent>
       </AirdropsClaimContainer>
     </AirdropsClaimWrapper>
