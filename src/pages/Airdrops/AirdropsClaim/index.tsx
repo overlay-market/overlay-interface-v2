@@ -14,6 +14,7 @@ import {
   GradientText,
   HandImg,
   InfoBox,
+  LineSeparator,
   MainBgImg,
   ShareOnXbutton,
 } from "./airdrops-claim-styles";
@@ -21,7 +22,6 @@ import theme from "../../../theme";
 import LogoImg from "../../../assets/images/overlay-logo-only-no-background.png";
 import {
   GradientLink,
-  LineSeparator,
   StyledLink,
 } from "../EligibilityChecker/eligibility-checker-styles";
 import Xlogo from "../../../assets/images/airdrops/socials-x.png";

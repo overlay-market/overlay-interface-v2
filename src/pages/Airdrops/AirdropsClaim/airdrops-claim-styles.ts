@@ -299,3 +299,18 @@ export const InfoBox = styled(Flex)`
     border: solid 1px ${theme.color.darkBlue}; 
   } 
 `
+
+export const LineSeparator = styled(Flex)`
+  @media (min-width: ${theme.breakpoints.sm}) {
+    height: 0;
+    width: 100%;
+    position: absolute;
+    top: ${theme.headerSize.height};
+    left: 0;
+    border-bottom: 1px solid ${theme.color.darkBlue};
+  }
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    display: none;
+  }
+`
