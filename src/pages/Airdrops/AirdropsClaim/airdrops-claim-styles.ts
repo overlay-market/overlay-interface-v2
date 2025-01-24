@@ -264,6 +264,23 @@ export const ShareOnXbutton = styled(Flex)`
   } 
 `
 
+export const AirdropBox = styled(Flex)`
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 16px;
+  background: ${theme.color.background};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    gap: 8px;
+    padding: 16px;
+    border: solid 1px ${theme.color.darkBlue}; 
+  } 
+`
+
 export const InfoBox = styled(Flex)`
   flex-direction: column;
   justify-content: space-between;

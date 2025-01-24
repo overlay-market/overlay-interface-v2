@@ -12,6 +12,6 @@ export type ResponseDataType = {
   invalidAddresses: string[]
 }
 
-export type AddressRowsType = {
-  [address: string]: string[]
+export type AirdropsAmounts = {
+  [airdropID: string]: string
 }
