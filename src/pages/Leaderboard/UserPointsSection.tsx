@@ -57,7 +57,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
             }}
           >
-            to see points
+            to see your place on the leaderboard
           </Text>
         </Flex>
       )}
