@@ -3,6 +3,12 @@ export interface PrevWeekDetails {
   sessionStart: string
   sessionEnd: string
 }
+
+export interface SessionDetails {
+  sessionStart: string
+  sessionEnd: string
+  sessionLastUpdated: string
+}
 export interface UserData {
   _id: string
   totalPoints: number
@@ -18,5 +24,6 @@ export interface LeaderboardPointsData {
   previousWeekDetails: PrevWeekDetails
   totalUsers: number
   leaderboardTable: [UserData]
+  sessionDetails: SessionDetails
   user?: UserData
 }
