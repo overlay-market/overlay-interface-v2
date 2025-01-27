@@ -205,6 +205,8 @@ export const AirdropsClaimContent = styled(Flex)`
     width: 580px;
     gap: 16px;
     padding: 24px 16px 16px;
+    margin-top: 140px;
+    margin-bottom: 200px;
     border: solid 1px #AAAAAA; 
     border-radius: 16px;
     background: #0B0F1C;
