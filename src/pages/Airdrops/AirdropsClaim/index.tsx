@@ -16,6 +16,7 @@ import {
   InfoBox,
   LineSeparator,
   MainBgImg,
+  MobileShadowBox,
   ShareOnXbutton,
 } from "./airdrops-claim-styles";
 import theme from "../../../theme";
@@ -125,7 +126,12 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
         <ArcBottomImg />
 
         <AirdropsClaimContent>
-          <Flex align={"center"} gap={"8px"}>
+          <Flex
+            align={"center"}
+            gap={"8px"}
+            position={"relative"}
+            style={{ zIndex: "60" }}
+          >
             <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
             <Text
               size={{ initial: "6", sm: "7" }}
@@ -134,106 +140,110 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
               Overlay Airdrop
             </Text>
           </Flex>
-          <GradientBorderBox>
-            {totalAmount ? (
-              <>
+          <MobileShadowBox>
+            <GradientBorderBox>
+              {totalAmount ? (
+                <>
+                  <Text
+                    size={{ initial: "3", sm: "4" }}
+                    weight={"bold"}
+                    style={{ color: "#10DCB1", lineHeight: "19px" }}
+                  >
+                    You earned
+                  </Text>
+
+                  <GradientText>
+                    {totalAmount}{" "}
+                    <span style={{ fontFamily: "Inter" }}>OVL</span>
+                  </GradientText>
+                </>
+              ) : (
                 <Text
                   size={{ initial: "3", sm: "4" }}
                   weight={"bold"}
-                  style={{ color: "#10DCB1", lineHeight: "19px" }}
+                  style={{ color: theme.color.red1, lineHeight: "19px" }}
                 >
-                  You earned
+                  An error occurred. Please contact the team.
                 </Text>
+              )}
+            </GradientBorderBox>
 
-                <GradientText>
-                  {totalAmount} <span style={{ fontFamily: "Inter" }}>OVL</span>
-                </GradientText>
-              </>
-            ) : (
-              <Text
-                size={{ initial: "3", sm: "4" }}
-                weight={"bold"}
-                style={{ color: theme.color.red1, lineHeight: "19px" }}
-              >
-                An error occurred. Please contact the team.
-              </Text>
-            )}
-          </GradientBorderBox>
+            <ShareOnXbutton>
+              <Text>Share on</Text>
+              <img src={Xlogo} alt="Xlogo" width={"16px"} height={"16px"} />
+            </ShareOnXbutton>
 
-          <ShareOnXbutton>
-            <Text>Share on</Text>
-            <img src={Xlogo} alt="Xlogo" width={"16px"} height={"16px"} />
-          </ShareOnXbutton>
-
-          {airdropsAmounts &&
-            Object.keys(airdropsAmounts).map((airdropId) => (
-              <AirdropBox>
-                <Flex
-                  direction={{ initial: "column", sm: "row" }}
-                  gap={"8px"}
-                  width={"100%"}
-                  align={{ initial: "start", sm: "center" }}
-                  justify={"end"}
-                >
+            {airdropsAmounts &&
+              Object.keys(airdropsAmounts).map((airdropId) => (
+                <AirdropBox>
+                  <Flex
+                    direction={{ initial: "column", sm: "row" }}
+                    gap={"8px"}
+                    width={"100%"}
+                    align={{ initial: "start", sm: "center" }}
+                    justify={"end"}
+                  >
+                    <Text
+                      size={"3"}
+                      style={{ color: theme.color.white }}
+                      weight={"medium"}
+                    >
+                      {AIRDROPS[airdropId].title}
+                    </Text>
+                    <Text
+                      ml={{ initial: "0", sm: "auto" }}
+                      size={"5"}
+                      style={{
+                        color: theme.color.white,
+                        fontFamily: "Roboto Mono",
+                      }}
+                    >
+                      {airdropsAmounts[airdropId]}{" "}
+                      <span style={{ fontFamily: "Inter" }}>OVL</span>
+                    </Text>
+                    <Flex gap={"4px"}>
+                      <GradientSolidButton
+                        title={"Stake"}
+                        width={"73px"}
+                        height={"32px"}
+                        size={"12px"}
+                        handleClick={handleStake}
+                      />
+                      <GradientOutlineButton
+                        title={"Claim"}
+                        width={"73px"}
+                        height={"32px"}
+                        size={"12px"}
+                        handleClick={() => handleClaim(airdropId)}
+                      />
+                    </Flex>
+                  </Flex>
                   <Text
-                    size={"3"}
-                    style={{ color: theme.color.white }}
+                    size={"1"}
+                    style={{ lineHeight: "14.5px" }}
                     weight={"medium"}
                   >
-                    {AIRDROPS[airdropId].title}
+                    Note: 25% vested at TGE and 75% vested upon CEX listing of
+                    OVL
                   </Text>
-                  <Text
-                    ml={{ initial: "0", sm: "auto" }}
-                    size={"5"}
-                    style={{
-                      color: theme.color.white,
-                      fontFamily: "Roboto Mono",
-                    }}
-                  >
-                    {airdropsAmounts[airdropId]}{" "}
-                    <span style={{ fontFamily: "Inter" }}>OVL</span>
-                  </Text>
-                  <Flex gap={"4px"}>
-                    <GradientSolidButton
-                      title={"Stake"}
-                      width={"73px"}
-                      height={"32px"}
-                      size={"12px"}
-                      handleClick={handleStake}
-                    />
-                    <GradientOutlineButton
-                      title={"Claim"}
-                      width={"73px"}
-                      height={"32px"}
-                      size={"12px"}
-                      handleClick={() => handleClaim(airdropId)}
-                    />
-                  </Flex>
-                </Flex>
-                <Text
-                  size={"1"}
-                  style={{ lineHeight: "14.5px" }}
-                  weight={"medium"}
-                >
-                  Note: 25% vested at TGE and 75% vested upon CEX listing of OVL
-                </Text>
-              </AirdropBox>
-            ))}
+                </AirdropBox>
+              ))}
 
-          <InfoBox>
-            <Text size={"1"} style={{ lineHeight: "14.5px" }} weight={"bold"}>
-              Airdrop 2 campaign is now live.
-            </Text>
+            <InfoBox>
+              <Text size={"1"} style={{ lineHeight: "14.5px" }} weight={"bold"}>
+                Airdrop 2 campaign is now live.
+              </Text>
 
-            <StyledLink
-              to={AIRDROP_LEARN_MORE_LINK}
-              target="_blank"
-              style={{ textDecoration: "none" }}
-            >
-              <GradientLink> Don’t miss out</GradientLink>
-              <GradientOpenInNewIcon />
-            </StyledLink>
-          </InfoBox>
+              <StyledLink
+                to={AIRDROP_LEARN_MORE_LINK}
+                target="_blank"
+                style={{ textDecoration: "none" }}
+              >
+                <GradientLink> Don’t miss out</GradientLink>
+                <GradientOpenInNewIcon />
+              </StyledLink>
+            </InfoBox>
+          </MobileShadowBox>
         </AirdropsClaimContent>
       </AirdropsClaimContainer>
     </AirdropsClaimWrapper>

@@ -114,7 +114,7 @@ export const CalloutBottomImg = styled(Flex)`
   left: calc(50% - 180px);
   width: 149px;
   height: 74px;
-  z-index: 20; 
+  z-index: 60; 
   background-image: url(${calloutBottomLeftUrl});
   background-size: cover;
   background-position: center;
@@ -217,6 +217,27 @@ export const AirdropsClaimContent = styled(Flex)`
   }  
 `
 
+export const MobileShadowBox = styled(Flex)`
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  gap: 8px;
+  position: relative;
+  z-index: 50;  
+  background: rgba(255, 124, 213, 0.3);
+  border-radius: 16px;
+  box-shadow: 0px 0px 220px 10px rgba(255, 124, 213, 0.4),
+  0px 0px 220px 20px rgba(255, 124, 213, 0.25);
+ 
+
+  @media (min-width: ${theme.breakpoints.sm}) {    
+    box-shadow: none;
+    gap: 16px;
+    background: #0B0F1C;
+  } 
+`
+
 export const GradientBorderBox = styled(Flex)`
   flex-direction: column;
   align-items: center;
@@ -227,7 +248,6 @@ export const GradientBorderBox = styled(Flex)`
   border-radius: 16px;
   background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
     linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;  
-  box-shadow: 0px 0px 220px 0px rgba(255, 124, 213, 0.6);
 
   @media (min-width: ${theme.breakpoints.sm}) {    
     box-shadow: 0px 0px 12px 3px rgba(255, 255, 255, 0.45);
