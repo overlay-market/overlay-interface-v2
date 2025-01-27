@@ -1,18 +1,17 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { ColorButton } from "../../../components/Button";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
 import OpenPosition from "./OpenPosition";
-import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
-import { OpenPositionData } from "overlay-sdk";
+import type { OpenPositionData } from "overlay-sdk";
 import ClosePositionsModal from "../../../components/ClosePositionsModal";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { usePositionRefresh } from "../../../state/portfolio/hooks";
 
 const POSITIONS_COLUMNS = [
   "Market",
@@ -27,16 +26,10 @@ const POSITIONS_COLUMNS = [
 ];
 
 const OpenPositionsTable: React.FC = () => {
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [positions, setPositions] = useState<OpenPositionData[] | undefined>(
-    undefined
-  );
-  const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedPositions, setSelectedPositions] = useState<Set<string>>(
@@ -46,6 +39,9 @@ const OpenPositionsTable: React.FC = () => {
   const [showCloseModal, setShowCloseModal] = useState(false);
 
   const isMobile = useMediaQuery("(max-width: 767px)");
+
+  const { loading, positions, positionsTotalNumber, refreshPositions } =
+    usePositionRefresh(sdk, account, isNewTxnHash, currentPage, itemsPerPage);
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
@@ -73,54 +69,12 @@ const OpenPositionsTable: React.FC = () => {
     });
   };
 
-  const handleClosePositions = () => {
+  const handleClosePositions = async () => {
     setShowCloseModal(false);
     setShowCheckboxes(false);
     setSelectedPositions(new Set());
+    setTimeout(refreshPositions, 1000);
   };
-
-  useEffect(() => {
-    const fetchOpenPositions = async () => {
-      if (!account) {
-        setPositions(undefined);
-        setPositionsTotalNumber(0);
-      }
-
-      if (account) {
-        setLoading(true);
-        try {
-          const positions = await sdk.openPositions.transformOpenPositions(
-            currentPage,
-            itemsPerPage,
-            undefined,
-            account as Address,
-            isNewTxnHash
-          );
-
-          positions && setPositions(positions.data);
-          positions && setPositionsTotalNumber(positions.total);
-          if (!positions) {
-            setPositions(undefined);
-            setPositionsTotalNumber(0);
-          }
-        } catch (error) {
-          console.error("Error fetching open positions:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchOpenPositions();
-  }, [
-    chainId,
-    account,
-    isNewTxnHash,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    setCurrentPage,
-  ]);
 
   return (
     <Flex
