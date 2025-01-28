@@ -17,11 +17,22 @@ export const MarketHeaderContainer = styled(Flex)`
 
   @media (min-width: ${theme.breakpoints.sm}) {
     height: ${theme.headerSize.height};
+    width: calc(100% + ${theme.app.rightPadding});
+    margin-right: calc(0px - ${theme.app.rightPadding});
     border-bottom: 1px solid ${theme.color.darkBlue};
+  }
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    width: calc(100% + 10px);
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
     justify-content: start;
+  }
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    margin-left: calc(16px - ${theme.app.xxlPadding});
+    width: calc(100% + 2 * ${theme.app.xxlPadding} - 16px);
   }
 `;
 
