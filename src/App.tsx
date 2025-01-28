@@ -17,12 +17,15 @@ import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
 import PowerCards from "./pages/PowerCards";
+import useScrollbarWidth from "./hooks/useScrollbarWidth";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
   useSyncChainQuery(chainIdRef);
 
   const { chainId: contextChainID } = useMultichainContext();
+
+  useScrollbarWidth();
 
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
