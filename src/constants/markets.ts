@@ -21,6 +21,7 @@ import INK from "../assets/images/markets-full-logos/ink.jpeg";
 import ChessVideo from "../assets/videos/FuturisticChessMatch.mp4";
 import LanaDelRey from "../assets/images/markets-full-logos/lana-del-rey.png";
 import BeraNFT from "../assets/images/markets-full-logos/Bera-Nft-Index.png";
+import AiAgents from "../assets/images/markets-full-logos/AI-Agents-Index.png";
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -45,6 +46,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Electric%20Vehicle%20Commodity%20Index": EvIndex,
   "Lana%20Del%20Rey": LanaDelRey,
   "Bera%20NFT%20Index": BeraNFT,
+  "AI%20Agents%20Index": AiAgents,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -73,6 +75,7 @@ export const MARKETSORDER = [
   "Knives%20-%20CS2%20Skins",
   "Frogs%20vs%20Dogs%20-%20Meme%20War",
   "Knives%20vs%20Rifles%20-%20CS2%20Skins",
+  "AI%20Agents%20Index",
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
