@@ -58,6 +58,7 @@ export const MARKETSORDER = [
   "BTC%20Dominance",
   "ETH%20Dominance",
   "Bera%20NFT%20Index",
+  "AI%20Agents%20Index",
   "AI%20Index",
   "Lana%20Del%20Rey",
   "ETH%20%2F%20SOL",
@@ -75,7 +76,6 @@ export const MARKETSORDER = [
   "Knives%20-%20CS2%20Skins",
   "Frogs%20vs%20Dogs%20-%20Meme%20War",
   "Knives%20vs%20Rifles%20-%20CS2%20Skins",
-  "AI%20Agents%20Index",
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
