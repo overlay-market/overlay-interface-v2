@@ -1,6 +1,6 @@
 import { Dialog, Flex, Text } from "@radix-ui/themes";
 import { useState } from "react";
-import { OpenPositionData } from "overlay-sdk";
+import { OpenPositionData, SDKError } from "overlay-sdk";
 import useAccount from "../../hooks/useAccount";
 import useSDK from "../../hooks/useSDK";
 import theme from "../../theme";
@@ -9,6 +9,7 @@ import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
+import { TransactionResult } from "overlay-sdk/dist/core/types";
 
 type ClosePositionsModalProps = {
   open: boolean;
@@ -45,20 +46,38 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
         unwindPercentage: 1,
       });
 
+      console.log("Multiple unwind transactions", transactions);
+
       // Handle array of transactions
       transactions.forEach((tx) => {
-        addPopup(
-          {
-            txn: {
-              hash: tx.hash,
-              success: true,
-              message: "",
-              type: TransactionType.UNWIND_OVL_POSITION,
+        if (tx.status === "fulfilled") {
+          const txnResult = tx.value as TransactionResult;
+          addPopup(
+            {
+              txn: {
+                hash: txnResult.hash,
+                success: true,
+                message: "",
+                type: TransactionType.UNWIND_OVL_POSITION,
+              },
             },
-          },
-          tx.hash
-        );
-        handleTxnHashUpdate(tx.hash, 0);
+            txnResult.hash
+          );
+          handleTxnHashUpdate(txnResult.hash, 0);
+        } else {
+          const error = tx.reason as SDKError;
+          addPopup(
+            {
+              txn: {
+                hash: currentTimeForId,
+                success: false,
+                message: error.message,
+                type: TransactionType.UNWIND_OVL_POSITION,
+              },
+            },
+            currentTimeForId
+          );
+        }
       });
 
       onConfirm();
