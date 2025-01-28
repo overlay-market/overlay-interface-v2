@@ -22,6 +22,14 @@ import ChessVideo from "../assets/videos/FuturisticChessMatch.mp4";
 import LanaDelRey from "../assets/images/markets-full-logos/lana-del-rey.png";
 import BeraNFT from "../assets/images/markets-full-logos/Bera-Nft-Index.png";
 import AiAgents from "../assets/images/markets-full-logos/AI-Agents-Index.png";
+import TrumpFamily from "../assets/images/markets-full-logos/trump-family-index.png";
+import MrBeast from "../assets/images/markets-full-logos/mrbeast-yt-index.png";
+import MemesIndex from "../assets/images/markets-full-logos/meme-index.png";
+import L2 from "../assets/images/markets-full-logos/l2-index.png";
+import L1vL2 from "../assets/images/markets-full-logos/l1-vs-l2-index.png";
+import L1 from "../assets/images/markets-full-logos/l1-index.png";
+import HoneryJar from "../assets/images/markets-full-logos/honeyjar.png";
+import DeFi from "../assets/images/markets-full-logos/defi-index.png";
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -47,6 +55,14 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Lana%20Del%20Rey": LanaDelRey,
   "Bera%20NFT%20Index": BeraNFT,
   "AI%20Agents%20Index": AiAgents,
+  "Trump%20Family%20Index": TrumpFamily,
+  "Mr%20Beast%20Popularity%20Index": MrBeast,
+  "Memes%20Index": MemesIndex,
+  "Layer%202%20Index": L2,
+  "Layer1%20Vs%20Layer2%20Index": L1vL2,
+  "Layer%201%20Index": L1,
+  "HoneyJar%20NFTs%20Index": HoneryJar,
+  "Defi%20Index": DeFi,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -58,8 +74,16 @@ export const MARKETSORDER = [
   "BTC%20Dominance",
   "ETH%20Dominance",
   "Bera%20NFT%20Index",
+  "Mr%20Beast%20Popularity%20Index",
   "AI%20Agents%20Index",
   "AI%20Index",
+  "Trump%20Family%20Index",
+  "Memes%20Index",
+  "Layer%202%20Index",
+  "Layer1%20Vs%20Layer2%20Index",
+  "Layer%201%20Index",
+  "HoneyJar%20NFTs%20Index",
+  "Defi%20Index",
   "Lana%20Del%20Rey",
   "ETH%20%2F%20SOL",
   "Quantum%20Cats",
@@ -126,6 +150,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   ],
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
+    "Mr%20Beast%20Popularity%20Index",
   ],
   [CategoryName.Other]: [
 
