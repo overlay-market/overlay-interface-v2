@@ -41,6 +41,7 @@ import {
 import { AirdropsAmounts } from "../types";
 import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
 import { GraphQLClient } from "graphql-request";
+
 type AirdropClaimProps = {
   airdropsAmounts: AirdropsAmounts | null;
 };

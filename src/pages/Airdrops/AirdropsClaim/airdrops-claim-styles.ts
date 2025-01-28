@@ -14,12 +14,21 @@ export const AirdropsClaimWrapper = styled(Flex)`
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 100%;
+  margin-left: -${theme.app.mobilePadding};
+  margin-right: -${theme.app.mobilePadding};
+  width: calc(100% + 2 * ${theme.app.mobilePadding});
   height: 100%;
   overflow: hidden;
 
   @media (min-width: ${theme.breakpoints.sm}) {    
-    margin-right: -40px;
+    margin-right: -${theme.app.rightPadding};
+    width: calc(100% + ${theme.app.rightPadding});
+    margin-left: 0;
+  } 
+
+  @media (min-width: ${theme.breakpoints.xxl}) {    
+    margin-right: -${theme.app.xxlPadding};
+    width: calc(100% + ${theme.app.xxlPadding});
   } 
 `
 
