@@ -101,6 +101,16 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
     window.open(url, "_blank");
   };
 
+  const handleShareOnX = () => {
+    const shareText = `I just got my $OVL airdrop from @overlaymarket! ${totalAmount} $OVL 🐻🔥 \n\nCheck yours and start trading today at app.overlay.market/airdrops`;
+
+    const XshareUrl = `https://x.com/intent/post?text=${encodeURIComponent(
+      shareText
+    )}`;
+
+    window.open(XshareUrl, "_blank");
+  };
+
   return (
     <AirdropsClaimWrapper>
       <Flex
@@ -169,10 +179,12 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
               )}
             </GradientBorderBox>
 
-            <ShareOnXbutton>
-              <Text>Share on</Text>
-              <img src={Xlogo} alt="Xlogo" width={"16px"} height={"16px"} />
-            </ShareOnXbutton>
+            {totalAmount !== null && totalAmount > 0 && (
+              <ShareOnXbutton onClick={handleShareOnX}>
+                <Text>Share on</Text>
+                <img src={Xlogo} alt="Xlogo" width={"16px"} height={"16px"} />
+              </ShareOnXbutton>
+            )}
 
             {airdropsAmounts &&
               Object.keys(airdropsAmounts).map((airdropId) => (

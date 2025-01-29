@@ -291,7 +291,8 @@ export const ShareOnXbutton = styled(Flex)`
   gap: 4px;
   border: 1px solid ${theme.color.grey2};
   background: ${theme.color.background};
-
+  cursor: pointer;
+  
   @media (min-width: ${theme.breakpoints.sm}) {    
    background: transparent;
    box-shadow: none;
