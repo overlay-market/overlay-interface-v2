@@ -56,39 +56,46 @@ export const CurrentMarketLogo = styled.img`
 `;
 
 export const DropdownContainer = styled(Box)`
-  width: 280px;
+  width: 100%;
   height: 520px;
+  padding: 0 8px;
   position: absolute;
   top: ${theme.headerSize.height}
   left: 0;
   z-index: 10;
   background-color: ${theme.color.background};
   border-top: 1px solid ${theme.color.darkBlue};
+  border-right: 1px solid ${theme.color.darkBlue};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 334px;
     height: 614px;
+    padding: 0;
   }
   @media (min-width: ${theme.breakpoints.lg}) {
     width: 260px;
     height: 562px;
   }
   @media (min-width: ${theme.breakpoints.xxl}) {
-    width: 272px;
+    width: calc(272px + 60px);
     height: 645px;
+    left: 0;
   }
 `;
 
 export const StyledScrollArea = styled.div`
   height: 520px;
   overflow-y: auto;
-
+  position: relative;
+  padding-right: 8px;
+  margin-right: -8px;
+ 
   &::-webkit-scrollbar {
     width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: ${theme.color.background};
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
@@ -100,6 +107,8 @@ export const StyledScrollArea = styled.div`
   }
   @media (min-width: ${theme.breakpoints.sm}) {
     height: 614px;
+    padding-right: 0px;
+    margin-right: 0px;
   }
   @media (min-width: ${theme.breakpoints.lg}) {
     height: 562px;
