@@ -135,18 +135,31 @@ const OpenPositionsTable: React.FC = () => {
         showCheckbox={showCheckboxes}
         onSelectAll={handleSelectAll}
         body={
-          positions &&
-          positions.map((position: OpenPositionData) => (
-            <OpenPosition
-              position={position}
-              key={position.positionId}
-              showCheckbox={showCheckboxes}
-              onCheckboxChange={(checked) =>
-                handlePositionSelect(position, checked)
-              }
-              isChecked={selectedPositions.has(position.positionId.toString())}
-            />
-          ))
+          loading ? (
+            <tr>
+              <td
+                colSpan={POSITIONS_COLUMNS.length}
+                style={{ padding: "20px 0" }}
+              >
+                <Loader />
+              </td>
+            </tr>
+          ) : (
+            positions &&
+            positions.map((position: OpenPositionData) => (
+              <OpenPosition
+                position={position}
+                key={position.positionId}
+                showCheckbox={showCheckboxes}
+                onCheckboxChange={(checked) =>
+                  handlePositionSelect(position, checked)
+                }
+                isChecked={selectedPositions.has(
+                  position.positionId.toString()
+                )}
+              />
+            ))
+          )
         }
       />
 

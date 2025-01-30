@@ -5,6 +5,7 @@ import type {
   OverlaySDK,
 } from "overlay-sdk";
 import type { Address } from "viem";
+
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const POLLING_INTERVAL = 5000;
@@ -22,13 +23,14 @@ export function usePositionRefresh(
     undefined
   );
   const [positionsTotalNumber, setPositionsTotalNumber] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const fetchPositions = useCallback(
-    async (retryCount = 0): Promise<void> => {
+    async (retryCount = 0): Promise<boolean> => {
       if (!account) {
         setPositions(undefined);
         setPositionsTotalNumber(0);
-        return;
+        return false;
       }
 
       try {
@@ -57,8 +59,12 @@ export function usePositionRefresh(
           );
         });
 
+        const hasNewData = validPositions.length !== positionsTotalNumber;
+
         setPositions(validPositions);
         setPositionsTotalNumber(validPositions.length);
+
+        return hasNewData;
       } catch (error) {
         console.error(
           `Error fetching positions (attempt ${retryCount + 1}):`,
@@ -67,14 +73,22 @@ export function usePositionRefresh(
 
         if (retryCount < MAX_RETRIES) {
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
-          await fetchPositions(retryCount + 1);
+          return fetchPositions(retryCount + 1);
         } else {
           setPositions(undefined);
           setPositionsTotalNumber(0);
+          return false;
         }
       }
     },
-    [sdk, account, isNewTxnHash, currentPage, itemsPerPage]
+    [
+      sdk,
+      account,
+      isNewTxnHash,
+      currentPage,
+      itemsPerPage,
+      positionsTotalNumber,
+    ]
   );
 
   useEffect(() => {
@@ -87,8 +101,21 @@ export function usePositionRefresh(
     refresh();
   }, [fetchPositions]);
 
+  useEffect(() => {
+    if (isNewTxnHash) {
+      setIsUpdating(true);
+      const poll = async () => {
+        const hasNewData = await fetchPositions();
+        if (hasNewData) {
+          setIsUpdating(false);
+        }
+      };
+      poll();
+    }
+  }, [isNewTxnHash, fetchPositions]);
+
   return {
-    loading,
+    loading: loading || isUpdating,
     positions,
     positionsTotalNumber,
     refreshPositions: fetchPositions,
@@ -103,6 +130,7 @@ export function useUnwindPositionRefresh(
   itemsPerPage: number
 ) {
   const [loading, setLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [unwindPositions, setUnwindPositions] = useState<
     UnwindPositionData[] | undefined
   >(undefined);
@@ -162,7 +190,6 @@ export function useUnwindPositionRefresh(
         );
 
         if (retryCount < MAX_RETRIES) {
-          // Wait and retry
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
           return fetchUnwindPositions(retryCount + 1);
         } else {
@@ -193,6 +220,7 @@ export function useUnwindPositionRefresh(
       const elapsedTime = Date.now() - (startTimeRef.current || 0);
 
       if (hasNewData || elapsedTime >= MAX_POLLING_TIME) {
+        setIsUpdating(false);
         return;
       }
 
@@ -214,6 +242,7 @@ export function useUnwindPositionRefresh(
 
   useEffect(() => {
     if (isNewTxnHash) {
+      setIsUpdating(true);
       startPolling();
     }
 
@@ -225,7 +254,7 @@ export function useUnwindPositionRefresh(
   }, [isNewTxnHash, startPolling]);
 
   return {
-    loading,
+    loading: loading || isUpdating,
     unwindPositions,
     unwindPositionsTotalNumber,
     refreshUnwindPositions: fetchUnwindPositions,

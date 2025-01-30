@@ -1,6 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
 import type { Address } from "viem";
@@ -29,6 +29,10 @@ const UnwindsTable: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [lastFirstPosition, setLastFirstPosition] = useState<string | null>(
+    null
+  );
+  const [showLoader, setShowLoader] = useState(false);
 
   const { loading, unwindPositions, unwindPositionsTotalNumber } =
     useUnwindPositionRefresh(
@@ -38,6 +42,27 @@ const UnwindsTable: React.FC = () => {
       currentPage,
       itemsPerPage
     );
+
+  useEffect(() => {
+    if (isNewTxnHash) {
+      setShowLoader(true);
+      if (unwindPositions && unwindPositions.length > 0) {
+        setLastFirstPosition(unwindPositions[0].positionId.toString());
+      }
+    }
+  }, [isNewTxnHash, unwindPositions]);
+
+  useEffect(() => {
+    if (showLoader && unwindPositions && unwindPositions.length > 0) {
+      const currentFirstPosition = unwindPositions[0].positionId.toString();
+      if (currentFirstPosition !== lastFirstPosition) {
+        setShowLoader(false);
+        setLastFirstPosition(null);
+      }
+    }
+  }, [unwindPositions, lastFirstPosition]);
+
+  const isTableLoading = loading || showLoader;
 
   return (
     <Flex
@@ -62,23 +87,36 @@ const UnwindsTable: React.FC = () => {
         setCurrentPage={setCurrentPage}
         setItemsPerPage={setItemsPerPage}
         body={
-          unwindPositions &&
-          unwindPositions.map((position: UnwindPositionData, index: number) => (
-            <UnwindPosition position={position} key={index} />
-          ))
+          showLoader ? (
+            <tr>
+              <td
+                colSpan={UNWIND_POSITIONS_COLUMNS.length}
+                style={{ padding: "20px 0" }}
+              >
+                <Loader />
+              </td>
+            </tr>
+          ) : (
+            unwindPositions &&
+            unwindPositions.map(
+              (position: UnwindPositionData, index: number) => (
+                <UnwindPosition position={position} key={index} />
+              )
+            )
+          )
         }
       />
 
-      {loading && !unwindPositions ? (
-        <Loader />
-      ) : account ? (
+      {!isTableLoading && !account && (
+        <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
+      )}
+
+      {!isTableLoading &&
+        account &&
         unwindPositions &&
         unwindPositionsTotalNumber === 0 && (
           <Text>You have no unwind positions</Text>
-        )
-      ) : (
-        <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
-      )}
+        )}
     </Flex>
   );
 };
