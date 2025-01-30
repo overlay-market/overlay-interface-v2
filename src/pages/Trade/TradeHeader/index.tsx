@@ -16,7 +16,7 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals, toWei } from "overlay-sdk";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
-import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const TradeHeader: React.FC = () => {
   const { marketId } = useParams();
@@ -59,12 +59,7 @@ const TradeHeader: React.FC = () => {
   useEffect(() => {
     market &&
       price &&
-      setCurrencyPrice(
-        `${market.priceCurrency}${formatPriceByCurrency(
-          price,
-          market.priceCurrency
-        )}`
-      );
+      setCurrencyPrice(formatPriceWithCurrency(price, market.priceCurrency));
   }, [price, market]);
 
   useEffect(() => {

@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
-import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const PositionSelectComponent: React.FC = () => {
   const { marketId } = useParams();
@@ -53,23 +53,13 @@ const PositionSelectComponent: React.FC = () => {
   useEffect(() => {
     ask &&
       market &&
-      setCurrencyAsk(
-        `${market.priceCurrency}${formatPriceByCurrency(
-          ask,
-          market.priceCurrency
-        )}`
-      );
+      setCurrencyAsk(formatPriceWithCurrency(ask, market.priceCurrency));
   }, [ask, market]);
 
   useEffect(() => {
     bid &&
       market &&
-      setCurrencyBid(
-        `${market.priceCurrency}${formatPriceByCurrency(
-          bid,
-          market.priceCurrency
-        )}`
-      );
+      setCurrencyBid(formatPriceWithCurrency(bid, market.priceCurrency));
   }, [bid, market]);
 
   const handleSelectPositionSide = useCallback(
