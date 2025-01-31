@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
 import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 type MainTradeDetailsProps = {
   tradeState?: TradeStateData;
@@ -39,12 +39,7 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
     price &&
       typedValue &&
       market &&
-      setCurrencyPrice(
-        `${market.priceCurrency}${formatPriceByCurrency(
-          price,
-          market.priceCurrency
-        )}`
-      );
+      setCurrencyPrice(formatPriceWithCurrency(price, market.priceCurrency));
   }, [price, market, typedValue]);
 
   useEffect(() => {
@@ -52,10 +47,7 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
       typedValue &&
       market &&
       setCurrencyMinPrice(
-        `${market.priceCurrency}${formatPriceByCurrency(
-          minPrice,
-          market.priceCurrency
-        )}`
+        formatPriceWithCurrency(minPrice, market.priceCurrency)
       );
   }, [minPrice, market, typedValue]);
 

@@ -11,8 +11,8 @@ import {
   DropdownContainer,
   StyledScrollArea,
 } from "./markets-list-styles";
-import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const MarketsList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,12 +47,10 @@ const MarketsList: React.FC = () => {
             <Flex direction="column" align={"center"}>
               {markets &&
                 markets.map((market) => {
-                  const currencyPrice = `${
-                    market.priceCurrency
-                  }${formatPriceByCurrency(
+                  const currencyPrice = formatPriceWithCurrency(
                     market.parsedMid ?? 0,
                     market.priceCurrency
-                  )}`;
+                  );
 
                   return (
                     <Fragment key={market.id}>
