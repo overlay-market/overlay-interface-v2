@@ -27,6 +27,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 }) => {
   const { address: account } = useAccount();
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMultipleSessions = false;
 
   return (
     <Table>
@@ -39,12 +40,12 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
           >
             Leaderboard Rankings
           </StyledHeader>
-          {!isMobile && (
+          {!isMobile && isMultipleSessions && (
             <StyledHeader textalign={"right"}>
               Points-Previous Week
             </StyledHeader>
           )}
-          <StyledHeader textalign={"right"}>Total Points</StyledHeader>
+          <StyledHeader textalign={"right"}>Total PnL</StyledHeader>
         </tr>
       </thead>
 
@@ -73,13 +74,13 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                 </Text>
               </Flex>
             </StyledCell>
-            {!isMobile && (
+            {!isMobile && isMultipleSessions && (
               <StyledCell textalign="right">
                 {currentUserData?.previousWeekPoints ?? "0"}
               </StyledCell>
             )}
             <StyledCell textalign="right">
-              {currentUserData?.totalPoints ?? "0"}
+              {currentUserData?.totalPoints ? (+currentUserData?.totalPoints).toFixed(2) + "%" : "0"}
             </StyledCell>
           </CurrentUserRankingRow>
           <BgRow></BgRow>
@@ -125,12 +126,12 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                   <Text>{shortenAddress(rank._id)}</Text>
                 </Flex>
               </StyledCell>
-              {!isMobile && (
+              {!isMobile && isMultipleSessions && (
                 <StyledCell textalign="right">
                   {rank.previousWeekPoints}
                 </StyledCell>
               )}
-              <StyledCell textalign="right">{rank.totalPoints}</StyledCell>
+              <StyledCell textalign="right">{rank.totalPoints.toFixed(2) + "%"}</StyledCell>
             </StyledRow>
           ))}
       </tbody>

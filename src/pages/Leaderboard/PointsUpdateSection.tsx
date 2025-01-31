@@ -33,7 +33,7 @@ const PointsUpdateSection: React.FC<PointsUpdateSectionProps> = ({
 
       <Flex direction={"column"} gap={"4px"}>
         <Text size={"1"} style={{ color: theme.color.grey1 }}>
-          Points Updated At
+          Updated At
         </Text>
         <Text size={"3"} style={{ fontWeight: "600" }}>
           {pointsUpdatedAt ? (
