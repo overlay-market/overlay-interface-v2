@@ -39,7 +39,8 @@ export const CardContent = styled(Flex)`
 export const CardsValue = styled.h2`
   margin: 0;
   font-size: clamp(0.8rem, 3vw, 1.2rem);
-  color: ${theme.color.green2};
+  color: ${theme.color.white};
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

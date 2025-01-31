@@ -66,7 +66,8 @@ export const SubtitleText = styled(Text)`
 export const CardsValue = styled.h2`
   margin: 0;
   font-size: clamp(0.8rem, 3vw, 18px);
-  color: ${theme.color.green2};
+  color: ${theme.color.grey1};
+  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
