@@ -12,6 +12,7 @@ import type { OpenPositionData } from "overlay-sdk";
 import ClosePositionsModal from "../../../components/ClosePositionsModal";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { usePositionRefresh } from "../../../state/portfolio/hooks";
+import { triggerLoader } from "../UnwindsTable";
 
 const POSITIONS_COLUMNS = [
   "Market",
@@ -73,6 +74,7 @@ const OpenPositionsTable: React.FC = () => {
     setShowCloseModal(false);
     setShowCheckboxes(false);
     setSelectedPositions(new Set());
+    triggerLoader && triggerLoader();
     setTimeout(refreshPositions, 1000);
   };
 
@@ -135,7 +137,7 @@ const OpenPositionsTable: React.FC = () => {
         showCheckbox={showCheckboxes}
         onSelectAll={handleSelectAll}
         body={
-          loading ? (
+          loading && positions ? (
             <tr>
               <td
                 colSpan={POSITIONS_COLUMNS.length}

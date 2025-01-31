@@ -5,11 +5,27 @@ import type {
   OverlaySDK,
 } from "overlay-sdk";
 import type { Address } from "viem";
+import { useAppSelector } from "../hooks";
+import { TransactionType } from "../../constants/transaction";
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const POLLING_INTERVAL = 5000;
 const MAX_POLLING_TIME = 60000;
+
+export function useIsNewUnwindTxn(): boolean {
+  const txnHash = useAppSelector((state) => state.trade.txnHash);
+  const activePopups = useAppSelector((state) => state.application.popupList);
+
+  const currentTxnPopup = activePopups.find(
+    (popup) => popup.content.txn.hash === txnHash && popup.show
+  );
+
+  return Boolean(
+    currentTxnPopup?.content.txn.type === TransactionType.UNWIND_OVL_POSITION &&
+      currentTxnPopup?.content.txn.success === true
+  );
+}
 
 export function usePositionRefresh(
   sdk: OverlaySDK,
@@ -24,6 +40,7 @@ export function usePositionRefresh(
   );
   const [positionsTotalNumber, setPositionsTotalNumber] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
+  const isUnwindTxn = useIsNewUnwindTxn();
 
   const fetchPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
@@ -102,7 +119,7 @@ export function usePositionRefresh(
   }, [fetchPositions]);
 
   useEffect(() => {
-    if (isNewTxnHash) {
+    if (isNewTxnHash && isUnwindTxn) {
       setIsUpdating(true);
       const poll = async () => {
         const hasNewData = await fetchPositions();
@@ -112,7 +129,7 @@ export function usePositionRefresh(
       };
       poll();
     }
-  }, [isNewTxnHash, fetchPositions]);
+  }, [isNewTxnHash, isUnwindTxn, fetchPositions]);
 
   return {
     loading: loading || isUpdating,
@@ -138,6 +155,7 @@ export function useUnwindPositionRefresh(
     useState(0);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const isUnwindTxn = useIsNewUnwindTxn();
 
   const fetchUnwindPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
@@ -241,7 +259,7 @@ export function useUnwindPositionRefresh(
   }, [fetchUnwindPositions]);
 
   useEffect(() => {
-    if (isNewTxnHash) {
+    if (isNewTxnHash && isUnwindTxn) {
       setIsUpdating(true);
       startPolling();
     }
@@ -251,7 +269,7 @@ export function useUnwindPositionRefresh(
         clearTimeout(pollingTimeoutRef.current);
       }
     };
-  }, [isNewTxnHash, startPolling]);
+  }, [isNewTxnHash, isUnwindTxn, startPolling]);
 
   return {
     loading: loading || isUpdating,

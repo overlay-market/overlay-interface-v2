@@ -22,6 +22,8 @@ const UNWIND_POSITIONS_COLUMNS = [
   "PnL",
 ];
 
+export let triggerLoader: (() => void) | null = null;
+
 const UnwindsTable: React.FC = () => {
   const sdk = useSDK();
   const { address: account } = useAccount();
@@ -44,15 +46,6 @@ const UnwindsTable: React.FC = () => {
     );
 
   useEffect(() => {
-    if (isNewTxnHash) {
-      setShowLoader(true);
-      if (unwindPositions && unwindPositions.length > 0) {
-        setLastFirstPosition(unwindPositions[0].positionId.toString());
-      }
-    }
-  }, [isNewTxnHash, unwindPositions]);
-
-  useEffect(() => {
     if (showLoader && unwindPositions && unwindPositions.length > 0) {
       const currentFirstPosition = unwindPositions[0].positionId.toString();
       if (currentFirstPosition !== lastFirstPosition) {
@@ -63,6 +56,13 @@ const UnwindsTable: React.FC = () => {
   }, [unwindPositions, lastFirstPosition]);
 
   const isTableLoading = loading || showLoader;
+
+  triggerLoader = () => {
+    setShowLoader(true);
+    if (unwindPositions && unwindPositions.length > 0) {
+      setLastFirstPosition(unwindPositions[0].positionId.toString());
+    }
+  };
 
   return (
     <Flex
@@ -106,6 +106,8 @@ const UnwindsTable: React.FC = () => {
           )
         }
       />
+
+      {loading && !unwindPositions && <Loader />}
 
       {!isTableLoading && !account && (
         <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
