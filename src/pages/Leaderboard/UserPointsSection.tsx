@@ -64,7 +64,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
 
       <Flex gap={"8px"} align={"center"}>
         <Text size={"1"} style={{ color: theme.color.grey3 }}>
-          Leaderboard is updated every 10 minutes!
+          Leaderboard is updated every minute!
         </Text>
         {false && <Link target="_blank" href={LEADERBOARD_LEARN_MORE_LINK}>
           <GradientText>Learn more</GradientText>
