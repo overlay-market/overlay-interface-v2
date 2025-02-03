@@ -28,7 +28,7 @@ const NavBar: React.FC = () => {
         top={"0"}
         style={{
           borderRight: isMobile
-            ? "0px solid transparent" // Remove the border
+            ? "0px solid transparent"
             : `1px solid ${theme.color.darkBlue}`,
         }}
       >

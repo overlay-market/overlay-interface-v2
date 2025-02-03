@@ -17,10 +17,10 @@ import {
 //   PowercardIcon,
 //   PowercardActiveIcon,
 // } from "../../assets/icons/navBar-icons/powercard";
-// import {
-//   StakeIcon,
-//   StakeActiveIcon,
-// } from "../../assets/icons/navBar-icons/stake";
+import {
+  StakeIcon,
+  StakeActiveIcon,
+} from "../../assets/icons/navBar-icons/stake";
 import { DEFAULT_MARKET_ID, NAVBAR_MODE } from "../../constants/applications";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -28,10 +28,6 @@ import {
   TrophyActiveIcon,
   TrophyIcon,
 } from "../../assets/icons/navBar-icons/trophy";
-import {
-  AirdropsActiveIcon,
-  AirdropsIcon,
-} from "../../assets/icons/navBar-icons/airdrops";
 import {
   MarketsActiveIcon,
   MarketsIcon,
@@ -95,17 +91,17 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       showOnMobile: true,
     },
     {
-      to: "/airdrops",
-      label: "Airdrops",
-      icon: AirdropsIcon,
-      activeIcon: AirdropsActiveIcon,
+      to: "/earn",
+      label: "Earn",
+      icon: StakeIcon,
+      activeIcon: StakeActiveIcon,
       showOnMobile: true,
     },
     // {
-    //   to: "/stake",
-    //   label: "Stake",
-    //   icon: StakeIcon,
-    //   activeIcon: StakeActiveIcon,
+    //   to: "/airdrops",
+    //   label: "Airdrops",
+    //   icon: AirdropsIcon,
+    //   activeIcon: AirdropsActiveIcon,
     //   showOnMobile: true,
     // },
   ];
