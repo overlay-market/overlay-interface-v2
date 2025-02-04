@@ -1,6 +1,6 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+import { Mousewheel, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -25,7 +25,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
       <Skeleton height="257px" loading={marketsData.length < 1} />
       {marketsData.length > 0 && (
         <Swiper
-          modules={[Navigation, Pagination]}
+          modules={[Navigation, Pagination, Mousewheel]}
           style={{
             height: "auto",
             marginTop: "4px",
