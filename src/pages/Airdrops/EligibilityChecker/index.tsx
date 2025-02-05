@@ -39,18 +39,6 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
 
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
-      <Flex
-        display={{ initial: "none", sm: "flex", lg: "none" }}
-        justify={"start"}
-        align={"center"}
-        width={"100%"}
-        height={theme.headerSize.height}
-        px={"10px"}
-      >
-        <Text size={"2"} weight={"medium"}>
-          Airdrops
-        </Text>
-      </Flex>
       <LineSeparator />
 
       <Flex
@@ -58,6 +46,7 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
         height={"100%"}
         direction={"column"}
         pt={{ initial: "16px", sm: "0", lg: "150px" }}
+        mt={{ sm: `-${theme.headerSize.height}`, lg: "0" }}
         justify={{ initial: "start", sm: "center", lg: "start" }}
         align={"center"}
       >
@@ -70,7 +59,7 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
             style={{ fontWeight: "600", textAlign: "center" }}
             size={{ initial: "6", sm: "8" }}
           >
-            Eligibility Checker 🪂
+            Airdrop <br /> Eligibility Checker 🪂
           </Text>
           <GradientBorderBox
             bordercolor={
