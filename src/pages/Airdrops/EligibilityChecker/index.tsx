@@ -134,7 +134,22 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
             </BummerContainer>
           )}
 
-          {eligibilityStatus === "ineligible" && (
+          {eligibilityStatus === "eligibleNoRewards" && (
+            <BummerContainer>
+              <Text size={"4"} weight={"bold"} style={{ lineHeight: "21px" }}>
+                Bummer!
+              </Text>
+              <Text
+                size={"1"}
+                style={{ color: theme.color.grey10, lineHeight: "14px" }}
+              >
+                No allocation reserved for this address.
+              </Text>
+            </BummerContainer>
+          )}
+
+          {(eligibilityStatus === "ineligible" ||
+            eligibilityStatus === "eligibleNoRewards") && (
             <InfoContainer>
               <Text size={"1"} style={{ lineHeight: "14.5px" }}>
                 <span style={{ fontWeight: "700" }}>Didn’t make the cut?</span>{" "}

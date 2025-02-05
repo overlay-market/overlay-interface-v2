@@ -12,6 +12,7 @@ import AirdropsClaim from "./AirdropsClaim";
 
 export enum EligibilityStatus {
   Eligible = "eligible",
+  EligibleNoRewards = "eligibleNoRewards",
   Ineligible = "ineligible",
   Null = "null",
 }
@@ -132,12 +133,20 @@ const Airdrops: React.FC = () => {
     return addressResults ? getAirdropsAmounts() : null;
   }, [addressResults, getAirdropsAmounts]);
 
+  const noRewardsAvailable = useMemo<boolean | null>(() => {
+    return airdropsAmounts ? Object.keys(airdropsAmounts).length === 0 : null;
+  }, [airdropsAmounts]);
+
   useEffect(() => {
     if (responseData) {
       const invalidAddresses = responseData.invalidAddresses;
       if (invalidAddresses) {
         if (invalidAddresses.length === 0) {
-          setEligibilityStatus(EligibilityStatus.Eligible);
+          if (noRewardsAvailable) {
+            setEligibilityStatus(EligibilityStatus.EligibleNoRewards);
+          } else {
+            setEligibilityStatus(EligibilityStatus.Eligible);
+          }
         } else {
           setEligibilityStatus(EligibilityStatus.Ineligible);
         }
@@ -147,11 +156,13 @@ const Airdrops: React.FC = () => {
     } else {
       setEligibilityStatus(EligibilityStatus.Null);
     }
-  }, [responseData]);
+  }, [responseData, noRewardsAvailable]);
 
   return (
     <>
-      {["ineligible", "null"].includes(eligibilityStatus) && (
+      {["eligibleNoRewards", "ineligible", "null"].includes(
+        eligibilityStatus
+      ) && (
         <EligibilityChecker
           eligibilityStatus={eligibilityStatus}
           address={address}

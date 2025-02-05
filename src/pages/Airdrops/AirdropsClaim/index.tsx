@@ -153,7 +153,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
           </Flex>
           <MobileShadowBox>
             <GradientBorderBox>
-              {totalAmount ? (
+              {totalAmount && (
                 <>
                   <Text
                     size={{ initial: "3", sm: "4" }}
@@ -168,14 +168,6 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                     <span style={{ fontFamily: "Inter" }}>OVL</span>
                   </GradientText>
                 </>
-              ) : (
-                <Text
-                  size={{ initial: "3", sm: "4" }}
-                  weight={"bold"}
-                  style={{ color: theme.color.red1, lineHeight: "19px" }}
-                >
-                  An error occurred. Please contact the team.
-                </Text>
               )}
             </GradientBorderBox>
 
