@@ -51,6 +51,8 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
   const account = "0x55176a12ba096f60810fd74b90d1b1138b595ede";
 
   const [streamData, setStreamData] = useState<StreamData | null>(null);
+  const [airdropIdForErrorClaimAlias, setAirdropIdForErrorClaimAlias] =
+    useState<string | null>(null);
 
   const client = new GraphQLClient(SABLIER_SUBGRAPH_URL);
 
@@ -89,6 +91,8 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
   };
 
   const handleClaim = (airdropId: string) => {
+    setAirdropIdForErrorClaimAlias(null);
+
     const alias =
       streamData &&
       streamData.find(
@@ -97,8 +101,12 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
           MERKLE_DISTIBUTOR_ADDRESSES[airdropId].toLowerCase()
       )?.alias;
 
-    const url = `${SABLIER_VESTING_URL}${alias}`;
-    window.open(url, "_blank");
+    if (alias) {
+      const url = `${SABLIER_VESTING_URL}${alias}`;
+      window.open(url, "_blank");
+    } else {
+      setAirdropIdForErrorClaimAlias(airdropId);
+    }
   };
 
   const handleShareOnX = () => {
@@ -231,6 +239,17 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                     Note: 25% vested at TGE and 75% vested upon CEX listing of
                     OVL
                   </Text>
+                  {airdropIdForErrorClaimAlias === airdropId && (
+                    <Text
+                      size={"1"}
+                      weight={"medium"}
+                      style={{
+                        color: theme.color.red1,
+                      }}
+                    >
+                      An error occurred. Please contact the team.
+                    </Text>
+                  )}
                 </AirdropBox>
               ))}
 
