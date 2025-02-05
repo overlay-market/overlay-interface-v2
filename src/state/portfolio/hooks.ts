@@ -79,7 +79,7 @@ export function usePositionRefresh(
         const hasNewData = validPositions.length !== positionsTotalNumber;
 
         setPositions(validPositions);
-        setPositionsTotalNumber(validPositions.length);
+        setPositionsTotalNumber(result.total);
 
         return hasNewData;
       } catch (error) {
@@ -198,7 +198,7 @@ export function useUnwindPositionRefresh(
           validUnwindPositions.length !== unwindPositionsTotalNumber;
 
         setUnwindPositions(validUnwindPositions);
-        setUnwindPositionsTotalNumber(validUnwindPositions.length);
+        setUnwindPositionsTotalNumber(result.total);
 
         return hasNewData;
       } catch (error) {
