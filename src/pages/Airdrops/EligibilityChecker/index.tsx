@@ -45,14 +45,15 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
         width={"100%"}
         height={"100%"}
         direction={"column"}
-        pt={{ initial: "16px", sm: "0", lg: "150px" }}
-        mt={{ sm: `-${theme.headerSize.height}`, lg: "0" }}
-        justify={{ initial: "start", sm: "center", lg: "start" }}
+        pt={{ initial: "16px", sm: "0" }}
+        justify={"start"}
         align={"center"}
       >
         <Flex
           direction={"column"}
           width={{ initial: "343px", sm: "424px", lg: "459px" }}
+          mt={{ sm: "120px", lg: "100px" }}
+          mb={"100px"}
           gap={{ initial: "32px", sm: "28px" }}
         >
           <Text
