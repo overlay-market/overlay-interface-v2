@@ -38,6 +38,10 @@ const Airdrops: React.FC = () => {
     }
   }, [account]);
 
+  useEffect(() => {
+    setEligibilityStatus(EligibilityStatus.Null);
+  }, [address]);
+
   const getAirdrops = (isActive: boolean) => {
     const convertMapToObject = (map: Map<string, AirdropType>) =>
       Object.fromEntries(map.entries());

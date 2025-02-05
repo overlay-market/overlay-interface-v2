@@ -188,7 +188,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
 
             {airdropsAmounts &&
               Object.keys(airdropsAmounts).map((airdropId) => (
-                <AirdropBox>
+                <AirdropBox key={airdropId}>
                   <Flex
                     direction={{ initial: "column", sm: "row" }}
                     gap={"8px"}
