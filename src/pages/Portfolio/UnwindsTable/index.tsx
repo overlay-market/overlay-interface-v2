@@ -87,23 +87,27 @@ const UnwindsTable: React.FC = () => {
         setCurrentPage={setCurrentPage}
         setItemsPerPage={setItemsPerPage}
         body={
-          showLoader ? (
-            <tr>
-              <td
-                colSpan={UNWIND_POSITIONS_COLUMNS.length}
-                style={{ padding: "20px 0" }}
-              >
-                <Loader />
-              </td>
-            </tr>
-          ) : (
-            unwindPositions &&
-            unwindPositions.map(
-              (position: UnwindPositionData, index: number) => (
-                <UnwindPosition position={position} key={index} />
-              )
-            )
-          )
+          <>
+            {showLoader && (
+              <tr>
+                <td
+                  colSpan={UNWIND_POSITIONS_COLUMNS.length}
+                  style={{
+                    padding: "16px 0",
+                    borderBottom: `1px solid ${theme.color.grey6}`,
+                  }}
+                >
+                  <Loader />
+                </td>
+              </tr>
+            )}
+            {unwindPositions &&
+              unwindPositions.map(
+                (position: UnwindPositionData, index: number) => (
+                  <UnwindPosition position={position} key={index} />
+                )
+              )}
+          </>
         }
       />
 
