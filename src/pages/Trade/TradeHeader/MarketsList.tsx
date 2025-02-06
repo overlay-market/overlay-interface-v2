@@ -11,7 +11,7 @@ import {
   DropdownContainer,
   StyledScrollArea,
 } from "./markets-list-styles";
-import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
+import { MARKETS_FULL_LOGOS, MARKETSORDER } from "../../../constants/markets";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const MarketsList: React.FC = () => {
@@ -20,6 +20,14 @@ const MarketsList: React.FC = () => {
   const toggleDropdown = () => setIsOpen((prev) => !prev);
   const { markets } = useMarketsState();
   const { currentMarket } = useCurrentMarketState();
+
+  const sortedMarkets =
+    markets &&
+    [...markets].sort((a, b) => {
+      return (
+        MARKETSORDER.indexOf(a.marketId) - MARKETSORDER.indexOf(b.marketId)
+      );
+    });
 
   return (
     <Box ref={ref} width={{ initial: "100%", sm: "260px" }}>
@@ -45,8 +53,8 @@ const MarketsList: React.FC = () => {
         <DropdownContainer>
           <StyledScrollArea>
             <Flex direction="column" align={"center"}>
-              {markets &&
-                markets.map((market) => {
+              {sortedMarkets &&
+                sortedMarkets.map((market) => {
                   const currencyPrice = formatPriceWithCurrency(
                     market.parsedMid ?? 0,
                     market.priceCurrency
