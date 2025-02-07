@@ -18,6 +18,7 @@ import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
 import Earn from "./pages/Earn";
 import useScrollbarWidth from "./hooks/useScrollbarWidth";
+import Stake from "./pages/Earn/StakePage";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -49,6 +50,7 @@ const App = () => {
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/earn" element={<Earn />} />
+                <Route path="/earn/:vaultId" element={<Stake />} />
               </Routes>
             </Flex>
           </AppContainer>
