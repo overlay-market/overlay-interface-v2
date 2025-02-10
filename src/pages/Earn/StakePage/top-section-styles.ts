@@ -2,7 +2,7 @@ import { Flex, Text } from "@radix-ui/themes";
 import styled from "styled-components";
 import theme from "../../../theme";
 
-export const RewardBox = styled(Flex)`
+export const StyledBox = styled(Flex)`
   flex-direction: column;
   gap: 8px;
   width: 100%;

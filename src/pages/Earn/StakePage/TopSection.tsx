@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import {
   ApyBadge,
   ApyBagdeText,
-  RewardBox,
+  StyledBox,
   TitleText,
 } from "./top-section-styles";
 
@@ -12,7 +12,7 @@ const TopSection: React.FC = () => {
   const { vaultId } = useParams();
 
   return (
-    <RewardBox>
+    <StyledBox>
       <ApyBadge>
         <ApyBagdeText>Variable APY</ApyBagdeText>
       </ApyBadge>
@@ -23,7 +23,7 @@ const TopSection: React.FC = () => {
         on your staked amount. This reward is distributed automatically to your
         staking balance, ensuring passive income.
       </Text>
-    </RewardBox>
+    </StyledBox>
   );
 };
 

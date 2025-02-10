@@ -1,6 +1,19 @@
-import { Box, Text } from "@radix-ui/themes";
+import { Box, Flex, Text } from "@radix-ui/themes";
 import styled from "styled-components";
 import theme from "../../../theme";
+
+export const RewardBox = styled(Flex)`
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 8px;
+  background: ${theme.color.grey4};
+
+  @media (min-width: ${theme.breakpoints.sm}) {      
+    
+  }
+`
 
 export const InfoBox = styled(Box)`
   display: flex;
@@ -19,9 +32,13 @@ export const InfoBox = styled(Box)`
 
 export const TextLabel = styled(Text)`
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 700;
 
   @media (min-width: ${theme.breakpoints.sm}) {      
+    font-weight: 400;
+  }
+
+  @media (min-width: ${theme.breakpoints.lg}) {      
     font-size: 16px;
   }
 `
