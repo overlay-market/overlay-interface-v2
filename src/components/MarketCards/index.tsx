@@ -29,7 +29,6 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
         <CardImage
           src={MARKETS_FULL_LOGOS[id]}
           alt={`${title} market`}
-          loading="lazy"
           data-fetchpriority="high"
         />
         <CardContent direction="column" align="center">
