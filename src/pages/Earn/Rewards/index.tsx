@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
 import { RewardCard, TitleText } from "./rewards-styles";
-import Utopia from "../../../assets/images/stake-images/utopia.png";
+import Utopia from "../../../assets/images/stake-images/utopia.webp";
 
 const Rewards: React.FC = () => {
   return (
