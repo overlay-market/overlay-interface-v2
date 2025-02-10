@@ -4,15 +4,19 @@ import {
   StyledHeader,
   StyledRow,
   StyledTable,
+  TokenImg,
 } from "./stake-table-styles";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { useNavigate } from "react-router-dom";
 import useAccount from "../../../hooks/useAccount";
+import { VAULTS_TOKEN_LOGOS } from "../../../constants/stake";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const StakeTable: React.FC = () => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
+  const isDesktop = useMediaQuery("(min-width: 1280px)");
 
   const vaults = [
     {
@@ -28,6 +32,13 @@ const StakeTable: React.FC = () => {
       tvl: "$120,000,000",
       lockPeriod: "30 Days",
       rewards: ["OVL"],
+    },
+    {
+      vaultId: "BERA-OVL",
+      apr: "14.3%",
+      tvl: "$120,000,000",
+      lockPeriod: "30 Days",
+      rewards: ["BGT", "OVL"],
     },
   ];
 
@@ -49,7 +60,7 @@ const StakeTable: React.FC = () => {
               STAKE
             </Text>
           </StyledHeader>
-          <StyledHeader textalign={"right"}>APR</StyledHeader>
+          <StyledHeader textalign={"right"}>APY</StyledHeader>
           {account && (
             <StyledHeader textalign={"right"}>My Rewards</StyledHeader>
           )}
@@ -81,11 +92,39 @@ const StakeTable: React.FC = () => {
               onClick={() => redirectToStakePage(vault.vaultId)}
             >
               <StyledCell textalign="left">
-                <Text weight={"medium"}>{vault.vaultId} Vault</Text>
+                <Flex gap={"8px"} align={"center"}>
+                  <Flex
+                    width={{ initial: "34px", lg: "62px" }}
+                    justify={"center"}
+                  >
+                    {VAULTS_TOKEN_LOGOS[
+                      vault.vaultId as keyof typeof VAULTS_TOKEN_LOGOS
+                    ].map((tokenLogo) => (
+                      <TokenImg src={tokenLogo} alt={"token logo"} />
+                    ))}
+                  </Flex>
+                  <Flex
+                    px={{ initial: "8px", lg: "10px" }}
+                    py={{ initial: "4px", sm: "12px" }}
+                  >
+                    <Text weight={"medium"} style={{ lineHeight: "17px" }}>
+                      {isDesktop ? (
+                        `${vault.vaultId} Vault`
+                      ) : (
+                        <Flex direction={"column"}>
+                          <span>{vault.vaultId.split("-")[0]}</span>
+                          <span>{vault.vaultId.split("-")[1]} Vault</span>
+                        </Flex>
+                      )}
+                    </Text>
+                  </Flex>
+                </Flex>
               </StyledCell>
+
               <StyledCell textalign="right">
                 <Text>{vault.apr}</Text>
               </StyledCell>
+
               {account && (
                 <StyledCell textalign="right">
                   <Flex direction={"column"}>
@@ -102,12 +141,15 @@ const StakeTable: React.FC = () => {
                   </Flex>
                 </StyledCell>
               )}
+
               <StyledCell textalign="right">
                 <Text>{vault.tvl}</Text>
               </StyledCell>
+
               {/* <StyledCell textalign="right">
                 <Text>{vault.lockPeriod}</Text>
               </StyledCell> */}
+
               <StyledCell textalign="right">
                 <Text>{vault.rewards.join(" / ")}</Text>
               </StyledCell>

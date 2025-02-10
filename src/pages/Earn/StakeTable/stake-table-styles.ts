@@ -34,3 +34,20 @@ export const StyledCell = styled.td<{textalign: string, weight?: string}>`
     padding: 12px 10px;
   }
 `;
+
+export const TokenImg = styled.img`
+  width: 20px;
+  height: 20px;
+  
+  &:not(:first-child) {
+    margin-left: -6px;
+  }
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    width: 36px;
+    height: 36px;
+    &:not(:first-child) {
+      margin-left: -10px;
+    }
+  }
+`
