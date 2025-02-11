@@ -1,5 +1,10 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { InfoCard } from "./my-stats-styles";
+import {
+  ClaimRewardsButton,
+  MyStatsContainer,
+  StatCard,
+  StatValue,
+} from "./my-stats-styles";
 import theme from "../../../theme";
 
 const MyStats: React.FC = () => {
@@ -7,54 +12,32 @@ const MyStats: React.FC = () => {
     <Flex direction={"column"}>
       <Text style={{ color: theme.color.grey10 }}>MY STATS</Text>
 
-      <Flex
-        justify={"between"}
-        gap={"12px"}
-        p={"12px"}
-        style={{ background: theme.color.grey4, borderRadius: "8px" }}
-      >
-        <InfoCard>
+      <MyStatsContainer>
+        <StatCard>
           <Text size={"1"}>Current Balance</Text>
-          <Flex align={"center"} height={"14px"}>
-            <Text weight={"bold"} size={"3"}>
-              500 OVL
-            </Text>
-          </Flex>
-        </InfoCard>
+          <StatValue>500 OVL</StatValue>
+        </StatCard>
 
-        <InfoCard>
+        <StatCard>
           <Text size={"1"}>Earned Rewards</Text>
-          <Flex align={"center"} height={"14px"}>
-            <Text weight={"bold"} size={"3"}>
-              7,500,000 OVL + 7,500,000 BERA
-            </Text>
-          </Flex>
-        </InfoCard>
+          <StatValue>7,500,000 OVL + 7,500,000 BERA</StatValue>
+        </StatCard>
 
-        <InfoCard>
+        <StatCard>
           <Flex justify={"between"} align={"center"}>
             <Text size={"1"}>Pending Rewards</Text>
-            <Text
-              size={"1"}
-              style={{
-                color: theme.color.blue3,
-                textDecoration: "underline",
-                cursor: "pointer",
-              }}
+            <ClaimRewardsButton
               onClick={() => {
                 console.log("claim");
               }}
             >
               Claim Rewards
-            </Text>
+            </ClaimRewardsButton>
           </Flex>
-          <Flex align={"center"} height={"14px"}>
-            <Text weight={"bold"} size={"3"}>
-              7,500,000 OVL + 7,500,000 BERA
-            </Text>
-          </Flex>
-        </InfoCard>
-      </Flex>
+
+          <StatValue>7,500,000 OVL + 7,500,000 BERA</StatValue>
+        </StatCard>
+      </MyStatsContainer>
     </Flex>
   );
 };
