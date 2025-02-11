@@ -17,6 +17,7 @@ const StakeTable: React.FC = () => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
   const isDesktop = useMediaQuery("(min-width: 1280px)");
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const vaults = [
     {
@@ -55,18 +56,24 @@ const StakeTable: React.FC = () => {
     <StyledTable>
       <thead>
         <tr>
-          <StyledHeader textalign={"left"}>
+          <StyledHeader textalign={"left"} style={{ paddingLeft: "0" }}>
             <Text size={"2"} style={{ color: theme.color.grey10 }}>
               STAKE
             </Text>
           </StyledHeader>
           <StyledHeader textalign={"right"}>APY</StyledHeader>
-          {account && (
+          {account && !isMobile && (
             <StyledHeader textalign={"right"}>My Rewards</StyledHeader>
           )}
           <StyledHeader textalign={"right"}>TVL</StyledHeader>
-          {/* <StyledHeader textalign={"right"}>Lock-up Period</StyledHeader> */}
-          <StyledHeader textalign={"right"}>Rewards</StyledHeader>
+          {/* {!isMobile && (
+            <StyledHeader textalign={"right"}>
+              Lock-up {!isDesktop && <br />} Period
+            </StyledHeader>
+          )} */}
+          {!isMobile && (
+            <StyledHeader textalign={"right"}>Rewards</StyledHeader>
+          )}
         </tr>
       </thead>
 
@@ -108,7 +115,7 @@ const StakeTable: React.FC = () => {
                     py={{ initial: "4px", sm: "12px" }}
                   >
                     <Text weight={"medium"} style={{ lineHeight: "17px" }}>
-                      {isDesktop ? (
+                      {isDesktop || vault.vaultId.split("-").length === 1 ? (
                         `${vault.vaultId} Vault`
                       ) : (
                         <Flex direction={"column"}>
@@ -125,7 +132,7 @@ const StakeTable: React.FC = () => {
                 <Text>{vault.apr}</Text>
               </StyledCell>
 
-              {account && (
+              {account && !isMobile && (
                 <StyledCell textalign="right">
                   <Flex direction={"column"}>
                     {myRewards &&
@@ -146,13 +153,17 @@ const StakeTable: React.FC = () => {
                 <Text>{vault.tvl}</Text>
               </StyledCell>
 
-              {/* <StyledCell textalign="right">
-                <Text>{vault.lockPeriod}</Text>
-              </StyledCell> */}
+              {/* {!isMobile && (
+                <StyledCell textalign="right">
+                  <Text>{vault.lockPeriod}</Text>
+                </StyledCell>
+              )} */}
 
-              <StyledCell textalign="right">
-                <Text>{vault.rewards.join(" / ")}</Text>
-              </StyledCell>
+              {!isMobile && (
+                <StyledCell textalign="right">
+                  <Text>{vault.rewards.join(" / ")}</Text>
+                </StyledCell>
+              )}
             </StyledRow>
           ))}
       </tbody>

@@ -4,6 +4,7 @@ import theme from "../../../theme";
 export const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
+  margin-bottom: 100px;
 `;
 
 export const StyledHeader = styled.th<{textalign: string}>`
@@ -19,9 +20,13 @@ export const StyledHeader = styled.th<{textalign: string}>`
 `;
 
 export const StyledRow = styled.tr`
-  height: 83px; 
+  height: 60px; 
   border-bottom: 1px solid ${theme.color.darkBlue};
   cursor: pointer;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    height: 83px; 
+  }
 `;
 
 export const StyledCell = styled.td<{textalign: string, weight?: string}>`
@@ -29,6 +34,10 @@ export const StyledCell = styled.td<{textalign: string, weight?: string}>`
   font-size: 14px;
   text-align: ${({textalign}) => textalign};
   box-sizing: border-box;
+
+  &:first-child {
+    padding-left: 0px;
+  }
   
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 12px 10px;
