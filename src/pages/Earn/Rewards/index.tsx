@@ -9,7 +9,11 @@ const Rewards: React.FC = () => {
       <Text style={{ color: theme.color.grey10 }}>REWARDS</Text>
 
       <Flex direction={"column"} gap={"16px"}>
-        <RewardCard src={Utopia} bgposition={"0% 40%"} height={"76px"}>
+        <RewardCard
+          src={Utopia}
+          bgposition={"0% 40%"}
+          height={{ initial: "65px", sm: "84px", lg: "76px" }}
+        >
           <Flex direction={"column"} gap={"8px"} width={"540px"}>
             <Flex gap={"8px"} align={"center"}>
               <TitleText>COMING SOON</TitleText>

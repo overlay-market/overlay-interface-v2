@@ -5,15 +5,14 @@ import theme from "../../../theme";
 interface RewardCardProps {
   src: string;
   bgposition: string;
-  height?: string;
+  height?: { initial: string; sm: string; lg: string};
 }
 
 export const RewardCard = styled(Flex)<RewardCardProps>`
   position: relative;
   justify-content: space-between;
   width: 100%;
-  height: ${(props) => (props.height ? props.height : `91px`)};
-  padding: 16px;
+  padding: 12px;
   border-radius: 20px;
   overflow: hidden;
   z-index: 1; 
@@ -33,13 +32,26 @@ export const RewardCard = styled(Flex)<RewardCardProps>`
     opacity: 0.45; 
     z-index: -1; 
   }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 16px;
+  }
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    height: ${(props) => (props.height ? props.height : `91px`)};
+  }
 `
 
 export const TitleText = styled(Text)`
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 29px;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 21px;
   -webkit-text-stroke: 0.5px  rgba(0, 0, 0, 0.5);
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    font-size: 24px;
+    line-height: 29px;
+  }
 `;
 
 export const ApyBadge = styled(Flex)`
