@@ -12,11 +12,14 @@ import useAccount from "../../../hooks/useAccount";
 import InfoSection from "./InfoSection";
 import MyStats from "./MyStats";
 import TransactSection from "./TransactSection";
+import TopSection from "./TopSection";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 const Stake: React.FC = () => {
   const { vaultId } = useParams();
   const navigate = useNavigate();
   const { address: account } = useAccount();
+  const isDesktop = useMediaQuery("(min-width: 1280px)");
 
   const redirectToEarnPage = () => {
     navigate(`/earn`);
@@ -47,16 +50,16 @@ const Stake: React.FC = () => {
       </Flex>
       <LineSeparator />
 
-      <StakeContent
-        direction={"column"}
-        gap={{ initial: "24px", sm: "28px", md: "32px" }}
-        pt={"16px"}
-        pl={{ initial: "4px", sm: "16px" }}
-        pr={{ initial: "4px", sm: "0px" }}
-      >
+      <StakeContent>
+        {!isDesktop && <TopSection />}
+
         {account && <MyStats />}
-        <Flex gap={"16px"}>
-          <Flex style={{ flex: 1 }}>
+        <Flex
+          gap={"16px"}
+          direction={{ initial: "column-reverse", sm: "column", lg: "row" }}
+        >
+          <Flex direction={"column"} gap={"16px"} style={{ flex: 1 }}>
+            {isDesktop && <TopSection />}
             <InfoSection />
           </Flex>
 
