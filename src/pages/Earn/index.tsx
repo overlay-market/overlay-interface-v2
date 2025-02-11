@@ -21,13 +21,7 @@ const Earn: React.FC = () => {
       </Flex>
       <LineSeparator />
 
-      <EarnContent
-        direction={"column"}
-        gap={{ initial: "24px", sm: "28px", md: "16px" }}
-        pt={"16px"}
-        pl={{ initial: "4px", sm: "16px" }}
-        pr={{ initial: "4px", sm: "0px" }}
-      >
+      <EarnContent>
         <Overview />
         <Rewards />
         <StakeTable />

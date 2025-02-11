@@ -9,6 +9,19 @@ export const EarnContainer = styled(Flex)`
 `;
 
 export const EarnContent = styled(Flex)`
+  flex-direction: column;
+  gap: 24px;
+  padding-top: 16px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    gap: 28px;
+    padding-left: 16px;
+  }
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    gap: 16px;
+  }
+
   @media (min-width: ${theme.breakpoints.xxl}) {
     padding-left: 0;
   }
