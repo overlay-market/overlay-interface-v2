@@ -63,7 +63,7 @@ const InputComponent: React.FC<InputComponentProps> = ({
       p={"8px"}
       style={{ borderRadius: "8px", background: theme.color.grey4 }}
     >
-      <Flex direction={"column"} gap="30px">
+      <Flex direction={"column"} gap="22px">
         <Flex justify="between">
           <Text size="1" style={{ color: theme.color.grey3 }}>
             Amount

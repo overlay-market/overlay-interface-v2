@@ -2,7 +2,7 @@ import { Flex, Text } from "@radix-ui/themes";
 import React, { useState } from "react";
 import {
   StakeSelectButton,
-  StyledContainer,
+  TransactContainer,
   WithdrawSelectButton,
 } from "./transact-section-styles";
 import { GradientOutlineButton } from "../../../../components/Button";
@@ -22,7 +22,7 @@ const TransactSection: React.FC = () => {
   };
 
   return (
-    <StyledContainer>
+    <TransactContainer>
       <Flex gap={"8px"}>
         <StakeSelectButton
           active={stakeSelected.toString()}
@@ -73,7 +73,7 @@ const TransactSection: React.FC = () => {
           handleClick={openModal}
         />
       )}
-    </StyledContainer>
+    </TransactContainer>
   );
 };
 

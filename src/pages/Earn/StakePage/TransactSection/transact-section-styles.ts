@@ -2,15 +2,23 @@ import { Box, Flex } from "@radix-ui/themes";
 import styled from "styled-components";
 import theme from "../../../../theme";
 
-export const StyledContainer = styled(Flex)`
+export const TransactContainer = styled(Flex)`
   flex-direction: column;
   flex: 1;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
   height: fit-content;
-  padding: 24px 20px;
-  background: #1D1D28;
-  border-radius: 8px;
+  
+  @media (min-width: ${theme.breakpoints.sm}) {
+    gap: 12px;
+  }
+  
+  @media (min-width: ${theme.breakpoints.lg}) {
+    padding: 24px 20px;
+    gap: 24px;
+    background: #1D1D28;
+    border-radius: 8px;
+  }
 `
 
 export const StakeSelectButton = styled(Box)<{ active: string }>`
