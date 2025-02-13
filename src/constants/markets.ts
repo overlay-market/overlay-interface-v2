@@ -62,6 +62,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Layer1%20Vs%20Layer2%20Index": L1vL2,
   "Layer%201%20Index": L1,
   "HoneyJar%20NFTs%20Index": HoneryJar,
+  "HoneyComb%2BJars%20NFT%20Index": HoneryJar,
   "Defi%20Index": DeFi,
 };
 
@@ -82,6 +83,7 @@ export const MARKETSORDER = [
   "Layer%202%20Index",
   "Layer1%20Vs%20Layer2%20Index",
   "Layer%201%20Index",
+  "HoneyComb%2BJars%20NFT%20Index",
   "HoneyJar%20NFTs%20Index",
   "Defi%20Index",
   "Lana%20Del%20Rey",
