@@ -29,7 +29,7 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
         <CardImage
           src={MARKETS_FULL_LOGOS[id]}
           alt={`${title} market`}
-          data-fetchpriority="high"
+          fetchPriority="high"
         />
         <CardContent direction="column" align="center">
           <CardsValue>{priceWithCurrency}</CardsValue>
