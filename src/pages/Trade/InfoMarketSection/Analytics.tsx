@@ -4,32 +4,42 @@ import { InfoBox, TextLabel, TextValue } from "./analytics-styles";
 import { CHAIN_SUBGRAPH_URL } from "../../../constants/subgraph";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { gql, request } from "graphql-request";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 
 const document = gql`
-  query MyQuery {
-    analytics_collection {
-      totalTokensLocked
-      totalTransactions
+  query MyQuery($marketId: String!) {
+    market(id: $marketId) {
       totalVolume
+      numberOfBuilds
+      numberOfUnwinds
+      numberOfLiquidates
+    }
+    tokenPositions(where: { owner: $marketId }) {
+      balance
     }
   }
 `;
 
-type AnalyticsItem = {
-  totalTokensLocked: string;
-  totalTransactions: string;
+type MarketData = {
   totalVolume: string;
+  numberOfBuilds: string;
+  numberOfUnwinds: string;
+  numberOfLiquidates: string;
+} | null;
+
+type BalanceData = {
+  balance: string;
 };
 
-type AnalyticsData = AnalyticsItem[];
-
-type MyQueryResponse = {
-  analytics_collection: AnalyticsData;
+type AnalyticsData = {
+  market: MarketData;
+  tokenPositions: BalanceData[];
 };
 
 const Analytics: React.FC = () => {
   const sdk = useSDK();
   const subgraphUrl = CHAIN_SUBGRAPH_URL[sdk.core.chainId];
+  const { currentMarket } = useCurrentMarketState();
 
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
@@ -37,24 +47,29 @@ const Analytics: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const data: MyQueryResponse = await request(subgraphUrl, document);
-        setAnalyticsData(data.analytics_collection);
-      } catch (error) {
-        console.log(error);
+      if (currentMarket) {
+        try {
+          const data: AnalyticsData = await request(subgraphUrl, document, {
+            marketId: currentMarket.id,
+          });
+          setAnalyticsData(data);
+        } catch (error) {
+          console.log(error);
+        }
       }
     };
 
     fetchData();
-  }, [subgraphUrl]);
+  }, [subgraphUrl, currentMarket]);
 
   const formatAndTransform = (value: string) => {
-    if (value.trim() === "") return "-";
+    if (value.trim() === "") return " ";
 
     const bigIntValue = BigInt(value);
     const divisor = BigInt(1e18);
+    const formattedValue = bigIntValue / divisor;
 
-    return (bigIntValue / divisor)
+    return formattedValue
       .toLocaleString("en-US", {
         maximumFractionDigits: 0,
       })
@@ -62,32 +77,36 @@ const Analytics: React.FC = () => {
   };
 
   const totalVolume = useMemo(() => {
-    if (analyticsData && analyticsData.length > 0) {
-      return formatAndTransform(analyticsData[0].totalVolume);
+    if (analyticsData?.market) {
+      return formatAndTransform(analyticsData.market.totalVolume);
     } else {
-      return "-";
+      return " ";
     }
-  }, [analyticsData]);
+  }, [analyticsData?.market]);
 
   const totalTokensLocked = useMemo(() => {
-    if (analyticsData && analyticsData.length > 0) {
-      return formatAndTransform(analyticsData[0].totalTokensLocked);
+    if (analyticsData && analyticsData.tokenPositions.length > 0) {
+      return formatAndTransform(analyticsData.tokenPositions[0].balance);
     } else {
-      return "-";
+      return " ";
     }
-  }, [analyticsData]);
+  }, [analyticsData?.tokenPositions]);
 
   const totalTransactions = useMemo(() => {
-    if (analyticsData && analyticsData.length > 0) {
-      return BigInt(analyticsData[0].totalTransactions)
+    if (analyticsData?.market) {
+      return (
+        BigInt(analyticsData.market.numberOfBuilds) +
+        BigInt(analyticsData.market.numberOfLiquidates) +
+        BigInt(analyticsData.market.numberOfUnwinds)
+      )
         .toLocaleString("en-US", {
           maximumFractionDigits: 0,
         })
         .replaceAll(",", " ");
     } else {
-      return "-";
+      return " ";
     }
-  }, [analyticsData]);
+  }, [analyticsData?.market]);
 
   return (
     <Flex direction={"column"} gap={"16px"} style={{ flex: 1 }}>
