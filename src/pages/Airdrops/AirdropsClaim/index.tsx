@@ -25,7 +25,7 @@ import {
   GradientLink,
   StyledLink,
 } from "../EligibilityChecker/eligibility-checker-styles";
-import Xlogo from "../../../assets/images/airdrops/socials-x.png";
+import Xlogo from "../../../assets/images/airdrops/socials-x.webp";
 import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
 import {
   AIRDROP_LEARN_MORE_LINK,

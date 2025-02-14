@@ -1,13 +1,13 @@
 import { Flex, Text } from "@radix-ui/themes";
 import styled from "styled-components";
 import theme from "../../../theme";
-import mainBg from "../../../assets/images/airdrops/main-bg.png";
-import handImgUrl from '../../../assets/images/airdrops/hand.png';
-import catImgUrl from '../../../assets/images/airdrops/cat.png';
-import calloutTopUrl from '../../../assets/images/airdrops/callout-top.png';
-import calloutTopDesktopUrl from '../../../assets/images/airdrops/callout-top-desktop.png';
-import calloutBottomRightUrl from '../../../assets/images/airdrops/callout-bottom-right.png';
-import calloutBottomLeftUrl from '../../../assets/images/airdrops/callout-bottom-left.png';
+import mainBg from "../../../assets/images/airdrops/main-bg.webp";
+import handImgUrl from '../../../assets/images/airdrops/hand.webp';
+import catImgUrl from '../../../assets/images/airdrops/cat.webp';
+import calloutTopUrl from '../../../assets/images/airdrops/callout-top.webp';
+import calloutTopDesktopUrl from '../../../assets/images/airdrops/callout-top-desktop.webp';
+import calloutBottomRightUrl from '../../../assets/images/airdrops/callout-bottom-right.webp';
+import calloutBottomLeftUrl from '../../../assets/images/airdrops/callout-bottom-left.webp';
 
 export const AirdropsClaimWrapper = styled(Flex)`
   flex-direction: column;
