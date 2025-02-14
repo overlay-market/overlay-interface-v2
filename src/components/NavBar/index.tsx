@@ -1,5 +1,5 @@
 import { Box, Flex } from "@radix-ui/themes";
-import LogoImg from "../../assets/images/overlay-logo-only-no-background.png";
+import LogoImg from "../../assets/images/overlay-logo-only-no-background.webp";
 import theme from "../../theme";
 import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
