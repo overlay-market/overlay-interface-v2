@@ -10,8 +10,8 @@ import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
-// import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
-// import { MarketsLogos } from "./markets-table-styles";
+import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
+import { MarketsLogos } from "./markets-table-styles";
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
@@ -360,11 +360,11 @@ export default function MarketsTable({
                     style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                   >
                     <Flex style={{ alignItems: "center" }}>
-                      {/* <MarketsLogos
+                      <MarketsLogos
                         src={MARKETS_FULL_LOGOS[market.marketId]}
                         alt={decodeURIComponent(market.marketId)}
                         className="rounded-full"
-                      /> */}
+                      />
                       <span style={{ alignSelf: "center", marginLeft: 20 }}>
                         {isMobile &&
                         decodeURIComponent(market.marketId).length > 28

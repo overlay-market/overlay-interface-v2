@@ -3,10 +3,10 @@ import {
   CustomCard,
   CardsValue,
   CardsTitle,
-  // CardImage,
+  CardImage,
 } from "./market-cards-styles";
 import { Skeleton } from "@radix-ui/themes";
-// import { MARKETS_FULL_LOGOS } from "../../constants/markets";
+import { MARKETS_FULL_LOGOS } from "../../constants/markets";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 
 interface MarketCardsProps {
@@ -26,11 +26,11 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
         }}
         onClick={() => redirectToTradePage(id)}
       >
-        {/* <CardImage
+        <CardImage
           src={MARKETS_FULL_LOGOS[id]}
           alt={`${title} market`}
           fetchPriority="high"
-        /> */}
+        />
         <CardContent direction="column" align="center">
           <CardsValue>{priceWithCurrency}</CardsValue>
           <CardsTitle>{title}</CardsTitle>
