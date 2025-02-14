@@ -3,7 +3,6 @@ import {
   CustomCard,
   CardsValue,
   CardsTitle,
-  CardImage,
 } from "./market-cards-styles";
 import { Skeleton } from "@radix-ui/themes";
 import { MARKETS_FULL_LOGOS } from "../../constants/markets";
@@ -21,16 +20,14 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
     <Skeleton loading={false}>
       <CustomCard
         style={{
+          backgroundImage: `url(${MARKETS_FULL_LOGOS[id]})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           cursor: "pointer",
           width: 200,
         }}
         onClick={() => redirectToTradePage(id)}
       >
-        <CardImage
-          src={MARKETS_FULL_LOGOS[id]}
-          alt={`${title} market`}
-          data-fetchpriority="high"
-        />
         <CardContent direction="column" align="center">
           <CardsValue>{priceWithCurrency}</CardsValue>
           <CardsTitle>{title}</CardsTitle>

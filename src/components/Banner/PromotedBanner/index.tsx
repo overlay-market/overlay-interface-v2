@@ -57,8 +57,7 @@ export const PromotedBanner = ({
       ) : (
         <img
           src={imageSrc}
-          alt={`${Name} market banner`}
-          data-fetchpriority="high"
+          alt=""
           style={{
             position: "absolute",
             width: "100%",
