@@ -5,10 +5,8 @@ import {
   CardsValue,
 } from "../banners-styles";
 import { Flex } from "@radix-ui/themes";
+import { MARKETS_FULL_LOGOS, MARKETS_VIDEOS } from "../../../constants/markets";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
-
-// Video configuration
-// const VIDEO_ID = "dQw4w9WgXcQ"; // Example YouTube video ID
 
 interface PromotedBannerProps {
   Title?: string;
@@ -24,43 +22,60 @@ export const PromotedBanner = ({
   Id,
 }: PromotedBannerProps) => {
   const redirectToTradePage = useRedirectToTradePage();
-
-  // const handleVideoError = (event: React.SyntheticEvent<HTMLVideoElement>) => {
-  //   console.error("Video failed to load", event);
-  // };
+  const videoSrc = MARKETS_VIDEOS[Id];
+  const imageSrc = MARKETS_FULL_LOGOS[Id];
 
   return (
     <StyledPromotedBanner
       style={{
+        backgroundImage: `${
+          !videoSrc ? "url(" + MARKETS_FULL_LOGOS[Id] + ")" : "none"
+        }`,
         position: "relative",
         cursor: "pointer",
         overflow: "hidden",
       }}
       onClick={() => redirectToTradePage(Id)}
     >
-      {/* <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        onError={handleVideoError}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          zIndex: 1,
-        }}
-        src={`https://www.youtube.com/watch?v=${VIDEO_ID}`}
-      /> */}
+      {videoSrc ? (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            zIndex: 0, // Place it behind the content
+          }}
+          src={videoSrc}
+        />
+      ) : (
+        <img
+          src={imageSrc}
+          alt={`${Name} market banner`}
+          data-fetchpriority="high"
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            top: 0,
+            left: 0,
+            zIndex: -1,
+          }}
+        />
+      )}
       <Flex
         direction={"column"}
         justify={"start"}
         align={"start"}
         width={"100%"}
-        style={{ position: "relative", zIndex: 2 }}
+        style={{ position: "relative", zIndex: 1 }} // Keep content above the video
       >
         <SubtitleText>{Title}</SubtitleText>
         <TitleText>{Name}</TitleText>
