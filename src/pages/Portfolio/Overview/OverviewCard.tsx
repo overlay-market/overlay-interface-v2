@@ -41,7 +41,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
     )}
 
     <Box py={"12px"}>
-      {value ? (
+      {value !== undefined ? (
         <Text size="3" weight={"bold"}>
           {value}
         </Text>
@@ -50,7 +50,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
       )}
     </Box>
 
-    {unit && value ? <Text>{unit}</Text> : <Box m={"10px"}></Box>}
+    {unit && value !== undefined ? <Text>{unit}</Text> : <Box m={"10px"}></Box>}
   </Flex>
 );
 

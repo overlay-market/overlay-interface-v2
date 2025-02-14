@@ -1,15 +1,15 @@
 import { Flex, Text } from "@radix-ui/themes";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
-import { Address } from "viem";
+import type { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import UnwindPosition from "./UnwindPosition";
-import { UnwindPositionData } from "overlay-sdk";
+import type { UnwindPositionData } from "overlay-sdk";
+import { useUnwindPositionRefresh } from "../../../state/portfolio/hooks";
 
 const UNWIND_POSITIONS_COLUMNS = [
   "Market",
@@ -22,62 +22,47 @@ const UNWIND_POSITIONS_COLUMNS = [
   "PnL",
 ];
 
+export let triggerLoader: (() => void) | null = null;
+
 const UnwindsTable: React.FC = () => {
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [unwindPositions, setUnwindPositions] = useState<
-    UnwindPositionData[] | undefined
-  >(undefined);
-  const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [lastFirstPosition, setLastFirstPosition] = useState<string | null>(
+    null
+  );
+  const [showLoader, setShowLoader] = useState(false);
+
+  const { loading, unwindPositions, unwindPositionsTotalNumber } =
+    useUnwindPositionRefresh(
+      sdk,
+      account as Address | undefined,
+      isNewTxnHash,
+      currentPage,
+      itemsPerPage
+    );
 
   useEffect(() => {
-    const fetchUnwindPositions = async () => {
-      if (!account) {
-        setUnwindPositions(undefined);
-        setPositionsTotalNumber(0);
+    if (showLoader && unwindPositions && unwindPositions.length > 0) {
+      const currentFirstPosition = unwindPositions[0].positionId.toString();
+      if (currentFirstPosition !== lastFirstPosition) {
+        setShowLoader(false);
+        setLastFirstPosition(null);
       }
+    }
+  }, [unwindPositions, lastFirstPosition]);
 
-      if (account) {
-        setLoading(true);
-        try {
-          const unwinds = await sdk.unwindPositions.transformUnwindPositions(
-            currentPage,
-            itemsPerPage,
-            undefined,
-            account as Address,
-            isNewTxnHash
-          );
+  const isTableLoading = loading || showLoader;
 
-          unwinds && setUnwindPositions(unwinds.data);
-          unwinds && setPositionsTotalNumber(unwinds.total);
-          if (!unwinds) {
-            setUnwindPositions(undefined);
-            setPositionsTotalNumber(0);
-          }
-        } catch (error) {
-          console.error("Error fetching unwind positions:", error);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchUnwindPositions();
-  }, [
-    chainId,
-    account,
-    isNewTxnHash,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    setCurrentPage,
-  ]);
+  triggerLoader = () => {
+    setShowLoader(true);
+    if (unwindPositions && unwindPositions.length > 0) {
+      setLastFirstPosition(unwindPositions[0].positionId.toString());
+    }
+  };
 
   return (
     <Flex
@@ -98,25 +83,46 @@ const UnwindsTable: React.FC = () => {
         minWidth="950px"
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
-        positionsTotalNumber={positionsTotalNumber}
+        positionsTotalNumber={unwindPositionsTotalNumber}
         setCurrentPage={setCurrentPage}
         setItemsPerPage={setItemsPerPage}
         body={
-          unwindPositions &&
-          unwindPositions.map((position: UnwindPositionData, index: number) => (
-            <UnwindPosition position={position} key={index} />
-          ))
+          <>
+            {showLoader && (
+              <tr>
+                <td
+                  colSpan={UNWIND_POSITIONS_COLUMNS.length}
+                  style={{
+                    padding: "16px 0",
+                    borderBottom: `1px solid ${theme.color.grey6}`,
+                  }}
+                >
+                  <Loader />
+                </td>
+              </tr>
+            )}
+            {unwindPositions &&
+              unwindPositions.map(
+                (position: UnwindPositionData, index: number) => (
+                  <UnwindPosition position={position} key={index} />
+                )
+              )}
+          </>
         }
       />
 
-      {loading && !unwindPositions ? (
-        <Loader />
-      ) : account ? (
-        unwindPositions &&
-        positionsTotalNumber === 0 && <Text>You have no unwind positions</Text>
-      ) : (
+      {loading && !unwindPositions && <Loader />}
+
+      {!isTableLoading && !account && (
         <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
       )}
+
+      {!isTableLoading &&
+        account &&
+        unwindPositions &&
+        unwindPositionsTotalNumber === 0 && (
+          <Text>You have no unwind positions</Text>
+        )}
     </Flex>
   );
 };
