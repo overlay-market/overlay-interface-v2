@@ -143,10 +143,7 @@ const SuggestedCards: React.FC = () => {
   }, [isTablet, isMobile, similarMarkets]);
 
   return (
-    <SuggestedCardsContainer
-      direction="column"
-      p={{ initial: "0px 4px 66px", sm: "0px 8px 66px" }}
-    >
+    <SuggestedCardsContainer direction="column">
       <Text style={{ color: "#8D8F94" }}>SUGGESTED</Text>
       <Flex direction={{ initial: "column", sm: "row" }} gap={"20px"}>
         <Skeleton height="257px" loading={!similarMarkets} />
