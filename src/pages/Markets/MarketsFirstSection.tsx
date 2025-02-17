@@ -19,33 +19,47 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         xs: "row",
       }}
     >
-      <Skeleton loading={marketsData.length < 14 + 1}>
+      <Skeleton loading={!marketsData.length}>
         <Box flexGrow="7" flexShrink="1" flexBasis="0%">
-          <PromotedBanner
-            Name={decodeURIComponent(marketsData[14]?.marketId ?? "")}
-            Value={formatPriceWithCurrency(
-              marketsData[14]?.price ?? 0,
-              marketsData[14]?.priceCurrency,
-              Number(marketsData[14]?.price) > 10000 &&
-                Number(marketsData[14]?.price) < 1000000
-                ? 5
-                : 4
-            )}
-            Id={marketsData[14]?.marketId ?? ""}
-          />
+          {(() => {
+            const market = marketsData.find(
+              (m) => m.marketId === "Hikaru%20Nakamura"
+            );
+            return (
+              <PromotedBanner
+                Name={decodeURIComponent(market?.marketId ?? "")}
+                Value={formatPriceWithCurrency(
+                  market?.price ?? 0,
+                  market?.priceCurrency ?? "",
+                  Number(market?.price) > 10000 &&
+                    Number(market?.price) < 1000000
+                    ? 5
+                    : 4
+                )}
+                Id={market?.marketId ?? ""}
+              />
+            );
+          })()}
         </Box>
       </Skeleton>
-      <Skeleton loading={marketsData.length < 5 + 1}>
+      <Skeleton loading={!marketsData.length}>
         <Box flexGrow="3" flexShrink="1" flexBasis="0%">
-          <PromotedBanner
-            Name={decodeURIComponent(marketsData[5]?.marketId ?? "")}
-            Value={formatPriceWithCurrency(
-              marketsData[5]?.price ?? 0,
-              marketsData[5]?.priceCurrency,
-              Number(marketsData[5]?.price) > 100 ? 5 : 4
-            )}
-            Id={marketsData[5]?.marketId ?? ""}
-          />
+          {(() => {
+            const market = marketsData.find(
+              (m) => m.marketId === "ETH%20Dominance"
+            );
+            return (
+              <PromotedBanner
+                Name={decodeURIComponent(market?.marketId ?? "")}
+                Value={formatPriceWithCurrency(
+                  market?.price ?? 0,
+                  market?.priceCurrency ?? "",
+                  Number(market?.price) > 100 ? 5 : 4
+                )}
+                Id={market?.marketId ?? ""}
+              />
+            );
+          })()}
         </Box>
       </Skeleton>
       {/* <Box flexGrow="3" flexShrink="1" flexBasis="0%">
