@@ -5,5 +5,5 @@ export interface VaultDetails {
   userRewards: {
     rewardA: number;
     rewardB?: number;
-  } | null;
+  } | undefined;
 }

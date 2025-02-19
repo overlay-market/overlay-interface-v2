@@ -32,7 +32,7 @@ export const useVaultDetails = (vaults?: StakingPool[]) => {
                   vault.stakingPool as `0x${string}`,
                   userAddress
                 )
-              : Promise.resolve(null);
+              : Promise.resolve(undefined);
 
             const [totalSupplyResponse, rewardsResponse] = await Promise.all([
               totalSupplyPromise,
@@ -44,6 +44,7 @@ export const useVaultDetails = (vaults?: StakingPool[]) => {
                 formattedTotalSupply = Math.trunc(
                   Number(formatUnits(totalSupplyResponse.data, 18))
                 );
+                
                 totalSupplyCache.current.set(
                   vault.stakingPool,
                   formattedTotalSupply
@@ -53,7 +54,7 @@ export const useVaultDetails = (vaults?: StakingPool[]) => {
               }
             }
 
-            let userRewards: VaultDetails["userRewards"] = null;
+            let userRewards: VaultDetails["userRewards"] = undefined;
 
             if (
               rewardsResponse &&
@@ -61,12 +62,12 @@ export const useVaultDetails = (vaults?: StakingPool[]) => {
               rewardsResponse.data
             ) {
               userRewards = {
-                rewardA: Number(
+                rewardA: parseFloat(Number(
                   formatUnits(rewardsResponse.data.rewardA ?? 0n, 18)
-                ),
+                ).toFixed(2)),
                 rewardB:
                   "rewardB" in rewardsResponse.data
-                    ? Number(formatUnits(rewardsResponse.data.rewardB ?? 0n, 18))
+                    ? parseFloat(Number(formatUnits(rewardsResponse.data.rewardB ?? 0n, 18)).toFixed(2))
                     : undefined,
               };
             } else if (userAddress) {
@@ -89,7 +90,7 @@ export const useVaultDetails = (vaults?: StakingPool[]) => {
             return {
               vaultAddress: vault.stakingPool,
               totalSupply: 0,
-              userRewards: null,
+              userRewards: undefined,
             };
           }
         })
