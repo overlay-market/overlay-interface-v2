@@ -1,8 +1,20 @@
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
 import { GreenDot, InfoItem } from "./overview-styles";
+import { useVaultsState } from "../../../state/vaults/hooks";
+import { useMemo } from "react";
 
 const Overview: React.FC = () => {
+  const { vaultDetails } = useVaultsState();
+
+  const tvl = useMemo(() => {
+    if (!vaultDetails) return "0";
+
+    const sum = vaultDetails.reduce((sum, vault) => sum + vault.totalSupply, 0);
+    const formattedTVL = sum.toLocaleString();
+    return formattedTVL;
+  }, [vaultDetails]);
+
   return (
     <Flex
       justify={"between"}
@@ -13,7 +25,7 @@ const Overview: React.FC = () => {
     >
       <InfoItem>
         <Text>TVL</Text>
-        <Text weight={"bold"}>$120,500,000</Text>
+        <Text weight={"bold"}>{tvl} OVL</Text>
       </InfoItem>
 
       <GreenDot />
