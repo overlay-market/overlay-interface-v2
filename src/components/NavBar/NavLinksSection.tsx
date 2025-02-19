@@ -9,26 +9,17 @@ import {
   TradeIcon,
   TradeActiveIcon,
 } from "../../assets/icons/navBar-icons/trade";
-// import {
-//   RocketIcon,
-//   RocketActiveIcon,
-// } from "../../assets/icons/navBar-icons/rocket";
-// import {
-//   PowercardIcon,
-//   PowercardActiveIcon,
-// } from "../../assets/icons/navBar-icons/powercard";
-// import {
-//   StakeIcon,
-//   StakeActiveIcon,
-// } from "../../assets/icons/navBar-icons/stake";
-import { DEFAULT_MARKET_ID, NAVBAR_MODE } from "../../constants/applications";
-import { useCurrentMarketState } from "../../state/currentMarket/hooks";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import {
+  PowercardIcon,
+  PowercardActiveIcon,
+} from "../../assets/icons/navBar-icons/powercard";
 import {
   TrophyActiveIcon,
   TrophyIcon,
 } from "../../assets/icons/navBar-icons/trophy";
-// import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { DEFAULT_MARKET_ID, NAVBAR_MODE } from "../../constants/applications";
+import { useCurrentMarketState } from "../../state/currentMarket/hooks";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export interface NavLinkAsset {
   to: string;
@@ -72,13 +63,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: <BackpackActiveIcon />,
       showOnMobile: true,
     },
-    // {
-    //   to: "/powercards",
-    //   label: "PowerCards",
-    //   icon: <PowercardIcon />,
-    //   activeIcon: <PowercardActiveIcon />,
-    //   showOnMobile: !isMobile,
-    // },
+    {
+      to: "/power-cards",
+      label: "PowerCards",
+      icon: <PowercardIcon />,
+      activeIcon: <PowercardActiveIcon />,
+      showOnMobile: true,
+    },
     {
       to: "/leaderboard",
       label:
@@ -87,13 +78,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: <TrophyActiveIcon />,
       showOnMobile: true,
     },
-    // {
-    //   to: "/stake",
-    //   label: "Stake",
-    //   icon: <StakeIcon />,
-    //   activeIcon: <StakeActiveIcon />,
-    //   showOnMobile: true,
-    // },
   ];
 
   return (
