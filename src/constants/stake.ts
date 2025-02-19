@@ -23,6 +23,20 @@ export const VAULTS_TOKEN_LOGOS: { [key in VAULTS_NAMES]: string[]; } = {
   ],
 }
 
+export enum TOKENS {
+  USDC = 'USDC', 
+  OVL = 'OVL',
+  BGT = 'BGT',
+}
+
+export const TOKEN_LOGOS: { [key in TOKENS]: string } = {
+  [TOKENS.USDC]: USDCToken,
+  [TOKENS.OVL]: OVLToken,
+  [TOKENS.BGT]: BGTToken,
+}
+
+export const DEFAULT_TOKEN_LOGO = OVLToken
+
 export interface VaultData {
   vaultName: string
   vaultAddress: string
