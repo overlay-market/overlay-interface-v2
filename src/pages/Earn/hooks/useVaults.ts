@@ -23,10 +23,9 @@ export const useVaults = () => {
           return;
         }
 
-        const chainVaults = ACTIVE_VAULTS[chainId as number] || [];
         const filteredVaults: StakingPool[] =
           activeVaults.data?.filter((pool) =>
-            chainVaults.some((vault) => vault.vaultAddress === pool.stakingPool)
+          ACTIVE_VAULTS.some((vault) => vault.vaultAddress === pool.stakingPool)
           ) || [];
 
         setVaults(filteredVaults);

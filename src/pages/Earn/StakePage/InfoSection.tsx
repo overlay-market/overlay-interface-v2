@@ -8,7 +8,6 @@ import {
 } from "./info-section-styles";
 import theme from "../../../theme";
 import { useParams } from "react-router-dom";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import {
   getTokenLogo,
   getVaultAddressByVaultName,
@@ -21,9 +20,8 @@ import { formatReward } from "../utils/formatReward";
 
 const InfoSection: React.FC = () => {
   const { vaultId } = useParams();
-  const { chainId } = useMultichainContext();
 
-  const vaultAddress = getVaultAddressByVaultName(chainId, vaultId);
+  const vaultAddress = getVaultAddressByVaultName(vaultId);
   const currentVault = useCurrentVault(vaultAddress);
   const currentVaultDetails = useCurrentVaultDetails(vaultAddress);
 
@@ -79,8 +77,13 @@ const InfoSection: React.FC = () => {
           gap={{ initial: "8px", sm: "20px", lg: "8px" }}
         >
           {vaultId &&
-            dailyRewards.map((reward) => (
-              <Flex justify={"between"} align={"center"} width={"100%"}>
+            dailyRewards.map((reward, idx) => (
+              <Flex
+                justify={"between"}
+                align={"center"}
+                width={"100%"}
+                key={idx}
+              >
                 <Flex gap={"8px"} align={"center"}>
                   <img
                     src={reward.logo}

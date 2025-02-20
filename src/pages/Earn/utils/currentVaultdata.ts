@@ -1,18 +1,17 @@
 import { Reward } from "@steerprotocol/sdk";
 import { ACTIVE_VAULTS, DEFAULT_TOKEN_LOGO, TOKEN_LOGOS, TOKENS } from "../../../constants/stake";
-import { Chain } from "viem";
 
-export const getVaultNameByVaultAddress = (chainId: number | Chain | undefined, vaultAddress: string) => {
+export const getVaultNameByVaultAddress = ( vaultAddress: string) => {
   return (
-    ACTIVE_VAULTS[chainId as number]?.find(
+    ACTIVE_VAULTS.find(
       (v) => v.vaultAddress.toLowerCase() === vaultAddress
     )?.vaultName || ""
   )
 }  
 
-export const getVaultAddressByVaultName = (chainId: number | Chain | undefined, vaultName: string | undefined) => {
+export const getVaultAddressByVaultName = ( vaultName: string | undefined) => {
   return (
-    ACTIVE_VAULTS[chainId as number]?.find(
+    ACTIVE_VAULTS.find(
       (v) => v.vaultName === vaultName
     )?.vaultAddress || ""
   )

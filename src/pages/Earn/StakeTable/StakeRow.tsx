@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { useVaultsState } from "../../../state/vaults/hooks";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useMemo } from "react";
 import {
   getTokenLogo,
@@ -21,14 +20,13 @@ type StakeRowProps = {
 const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
-  const { chainId } = useMultichainContext();
   const { vaultDetails } = useVaultsState();
 
   const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const vaultAddress = vault.stakingPool.toLowerCase();
-  const vaultName = getVaultNameByVaultAddress(chainId, vaultAddress);
+  const vaultName = getVaultNameByVaultAddress(vaultAddress);
 
   const formattedVaultName = useMemo(() => {
     if (isDesktop || !vaultName.includes("-")) {
