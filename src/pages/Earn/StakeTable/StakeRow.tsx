@@ -1,19 +1,18 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { StyledCell, StyledRow, TokenImg } from "./stake-table-styles";
-import {
-  ACTIVE_VAULTS,
-  DEFAULT_TOKEN_LOGO,
-  TOKEN_LOGOS,
-  TOKENS,
-} from "../../../constants/stake";
 import theme from "../../../theme";
-import { Reward, StakingPool } from "@steerprotocol/sdk";
+import { StakingPool } from "@steerprotocol/sdk";
 import { useNavigate } from "react-router-dom";
 import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { useVaultsState } from "../../../state/vaults/hooks";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useMemo } from "react";
+import {
+  getTokenLogo,
+  getVaultNameByVaultAddress,
+} from "../utils/currentVaultdata";
+import { formatReward } from "../utils/formatReward";
 
 type StakeRowProps = {
   vault: StakingPool;
@@ -28,15 +27,8 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
   const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const vaultId = vault.stakingPool.toLowerCase();
-
-  const vaultName = useMemo(() => {
-    return (
-      ACTIVE_VAULTS[chainId as number]?.find(
-        (v) => v.vaultAddress.toLowerCase() === vaultId
-      )?.vaultName || ""
-    );
-  }, [chainId, vaultId]);
+  const vaultAddress = vault.stakingPool.toLowerCase();
+  const vaultName = getVaultNameByVaultAddress(chainId, vaultAddress);
 
   const formattedVaultName = useMemo(() => {
     if (isDesktop || !vaultName.includes("-")) {
@@ -52,10 +44,6 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
     );
   }, [isDesktop, vaultName]);
 
-  const getTokenLogo = (tokenDetail: Reward) => {
-    return TOKEN_LOGOS[tokenDetail.symbol as TOKENS] || DEFAULT_TOKEN_LOGO;
-  };
-
   const tokenLogos = useMemo(() => {
     const logos = [
       getTokenLogo(vault.rewardTokenADetail),
@@ -68,15 +56,10 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
   }, [vault.rewardTokenADetail, vault.rewardTokenBDetail]);
 
   const currentVaultDetails = vaultDetails?.find(
-    (detail) => detail.vaultAddress.toLowerCase() === vaultId
+    (detail) => detail.vaultAddress.toLowerCase() === vaultAddress
   );
 
   const totalSupply = currentVaultDetails?.totalSupply.toLocaleString() ?? "";
-
-  const formatReward = (reward: number | undefined, tokenDetail: Reward) => {
-    if (reward === undefined) return "";
-    return `${reward.toLocaleString()} ${tokenDetail.symbol}`;
-  };
 
   const userRewards = useMemo(() => {
     if (!currentVaultDetails?.userRewards) return [];
