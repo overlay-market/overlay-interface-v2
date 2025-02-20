@@ -7,14 +7,6 @@ export const Container = styled.div`
   flex-direction: column;
 `;
 
-export const ContentArea = styled.div`
-  flex: 1;
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-`;
-
 export const TabsContainer = styled.div`
   display: flex;
   gap: 16px;

@@ -1,12 +1,8 @@
 import { useState } from "react";
 import { PowerCardsGrid } from "./PowerCardsGrid";
-import {
-  Container,
-  ContentArea,
-  TabsContainer,
-  Tab,
-} from "./power-cards-styles";
+import { Container, TabsContainer, Tab } from "./power-cards-styles";
 import PowerCardsHeader from "./PowerCardsHeader";
+import { Flex } from "@radix-ui/themes";
 
 const tabs = ["All Cards", "My Cards", "Burnt Cards"];
 
@@ -16,7 +12,13 @@ export default function PowerCards() {
   return (
     <Container>
       <PowerCardsHeader />
-      <ContentArea>
+      <Flex
+        direction={"column"}
+        gap={{ initial: "24px", sm: "28px", md: "32px" }}
+        pt={"16px"}
+        pl={{ initial: "4px", sm: "16px", md: "12px" }}
+        pr={{ initial: "4px", sm: "0px" }}
+      >
         <TabsContainer>
           {tabs.map((tab, index) => (
             <Tab
@@ -29,7 +31,7 @@ export default function PowerCards() {
           ))}
         </TabsContainer>
         <PowerCardsGrid activeTab={activeTab} />
-      </ContentArea>
+      </Flex>
     </Container>
   );
 }
