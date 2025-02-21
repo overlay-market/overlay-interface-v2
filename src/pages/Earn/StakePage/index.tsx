@@ -14,11 +14,13 @@ import MyStats from "./MyStats";
 import TransactSection from "./TransactSection";
 import TopSection from "./TopSection";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { useUserStats } from "../hooks/useUserStats";
 
 const Stake: React.FC = () => {
   const { vaultId } = useParams();
   const navigate = useNavigate();
   const { address: account } = useAccount();
+  useUserStats();
   const isDesktop = useMediaQuery("(min-width: 1280px)");
 
   const redirectToEarnPage = () => {
