@@ -5,13 +5,13 @@ import { StakingPool } from "@steerprotocol/sdk";
 import { useNavigate } from "react-router-dom";
 import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { useVaultsState } from "../../../state/vaults/hooks";
 import { useMemo } from "react";
 import {
   getTokenLogo,
   getVaultNameByVaultAddress,
 } from "../utils/currentVaultdata";
 import { formatReward } from "../utils/formatReward";
+import { useCurrentVaultDetails } from "../hooks/useCurrentVaultData";
 
 type StakeRowProps = {
   vault: StakingPool;
@@ -20,13 +20,13 @@ type StakeRowProps = {
 const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
-  const { vaultDetails } = useVaultsState();
 
   const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const vaultAddress = vault.stakingPool.toLowerCase();
   const vaultName = getVaultNameByVaultAddress(vaultAddress);
+  const currentVaultDetails = useCurrentVaultDetails(vaultAddress);
 
   const formattedVaultName = useMemo(() => {
     if (isDesktop || !vaultName.includes("-")) {
@@ -52,10 +52,6 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
 
     return logos;
   }, [vault.rewardTokenADetail, vault.rewardTokenBDetail]);
-
-  const currentVaultDetails = vaultDetails?.find(
-    (detail) => detail.vaultAddress.toLowerCase() === vaultAddress
-  );
 
   const totalSupply = currentVaultDetails?.totalSupply.toLocaleString() ?? "";
 
