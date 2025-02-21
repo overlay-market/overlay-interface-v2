@@ -1,18 +1,21 @@
 import { createReducer } from "@reduxjs/toolkit";
 import {
+  updateUserStats,
   updateVaults, updateVaultsDetails
 } from "./actions";
 import { StakingPool } from "@steerprotocol/sdk";
-import { VaultDetails } from "../../types/vaultTypes";
+import { UserStats, VaultDetails } from "../../types/vaultTypes";
 
 export interface VaultsState {
   readonly vaults: StakingPool[] | undefined;
   readonly vaultDetails: VaultDetails[] | undefined;
+  readonly userStats: UserStats | undefined;
 }
 
 export const initialState: VaultsState = {
   vaults: undefined,
   vaultDetails: undefined,
+  userStats: undefined,
 };
 
 export default createReducer<VaultsState>(initialState, (builder) =>
@@ -22,5 +25,8 @@ export default createReducer<VaultsState>(initialState, (builder) =>
     })
     .addCase(updateVaultsDetails, (state, action) => {
       state.vaultDetails = action.payload.vaultDetails;
+    })
+    .addCase(updateUserStats, (state, action) => {
+      state.userStats = action.payload.userStats;
     })
 );
