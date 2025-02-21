@@ -11,10 +11,10 @@ export const StakeContainer = styled(Flex)`
 export const StakeContent = styled(Flex)`
   flex-direction: column;
   gap: 16px;
-  padding-top: 16px;
   margin-bottom: 100px;
 
   @media (min-width: ${theme.breakpoints.sm}) {
+    padding-top: 16px;
     padding-left: 16px;
   }
 

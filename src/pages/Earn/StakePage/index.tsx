@@ -30,15 +30,15 @@ const Stake: React.FC = () => {
   return (
     <StakeContainer width={"100%"} height={"100%"} direction={"column"}>
       <Flex
-        display={{ initial: "none", sm: "flex" }}
         align={"center"}
         gap={"12px"}
-        height={theme.headerSize.height}
-        px={"16px"}
+        height={{ initial: "47px", sm: theme.headerSize.height }}
+        px={{ initial: "0px", sm: "16px" }}
       >
         <Flex
           gap={"4px"}
           align={"center"}
+          px={"4px"}
           style={{ color: theme.color.blue3, cursor: "pointer" }}
           onClick={() => redirectToEarnPage()}
         >
