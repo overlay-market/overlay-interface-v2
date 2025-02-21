@@ -3,11 +3,14 @@ import steerClient from "../../../services/steerClient";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { StakingPool } from "@steerprotocol/sdk";
 import { ACTIVE_VAULTS } from "../../../constants/stake";
+import { useVaultsActionHandlers } from "../../../state/vaults/hooks";
 
 
 export const useVaults = () => {
   const stakingClient = steerClient.staking;
   const { chainId } = useMultichainContext();
+  const { handleVaultsUpdate } =
+    useVaultsActionHandlers();
 
   const [vaults, setVaults] = useState<StakingPool[] | undefined>(undefined);
 
@@ -16,7 +19,9 @@ export const useVaults = () => {
       if (!chainId) return;
 
       try {
-        const activeVaults = await stakingClient.getLiveStakingPools();
+        // const activeVaults = await stakingClient.getLiveStakingPools();
+        const activeVaults = await stakingClient.getStakingPools();
+
         // const activeVaults = await stakingClient.getLiveStakingPools(chainId);
         if (!activeVaults.success) {
           console.error("Error fetching vaults:", activeVaults.error);
@@ -37,5 +42,9 @@ export const useVaults = () => {
     fetchActiveVaults();
   }, [chainId]);
 
-  return vaults;
+  useEffect(() => {
+    if (vaults) {
+      handleVaultsUpdate(vaults);
+    }
+  }, [chainId, vaults]);
 };

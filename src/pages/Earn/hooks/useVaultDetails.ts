@@ -1,13 +1,18 @@
-import { StakingPool } from "@steerprotocol/sdk";
 import { useEffect, useRef, useState } from "react";
 import steerClient from "../../../services/steerClient";
 import useAccount from "../../../hooks/useAccount";
 import { VaultDetails } from "../../../types/vaultTypes";
 import { formatUnits } from "viem";
+import { useVaultsActionHandlers, useVaultsState } from "../../../state/vaults/hooks";
 
-export const useVaultDetails = (vaults?: StakingPool[]) => {
+export const useVaultDetails = () => {
   const stakingClient = steerClient.staking;
   const { address: userAddress } = useAccount();
+  const { handleVaultDetailsUpdate } =
+    useVaultsActionHandlers();
+
+  const { vaults } = useVaultsState();  
+
   const [vaultsDetails, setVaultsDetails] = useState<VaultDetails[]>([]);
   const totalSupplyCache = useRef<Map<string, number>>(new Map());
 
@@ -102,5 +107,9 @@ export const useVaultDetails = (vaults?: StakingPool[]) => {
     fetchVaultsDetails();
   }, [vaults, userAddress]);
 
-  return vaultsDetails;
+  useEffect(() => {
+    if (vaultsDetails) {
+      handleVaultDetailsUpdate(vaultsDetails);
+    }
+  }, [vaultsDetails]);
 };

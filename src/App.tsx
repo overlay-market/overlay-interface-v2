@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Trade from "./pages/Trade";
 import { Flex, Theme } from "@radix-ui/themes";
 import NavBar from "./components/NavBar";
@@ -19,14 +19,30 @@ import Leaderboard from "./pages/Leaderboard";
 import Earn from "./pages/Earn";
 import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import Stake from "./pages/Earn/StakePage";
+import SteerProvider from "./providers/SteerProvider";
+
+const earnRoutes = (
+  <>
+    <Route path="/earn" element={<Earn />} />
+    <Route path="/earn/:vaultId" element={<Stake />} />
+  </>
+);
+
+const SteerProviderWrapper = () => (
+  <SteerProvider>
+    <Routes>{earnRoutes}</Routes>
+  </SteerProvider>
+);
 
 const App = () => {
+  const location = useLocation();
   const chainIdRef = useRef<number | undefined>(undefined);
   useSyncChainQuery(chainIdRef);
-
   const { chainId: contextChainID } = useMultichainContext();
 
   useScrollbarWidth();
+
+  const isEarnRoute = location.pathname.startsWith("/earn");
 
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
@@ -49,8 +65,12 @@ const App = () => {
                 <Route path="/trade/:marketId" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/earn" element={<Earn />} />
-                <Route path="/earn/:vaultId" element={<Stake />} />
+
+                {isEarnRoute ? (
+                  <Route element={<SteerProviderWrapper />}>{earnRoutes}</Route>
+                ) : (
+                  earnRoutes
+                )}
               </Routes>
             </Flex>
           </AppContainer>
