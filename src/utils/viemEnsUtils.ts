@@ -1,11 +1,8 @@
-import { Address, createPublicClient, GetEnsNameReturnType, http, PublicClient, GetEnsAvatarReturnType } from "viem";
-import { mainnet } from "viem/chains";
+import { Address, createPublicClient, GetEnsNameReturnType, http } from "viem";
+import { mainnet, berachain } from "viem/chains";
 import { normalize } from 'viem/ens'
-import useSDK from "../providers/SDKProvider/useSDK";
-import { SUPPORTED_CHAINID } from "../constants/chains";
 
 type GetEnsNameFunction = (address: Address) => Promise<GetEnsNameReturnType>;
-type GetEnsAvatarFunction = (name: string) => Promise<GetEnsAvatarReturnType>;
 
 type ExtendedUserData = {
   _id: string; 
@@ -15,60 +12,75 @@ type ExtendedUserData = {
 };
 type ResolveEnsProfilesFunction = (users: ExtendedUserData[]) => Promise<ExtendedUserData[]>;
 
-const publicClient: PublicClient = createPublicClient({
+const berachainWithEns = {
+  ...berachain,
+  contracts: {
+    ensRegistry: {
+      address: "0x5b22280886a2f5e09a49bea7e320eab0e5320e28" as `0x${string}`,
+    },
+    ensUniversalResolver: {
+      address: "0xddfb18888a9466688235887dec2a10c4f5effee9" as `0x${string}`,
+    },
+  },
+};
+
+const mainnetClient = createPublicClient({
   chain: mainnet,
   transport: http(),
 });
 
-const useGetClient = (): PublicClient => {
-  const sdk = useSDK();
-  return sdk.core.chainId as number === SUPPORTED_CHAINID.MAINNET ? sdk.core.rpcProvider : publicClient;
-};
+const berachainClient = createPublicClient({
+  chain: berachainWithEns,
+  transport: http(),
+})
 
+type ClientType = typeof mainnetClient | typeof berachainClient;
 
 export const useGetEnsName = (): GetEnsNameFunction => {
-  const client = useGetClient();
-
   const getEnsName: GetEnsNameFunction = async (address) => {
-    const name = await client.getEnsName({ address });
+    
+    let name: GetEnsNameReturnType;
+    name = await berachainClient.getEnsName({ address });
+    if (!name) {
+      name = await mainnetClient.getEnsName({ address });
+    }
+   
     return name;
   };
 
   return getEnsName;
 };
 
-export const useGetEnsAvatar = (): GetEnsAvatarFunction => {
-  const client = useGetClient();
-
-  const getEnsAvatar: GetEnsAvatarFunction = async(name) => {
-    const avatarUrl = await client.getEnsAvatar({
-      name: normalize(name),
-    });  
-    return avatarUrl
-  }
-  return getEnsAvatar;
-}
-
 export const useResolveEnsProfiles = (): ResolveEnsProfilesFunction => {
-  const client = useGetClient();
-  
   const resolveEnsProfiles: ResolveEnsProfilesFunction = async (users) => {
-    const promises = users.map(async(user) => {
-      const username = await client.getEnsName({address: user._id as Address})
-      const avatarUrl = username && (await client.getEnsAvatar({
-        name: normalize(username),
-      }))
-  
-      if (username) {
-        user.username = username;
-        if (avatarUrl) {
-          user.avatar = avatarUrl;
-        }      
+    const promises = users.map(async (user) => {
+      let clientUsed: ClientType;
+
+      let username = await berachainClient.getEnsName({ address: user._id as Address });
+      clientUsed = berachainClient;
+
+      if (!username) {
+        username = await mainnetClient.getEnsName({ address: user._id as Address });
+        clientUsed = mainnetClient; 
       }
-      return user
-    }    
-    );
+
+      if (!username) return user;
+
+      user.username = username;
+
+      const avatarUrl = await clientUsed.getEnsAvatar({ name: normalize(username) });
+
+      if (avatarUrl) {
+        user.avatar = avatarUrl;
+      }
+
+      return user;
+    });
+
     return Promise.all(promises);
-  }
-  return resolveEnsProfiles
+  };
+
+  return resolveEnsProfiles;
 };
+
+
