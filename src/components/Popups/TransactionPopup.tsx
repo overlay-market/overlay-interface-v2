@@ -59,11 +59,7 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
 
         {chainId && hash && success && (
           <ExternalLink
-            href={getExplorerLink(
-              chainId as number,
-              hash,
-              ExplorerDataType.TRANSACTION
-            )}
+            href={getExplorerLink(hash, ExplorerDataType.TRANSACTION)}
           >
             <Flex mt={"4px"}>
               <Text weight={"regular"}>View on explorer</Text>
