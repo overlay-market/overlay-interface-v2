@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { Settings } from "react-feather";
 import NumericalInput from "../NumericalInput";
 import {
@@ -10,43 +10,41 @@ import { DefaultTxnSettings } from "../../state/trade/actions";
 import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import Modal from "../Modal";
-import useAccount from "../../hooks/useAccount";
 
 const SetSlippageModal: React.FC = () => {
-  const account = useAccount();
   const { slippageValue } = useTradeState();
   const { handleSlippageSet } = useTradeActionHandlers();
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const handleSlippageReset = useCallback(() => {
     handleSlippageSet(DefaultTxnSettings.DEFAULT_SLIPPAGE);
+    localStorage.setItem("slippage", DefaultTxnSettings.DEFAULT_SLIPPAGE);
+    setIsOpen(false);
   }, [handleSlippageSet]);
 
   useEffect(() => {
-    const fetchSlippage = async () => {
-      const storedSlippage = localStorage.getItem(`slippage`);
-      // When value is edited or not a valid number, set to default slippage value
-      if (storedSlippage && !isNaN(Number(storedSlippage))) {
-        handleSlippageSet(
-          storedSlippage || DefaultTxnSettings.DEFAULT_SLIPPAGE
-        );
-      } else {
-        localStorage.setItem(
-          `slippage`,
-          slippageValue ?? DefaultTxnSettings.DEFAULT_SLIPPAGE
-        );
-      }
-    };
-
-    fetchSlippage();
-  }, [account, handleSlippageSet, slippageValue]);
-
-  const handleSlippageModalClose = () => {
-    if (Number(slippageValue) < MINIMUM_SLIPPAGE_VALUE) {
-      handleSlippageSet(MINIMUM_SLIPPAGE_VALUE.toString());
-    }
-    if (slippageValue === ".") {
+    const storedSlippage = localStorage.getItem(`slippage`);
+    if (storedSlippage && !isNaN(Number(storedSlippage))) {
+      handleSlippageSet(storedSlippage);
+    } else {
       handleSlippageSet(DefaultTxnSettings.DEFAULT_SLIPPAGE);
     }
+  }, [handleSlippageSet]);
+
+  const handleSlippageModalClose = () => {
+    const numValue = Number(slippageValue);
+    if (!isNaN(numValue) && numValue >= MINIMUM_SLIPPAGE_VALUE) {
+      localStorage.setItem("slippage", slippageValue);
+      setIsOpen(false);
+    } else if (slippageValue === ".") {
+      handleSlippageSet(DefaultTxnSettings.DEFAULT_SLIPPAGE);
+      localStorage.setItem("slippage", DefaultTxnSettings.DEFAULT_SLIPPAGE);
+      setIsOpen(false);
+    }
+  };
+
+  const handleModalOpen = () => {
+    setIsOpen(true);
   };
 
   return (
@@ -59,6 +57,7 @@ const SetSlippageModal: React.FC = () => {
             cursor: "pointer",
             color: theme.color.blue2,
           }}
+          onClick={handleModalOpen}
         >
           {`${slippageValue}% slippage`}
         </Text>
@@ -67,6 +66,7 @@ const SetSlippageModal: React.FC = () => {
       width="375px"
       minHeight="190px"
       handleClose={handleSlippageModalClose}
+      open={isOpen}
     >
       <Flex
         direction={"column"}
