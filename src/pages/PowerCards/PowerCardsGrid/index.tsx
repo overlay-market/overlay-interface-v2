@@ -68,7 +68,7 @@ export function PowerCardsGrid({ activeTab }: PowerCardsGridProps) {
   return (
     <Container>
       {filteredCards.map((card) => (
-        <PowerCard key={card.id} card={card} />
+        <PowerCard key={card.id} />
       ))}
     </Container>
   );
