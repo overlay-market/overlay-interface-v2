@@ -1,5 +1,4 @@
 import { styled } from "styled-components";
-import theme from "../../theme";
 
 export const Container = styled.div`
   width: 100%;
@@ -16,23 +15,35 @@ export const TabsContainer = styled.div`
 
 export const Tab = styled.button<{ active: boolean }>`
   padding: 12px 20px;
-  background: none;
+  position: relative;
+  background: ${({ active, theme }) => (active ? theme.color.grey4 : "none")};
   border: none;
-  color: white;
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
-  border: 1px solid
-    ${({ theme, active }) => (active ? theme.primary1 : "#252534")};
+  border: 1px solid ${({ active }) => (active ? "transparent" : "#252534")};
   transition: all 0.2s ease;
   border-radius: 8px;
-  &:hover {
-    color: ${({ theme }) => theme.text1};
-  }
-  background: linear-gradient(${theme.color.grey7}, ${theme.color.background})
-      padding-box,
-    linear-gradient(90deg, ${theme.color.grey4} 0%, ${theme.color.grey4} 100%)
-      border-box;
+  color: ${({ active }) => (active ? "transparent" : "white")};
+
+  ${({ active }) =>
+    active &&
+    `
+    &::before {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+  `}
 `;
 
 export const EmptyState = styled.div`

@@ -25,6 +25,7 @@ export default function PowerCards() {
               key={tab}
               active={activeTab === index}
               onClick={() => setActiveTab(index)}
+              data-text={tab}
             >
               {tab}
             </Tab>
