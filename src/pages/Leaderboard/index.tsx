@@ -17,7 +17,7 @@ import {
 import { Address } from "viem";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
-import { useGetEnsName } from "../../utils/viemEnsUtils";
+import { useGetEnsName, useResolveEnsProfiles } from "../../utils/viemEnsUtils";
 import { GradientText } from "./user-points-section-styles";
 
 const INITIAL_NUMBER_OF_ROWS = 10;
@@ -28,6 +28,7 @@ const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
 
   const getEnsName = useGetEnsName();
+  const getEnsProfiles = useResolveEnsProfiles();
 
   const [pointsData, setPointsData] = useState<
     LeaderboardPointsData | undefined
@@ -38,9 +39,13 @@ const Leaderboard: React.FC = () => {
   const [fetchingPointsData, setFetchingPointsData] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [extendedRanks, setExtendedRanks] = useState<
+    ExtendedUserData[] | undefined
+  >(undefined);
   const [loadedNumberOfRows, setLoadedNumberOfRows] = useState(
     INITIAL_NUMBER_OF_ROWS
   );
+  const previousRanksRef = useRef<UserData[]>([]);
   const observerRef = useRef<HTMLDivElement>(null);
 
   const getPointsData = async (numberOfRows: number, account?: Address) => {
@@ -96,6 +101,33 @@ const Leaderboard: React.FC = () => {
       return pointsData.leaderboardTable;
     }
   }, [pointsData]);
+
+  useEffect(() => {
+    if (!ranks) return;
+
+    const alreadyResolvedCount = previousRanksRef.current.length;
+    const newRanks = ranks.slice(alreadyResolvedCount);
+
+    if (newRanks.length === 0) return;
+
+    previousRanksRef.current = ranks;
+
+    const resolveUsers = async () => {
+      const extendedUsers = newRanks.map((user) => ({
+        ...user,
+        username: undefined,
+        avatar: undefined,
+      }));
+
+      const resolvedUsers = (await getEnsProfiles(
+        extendedUsers
+      )) as ExtendedUserData[];
+
+      setExtendedRanks((prev) => [...(prev ?? []), ...resolvedUsers]);
+    };
+
+    resolveUsers();
+  }, [ranks]);
 
   useEffect(() => {
     const resolveUsername = async (user: ExtendedUserData) => {
@@ -234,7 +266,7 @@ const Leaderboard: React.FC = () => {
             >
               Coming Soon
             </GradientText>
-            <Text size="2" style={{textAlign: "center"}}>
+            <Text size="2" style={{ textAlign: "center" }}>
               This feature is currently under development. Stay tuned!
             </Text>
           </Flex>
@@ -259,10 +291,17 @@ const Leaderboard: React.FC = () => {
             userPoints={currentUserData?.totalPoints}
             isLoading={fetchingPointsData}
           />
-          <PointsUpdateSection pointsUpdatedAt={sessionDetails?.sessionLastUpdated || prevWeekDetails?.sessionEnd} />
+          <PointsUpdateSection
+            pointsUpdatedAt={
+              sessionDetails?.sessionLastUpdated || prevWeekDetails?.sessionEnd
+            }
+          />
         </Flex>
 
-        <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
+        <LeaderboardTable
+          ranks={extendedRanks}
+          currentUserData={currentUserData}
+        />
 
         {loading && (
           <Flex
