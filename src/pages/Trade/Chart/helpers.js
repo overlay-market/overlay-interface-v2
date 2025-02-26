@@ -1,32 +1,3 @@
-import {MARKET_CHART_URL} from '../../../constants/applications'
-import {SUPPORTED_CHAINID} from '../../../constants/chains'
-
-export const isSepolia = (chainId) => {
-  return chainId === Number(SUPPORTED_CHAINID.ARBITRUM_SEPOLIA)
-}
-
-export const isImola = (chainId) => {
-  return chainId === Number(SUPPORTED_CHAINID.IMOLA)
-}
-
-export const isBartio = (chainId) => {
-  return chainId === Number(SUPPORTED_CHAINID.BARTIO)
-}
-
-export const getMarketChartUrl = (value) => {
-  const chainId = typeof value === 'number' ? value : JSON.parse(value.ticker).chainId
-
-  if (isSepolia(chainId)) {
-    return MARKET_CHART_URL.SEPOLIA
-  } else if (isImola(chainId)) {
-    return MARKET_CHART_URL.IMOLA
-  } else if (isBartio(chainId)) {
-    return MARKET_CHART_URL.BARTIO
-  } else {
-    return MARKET_CHART_URL.DEFAULT
-  }
-}
-
 export const getBinSizeAndUnit = (input) => {
   const numValue = Number(input)
 

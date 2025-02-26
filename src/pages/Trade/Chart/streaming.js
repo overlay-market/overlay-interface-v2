@@ -1,4 +1,5 @@
-import {getBinSizeAndUnit, getMarketChartUrl} from './helpers'
+import { MARKET_CHART_URL } from '../../../constants/applications'
+import {getBinSizeAndUnit} from './helpers'
 
 // Reference: https://www.tradingview.com/charting-library-docs/latest/tutorials/implement_datafeed_tutorial/Streaming-Implementation
 
@@ -20,8 +21,7 @@ export const subscribeOnStream = (symbolInfo, resolution, onRealtimeCallback, su
     .map(name => `${name}=${encodeURIComponent(urlParameters[name])}`)
     .join('&')
 
-  const marketChartUrl = getMarketChartUrl(symbolInfo)
-  const endpoint = `${marketChartUrl}/sse?${query}`
+  const endpoint = `${MARKET_CHART_URL}/sse?${query}`
 
   const eventSource = new EventSource(endpoint)
 
