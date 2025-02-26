@@ -12,14 +12,12 @@ import {
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals } from "overlay-sdk";
 import { useParams } from "react-router-dom";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const PositionSelectComponent: React.FC = () => {
   const { marketId } = useParams();
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
 
   const { currentMarket: market } = useCurrentMarketState();
@@ -48,7 +46,7 @@ const PositionSelectComponent: React.FC = () => {
     fetchBidAndAsk();
     const intervalId = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
+  }, [marketId, sdk]);
 
   useEffect(() => {
     ask &&

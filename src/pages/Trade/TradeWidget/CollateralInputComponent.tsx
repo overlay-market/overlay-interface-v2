@@ -9,13 +9,11 @@ import {
 import { useParams } from "react-router-dom";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { toWei } from "overlay-sdk";
 
 const CollateralInputComponent: React.FC = () => {
   const { marketId } = useParams();
   const { address } = useAccount();
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { typedValue, selectedLeverage } = useTradeState();
   const { handleAmountInput } = useTradeActionHandlers();
@@ -45,7 +43,7 @@ const CollateralInputComponent: React.FC = () => {
     };
 
     fetchMaxInputIncludingFees();
-  }, [marketId, address, selectedLeverage, chainId]);
+  }, [marketId, address, selectedLeverage]);
 
   const handleUserInput = useCallback(
     (input: string) => {

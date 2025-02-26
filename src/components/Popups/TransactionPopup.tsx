@@ -1,7 +1,6 @@
 import { AlertTriangle, CheckCircle } from "react-feather";
 import { ExternalLink as ExternalLinkIcon } from "react-feather";
 import { Box, Flex, Text } from "@radix-ui/themes";
-import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { ExplorerDataType, getExplorerLink } from "../../utils/getExplorerLink";
 import { ExternalLink } from "../ExternalLink";
 import theme from "../../theme";
@@ -13,7 +12,6 @@ type TxnPopupProps = {
 };
 
 const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
-  const { chainId } = useMultichainContext();
   const {
     txn: { hash, success, message, type },
   } = content;
@@ -57,7 +55,7 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
 
         {errorDetails && <Text>{errorDetails}</Text>}
 
-        {chainId && hash && success && (
+        {hash && success && (
           <ExternalLink
             href={getExplorerLink(hash, ExplorerDataType.TRANSACTION)}
           >

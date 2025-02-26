@@ -2,7 +2,6 @@ import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
 import { InfoIcon } from "../../../assets/icons/svg-icons";
 import { useParams } from "react-router-dom";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useTradeState } from "../../../state/trade/hooks";
@@ -19,7 +18,6 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
   tradeState,
 }) => {
   const { marketId } = useParams();
-  const { chainId } = useMultichainContext();
   const { address } = useAccount();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
@@ -51,7 +49,7 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
       }
     };
     fetchFee();
-  }, [marketId, chainId]);
+  }, [marketId]);
 
   useEffect(() => {
     estLiquidationPrice &&

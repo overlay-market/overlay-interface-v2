@@ -1,6 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { ColorButton } from "../../../components/Button";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
@@ -27,7 +26,6 @@ const POSITIONS_COLUMNS = [
 ];
 
 const OpenPositionsTable: React.FC = () => {
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
@@ -113,7 +111,6 @@ const OpenPositionsTable: React.FC = () => {
 
     fetchOpenPositions();
   }, [
-    chainId,
     account,
     isNewTxnHash,
     currentPage,

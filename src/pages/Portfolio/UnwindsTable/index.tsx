@@ -1,5 +1,4 @@
 import { Flex, Text } from "@radix-ui/themes";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
@@ -23,7 +22,6 @@ const UNWIND_POSITIONS_COLUMNS = [
 ];
 
 const UnwindsTable: React.FC = () => {
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
@@ -70,7 +68,6 @@ const UnwindsTable: React.FC = () => {
 
     fetchUnwindPositions();
   }, [
-    chainId,
     account,
     isNewTxnHash,
     currentPage,
