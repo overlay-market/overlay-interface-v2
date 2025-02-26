@@ -1,28 +1,23 @@
-// context/SDKContext.tsx
 import React, { useMemo } from "react";
 import { OverlaySDK } from "overlay-sdk";
 import { useConnectorClient } from "wagmi";
-import { DEFAULT_CHAINID, SUPPORTED_CHAINID } from "../../constants/chains";
-import useMultichainContext from "../MultichainContextProvider/useMultichainContext";
+import { SUPPORTED_CHAINID } from "../../constants/chains";
 import { SDKContext } from "./types";
 
 const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { chainId } = useMultichainContext();
   const { data: walletClient } = useConnectorClient();
 
   const sdk = useMemo(() => {
     return new OverlaySDK({
-      chainId: chainId ? (chainId as number) : (DEFAULT_CHAINID as number),
+      chainId: SUPPORTED_CHAINID.BERACHAIN as number,
       rpcUrls: {
-        [SUPPORTED_CHAINID.BARTIO]: import.meta.env.VITE_BARTIO_RPC,
-        [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: import.meta.env
-          .VITE_ARBITRUM_SEPOLIA_RPC,
+        [SUPPORTED_CHAINID.BERACHAIN]: import.meta.env.VITE_BERACHAIN_RPC,
       },
       web3Provider: walletClient as any,
+      useShiva: true,
+      brokerId: import.meta.env.VITE_BROKER_ID,
     });
-  }, [chainId, walletClient]);
-
-  console.log("SDK instance created with chainId:", chainId);
+  }, [walletClient]);
 
   return <SDKContext.Provider value={sdk}>{children}</SDKContext.Provider>;
 };
