@@ -2,39 +2,44 @@ import styled from "styled-components";
 
 export const PowerCardContainer = styled.div`
   width: 100%;
-  height: auto;
-  border-radius: 30px;
-  transition: 0.5s;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  overflow: hidden;
-  background-image: url("placeholder-card-background.png"); /* Replace with actual image */
-  background-size: cover;
-  background-position: center;
-  border: none; /* Remove border */
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  aspect-ratio: 3/4; // This maintains the card proportions
+  cursor: pointer;
+  position: relative;
+  perspective: 1000px;
+
+  .card-side {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    backface-visibility: hidden;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
+
+  .back {
+    background: #2a2a2a;
+    // border-radius: 16px;
+    transform: rotateY(180deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    // border-radius: 16px;
+  }
 
   &:hover {
-    transform: perspective(1000px) rotateY(180deg);
+    .front {
+      transform: rotateY(180deg);
+    }
+    .back {
+      transform: rotateY(0);
+    }
   }
-`;
-
-export const CardImage = styled.img`
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  border-radius: 30px;
-  backface-visibility: hidden;
-  transform: perspective(1000px) rotateY(0deg);
-  transition: 0.5s;
-  box-shadow: 0 25px 15px rgb(0 0 0 / 50%);
-  width: 100%;
-  border-radius: 12px;
-  aspect-ratio: 1 / 1.2;
-  object-fit: cover;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
 `;
 
 export const CardButton = styled.button`
