@@ -25,6 +25,11 @@ export const PowerCardContainer = styled.div`
     justify-content: center;
   }
 
+  .grayscale {
+    filter: grayscale(1);
+    cursor: auto;
+  }
+
   img {
     width: 100%;
     height: 100%;
