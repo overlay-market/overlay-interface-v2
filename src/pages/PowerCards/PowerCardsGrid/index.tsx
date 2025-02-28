@@ -1,14 +1,16 @@
-import { styled } from "styled-components";
-import { PowerCard } from "./PowerCard";
 import { CardData } from "../types";
 import { EmptyState } from "../power-cards-styles";
+import { AvailableCard, BurntCard, OwnedCard } from "./PowerCard";
+import { Container } from "./power-cards-grid-styles";
 
 interface PowerCardsGridProps {
   activeTab: number;
+  cards: CardData[];
+  setSelectedCard: Function;
 }
 
 // Mock data - this would typically come from an API or state management
-const mockCards: CardData[] = [
+const ownedCards: CardData[] = [
   {
     id: 1,
     name: "Breeze of Mt Fuji",
@@ -27,60 +29,53 @@ const mockCards: CardData[] = [
     rarity: "1/5000",
     status: "owned" as const,
   },
+];
+
+const burntCards: CardData[] = [
   {
-    id: 3,
-    name: "Zen Garden Gateway",
-    image: "/path/to/zen-image.jpg",
-    effect: "Zero Fees",
+    id: 1,
+    name: "Breeze of Mt Fuji",
+    image: "/path/to/fuji-image.jpg",
+    effect: "Negative Fees",
     duration: "Good for 1 day",
     rarity: "1/2000",
-    status: "burnt" as const,
+    status: "available" as const,
   },
 ];
 
-export function PowerCardsGrid({ activeTab }: PowerCardsGridProps) {
-  // Filter cards based on activeTab
-  const filteredCards = mockCards.filter((card) => {
-    switch (activeTab) {
-      case 0: // All Cards
-        return true;
-      case 1: // My Cards
-        return card.status === "owned";
-      case 2: // Burnt Cards
-        return card.status === "burnt";
-      default:
-        return true;
-    }
-  });
-
-  if (filteredCards.length === 0) {
-    return (
-      <EmptyState>
-        {activeTab === 1
-          ? "You don't own any Power Cards yet"
-          : activeTab === 2
-          ? "No burnt Power Cards found"
-          : "No Power Cards available"}
-      </EmptyState>
-    );
-  }
-
+export function PowerCardsGrid({
+  activeTab,
+  cards,
+  setSelectedCard,
+}: PowerCardsGridProps) {
   return (
     <Container>
-      {filteredCards.map((card) => (
-        <PowerCard key={card.id} />
-      ))}
+      {activeTab === 0 &&
+        cards.map((card) => (
+          <AvailableCard
+            key={card.id}
+            card={card}
+            setSelectedCard={setSelectedCard}
+          />
+        ))}
+
+      {activeTab === 1 &&
+        ownedCards.map((card) => <OwnedCard key={card.id} card={card} />)}
+
+      {activeTab === 2 &&
+        burntCards.map((card) => <BurntCard key={card.id} card={card} />)}
+
+      {cards.length === 0 && activeTab === 0 && (
+        <EmptyState>No Power Cards available</EmptyState>
+      )}
+
+      {ownedCards.length === 0 && activeTab === 1 && (
+        <EmptyState>You don't own any Power Cards yet</EmptyState>
+      )}
+
+      {burntCards.length === 0 && activeTab === 2 && (
+        <EmptyState>No burnt Power Cards found</EmptyState>
+      )}
     </Container>
   );
 }
-
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 24px;
-  padding: 16px 0;
-
-  @media (min-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  }
-`;
