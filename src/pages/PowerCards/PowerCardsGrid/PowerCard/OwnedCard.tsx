@@ -7,14 +7,14 @@ type OwnedCardProps = {
   card: CardData;
 };
 
-export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
+export const OwnedCard: React.FC<OwnedCardProps> = () => {
   return (
     <PowerCardContainer>
       <div className="card-side front">
         <img src={zengarden} alt="Example" />
       </div>
       <div className="card-side back">
-        <CardButton>Burn Card</CardButton>
+        <CardButton>View More</CardButton>
       </div>
     </PowerCardContainer>
   );

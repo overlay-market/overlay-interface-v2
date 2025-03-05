@@ -18,12 +18,32 @@ export const PowerCardContainer = styled.div`
     transform-style: preserve-3d;
   }
 
+  .front {
+    z-index: 2;
+  }
+
   .back {
-    background: #2a2a2a;
+    background: none;
     transform: rotateY(180deg);
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("/src/assets/images/power-cards/zengarden.png");
+      background-size: cover;
+      opacity: 0.3;
+      transform: scaleX(-1);
+      z-index: -1;
+      backface-visibility: hidden;
+    }
   }
 
   .grayscale {
