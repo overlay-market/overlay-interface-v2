@@ -12,6 +12,7 @@ const useSDK = (): OverlaySDK => {
     web3Provider: walletClient as any,
     rpcUrls: {
       [SUPPORTED_CHAINID.BARTIO]: 'https://bera-testnet.nodeinfra.com',
+      [SUPPORTED_CHAINID.BERACHAIN]: 'https://rpc.berachain.com',
     }
   });
 

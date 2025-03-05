@@ -13,6 +13,10 @@ export const isBartio = (chainId) => {
   return chainId === Number(SUPPORTED_CHAINID.BARTIO)
 }
 
+export const isBerachain = (chainId) => {
+  return chainId === Number(SUPPORTED_CHAINID.BERACHAIN)
+}
+
 export const getMarketChartUrl = (value) => {
   const chainId = typeof value === 'number' ? value : JSON.parse(value.ticker).chainId
 
@@ -22,6 +26,8 @@ export const getMarketChartUrl = (value) => {
     return MARKET_CHART_URL.IMOLA
   } else if (isBartio(chainId)) {
     return MARKET_CHART_URL.BARTIO
+  } else if (isBerachain(chainId)) {
+    return MARKET_CHART_URL.BARTIO // TODO: change to berachain-charts
   } else {
     return MARKET_CHART_URL.DEFAULT
   }

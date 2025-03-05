@@ -94,6 +94,18 @@ export const getExplorerLink = (chainId: number, data: string, type: ExplorerDat
     }
   }
 
+  if (chainId === SUPPORTED_CHAINID.BERACHAIN) {
+    switch (type) {
+      case ExplorerDataType.TRANSACTION:
+        return `https://berascan.com/tx/${data}`
+      case ExplorerDataType.ADDRESS:
+      case ExplorerDataType.TOKEN:
+        return `https://berascan.com/address/${data}`
+      case ExplorerDataType.BLOCK:
+        return `https://berascan.com/block/${data}`
+    }
+  }
+
   const prefix = `https://${ETHERSCAN_PREFIXES[chainId] ?? ''}etherscan.io`
 
   switch (type) {
