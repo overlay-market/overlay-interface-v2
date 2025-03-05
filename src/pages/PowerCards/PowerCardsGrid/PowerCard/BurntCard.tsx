@@ -6,7 +6,7 @@ type BurntCardProps = {
   card: CardData;
 };
 
-export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
+export const BurntCard: React.FC<BurntCardProps> = () => {
   return (
     <PowerCardContainer>
       <div className="grayscale">
