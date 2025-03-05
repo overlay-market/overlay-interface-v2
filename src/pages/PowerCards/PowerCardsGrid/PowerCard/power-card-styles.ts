@@ -2,15 +2,17 @@ import styled from "styled-components";
 
 export const PowerCardContainer = styled.div`
   width: 100%;
-  aspect-ratio: 3/4; // This maintains the card proportions
-  cursor: pointer;
+  padding-bottom: 136%;
   position: relative;
   perspective: 1000px;
+  cursor: pointer;
 
   .card-side {
-    width: 100%;
-    height: 100%;
     position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     backface-visibility: hidden;
     transition: transform 0.8s;
     transform-style: preserve-3d;
@@ -18,7 +20,6 @@ export const PowerCardContainer = styled.div`
 
   .back {
     background: #2a2a2a;
-    // border-radius: 16px;
     transform: rotateY(180deg);
     display: flex;
     align-items: center;
@@ -34,7 +35,6 @@ export const PowerCardContainer = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
-    // border-radius: 16px;
   }
 
   &:hover {
