@@ -11,6 +11,7 @@ import OverviewChart from "./OverviewChart";
 import { UNIT } from "../../../constants/applications";
 import { IntervalType, OverviewData } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
+import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
@@ -44,7 +45,13 @@ const Overview: React.FC = () => {
     };
 
     fetchOverviewDetails();
-  }, [account, isNewTxnHash, selectedInterval, isNewSelectedInterval]);
+  }, [
+    account,
+    isNewTxnHash,
+    selectedInterval,
+    isNewSelectedInterval,
+    useIsNewUnwindTxn,
+  ]);
 
   const isOver1000OpenPositions = useMemo(() => {
     if (overviewData) {
