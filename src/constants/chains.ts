@@ -1,5 +1,5 @@
 import { Chain } from "viem";
-import BartioLogo from "../assets/images/bartio-logo.png";
+import BartioLogo from "../assets/images/bartio-logo.webp";
 
 export enum SUPPORTED_CHAINID {
   BERACHAIN = 80094,
