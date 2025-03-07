@@ -18,6 +18,7 @@ import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import theme from "../../../theme";
 import useBidAndAsk from "./utils/useBidAndAsk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { LocalStorageSaveLoadAdapter } from "./utils/localStorageSaveLoadAdapter";
 
 const TVChartContainer = styled.div`
   height: 258px;
@@ -116,6 +117,7 @@ const Chart: React.FC = () => {
           defaultProps.interval as ChartingLibraryWidgetOptions["interval"],
         container: chartContainerRef.current,
         locale: "en",
+        save_load_adapter: new LocalStorageSaveLoadAdapter(),
         disabled_features: isMobile
           ? [
               "left_toolbar",
@@ -126,7 +128,6 @@ const Chart: React.FC = () => {
               "header_compare",
             ]
           : ["header_symbol_search", "symbol_search_hot_key", "header_compare"],
-        charts_storage_url: defaultProps.chartsStorageUrl,
         charts_storage_api_version: defaultProps.chartsStorageApiVersion,
         client_id: defaultProps.clientId,
         user_id: defaultProps.userId,
