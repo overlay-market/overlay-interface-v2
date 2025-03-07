@@ -1,6 +1,5 @@
 import { Text } from "@radix-ui/themes";
 import { useParams } from "react-router-dom";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -28,7 +27,6 @@ const POSITIONS_COLUMNS = [
 
 const PositionsTable: React.FC = () => {
   const { marketId } = useParams();
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
@@ -84,7 +82,6 @@ const PositionsTable: React.FC = () => {
 
     fetchOpenPositions();
   }, [
-    chainId,
     marketId,
     account,
     isNewTxnHash,
@@ -98,7 +95,7 @@ const PositionsTable: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
     setItemsPerPage(10);
-  }, [chainId, marketId]);
+  }, [marketId]);
 
   return (
     <>

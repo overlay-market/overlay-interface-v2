@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { MARKET_CHART_URL } from "../constants/applications";
+import { SUPPORTED_CHAINID } from "../constants/chains";
 
 interface MarketDataPoint {
   latestPrice: number;
@@ -34,7 +35,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
         const response2 = await axios.get("https://api.overlay.market/data/api/markets");
         const mapping: Record<string, string> = {};
 
-        response2.data[421614].forEach((item: { marketId: string; chains: { deploymentAddress: string }[] }) => {
+        response2.data[SUPPORTED_CHAINID.BERACHAIN].forEach((item: { marketId: string; chains: { deploymentAddress: string }[] }) => {
           mapping[item.marketId] = item.chains[0]?.deploymentAddress.toLowerCase();
         });
 
@@ -54,14 +55,14 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
 
       try {
         const responseOverview = await axios.get<MarketDataPoint[]>(
-          `${MARKET_CHART_URL.SEPOLIA}/marketsPricesOverview`
+          `${MARKET_CHART_URL}/marketsPricesOverview`
         );
         const chartDataArray = responseOverview.data;
 
         const updatedMarketsData = stableMarketIds.map((marketId) => {
           try {
-            const marketAddressSepolia = marketAddressMapping[marketId];
-            const chartData = chartDataArray.find((item) => item.marketAddress === marketAddressSepolia);
+            const marketAddressBerachain = marketAddressMapping[marketId];
+            const chartData = chartDataArray.find((item) => item.marketAddress === marketAddressBerachain);
 
             if (!chartData) {
               throw new Error(`No chart data available for ${marketId}`);

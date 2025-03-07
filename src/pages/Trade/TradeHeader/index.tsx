@@ -14,13 +14,11 @@ import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals, toWei } from "overlay-sdk";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const TradeHeader: React.FC = () => {
   const { marketId } = useParams();
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
@@ -54,7 +52,7 @@ const TradeHeader: React.FC = () => {
     fetchPrice();
     const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, typedValue, selectedLeverage, isLong, chainId, sdk]);
+  }, [marketId, typedValue, selectedLeverage, isLong, sdk]);
 
   useEffect(() => {
     market &&
@@ -77,7 +75,7 @@ const TradeHeader: React.FC = () => {
     fetchFunding();
     const intervalId = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
+  }, [marketId, sdk]);
 
   useEffect(() => {
     const fetchOiBalance = async () => {
@@ -97,7 +95,7 @@ const TradeHeader: React.FC = () => {
     fetchOiBalance();
     const intervalId = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
+  }, [marketId, sdk]);
 
   const isFundingRatePositive = useMemo(() => {
     return Math.sign(Number(funding)) > 0;

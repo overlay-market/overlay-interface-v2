@@ -7,7 +7,6 @@ import useAccount from "../../../hooks/useAccount";
 import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import MainOverviewCard from "./MainOverviewCard";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import OverviewChart from "./OverviewChart";
 import { UNIT } from "../../../constants/applications";
 import { IntervalType, OverviewData } from "overlay-sdk";
@@ -16,7 +15,6 @@ import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
-  const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
 
@@ -49,7 +47,6 @@ const Overview: React.FC = () => {
     fetchOverviewDetails();
   }, [
     account,
-    chainId,
     isNewTxnHash,
     selectedInterval,
     isNewSelectedInterval,

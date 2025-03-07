@@ -14,7 +14,6 @@ import { useEffect, useState } from "react";
 import { Address } from "viem";
 import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
 import { useParams } from "react-router-dom";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
@@ -23,7 +22,6 @@ import useDebounce from "../../../hooks/useDebounce";
 
 const TradeWidget: React.FC = () => {
   const { marketId } = useParams();
-  const { chainId } = useMultichainContext();
   const { address } = useAccount();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
@@ -92,7 +90,6 @@ const TradeWidget: React.FC = () => {
     address,
     debouncedTypedValue,
     selectedLeverage,
-    chainId,
     isLong,
     slippageValue,
     isNewTxnHash,

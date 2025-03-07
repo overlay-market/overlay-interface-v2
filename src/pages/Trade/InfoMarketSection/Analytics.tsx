@@ -1,10 +1,9 @@
 import { Flex } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
 import { InfoBox, TextLabel, TextValue } from "./analytics-styles";
-import { CHAIN_SUBGRAPH_URL } from "../../../constants/subgraph";
-import useSDK from "../../../providers/SDKProvider/useSDK";
 import { gql, request } from "graphql-request";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { SUBGRAPH_URL } from "../../../constants/applications";
 
 const document = gql`
   query MyQuery($marketId: String!) {
@@ -37,8 +36,6 @@ type AnalyticsData = {
 };
 
 const Analytics: React.FC = () => {
-  const sdk = useSDK();
-  const subgraphUrl = CHAIN_SUBGRAPH_URL[sdk.core.chainId];
   const { currentMarket } = useCurrentMarketState();
 
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
@@ -49,7 +46,7 @@ const Analytics: React.FC = () => {
     const fetchData = async () => {
       if (currentMarket) {
         try {
-          const data: AnalyticsData = await request(subgraphUrl, document, {
+          const data: AnalyticsData = await request(SUBGRAPH_URL, document, {
             marketId: currentMarket.id,
           });
           setAnalyticsData(data);
@@ -60,7 +57,7 @@ const Analytics: React.FC = () => {
     };
 
     fetchData();
-  }, [subgraphUrl, currentMarket]);
+  }, [currentMarket]);
 
   const formatAndTransform = (value: string) => {
     if (value.trim() === "") return " ";

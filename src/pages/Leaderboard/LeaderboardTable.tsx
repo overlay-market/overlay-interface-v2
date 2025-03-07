@@ -8,10 +8,10 @@ import {
 } from "./leaderboard-table-styles";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { ExtendedUserData } from "./types";
-import { Flex, Text } from "@radix-ui/themes";
+import { Avatar, Flex, Text } from "@radix-ui/themes";
 import { shortenAddress } from "../../utils/web3";
 import { getRandomColors, getRandomName } from "../../utils/boringAvatars";
-import Avatar from "boring-avatars";
+import BoringAvatar from "boring-avatars";
 import theme from "../../theme";
 import Loader from "../../components/Loader";
 import useAccount from "../../hooks/useAccount";
@@ -80,7 +80,9 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               </StyledCell>
             )}
             <StyledCell textalign="right">
-              {currentUserData?.totalPoints ? (+currentUserData?.totalPoints).toFixed(2) + "%" : "0"}
+              {currentUserData?.totalPoints
+                ? (+currentUserData?.totalPoints).toFixed(2) + "%"
+                : "0"}
             </StyledCell>
           </CurrentUserRankingRow>
           <BgRow></BgRow>
@@ -118,12 +120,18 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               >
                 <Flex align={"center"} gap={"8px"}>
                   <Avatar
-                    size={isMobile ? 28 : 36}
-                    variant="bauhaus"
-                    name={getRandomName()}
-                    colors={getRandomColors()}
+                    src={rank.avatar}
+                    radius="full"
+                    fallback={
+                      <BoringAvatar
+                        size={isMobile ? 28 : 36}
+                        variant="bauhaus"
+                        name={getRandomName()}
+                        colors={getRandomColors()}
+                      />
+                    }
                   />
-                  <Text>{shortenAddress(rank._id)}</Text>
+                  <Text>{rank.username ?? shortenAddress(rank._id)}</Text>
                 </Flex>
               </StyledCell>
               {!isMobile && isMultipleSessions && (
@@ -131,7 +139,9 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                   {rank.previousWeekPoints}
                 </StyledCell>
               )}
-              <StyledCell textalign="right">{rank.totalPoints.toFixed(2) + "%"}</StyledCell>
+              <StyledCell textalign="right">
+                {rank.totalPoints.toFixed(2) + "%"}
+              </StyledCell>
             </StyledRow>
           ))}
       </tbody>

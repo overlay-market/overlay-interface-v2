@@ -6,7 +6,6 @@ import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useParams } from "react-router-dom";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import Loader from "../../components/Loader";
 import {
   useCurrentMarketActionHandlers,
@@ -21,7 +20,6 @@ import SuggestedCards from "./SuggestedCards";
 
 const Trade: React.FC = () => {
   const { marketId } = useParams();
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const navigate = useNavigate();
   const { currentMarket } = useCurrentMarketState();
@@ -46,7 +44,7 @@ const Trade: React.FC = () => {
     };
 
     fetchActiveMarkets();
-  }, [chainId]);
+  }, []);
 
   useEffect(() => {
     if (markets) {
@@ -62,17 +60,17 @@ const Trade: React.FC = () => {
         navigate(`/trade/${activeMarket.marketId}`);
       }
     }
-  }, [marketId, chainId, markets]);
+  }, [marketId, markets]);
 
   useEffect(() => {
     if (markets) {
       handleMarketsUpdate(markets);
     }
-  }, [chainId, markets]);
+  }, [markets]);
 
   useEffect(() => {
     handleTradeStateReset();
-  }, [marketId, chainId, handleTradeStateReset]);
+  }, [marketId, handleTradeStateReset]);
 
   return (
     <TradeContainer direction="column" width={"100%"} mb="100px">

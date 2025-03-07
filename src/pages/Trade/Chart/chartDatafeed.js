@@ -1,4 +1,5 @@
-import {getBinSizeAndUnit, getMarketChartUrl} from './helpers'
+import { MARKET_CHART_URL } from '../../../constants/applications'
+import {getBinSizeAndUnit} from './helpers'
 import {subscribeOnStream, unsubscribeFromStream} from './streaming'
 
 // Reference: https://www.tradingview.com/charting-library-docs/latest/tutorials/implement_datafeed_tutorial/Widget-Setup
@@ -68,9 +69,7 @@ export default {
     try {
       let bars = []
 
-      const marketChartUrl = getMarketChartUrl(symbolInfo)
-
-      let res = await fetch(`${marketChartUrl}?${query}`)
+      let res = await fetch(`${MARKET_CHART_URL}?${query}`)
 
       res = await res.json()
 

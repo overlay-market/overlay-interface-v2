@@ -1,12 +1,9 @@
 import { limitDigitsInDecimals } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import { TRADE_POLLING_INTERVAL } from "../../../../constants/applications";
-import useMultichainContext from "../../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../../providers/SDKProvider/useSDK";
 
 const useBidAndAsk = (marketId: string | undefined): {bid: number | undefined, ask: number | undefined} => {
- 
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   
   const [ask, setAsk] = useState<number | undefined>(undefined);
@@ -15,7 +12,7 @@ const useBidAndAsk = (marketId: string | undefined): {bid: number | undefined, a
   useEffect(() => {
     setAsk(undefined);
     setBid(undefined);
-  }, [marketId, chainId]);
+  }, [marketId]);
   
   useEffect(() => {
     const fetchBidAndAsk = async () => {
@@ -41,7 +38,7 @@ const useBidAndAsk = (marketId: string | undefined): {bid: number | undefined, a
     fetchBidAndAsk();
     const intervalId = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
+  }, [marketId,  sdk]);
 
   return {bid, ask}
 }

@@ -1,17 +1,14 @@
 import { Text } from "@radix-ui/themes";
-import { SUPPORTED_CHAINID } from "../../constants/chains";
 import Loader from "../Loader";
 import NumberSpring from "../NumberSpring";
 import theme from "../../theme";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../hooks/useAccount";
 import { useIsNewTxnHash } from "../../state/trade/hooks";
 
 const TokenBalance: React.FC = () => {
   const sdk = useSDK();
-  const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
   const [ovlBalance, setOvlBalance] = useState<number | undefined>(undefined);
@@ -29,7 +26,7 @@ const TokenBalance: React.FC = () => {
     };
 
     fetchBalance();
-  }, [chainId, account, sdk, isNewTxnHash]);
+  }, [account, sdk, isNewTxnHash]);
 
   return (
     <Text
@@ -43,8 +40,6 @@ const TokenBalance: React.FC = () => {
     >
       {ovlBalance === undefined ? (
         <Loader size="12px" stroke="white" />
-      ) : SUPPORTED_CHAINID.MAINNET === chainId ? (
-        <NumberSpring inputValue={ovlBalance} text="OVL" />
       ) : (
         <NumberSpring inputValue={ovlBalance} text="OVL" />
       )}

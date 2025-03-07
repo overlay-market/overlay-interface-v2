@@ -1,7 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
-import { CHAIN_SUBGRAPH_URL } from "../../../constants/subgraph";
-import useSDK from "../../../providers/SDKProvider/useSDK";
 import { gql, request } from "graphql-request";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
@@ -11,6 +9,7 @@ import {
   RiskParamsTablesContainer,
 } from "./risk-parameters-styles";
 import theme from "../../../theme";
+import { SUBGRAPH_URL } from "../../../constants/applications";
 
 const document = gql`
   query RiskParams($marketId: String!) {
@@ -65,8 +64,6 @@ type RiskParamsResponse = {
 };
 
 const RiskParameters: React.FC = () => {
-  const sdk = useSDK();
-  const subgraphUrl = CHAIN_SUBGRAPH_URL[sdk.core.chainId];
   const { currentMarket } = useCurrentMarketState();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
@@ -79,7 +76,7 @@ const RiskParameters: React.FC = () => {
       if (currentMarket) {
         try {
           const data: RiskParamsResponse = await request(
-            subgraphUrl,
+            SUBGRAPH_URL,
             document,
             {
               marketId: currentMarket.id,
@@ -93,7 +90,7 @@ const RiskParameters: React.FC = () => {
     };
 
     fetchData();
-  }, [currentMarket, subgraphUrl]);
+  }, [currentMarket]);
 
   const formatAndTransform = (value: string) => {
     if (value.trim() === "") return "-";

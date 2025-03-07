@@ -10,11 +10,13 @@ import * as React from "react";
 import styled from "styled-components";
 import Datafeed from "./chartDatafeed";
 import moment from "moment";
-import { getMarketChartUrl } from "./helpers";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useParams } from "react-router-dom";
-import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
+import {
+  MARKET_CHART_URL,
+  TRADE_POLLING_INTERVAL,
+} from "../../../constants/applications";
 import theme from "../../../theme";
 import useBidAndAsk from "./utils/useBidAndAsk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
@@ -65,7 +67,7 @@ const Chart: React.FC = () => {
   useEffect(() => {
     setLongPrice(undefined);
     setShortPrice(undefined);
-  }, [marketId, chainId]);
+  }, [marketId]);
 
   useEffect(() => {
     if (
@@ -98,7 +100,7 @@ const Chart: React.FC = () => {
         }),
         interval: "60" as ResolutionString,
         userId: "public_user_id_paul",
-        datafeedUrl: getMarketChartUrl(chainId),
+        datafeedUrl: MARKET_CHART_URL,
         libraryPath: "/charting_library/",
         chartsStorageUrl: "https://saveload.tradingview.com",
         chartsStorageApiVersion: "1.1",
