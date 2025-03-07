@@ -43,6 +43,7 @@ export class LocalStorageSaveLoadAdapter implements IExternalSaveLoadAdapter {
   private _chartTemplates: SavedChartTemplate[] = [];
   private _isDirty = false;
   protected _drawings: SavedDrawings = {};
+  private readonly MAX_CHARTS = 100;
 
   public constructor() {
       this._charts =
@@ -55,6 +56,8 @@ export class LocalStorageSaveLoadAdapter implements IExternalSaveLoadAdapter {
           this._getFromLocalStorage<SavedChartTemplate[]>(storageKeys.chartTemplates) ?? [];
       this._drawings =
           this._getFromLocalStorage<SavedDrawings>(storageKeys.drawings) ?? {};
+
+      this._enforceChartLimit();    
 
       setInterval(() => {
           if (this._isDirty) {
@@ -89,6 +92,7 @@ export class LocalStorageSaveLoadAdapter implements IExternalSaveLoadAdapter {
           timestamp: Math.round(Date.now() / 1000),
       };
       this._charts.push(savedChartData);
+      this._enforceChartLimit();
       this._isDirty = true;
       
       return Promise.resolve(savedChartData.id);
@@ -199,6 +203,13 @@ export class LocalStorageSaveLoadAdapter implements IExternalSaveLoadAdapter {
       this._saveToLocalStorage(storageKeys.drawingTemplates, this._drawingTemplates);
       this._saveToLocalStorage(storageKeys.chartTemplates, this._chartTemplates);
       this._saveToLocalStorage(storageKeys.drawings, this._drawings);
+  }
+
+  private _enforceChartLimit(): void {
+    if (this._charts.length > this.MAX_CHARTS) {
+      this._charts.sort((a, b) => a.timestamp - b.timestamp);
+      this._charts = this._charts.slice(-this.MAX_CHARTS);
+    }
   }
 
   private _generateUniqueChartId(): string {
