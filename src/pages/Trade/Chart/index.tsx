@@ -117,7 +117,7 @@ const Chart: React.FC = () => {
           defaultProps.interval as ChartingLibraryWidgetOptions["interval"],
         container: chartContainerRef.current,
         locale: "en",
-        save_load_adapter: new LocalStorageSaveLoadAdapter(),
+        save_load_adapter: new LocalStorageSaveLoadAdapter(market.marketName),
         enabled_features: ["study_templates"],
         disabled_features: isMobile
           ? [

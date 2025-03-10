@@ -44,8 +44,11 @@ export class LocalStorageSaveLoadAdapter implements IExternalSaveLoadAdapter {
   private _isDirty = false;
   protected _drawings: SavedDrawings = {};
   private readonly MAX_CHARTS = 100;
+  private marketName: string | undefined;
 
-  public constructor() {
+  public constructor(marketName?: string) {
+    this.marketName = marketName;
+
       this._charts =
           this._getFromLocalStorage<SavedChartData[]>(storageKeys.charts) ?? [];
       this._studyTemplates =
@@ -68,7 +71,7 @@ export class LocalStorageSaveLoadAdapter implements IExternalSaveLoadAdapter {
   }
 
   public getAllCharts(): Promise<ChartMetaInfo[]> {
-    return Promise.resolve(this._charts.map(chart => ({
+    return Promise.resolve(this._charts.filter(chart => chart.symbol === this.marketName).map(chart => ({
         ...chart,
         id: Number(chart.id), 
     })));
