@@ -118,6 +118,7 @@ const Chart: React.FC = () => {
         container: chartContainerRef.current,
         locale: "en",
         save_load_adapter: new LocalStorageSaveLoadAdapter(),
+        enabled_features: ["study_templates"],
         disabled_features: isMobile
           ? [
               "left_toolbar",
