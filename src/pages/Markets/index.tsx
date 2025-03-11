@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import LegionBanner from "../../components/LegionBanner";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
@@ -21,12 +22,12 @@ const Markets: React.FC = () => {
     const fetchData = async () => {
       try {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
-          activeMarkets && setMarketsData(activeMarkets)
-        })
+          activeMarkets && setMarketsData(activeMarkets);
+        });
         sdk.ovl.totalSupplyDayChange().then((supplyChange) => {
           supplyChange &&
-          setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
-        })
+            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
+        });
       } catch (error) {
         console.error("Error fetching markets:", error);
       }
@@ -42,6 +43,7 @@ const Markets: React.FC = () => {
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
+      <LegionBanner />
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} />
       <MarketsTable marketsData={marketsData} />
