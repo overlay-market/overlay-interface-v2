@@ -40,6 +40,15 @@ const mockCards: CardData[] = [
     rarity: "1/2000",
     status: "burnt" as const,
   },
+  {
+    id: 4,
+    name: "Zen Garden Gateway",
+    image: "/path/to/zen-image.jpg",
+    effect: "Zero Fees",
+    duration: "Good for 1 day",
+    rarity: "1/2000",
+    status: "burnt" as const,
+  },
 ];
 
 const PowerCards = () => {

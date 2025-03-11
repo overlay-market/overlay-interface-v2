@@ -29,6 +29,24 @@ const ownedCards: CardData[] = [
     rarity: "1/5000",
     status: "owned" as const,
   },
+  {
+    id: 3,
+    name: "Samurai Jack",
+    image: "/path/to/samurai-image.jpg",
+    effect: "Rebate",
+    duration: "On one loss up to 10 OV",
+    rarity: "1/5000",
+    status: "owned" as const,
+  },
+  {
+    id: 4,
+    name: "Samurai Jack",
+    image: "/path/to/samurai-image.jpg",
+    effect: "Rebate",
+    duration: "On one loss up to 10 OV",
+    rarity: "1/5000",
+    status: "owned" as const,
+  },
 ];
 
 const burntCards: CardData[] = [
