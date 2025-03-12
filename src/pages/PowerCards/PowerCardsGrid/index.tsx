@@ -74,11 +74,18 @@ export function PowerCardsGrid({
             key={card.id}
             card={card}
             setSelectedCard={setSelectedCard}
+            isOwned={false}
           />
         ))}
 
       {activeTab === 1 &&
-        ownedCards.map((card) => <OwnedCard key={card.id} card={card} />)}
+        ownedCards.map((card) => (
+          <OwnedCard
+            key={card.id}
+            card={card}
+            setSelectedCard={setSelectedCard}
+          />
+        ))}
 
       {activeTab === 2 &&
         burntCards.map((card) => <BurntCard key={card.id} card={card} />)}

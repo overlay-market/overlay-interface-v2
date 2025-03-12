@@ -5,6 +5,7 @@ import { CardData } from "../../types";
 type AvailableCardProps = {
   card: CardData;
   setSelectedCard: Function;
+  isOwned: boolean;
 };
 
 export const AvailableCard: React.FC<AvailableCardProps> = ({
@@ -12,7 +13,7 @@ export const AvailableCard: React.FC<AvailableCardProps> = ({
   setSelectedCard,
 }) => {
   return (
-    <PowerCardContainer onClick={() => setSelectedCard(card)}>
+    <PowerCardContainer onClick={() => setSelectedCard(card, false)}>
       <div>
         <img src={zengarden} alt="Example" />
       </div>

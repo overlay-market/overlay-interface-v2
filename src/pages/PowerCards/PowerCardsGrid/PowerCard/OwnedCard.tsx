@@ -7,9 +7,13 @@ import { useUserPowerCards } from "../../../../hooks/useUserPowerCards";
 
 type OwnedCardProps = {
   card: CardData;
+  setSelectedCard: Function;
 };
 
-export const OwnedCard: React.FC<OwnedCardProps> = () => {
+export const OwnedCard: React.FC<OwnedCardProps> = ({
+  card,
+  setSelectedCard,
+}) => {
   const { loading, error, data } = useUserPowerCards();
 
   if (loading) return <p>Loading...</p>;
@@ -25,7 +29,10 @@ export const OwnedCard: React.FC<OwnedCardProps> = () => {
         <img src={zengarden} alt="Example" />
       </div>
       <div className="card-side back">
-        <GradientSolidButton title="View More" />
+        <GradientSolidButton
+          handleClick={() => setSelectedCard(card, true)}
+          title="View More"
+        />
       </div>
     </PowerCardContainer>
   );

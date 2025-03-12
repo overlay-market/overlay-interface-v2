@@ -16,9 +16,12 @@ import { GradientSolidButton } from "../../components/Button";
 
 type OpenedPowerCardProps = {
   card: CardData;
+  isOwned?: boolean;
 };
 
-const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card }) => {
+const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
+  const buttonText = isOwned ? "Burn this Power Card" : "Get this Power Card";
+
   return (
     <Flex width={"100%"} justify={"center"}>
       <Container>
@@ -70,10 +73,10 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card }) => {
           </Flex>
 
           <GradientSolidButton
-            title={"Get this Power Card"}
+            title={buttonText}
             width={"100%"}
             height={"49px"}
-            handleClick={() => console.log("Get this Power Card")}
+            handleClick={() => console.log(buttonText)}
           />
         </InfoBox>
       </Container>

@@ -54,6 +54,12 @@ const mockCards: CardData[] = [
 const PowerCards = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const [isOwned, setIsOwned] = useState<boolean>(false);
+
+  const handleSetSelectedCard = (card: CardData, isOwned: boolean) => {
+    setSelectedCard(card);
+    setIsOwned(isOwned);
+  };
 
   return (
     <Container>
@@ -79,12 +85,12 @@ const PowerCards = () => {
         )}
 
         {selectedCard ? (
-          <OpenedPowerCard card={selectedCard} />
+          <OpenedPowerCard card={selectedCard} isOwned={isOwned} />
         ) : (
           <PowerCardsGrid
             activeTab={activeTab}
             cards={mockCards}
-            setSelectedCard={setSelectedCard}
+            setSelectedCard={handleSetSelectedCard}
           />
         )}
       </PowercardsContent>
