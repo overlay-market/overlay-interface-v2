@@ -16,6 +16,7 @@ import { currentTimeParsed } from "../../../../utils/currentTime";
 import { useParams } from "react-router-dom";
 import { getVaultAddressByVaultName } from "../../utils/currentVaultdata";
 import { parseUnits } from "viem";
+import { handleError } from "../../../../utils/handleError";
 
 const TransactSection: React.FC = () => {
   const { address: account } = useAccount();
@@ -138,34 +139,6 @@ const TransactSection: React.FC = () => {
           currentTimeForId
         );
       });
-  };
-
-  const handleError = (error: Error) => {
-    try {
-      const errorString = JSON.stringify(error);
-      const errorObj = JSON.parse(errorString);
-
-      const errorCode: number | string =
-        errorObj.cause?.cause?.code ||
-        errorObj.cause?.code ||
-        errorObj.code ||
-        "UNKNOWN_ERROR";
-
-      const errorMessage =
-        errorObj.cause?.shortMessage ||
-        errorObj.cause?.cause?.shortMessage ||
-        errorObj.message ||
-        error.message ||
-        "An unknown error occurred";
-
-      return { errorCode, errorMessage };
-    } catch (parseError) {
-      console.error("Error parsing error object:", parseError);
-      return {
-        errorCode: "PARSE_ERROR",
-        errorMessage: error.message || "An unknown error occurred",
-      };
-    }
   };
 
   return (
