@@ -49,8 +49,9 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
           {type === TransactionType.UNWIND_OVL_POSITION && "Unwind Successful"}
           {type === TransactionType.LIQUIDATE_OVL_POSITION &&
             "Liquidation Successful"}
-          {type === TransactionType.BRIDGE_OVL && "Bridge Successful"}
-          {type === TransactionType.CLAIM_OVL && "Claim Successful"}
+          {type === TransactionType.CLAIM_REWARDS && "Claim Rewards Successful"}
+          {type === TransactionType.STAKE_OVL && "Stake OVL Successful"}
+          {type === TransactionType.WITHDRAW_OVL && "Withdraw OVL Successful"}
 
           {errorMessage}
         </Text>

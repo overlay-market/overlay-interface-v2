@@ -15,6 +15,11 @@ import {
 } from "../hooks/useCurrentVaultData";
 import { getVaultAddressByVaultName } from "../utils/currentVaultdata";
 import { formatReward } from "../utils/formatReward";
+import steerClient from "../../../services/steerClient";
+import { useAddPopup } from "../../../state/application/hooks";
+import { TransactionType } from "../../../constants/transaction";
+import { currentTimeParsed } from "../../../utils/currentTime";
+import { UNIT } from "../../../constants/applications";
 
 const MyStats: React.FC = () => {
   const { vaultId } = useParams();
@@ -22,6 +27,8 @@ const MyStats: React.FC = () => {
   const vaultAddress = getVaultAddressByVaultName(vaultId);
   const currentVault = useCurrentVault(vaultAddress);
   const currentVaultDetails = useCurrentVaultDetails(vaultAddress);
+  const addPopup = useAddPopup();
+  const currentTimeForId = currentTimeParsed();
 
   const pendingRewards = useMemo(() => {
     if (!currentVaultDetails?.userRewards) return [];
@@ -39,6 +46,83 @@ const MyStats: React.FC = () => {
     return rewards;
   }, [currentVaultDetails, currentVault]);
 
+  const handleClaimRewards = async () => {
+    steerClient.staking
+      .getReward({
+        stakingPool: vaultAddress as `0x${string}`,
+      })
+      .then((claimTx) => {
+        if (claimTx.success && claimTx.data) {
+          addPopup(
+            {
+              txn: {
+                hash: claimTx.data as string,
+                success: claimTx.success,
+                message: "",
+                type: TransactionType.CLAIM_REWARDS,
+              },
+            },
+            claimTx.data
+          );
+        } else {
+          addPopup(
+            {
+              txn: {
+                hash: currentTimeForId,
+                success: false,
+                message: claimTx.error ?? "Claim rewards failed",
+                type: claimTx.status,
+              },
+            },
+            currentTimeForId
+          );
+        }
+      })
+      .catch((error: Error) => {
+        const { errorCode, errorMessage } = handleError(error);
+
+        addPopup(
+          {
+            txn: {
+              hash: currentTimeForId,
+              success: false,
+              message: errorMessage,
+              type: errorCode,
+            },
+          },
+          currentTimeForId
+        );
+      });
+  };
+
+  const handleError = (error: Error) => {
+    try {
+      const errorString = JSON.stringify(error);
+      const errorObj = JSON.parse(errorString);
+
+      const errorCode: number | string =
+        errorObj.cause?.cause?.code ||
+        errorObj.cause?.code ||
+        errorObj.code ||
+        "UNKNOWN_ERROR";
+
+      const errorMessage =
+        errorObj.cause?.shortMessage ||
+        errorObj.cause?.cause?.shortMessage ||
+        errorObj.message ||
+        error.message ||
+        "An unknown error occurred";
+
+      return { errorCode, errorMessage };
+    } catch (parseError) {
+      console.error("Error parsing error object:", parseError);
+      return {
+        errorCode: "PARSE_ERROR",
+        errorMessage: error.message || "An unknown error occurred",
+      };
+    }
+  };
+
   return (
     <Flex direction={"column"}>
       <Text style={{ color: theme.color.grey10 }}>MY STATS</Text>
@@ -46,7 +130,9 @@ const MyStats: React.FC = () => {
       <MyStatsContainer>
         <StatCard>
           <Text size={"1"}>Current Balance</Text>
-          <StatValue>{userStats?.currentBalance} OVL</StatValue>
+          <StatValue>
+            {userStats?.currentBalance} {UNIT}
+          </StatValue>
         </StatCard>
 
         <StatCard>
@@ -57,11 +143,7 @@ const MyStats: React.FC = () => {
         <StatCard>
           <Flex justify={"between"} align={"center"}>
             <Text size={"1"}>Pending Rewards</Text>
-            <ClaimRewardsButton
-              onClick={() => {
-                console.log("claim");
-              }}
-            >
+            <ClaimRewardsButton onClick={handleClaimRewards}>
               Claim Rewards
             </ClaimRewardsButton>
           </Flex>
