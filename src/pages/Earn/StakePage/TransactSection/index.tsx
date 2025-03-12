@@ -9,16 +9,163 @@ import { GradientOutlineButton } from "../../../../components/Button";
 import InputComponent from "./InputComponent";
 import useAccount from "../../../../hooks/useAccount";
 import { useModalHelper } from "../../../../components/ConnectWalletModal/utils";
+import steerClient from "../../../../services/steerClient";
+import { TransactionType } from "../../../../constants/transaction";
+import { useAddPopup } from "../../../../state/application/hooks";
+import { currentTimeParsed } from "../../../../utils/currentTime";
+import { useParams } from "react-router-dom";
+import { getVaultAddressByVaultName } from "../../utils/currentVaultdata";
+import { parseUnits } from "viem";
 
 const TransactSection: React.FC = () => {
   const { address: account } = useAccount();
   const { openModal } = useModalHelper();
+  const { vaultId } = useParams();
+  const vaultAddress = getVaultAddressByVaultName(vaultId);
+  const addPopup = useAddPopup();
+  const currentTimeForId = currentTimeParsed();
 
   const [stakeSelected, setStakeSelected] = useState(true);
   const [typedAmount, setTypedAmount] = useState("");
 
   const handleTransactionTypeSelect = (isStake: boolean) => {
     setStakeSelected(isStake);
+  };
+
+  const handleStake = async () => {
+    if (!typedAmount) return;
+
+    const parsedAmount = parseUnits(typedAmount, 18);
+
+    steerClient.staking
+      .stake({
+        stakingPool: vaultAddress as `0x${string}`,
+        amount: parsedAmount,
+      })
+      .then((stakeTx) => {
+        if (stakeTx.success && stakeTx.data) {
+          addPopup(
+            {
+              txn: {
+                hash: stakeTx.data as string,
+                success: stakeTx.success,
+                message: "",
+                type: TransactionType.STAKE_OVL,
+              },
+            },
+            stakeTx.data
+          );
+        } else {
+          addPopup(
+            {
+              txn: {
+                hash: currentTimeForId,
+                success: false,
+                message: stakeTx.error ?? "Stake OVL failed",
+                type: stakeTx.status,
+              },
+            },
+            currentTimeForId
+          );
+        }
+      })
+      .catch((error: Error) => {
+        const { errorCode, errorMessage } = handleError(error);
+
+        addPopup(
+          {
+            txn: {
+              hash: currentTimeForId,
+              success: false,
+              message: errorMessage,
+              type: errorCode,
+            },
+          },
+          currentTimeForId
+        );
+      });
+  };
+
+  const handleWithdraw = async () => {
+    if (!typedAmount) return;
+
+    const parsedAmount = parseUnits(typedAmount, 18);
+
+    steerClient.staking
+      .withdraw({
+        stakingPool: vaultAddress as `0x${string}`,
+        amount: parsedAmount,
+      })
+      .then((withdrawTx) => {
+        if (withdrawTx.success && withdrawTx.data) {
+          addPopup(
+            {
+              txn: {
+                hash: withdrawTx.data as string,
+                success: withdrawTx.success,
+                message: "",
+                type: TransactionType.WITHDRAW_OVL,
+              },
+            },
+            withdrawTx.data
+          );
+        } else {
+          addPopup(
+            {
+              txn: {
+                hash: currentTimeForId,
+                success: false,
+                message: withdrawTx.error ?? "Withdraw OVL failed",
+                type: withdrawTx.status,
+              },
+            },
+            currentTimeForId
+          );
+        }
+      })
+      .catch((error: Error) => {
+        const { errorCode, errorMessage } = handleError(error);
+
+        addPopup(
+          {
+            txn: {
+              hash: currentTimeForId,
+              success: false,
+              message: errorMessage,
+              type: errorCode,
+            },
+          },
+          currentTimeForId
+        );
+      });
+  };
+
+  const handleError = (error: Error) => {
+    try {
+      const errorString = JSON.stringify(error);
+      const errorObj = JSON.parse(errorString);
+
+      const errorCode: number | string =
+        errorObj.cause?.cause?.code ||
+        errorObj.cause?.code ||
+        errorObj.code ||
+        "UNKNOWN_ERROR";
+
+      const errorMessage =
+        errorObj.cause?.shortMessage ||
+        errorObj.cause?.cause?.shortMessage ||
+        errorObj.message ||
+        error.message ||
+        "An unknown error occurred";
+
+      return { errorCode, errorMessage };
+    } catch (parseError) {
+      console.error("Error parsing error object:", parseError);
+      return {
+        errorCode: "PARSE_ERROR",
+        errorMessage: error.message || "An unknown error occurred",
+      };
+    }
   };
 
   return (
@@ -58,9 +205,7 @@ const TransactSection: React.FC = () => {
           height={"40px"}
           size={"12px"}
           // isDisabled={isDisabledTransactButton}
-          handleClick={() => {
-            console.log({ typedAmount });
-          }}
+          handleClick={stakeSelected ? handleStake : handleWithdraw}
         />
       )}
 
