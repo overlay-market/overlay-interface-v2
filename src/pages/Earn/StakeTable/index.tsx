@@ -11,7 +11,7 @@ const StakeTable: React.FC = () => {
   const { address: account } = useAccount();
   const { vaults } = useVaultsState();
 
-  const isDesktop = useMediaQuery("(min-width: 1280px)");
+  // const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (

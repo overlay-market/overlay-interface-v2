@@ -70,13 +70,13 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
     return rewards;
   }, [currentVaultDetails, vault]);
 
-  const lockUpPeriod = useMemo(() => {
-    const timeUnitSeconds = Number(vault.rewardsDuration);
-    const secondsInDay = 86400;
-    const timeUnitDays = Math.trunc(timeUnitSeconds / secondsInDay);
+  // const lockUpPeriod = useMemo(() => {
+  //   const timeUnitSeconds = Number(vault.rewardsDuration);
+  //   const secondsInDay = 86400;
+  //   const timeUnitDays = Math.trunc(timeUnitSeconds / secondsInDay);
 
-    return `${timeUnitDays} ${timeUnitDays === 1 ? "Day" : "Days"}`;
-  }, [vault.rewardsDuration]);
+  //   return `${timeUnitDays} ${timeUnitDays === 1 ? "Day" : "Days"}`;
+  // }, [vault.rewardsDuration]);
 
   const dailyRewards = useMemo(() => {
     const rewards = [
