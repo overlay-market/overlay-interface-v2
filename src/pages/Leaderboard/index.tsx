@@ -15,6 +15,7 @@ import {
   ExtendedUserData,
   LeaderboardPointsData,
   PrevWeekDetails,
+  SessionDetails,
   UserData,
 } from "./types";
 import { Address } from "viem";
@@ -25,7 +26,7 @@ import { GradientText } from "./user-points-section-styles";
 
 const INITIAL_NUMBER_OF_ROWS = 10;
 const ROWS_PER_LOAD = 20;
-const comingSoon = true;
+const comingSoon = false;
 
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
@@ -79,6 +80,12 @@ const Leaderboard: React.FC = () => {
   const prevWeekDetails = useMemo<PrevWeekDetails | undefined>(() => {
     if (pointsData) {
       return pointsData.previousWeekDetails;
+    }
+  }, [pointsData]);
+
+  const sessionDetails = useMemo<SessionDetails | undefined>(() => {
+    if (pointsData) {
+      return pointsData.sessionDetails;
     }
   }, [pointsData]);
 
@@ -256,7 +263,7 @@ const Leaderboard: React.FC = () => {
             userPoints={currentUserData?.totalPoints}
             isLoading={fetchingPointsData}
           />
-          <PointsUpdateSection pointsUpdatedAt={prevWeekDetails?.sessionEnd} />
+          <PointsUpdateSection pointsUpdatedAt={sessionDetails?.sessionLastUpdated || prevWeekDetails?.sessionEnd} />
         </Flex>
 
         <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />

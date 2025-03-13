@@ -10,6 +10,8 @@ import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { handleError } from "../../utils/handleError";
+import { Address } from "viem";
+import useAccount from "../../hooks/useAccount";
 
 type WithdrawOVLProps = {
   position: OpenPositionData;
@@ -23,6 +25,7 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
   handleDismiss,
 }) => {
   const sdk = useSDK();
+  const { address: account } = useAccount();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
@@ -39,8 +42,10 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
 
       sdk.market
         .emergencyWithdraw({
-          marketAddress: position.marketAddress,
+          account,
+          marketAddress: position.marketAddress as Address,
           positionId: BigInt(position.positionId),
+          owner: account as Address,
         })
         .then((result) => {
           addPopup(

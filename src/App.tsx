@@ -15,7 +15,7 @@ import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
-import Leaderboard from "./pages/Leaderboard";
+// import Leaderboard from "./pages/Leaderboard";
 import Earn from "./pages/Earn";
 import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import Stake from "./pages/Earn/StakePage";
@@ -64,7 +64,7 @@ const App = () => {
                 />
                 <Route path="/trade/:marketId" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
+                {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
 
                 {isEarnRoute ? (
                   <Route element={<SteerProviderWrapper />}>{earnRoutes}</Route>

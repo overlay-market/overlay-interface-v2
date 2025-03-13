@@ -155,7 +155,9 @@ const SuggestedCards: React.FC = () => {
             overflowX={"hidden"}
           >
             <Text weight={"bold"} size={"5"}>
-              Similar To This Market
+              {similarMarkets.length === 1
+                ? "Related"
+                : "Similar To This Market"}
             </Text>
             <Box>
               <Swiper
