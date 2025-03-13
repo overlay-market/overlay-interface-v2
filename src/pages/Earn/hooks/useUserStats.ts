@@ -6,6 +6,7 @@ import { formatUnits } from "viem";
 import { useParams } from "react-router-dom";
 import { getVaultAddressByVaultName } from "../utils/currentVaultdata";
 import { useVaultsActionHandlers } from "../../../state/vaults/hooks";
+import { formatDecimals } from "../utils/formatDecimals";
 
 export const useUserStats = () => {
   const { vaultId } = useParams();
@@ -24,18 +25,19 @@ export const useUserStats = () => {
       try {
         const currentBalanceResponse = await stakingClient.balanceOf(vaultAddress as `0x${string}`, userAddress);
        
-        let formattedCurrentbalance = 0;
+        let formattedCurrentbalance = '0';
 
         if (currentBalanceResponse?.success && currentBalanceResponse.data) {
-          formattedCurrentbalance = parseFloat(Number(
+          formattedCurrentbalance = formatDecimals(
             formatUnits(currentBalanceResponse.data ?? 0n, 18)
-          ).toFixed(2))
+          )
+          
         } else {
-          formattedCurrentbalance = 0;
+          formattedCurrentbalance = '0';
         }  
 
         setUserStats({
-          currentBalance: formattedCurrentbalance,
+          currentStakedBalance: formattedCurrentbalance,
         });
       } catch (error) {
         console.error("Error fetching user stats:", error);

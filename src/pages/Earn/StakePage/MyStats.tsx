@@ -104,7 +104,7 @@ const MyStats: React.FC = () => {
         <StatCard>
           <Text size={"1"}>Current Balance</Text>
           <StatValue>
-            {userStats?.currentBalance} {UNIT}
+            {userStats?.currentStakedBalance} {UNIT}
           </StatValue>
         </StatCard>
 

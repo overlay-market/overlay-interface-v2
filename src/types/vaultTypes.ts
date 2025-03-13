@@ -11,7 +11,7 @@ export interface VaultDetails {
 }
 
 export interface UserStats {
-  currentBalance: number;
+  currentStakedBalance: string;
   // earnedRewards: {
   //   rewardA: number;
   //   rewardB?: number;
