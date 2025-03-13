@@ -4,43 +4,25 @@ import { useEffect, useState } from "react";
 import NumericalInput from "../../../../components/NumericalInput";
 import useAccount from "../../../../hooks/useAccount";
 import { useModalHelper } from "../../../../components/ConnectWalletModal/utils";
-import useSDK from "../../../../providers/SDKProvider/useSDK";
-import useMultichainContext from "../../../../providers/MultichainContextProvider/useMultichainContext";
+import { UNIT } from "../../../../constants/applications";
 
 type InputComponentProps = {
   typedAmount: string;
   setTypedAmount: Function;
+  balance: string | undefined;
 };
 
 const InputComponent: React.FC<InputComponentProps> = ({
   typedAmount,
   setTypedAmount,
+  balance,
 }) => {
-  const sdk = useSDK();
-  const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const { openModal } = useModalHelper();
-
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
-  const [ovlBalance, setOvlBalance] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (account) {
-        try {
-          const ovlBalance = await sdk.ovl.balance(account, 8);
-          ovlBalance && setOvlBalance(Math.trunc(Number(ovlBalance)));
-        } catch (error) {
-          console.error("Error fetching ovlBalance:", error);
-        }
-      }
-    };
-
-    fetchBalance();
-  }, [chainId, account, sdk]);
 
   const handleUserInput = (input: string) => {
-    if (Number(input) !== ovlBalance) {
+    if (Number(input) !== Number(balance)) {
       setIsMaxSelected(false);
     }
     setTypedAmount(input);
@@ -48,14 +30,14 @@ const InputComponent: React.FC<InputComponentProps> = ({
 
   const handleMaxInput = () => {
     setIsMaxSelected(true);
-    return handleUserInput(Number(ovlBalance).toFixed(6));
+    return handleUserInput(balance!);
   };
 
   useEffect(() => {
-    if (isMaxSelected && ovlBalance) {
-      handleUserInput(ovlBalance.toString());
+    if (isMaxSelected && balance) {
+      handleUserInput(balance);
     }
-  }, [isMaxSelected, ovlBalance, handleUserInput]);
+  }, [isMaxSelected, balance, handleUserInput]);
 
   return (
     <Box
@@ -68,7 +50,7 @@ const InputComponent: React.FC<InputComponentProps> = ({
           <Text size="1" style={{ color: theme.color.grey3 }}>
             Amount
           </Text>
-          {account && (
+          {account && balance && (
             <Text
               size="1"
               onClick={handleMaxInput}
@@ -78,7 +60,7 @@ const InputComponent: React.FC<InputComponentProps> = ({
                 color: isMaxSelected ? theme.color.white : theme.color.grey3,
               }}
             >
-              Bal: {ovlBalance}
+              Bal: {balance}
             </Text>
           )}
 
@@ -102,7 +84,7 @@ const InputComponent: React.FC<InputComponentProps> = ({
             handleUserInput={handleUserInput}
           />
           <Text size="3" weight={"bold"} style={{ color: theme.color.blue1 }}>
-            OVL
+            {UNIT}
           </Text>
         </Flex>
       </Flex>

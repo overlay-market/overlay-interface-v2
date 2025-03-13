@@ -1,11 +1,14 @@
 import { Flex, Text } from "@radix-ui/themes";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   StakeSelectButton,
   TransactContainer,
   WithdrawSelectButton,
 } from "./transact-section-styles";
-import { GradientOutlineButton } from "../../../../components/Button";
+import {
+  GradientLoaderButton,
+  GradientOutlineButton,
+} from "../../../../components/Button";
 import InputComponent from "./InputComponent";
 import useAccount from "../../../../hooks/useAccount";
 import { useModalHelper } from "../../../../components/ConnectWalletModal/utils";
@@ -17,25 +20,68 @@ import { useParams } from "react-router-dom";
 import { getVaultAddressByVaultName } from "../../utils/currentVaultdata";
 import { parseUnits } from "viem";
 import { handleError } from "../../../../utils/handleError";
+import useSDK from "../../../../providers/SDKProvider/useSDK";
+import useMultichainContext from "../../../../providers/MultichainContextProvider/useMultichainContext";
+import { formatDecimals } from "../../utils/formatDecimals";
+import { useVaultsState } from "../../../../state/vaults/hooks";
 
 const TransactSection: React.FC = () => {
+  const sdk = useSDK();
+  const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const { openModal } = useModalHelper();
   const { vaultId } = useParams();
+  const { userStats } = useVaultsState();
   const vaultAddress = getVaultAddressByVaultName(vaultId);
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
 
   const [stakeSelected, setStakeSelected] = useState(true);
   const [typedAmount, setTypedAmount] = useState("");
+  const [attemptingTransaction, setAttemptingTransaction] = useState(false);
+  const [ovlBalance, setOvlBalance] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (account) {
+        try {
+          const ovlBalance = await sdk.ovl.balance(account, 8);
+          ovlBalance && setOvlBalance(formatDecimals(ovlBalance as string));
+        } catch (error) {
+          console.error("Error fetching ovlBalance:", error);
+        }
+      }
+    };
+
+    fetchBalance();
+  }, [chainId, account, sdk]);
 
   const handleTransactionTypeSelect = (isStake: boolean) => {
     setStakeSelected(isStake);
   };
 
+  const isTypedAmountExceeded = useMemo(() => {
+    return stakeSelected
+      ? Number(typedAmount) > Number(ovlBalance)
+      : Number(typedAmount) > Number(userStats?.currentStakedBalance);
+  }, [stakeSelected, typedAmount, ovlBalance, userStats?.currentStakedBalance]);
+
+  const isDisabledButton = useMemo(() => {
+    return !typedAmount || Number(typedAmount) === 0 || isTypedAmountExceeded;
+  }, [typedAmount, isTypedAmountExceeded]);
+
+  const buttonTitle = useMemo(() => {
+    return isTypedAmountExceeded
+      ? "Amount exceeds max input"
+      : stakeSelected
+      ? "Stake"
+      : "Withdraw";
+  }, [isTypedAmountExceeded, stakeSelected]);
+
   const handleStake = async () => {
     if (!typedAmount) return;
 
+    setAttemptingTransaction(true);
     const parsedAmount = parseUnits(typedAmount, 18);
 
     steerClient.staking
@@ -84,12 +130,17 @@ const TransactSection: React.FC = () => {
           },
           currentTimeForId
         );
+      })
+      .finally(() => {
+        setAttemptingTransaction(false);
+        setTypedAmount("");
       });
   };
 
   const handleWithdraw = async () => {
     if (!typedAmount) return;
 
+    setAttemptingTransaction(true);
     const parsedAmount = parseUnits(typedAmount, 18);
 
     steerClient.staking
@@ -138,6 +189,10 @@ const TransactSection: React.FC = () => {
           },
           currentTimeForId
         );
+      })
+      .finally(() => {
+        setAttemptingTransaction(false);
+        setTypedAmount("");
       });
   };
 
@@ -169,18 +224,25 @@ const TransactSection: React.FC = () => {
       <InputComponent
         typedAmount={typedAmount}
         setTypedAmount={setTypedAmount}
+        balance={stakeSelected ? ovlBalance : userStats?.currentStakedBalance}
       />
 
-      {account && (
-        <GradientOutlineButton
-          title={stakeSelected ? "Stake" : "Withdraw"}
-          width={"100%"}
-          height={"40px"}
-          size={"12px"}
-          // isDisabled={isDisabledTransactButton}
-          handleClick={stakeSelected ? handleStake : handleWithdraw}
-        />
-      )}
+      {account &&
+        (attemptingTransaction ? (
+          <GradientLoaderButton
+            title={"Pending confirmation..."}
+            height={"40px"}
+          />
+        ) : (
+          <GradientOutlineButton
+            title={buttonTitle ?? (stakeSelected ? "Stake" : "Withdraw")}
+            width={"100%"}
+            height={"40px"}
+            size={"12px"}
+            isDisabled={isDisabledButton}
+            handleClick={stakeSelected ? handleStake : handleWithdraw}
+          />
+        ))}
 
       {!account && (
         <GradientOutlineButton
