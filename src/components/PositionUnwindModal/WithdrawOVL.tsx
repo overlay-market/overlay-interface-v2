@@ -9,6 +9,7 @@ import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
+import { handleError } from "../../utils/handleError";
 import { Address } from "viem";
 import useAccount from "../../hooks/useAccount";
 
@@ -80,18 +81,6 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
           handleDismiss();
         });
     }
-  };
-
-  const handleError = (error: Error) => {
-    const errorString = JSON.stringify(error);
-    const errorObj = JSON.parse(errorString);
-
-    const errorCode: number | string =
-      errorObj.cause?.cause?.code || errorObj.code;
-
-    let errorMessage =
-      errorObj.cause?.shortMessage || errorObj.cause?.cause?.shortMessage;
-    return { errorCode, errorMessage };
   };
 
   return (

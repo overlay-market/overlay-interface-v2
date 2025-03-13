@@ -1,9 +1,9 @@
 import { FC } from "react";
 
-export const StakeIcon: FC = () => (
+export const StakeIcon: FC<{ size?: number }> = ({ size = 16 }) => (
   <svg
-    width="15"
-    height="16"
+    width={size}
+    height={size}
     viewBox="0 0 15 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -17,10 +17,10 @@ export const StakeIcon: FC = () => (
   </svg>
 );
 
-export const StakeActiveIcon: FC = () => (
+export const StakeActiveIcon: FC<{ size?: number }> = ({ size = 16 }) => (
   <svg
-    width="15"
-    height="16"
+    width={size}
+    height={size}
     viewBox="0 0 15 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
