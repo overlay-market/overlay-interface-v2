@@ -2,6 +2,8 @@ import { CardData } from "../types";
 import { EmptyState } from "../power-cards-styles";
 import { AvailableCard, BurntCard, OwnedCard } from "./PowerCard";
 import { Container } from "./power-cards-grid-styles";
+import { Skeleton } from "@radix-ui/themes";
+import { useUserPowerCards } from "../../../hooks/useUserPowerCards";
 
 interface PowerCardsGridProps {
   activeTab: number;
@@ -66,6 +68,8 @@ export function PowerCardsGrid({
   cards,
   setSelectedCard,
 }: PowerCardsGridProps) {
+  const { loading: ownedIsLoading } = useUserPowerCards();
+
   return (
     <Container>
       {activeTab === 0 &&
@@ -79,13 +83,17 @@ export function PowerCardsGrid({
         ))}
 
       {activeTab === 1 &&
-        ownedCards.map((card) => (
-          <OwnedCard
-            key={card.id}
-            card={card}
-            setSelectedCard={setSelectedCard}
-          />
-        ))}
+        ownedCards.map((card) =>
+          ownedIsLoading ? (
+            <Skeleton style={{ width: "100%", height: "500px" }} />
+          ) : (
+            <OwnedCard
+              key={card.id}
+              card={card}
+              setSelectedCard={setSelectedCard}
+            />
+          )
+        )}
 
       {activeTab === 2 &&
         burntCards.map((card) => <BurntCard key={card.id} card={card} />)}
