@@ -24,7 +24,7 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({
   console.log("Data:", data);
 
   return (
-    <PowerCardContainer>
+    <PowerCardContainer style={{ paddingBottom: "136%" }}>
       <div className="card-side front">
         <img src={zengarden} alt="Example" />
       </div>

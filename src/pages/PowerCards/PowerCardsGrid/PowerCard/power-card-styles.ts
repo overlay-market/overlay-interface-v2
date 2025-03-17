@@ -2,7 +2,6 @@ import styled from "styled-components";
 
 export const PowerCardContainer = styled.div`
   width: 100%;
-  padding-bottom: 136%;
   position: relative;
   perspective: 1000px;
   cursor: pointer;
