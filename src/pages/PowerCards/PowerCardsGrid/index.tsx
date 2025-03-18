@@ -78,7 +78,6 @@ export function PowerCardsGrid({
             key={card.id}
             card={card}
             setSelectedCard={setSelectedCard}
-            isOwned={false}
           />
         ))}
 

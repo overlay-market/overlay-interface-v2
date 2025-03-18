@@ -17,3 +17,15 @@ export const GET_USERS_POWER_CARDS = gql`
     }
   }
 `;
+export const GET_ALL_POWER_CARDS = gql`
+  query GetAllPowerCards {
+    erc1155Tokens {
+      address
+      id
+      tokenId
+      tokenUri
+      totalBurnt
+      totalSupply
+    }
+  }
+`;
