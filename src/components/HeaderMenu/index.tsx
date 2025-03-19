@@ -25,7 +25,7 @@ import { useModalHelper } from "../ConnectWalletModal/utils";
 const networkLabel = (chainId: number) => {
   const isTestnet = [
     SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
-    SUPPORTED_CHAINID.BARTIO,
+    SUPPORTED_CHAINID.BEPOLIA,
     SUPPORTED_CHAINID.IMOLA,
   ].includes(chainId);
 
