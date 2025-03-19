@@ -9,8 +9,8 @@ export const isImola = (chainId) => {
   return chainId === Number(SUPPORTED_CHAINID.IMOLA)
 }
 
-export const isBartio = (chainId) => {
-  return chainId === Number(SUPPORTED_CHAINID.BARTIO)
+export const isBepolia = (chainId) => {
+  return chainId === Number(SUPPORTED_CHAINID.BEPOLIA)
 }
 
 export const getMarketChartUrl = (value) => {
@@ -20,8 +20,8 @@ export const getMarketChartUrl = (value) => {
     return MARKET_CHART_URL.SEPOLIA
   } else if (isImola(chainId)) {
     return MARKET_CHART_URL.IMOLA
-  } else if (isBartio(chainId)) {
-    return MARKET_CHART_URL.BARTIO
+  } else if (isBepolia(chainId)) {
+    return MARKET_CHART_URL.BEPOLIA
   } else {
     return MARKET_CHART_URL.DEFAULT
   }

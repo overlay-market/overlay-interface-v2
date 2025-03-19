@@ -80,17 +80,17 @@ export const getExplorerLink = (chainId: number, data: string, type: ExplorerDat
     }
   }
 
-  if (chainId === SUPPORTED_CHAINID.BARTIO) {
+  if (chainId === SUPPORTED_CHAINID.BEPOLIA) {
     switch (type) {
       case ExplorerDataType.TRANSACTION:
-        return `https://bartio.beratrail.io/tx/${data}`
+        return `https://bepolia.beratrail.io/tx/${data}`
       case ExplorerDataType.ADDRESS:
       case ExplorerDataType.TOKEN:
-        return `https://bartio.beratrail.io/address/${data}`
+        return `https://bepolia.beratrail.io/address/${data}`
       case ExplorerDataType.BLOCK:
-        return `https://bartio.beratrail.io/block/${data}`
+        return `https://bepolia.beratrail.io/block/${data}`
       default:
-        return `https://bartio.beratrail.io/`
+        return `https://bepolia.beratrail.io`
     }
   }
 
@@ -104,9 +104,6 @@ export const getExplorerLink = (chainId: number, data: string, type: ExplorerDat
       return `${prefix}/token/${data}`
 
     case ExplorerDataType.BLOCK:
-      // if (chainId === SUPPORTED_CHAINID.OPTIMISM || chainId === SUPPORTED_CHAINID.OPTIMISTIC_KOVAN) {
-      //   return `${prefix}/tx/${data}`
-      // }
       return `${prefix}/block/${data}`
 
     case ExplorerDataType.ADDRESS:
