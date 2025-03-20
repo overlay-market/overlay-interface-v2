@@ -4,11 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import theme from "../../theme";
 import {
+  BeraCloud1Img,
+  BeraCloud2Img,
+  BeraCloud3Img,
+  BeraCloud4Img,
   BeraMarketsContainer,
   BeraMarketsContent,
   BeraMarketsWrapper,
+  BottomRightBeraBalloonsImg,
+  ImageWrapper,
   LineSeparator,
   Title,
+  TopLeftBeraBalloonsImg,
 } from "./bera-markets-styles";
 import { TransformedMarketData } from "overlay-sdk";
 import useSDK from "../../providers/SDKProvider/useSDK";
@@ -43,9 +50,9 @@ const BeraMarkets: React.FC = () => {
     if (marketsData.length >= 4) return marketsData;
 
     const baseMarket = marketsData[0] || {
-      marketId: "mock-market-1",
-      price: 1000,
-      priceCurrency: "USD",
+      marketId: " ",
+      price: " ",
+      priceCurrency: " ",
     };
 
     return [...marketsData, ...Array(4 - marketsData.length).fill(baseMarket)];
@@ -85,6 +92,12 @@ const BeraMarkets: React.FC = () => {
       <LineSeparator />
 
       <BeraMarketsContainer>
+        <TopLeftBeraBalloonsImg />
+        <BeraCloud1Img />
+        <BeraCloud2Img />
+        <BeraCloud3Img />
+        <BeraCloud4Img />
+
         <BeraMarketsContent>
           <Title>Berachain Markets</Title>
 
@@ -107,6 +120,10 @@ const BeraMarkets: React.FC = () => {
               ))}
           </Flex>
         </BeraMarketsContent>
+
+        <ImageWrapper>
+          <BottomRightBeraBalloonsImg />
+        </ImageWrapper>
       </BeraMarketsContainer>
     </BeraMarketsWrapper>
   );
