@@ -19,6 +19,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           .VITE_ARBITRUM_SEPOLIA_RPC,
       },
       web3Provider: walletClient as any,
+      useShiva: true,
     });
   }, [chainId, walletClient]);
 
