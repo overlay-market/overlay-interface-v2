@@ -18,6 +18,7 @@ import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
 import { useArcxAnalytics } from "@0xarc-io/analytics";
+import { SHIVA_ADDRESS } from "overlay-sdk/dist/constants";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -130,7 +131,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
     sdk.ovl
       .approve({
-        to: market?.id as Address,
+        to: sdk.core.useShiva ? SHIVA_ADDRESS[sdk.core.chainId] : market?.id as Address,
         amount: maxUint256,
       })
       .then((result) => {
