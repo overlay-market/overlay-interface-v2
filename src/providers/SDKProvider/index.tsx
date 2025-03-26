@@ -14,11 +14,12 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return new OverlaySDK({
       chainId: chainId ? (chainId as number) : (DEFAULT_CHAINID as number),
       rpcUrls: {
-        [SUPPORTED_CHAINID.BARTIO]: import.meta.env.VITE_BARTIO_RPC,
+        [SUPPORTED_CHAINID.BEPOLIA]: import.meta.env.VITE_BEPOLIA_RPC,
         [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: import.meta.env
           .VITE_ARBITRUM_SEPOLIA_RPC,
       },
       web3Provider: walletClient as any,
+      useShiva: true,
     });
   }, [chainId, walletClient]);
 

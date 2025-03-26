@@ -1,5 +1,5 @@
 import { Chain, defineChain } from "viem";
-import { arbitrumSepolia, berachainTestnetbArtio } from "viem/chains";
+import { arbitrumSepolia, berachainBepolia } from "viem/chains";
 import ArbitrumSepoliaLogo from "../assets/images/arbitrum-testnet-logo.webp";
 import ImolaLogo from "../assets/images/imola-logo.webp";
 import BartioLogo from "../assets/images/bartio-logo.webp";
@@ -12,7 +12,7 @@ export enum SUPPORTED_CHAINID {
   ARBITRUM_GÖRLI = 421613,
   ARBITRUM_SEPOLIA = 421614,
   IMOLA = 30732,
-  BARTIO = 80084,
+  BEPOLIA = 80069,
 }
 
 export const DEFAULT_NET = SUPPORTED_CHAINID[421614];
@@ -20,7 +20,7 @@ export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.ARBITRUM_SEPOLI
 
 export const WORKING_CHAINS = [
   SUPPORTED_CHAINID[SUPPORTED_CHAINID.ARBITRUM_SEPOLIA],
-  // SUPPORTED_CHAINID[SUPPORTED_CHAINID.BARTIO],
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.BEPOLIA],
 ];
 
 export const imola = defineChain({
@@ -46,7 +46,7 @@ export const imola = defineChain({
 
 export const VIEM_CHAINS: { [key: number]: Chain } = {
   [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: arbitrumSepolia,
-  [SUPPORTED_CHAINID.BARTIO]: berachainTestnetbArtio,
+  [SUPPORTED_CHAINID.BEPOLIA]: berachainBepolia,
   [SUPPORTED_CHAINID.IMOLA]: imola,
 };
 
@@ -55,16 +55,16 @@ export const NETWORK_ICONS: {
 } = {
   [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
   [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
-  [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
+  [SUPPORTED_CHAINID.BEPOLIA]: BartioLogo,
 };
 
 export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
   [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: "Arbitrum Sepolia",
   [SUPPORTED_CHAINID.IMOLA]: "Movement",
-  // [SUPPORTED_CHAINID.BARTIO]: "Berachain bArtio",
+  [SUPPORTED_CHAINID.BEPOLIA]: "Berachain Bepolia",
 };
 
 export const CHAIN_LIST_ORDER: { [x: number]: number } = {
-  // [0]: SUPPORTED_CHAINID.BARTIO,
+  [0]: SUPPORTED_CHAINID.BEPOLIA,
   [1]: SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
 };
