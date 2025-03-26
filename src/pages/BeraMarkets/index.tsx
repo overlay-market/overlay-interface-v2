@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Grid, Text } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
@@ -101,7 +101,11 @@ const BeraMarkets: React.FC = () => {
         <BeraMarketsContent>
           <Title>Berachain Markets</Title>
 
-          <Flex gap={{ initial: "12px", lg: "16px" }} wrap={"wrap"}>
+          <Grid
+            columns={{ initial: "2", lg: "4" }}
+            width="auto"
+            gap={{ initial: "12px", lg: "16px" }}
+          >
             {mockMarkets &&
               mockMarkets.map((market, index) => (
                 <MarketCards
@@ -118,7 +122,7 @@ const BeraMarkets: React.FC = () => {
                   title={decodeURIComponent(market.marketId)}
                 />
               ))}
-          </Flex>
+          </Grid>
         </BeraMarketsContent>
 
         <ImageWrapper>

@@ -75,14 +75,12 @@ export const BeraMarketsContainer = styled(Flex)`
 export const BeraMarketsContent = styled(Flex)`
   flex-direction: column;
   align-items: start;
-  width: 100%;
   gap: 12px;
   padding: 28px 16px 170px;
   position: relative;
   z-index: 2;
   
   @media (min-width: ${theme.breakpoints.sm}) {    
-    max-width: 956px;
     gap: 20px;
     padding: 80px 22px 260px;
   } 
@@ -116,6 +114,7 @@ export const Title = styled(Text)`
     font-size: 32px;
     font-weight: 700;
     text-shadow: none;
+    letter-spacing: -1.8px;
   }
 `
 
@@ -240,7 +239,7 @@ export const BeraCloud4Img = styled(Flex)`
     width: 132px;
     height: 45px;
     top: 66px;
-    right: 22%;
+    right: 21%;
   }  
 
   @media (min-width: ${theme.breakpoints.lg}) {   
