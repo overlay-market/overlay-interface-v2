@@ -1,5 +1,5 @@
 import { Flex, Grid, Text } from "@radix-ui/themes";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import theme from "../../theme";
@@ -21,13 +21,20 @@ import { TransformedMarketData } from "overlay-sdk";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import MarketCards from "../../components/MarketCards";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { BERA_MARKETS } from "../../constants/markets";
 
 const BeraMarkets: React.FC = () => {
   const navigate = useNavigate();
 
   const sdk = useSDK();
 
-  const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
+  const [beraMarkets, setBeraMarkets] = useState<TransformedMarketData[]>([
+    ...Array(4).fill({
+      marketId: "",
+      price: "",
+      priceCurrency: "",
+    }),
+  ]);
 
   useEffect(() => {
     if (!sdk || !sdk.markets) return;
@@ -35,8 +42,13 @@ const BeraMarkets: React.FC = () => {
     const fetchData = async () => {
       try {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
-          activeMarkets && setMarketsData(activeMarkets);
-          console.log({ activeMarkets });
+          if (activeMarkets) {
+            const filteredMarkets = activeMarkets.filter((market) =>
+              BERA_MARKETS.includes(market.marketId)
+            );
+
+            setBeraMarkets(filteredMarkets);
+          }
         });
       } catch (error) {
         console.error("Error fetching markets:", error);
@@ -45,18 +57,6 @@ const BeraMarkets: React.FC = () => {
 
     fetchData();
   }, [sdk]);
-
-  const mockMarkets = useMemo(() => {
-    if (marketsData.length >= 4) return marketsData;
-
-    const baseMarket = marketsData[0] || {
-      marketId: " ",
-      price: " ",
-      priceCurrency: " ",
-    };
-
-    return [...marketsData, ...Array(4 - marketsData.length).fill(baseMarket)];
-  }, [marketsData]);
 
   const redirectToMarketsPage = () => {
     navigate(`/markets`);
@@ -106,19 +106,23 @@ const BeraMarkets: React.FC = () => {
             width="auto"
             gap={{ initial: "12px", lg: "16px" }}
           >
-            {mockMarkets &&
-              mockMarkets.map((market, index) => (
+            {beraMarkets &&
+              beraMarkets.map((market, index) => (
                 <MarketCards
                   id={market?.marketId}
                   key={index}
-                  priceWithCurrency={formatPriceWithCurrency(
-                    market.price ?? 0,
-                    market.priceCurrency,
-                    Number(market.price) > 10000 &&
-                      Number(market.price) < 1000000
-                      ? 5
-                      : 4
-                  )}
+                  priceWithCurrency={
+                    market.marketId
+                      ? formatPriceWithCurrency(
+                          market.price ?? 0,
+                          market.priceCurrency,
+                          Number(market.price) > 10000 &&
+                            Number(market.price) < 1000000
+                            ? 5
+                            : 4
+                        )
+                      : ""
+                  }
                   title={decodeURIComponent(market.marketId)}
                 />
               ))}
