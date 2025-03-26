@@ -73,7 +73,7 @@ const Trade: React.FC = () => {
   }, [marketId, handleTradeStateReset]);
 
   return (
-    <TradeContainer direction="column" width={"100%"} mb="100px">
+    <TradeContainer direction="column" mb="100px">
       <TradeHeader />
 
       <Flex direction="column">

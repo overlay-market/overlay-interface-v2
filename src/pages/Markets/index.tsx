@@ -7,13 +7,21 @@ import { TransformedMarketData } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { MainnetIsLiveBanner, MarketsContainer } from "./markets-styles";
+import MainnetIsLive from "../../assets/images/bera-markets-page/mainnetIsLive.webp";
+import MainnetIsLiveMobile from "../../assets/images/bera-markets-page/mainnetIsLiveMobile.webp";
+import { useNavigate } from "react-router-dom";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 const Markets: React.FC = () => {
+  const navigate = useNavigate();
+  const sdk = useSDK();
+  const isMobile = useMediaQuery("(max-width: 519px)");
+
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
   const [totalSupplyChange, setTotalSupplyChange] = useState<
     string | undefined
   >();
-  const sdk = useSDK();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,12 +46,20 @@ const Markets: React.FC = () => {
   }, []);
 
   return (
-    <Flex direction="column" width={"100%"} overflowX={"hidden"}>
+    <MarketsContainer direction="column">
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
-      <FirstSection marketsData={marketsData} />
-      <Carousel marketsData={marketsData} />
-      <MarketsTable marketsData={marketsData} />
-    </Flex>
+
+      <Flex direction="column">
+        <MainnetIsLiveBanner
+          src={isMobile ? MainnetIsLiveMobile : MainnetIsLive}
+          alt="Mainnet is live"
+          onClick={() => navigate("/markets/bera-markets")}
+        />
+        <FirstSection marketsData={marketsData} />
+        <Carousel marketsData={marketsData} />
+        <MarketsTable marketsData={marketsData} />
+      </Flex>
+    </MarketsContainer>
   );
 };
 
