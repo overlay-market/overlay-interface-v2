@@ -82,7 +82,7 @@ export const BeraMarketsContent = styled(Flex)`
   
   @media (min-width: ${theme.breakpoints.sm}) {    
     gap: 20px;
-    padding: 80px 22px 260px;
+    padding: 80px 22px 140px;
   } 
 
   @media (min-width: ${theme.breakpoints.lg}) {    
@@ -271,8 +271,8 @@ export const BottomRightBeraBalloonsImg = styled(Flex)`
   }  
 
   @media (min-width: ${theme.breakpoints.lg}) {   
-    bottom: -12px;
-    right: -6px;
+    bottom: -62px;
+    right: 0px;
     width: 147px;
     height: 268px;
      
