@@ -30,6 +30,7 @@ import L1vL2 from "../assets/images/markets-full-logos/l1-vs-l2-index.webp";
 import L1 from "../assets/images/markets-full-logos/l1-index.webp";
 import HoneryJar from "../assets/images/markets-full-logos/honeyjar.webp";
 import DeFi from "../assets/images/markets-full-logos/defi-index.webp";
+import DefaultLogo from '../assets/images/markets-full-logos/dafault-logo.webp';
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -63,6 +64,8 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Layer%201%20Index": L1,
   "HoneyComb%20and%20Jars%20NFT%20Index": HoneryJar,
   "Defi%20Index": DeFi,
+  Bullas: DefaultLogo,
+  "IBGT%2FBERA": DefaultLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -74,6 +77,8 @@ export const MARKETSORDER = [
   "BTC%20Dominance",
   "ETH%20Dominance",
   "Bera%20NFT%20Index",
+  "Bullas",
+  "IBGT%2FBERA",
   "Mr%20Beast%20Popularity%20Index",
   "AI%20Agents%20Index",
   "AI%20Index",
@@ -111,6 +116,7 @@ export enum CategoryName {
   Crypto = "Crypto",
   Chess = "Chess",
   Artists = "Artists",
+  Bera = "Bera",
   Other = "Other",
 }
 
@@ -120,6 +126,7 @@ export type MarketCategoryMap = {
 
 export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Chess]: ["Hikaru%20Nakamura", "Magnus%20Carlsen"],
+  [CategoryName.Bera]: ["Bera%20NFT%20Index", "Bullas", "IBGT%2FBERA"],
   [CategoryName.MemeWar]: [
     "Cats%20vs%20Dogs%20-%20Meme%20War",
     "Cats%20vs%20Frogs%20-%20Meme%20War",
