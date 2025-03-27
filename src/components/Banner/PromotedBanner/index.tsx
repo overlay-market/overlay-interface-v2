@@ -5,8 +5,9 @@ import {
   CardsValue,
 } from "../banners-styles";
 import { Flex } from "@radix-ui/themes";
-import { MARKETS_FULL_LOGOS, MARKETS_VIDEOS } from "../../../constants/markets";
+import { MARKETS_VIDEOS } from "../../../constants/markets";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
+import { getMarketLogo } from "../../../utils/getMarketLogo";
 
 interface PromotedBannerProps {
   Title?: string;
@@ -23,13 +24,13 @@ export const PromotedBanner = ({
 }: PromotedBannerProps) => {
   const redirectToTradePage = useRedirectToTradePage();
   const videoSrc = MARKETS_VIDEOS[Id];
-  const imageSrc = MARKETS_FULL_LOGOS[Id];
+  const imageSrc = getMarketLogo(Id);
 
   return (
     <StyledPromotedBanner
       style={{
         backgroundImage: `${
-          !videoSrc ? "url(" + MARKETS_FULL_LOGOS[Id] + ")" : "none"
+          !videoSrc ? "url(" + getMarketLogo(Id) + ")" : "none"
         }`,
         position: "relative",
         cursor: "pointer",

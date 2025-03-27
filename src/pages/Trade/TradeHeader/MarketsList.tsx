@@ -11,8 +11,9 @@ import {
   DropdownContainer,
   StyledScrollArea,
 } from "./markets-list-styles";
-import { MARKETS_FULL_LOGOS, MARKETSORDER } from "../../../constants/markets";
+import { MARKETSORDER } from "../../../constants/markets";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import { getMarketLogo } from "../../../utils/getMarketLogo";
 
 const MarketsList: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,7 @@ const MarketsList: React.FC = () => {
         <Flex justify={"start"} align={"center"} gap={"10px"}>
           {currentMarket && (
             <CurrentMarketLogo
-              src={MARKETS_FULL_LOGOS[currentMarket.marketId]}
+              src={getMarketLogo(currentMarket.marketId)}
               alt={currentMarket.marketName}
             />
           )}
@@ -57,13 +58,14 @@ const MarketsList: React.FC = () => {
                 sortedMarkets.map((market) => {
                   const currencyPrice = formatPriceWithCurrency(
                     market.parsedMid ?? 0,
-                    market.priceCurrency
+                    market.priceCurrency,
+                    market.marketId
                   );
 
                   return (
                     <Fragment key={market.id}>
                       <MarketItem
-                        marketLogo={MARKETS_FULL_LOGOS[market.marketId]}
+                        marketLogo={getMarketLogo(market.marketId)}
                         marketName={market.marketName}
                         currencyPrice={currencyPrice}
                         marketId={market.marketId}

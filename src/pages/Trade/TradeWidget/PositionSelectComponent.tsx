@@ -53,13 +53,17 @@ const PositionSelectComponent: React.FC = () => {
   useEffect(() => {
     ask &&
       market &&
-      setCurrencyAsk(formatPriceWithCurrency(ask, market.priceCurrency));
+      setCurrencyAsk(
+        formatPriceWithCurrency(ask, market.priceCurrency, market.marketId)
+      );
   }, [ask, market]);
 
   useEffect(() => {
     bid &&
       market &&
-      setCurrencyBid(formatPriceWithCurrency(bid, market.priceCurrency));
+      setCurrencyBid(
+        formatPriceWithCurrency(bid, market.priceCurrency, market.marketId)
+      );
   }, [bid, market]);
 
   const handleSelectPositionSide = useCallback(

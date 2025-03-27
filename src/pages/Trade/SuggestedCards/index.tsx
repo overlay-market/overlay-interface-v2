@@ -133,7 +133,7 @@ const SuggestedCards: React.FC = () => {
   const similarMarketsSectionWidth = useMemo(() => {
     if (similarMarkets) {
       if (similarMarkets && similarMarkets.length === 1) {
-        return "217px";
+        return "176px";
       } else if (isTablet || similarMarkets.length === 2) {
         return "364px";
       } else if (isMobile) {
@@ -183,6 +183,7 @@ const SuggestedCards: React.FC = () => {
                       priceWithCurrency={formatPriceWithCurrency(
                         market.parsedMid ?? 0,
                         market.priceCurrency,
+                        market.marketId,
                         Number(market.parsedMid) > 10000 &&
                           Number(market.parsedMid) < 1000000
                           ? 5
@@ -226,6 +227,7 @@ const SuggestedCards: React.FC = () => {
                       priceWithCurrency={formatPriceWithCurrency(
                         market.parsedMid ?? 0,
                         market.priceCurrency,
+                        market.marketId,
                         Number(market.parsedMid) > 10000 &&
                           Number(market.parsedMid) < 1000000
                           ? 5

@@ -59,7 +59,9 @@ const TradeHeader: React.FC = () => {
   useEffect(() => {
     market &&
       price &&
-      setCurrencyPrice(formatPriceWithCurrency(price, market.priceCurrency));
+      setCurrencyPrice(
+        formatPriceWithCurrency(price, market.priceCurrency, market.marketId)
+      );
   }, [price, market]);
 
   useEffect(() => {
@@ -108,7 +110,7 @@ const TradeHeader: React.FC = () => {
       <MarketsList />
 
       <MarketInfoContainer>
-        <StyledFlex width={{ initial: "109px", sm: "167px", lg: "119px" }}>
+        <StyledFlex width={{ initial: "149px", sm: "167px", lg: "149px" }}>
           <Text weight="light" style={{ fontSize: "10px" }}>
             Price
           </Text>

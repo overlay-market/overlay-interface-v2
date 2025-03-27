@@ -21,12 +21,14 @@ const Markets: React.FC = () => {
     const fetchData = async () => {
       try {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
-          activeMarkets && setMarketsData(activeMarkets)
-        })
+          activeMarkets && setMarketsData(activeMarkets);
+        });
         sdk.ovl.totalSupplyDayChange().then((supplyChange) => {
           supplyChange &&
-          setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
-        })
+            setTotalSupplyChange(
+              formatPriceWithCurrency(supplyChange, "%", "", 4)
+            );
+        });
       } catch (error) {
         console.error("Error fetching markets:", error);
       }

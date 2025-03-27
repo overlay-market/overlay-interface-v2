@@ -10,13 +10,14 @@ import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
-import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
 import { MarketsLogos } from "./markets-table-styles";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import * as React from "react";
+import { getMarketLogo } from "../../../utils/getMarketLogo";
+
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
 }
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import * as React from "react";
 
 type SortableKeys =
   | "funding"
@@ -361,7 +362,7 @@ export default function MarketsTable({
                   >
                     <Flex style={{ alignItems: "center" }}>
                       <MarketsLogos
-                        src={MARKETS_FULL_LOGOS[market.marketId]}
+                        src={getMarketLogo(market.marketId)}
                         alt={decodeURIComponent(market.marketId)}
                         className="rounded-full"
                       />
@@ -380,6 +381,7 @@ export default function MarketsTable({
                     {formatPriceWithCurrency(
                       market.price ?? 0,
                       market.priceCurrency,
+                      market.marketId,
                       Number(market.price) > 10000 &&
                         Number(market.price) < 1000000
                         ? 5
