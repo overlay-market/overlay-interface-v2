@@ -7,8 +7,8 @@ import {
 } from "./description-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import theme from "../../../theme";
-import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { getMarketLogo } from "../../../utils/getMarketLogo";
 
 const Description: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
@@ -49,7 +49,7 @@ const Description: React.FC = () => {
   };
 
   const hasCurrentMarketFullLogo = Boolean(
-    currentMarket?.marketId && MARKETS_FULL_LOGOS[currentMarket.marketId]
+    currentMarket?.marketId && getMarketLogo(currentMarket.marketId)
   );
 
   return (
@@ -72,7 +72,7 @@ const Description: React.FC = () => {
       >
         {currentMarket && hasCurrentMarketFullLogo ? (
           <MarketImg
-            src={MARKETS_FULL_LOGOS[currentMarket.marketId]}
+            src={getMarketLogo(currentMarket.marketId)}
             alt="market logo"
             width={isMobile ? "60px" : "100%"}
           />

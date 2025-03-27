@@ -32,6 +32,8 @@ import HoneryJar from "../assets/images/markets-full-logos/honeyjar.webp";
 import DeFi from "../assets/images/markets-full-logos/defi-index.webp";
 import DefaultLogo from '../assets/images/markets-full-logos/dafault-logo.webp';
 
+export const DEFAULT_LOGO = DefaultLogo;
+
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
   "Rifles%20-%20CS2%20Skins": RiflesCS2Skins,
@@ -64,8 +66,6 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Layer%201%20Index": L1,
   "HoneyComb%20and%20Jars%20NFT%20Index": HoneryJar,
   "Defi%20Index": DeFi,
-  Bullas: DefaultLogo,
-  "iBGT%20%2F%20BERA": DefaultLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
