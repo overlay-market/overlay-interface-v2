@@ -1,5 +1,4 @@
-import { CardData } from "./types";
-import samuraiJack from "../../assets/images/power-cards/samuraijack.png";
+import { UnifiedCardData } from "./types";
 import {
   Badge,
   Container,
@@ -13,20 +12,53 @@ import {
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import { GradientSolidButton } from "../../components/Button";
+import useAccount from "../../hooks/useAccount";
+import { powerCardsABI } from "./PoweCardsABI";
+import { useWriteContract } from "wagmi";
 
 type OpenedPowerCardProps = {
-  card: CardData;
+  card: UnifiedCardData;
   isOwned?: boolean;
 };
 
 const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
+  const { address: account } = useAccount();
+  const { data: hash, isPending, writeContract } = useWriteContract();
+
+  const handleBurn = async () => {
+    if (!account || !card.id) return;
+
+    try {
+      writeContract({
+        address: card.token?.address as `0x${string}`,
+        abi: powerCardsABI,
+        functionName: "burn",
+        args: [
+          account as `0x${string}`,
+          BigInt(card.token?.tokenId as string),
+          BigInt("1"),
+        ],
+      });
+    } catch (error) {
+      console.error("Error burning card:", error);
+    }
+  };
+
   const buttonText = isOwned ? "Burn this Power Card" : "Get this Power Card";
+
+  const cardDescription =
+    card.ipfsData?.description || "No description available";
+
+  const ipfsImageUrl = `https://blush-select-dog-727.mypinata.cloud/ipfs/${card.ipfsData?.image.replace(
+    "ipfs://",
+    ""
+  )}`;
 
   return (
     <Flex width={"100%"} justify={"center"}>
       <Container>
         <ImgBox>
-          <img src={samuraiJack} alt={card.name} width={"100%"} />
+          <img src={ipfsImageUrl} alt={card.name} width={"100%"} />
         </ImgBox>
 
         <InfoBox>
@@ -37,12 +69,12 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
                 weight={"medium"}
                 style={{ color: theme.color.green2 }}
               >
-                PowerCard
+                {card.ipfsData?.attributes[0]?.value}
               </Text>
             </Badge>
 
             <Text weight={"bold"} style={{ fontSize: "32px" }}>
-              {card.name}
+              {card.ipfsData?.name}
             </Text>
 
             <Details>
@@ -51,8 +83,8 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
                   Stats
                 </Text>
                 <Flex direction={"column"} align={"end"}>
-                  <TextItem>{card.rarity}</TextItem>
-                  <TextItem>{card.duration}</TextItem>
+                  <TextItem>{card.ipfsData?.attributes[1]?.value}</TextItem>
+                  <TextItem>{card.ipfsData?.attributes[4]?.value}</TextItem>
                 </Flex>
               </StatsDetails>
 
@@ -61,12 +93,7 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
                   Info
                 </Text>
                 <Flex direction={"column"} align={"end"}>
-                  <TextItem>Step 1: Get this card</TextItem>
-                  <TextItem>Step 2: Burn this card</TextItem>
-                  <TextItem>Step 3: Trade for 24 hours</TextItem>
-                  <TextItem>
-                    Step 4: OV sent to you at the end of each month
-                  </TextItem>
+                  <Text>{cardDescription}</Text>
                 </Flex>
               </InfoDetails>
             </Details>
@@ -76,7 +103,8 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
             title={buttonText}
             width={"100%"}
             height={"49px"}
-            handleClick={() => console.log(buttonText)}
+            handleClick={isOwned ? handleBurn : () => console.log("Get card")}
+            isDisabled={isPending}
           />
         </InfoBox>
       </Container>

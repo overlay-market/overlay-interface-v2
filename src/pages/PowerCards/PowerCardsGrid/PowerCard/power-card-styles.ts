@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const PowerCardContainer = styled.div`
+interface PowerCardContainerProps {
+  backgroundImageUrl?: string;
+}
+
+export const PowerCardContainer = styled.div<PowerCardContainerProps>`
   width: 100%;
   position: relative;
   perspective: 1000px;
@@ -36,7 +40,9 @@ export const PowerCardContainer = styled.div`
       left: 0;
       right: 0;
       bottom: 0;
-      background: url("/src/assets/images/power-cards/zengarden.png");
+      background: url(${(props) =>
+        props.backgroundImageUrl ||
+        "/src/assets/images/power-cards/zengarden.png"});
       background-size: cover;
       opacity: 0.3;
       transform: scaleX(-1);

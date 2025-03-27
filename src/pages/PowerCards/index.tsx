@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PowerCardsGrid } from "./PowerCardsGrid";
 import {
   Container,
@@ -7,64 +7,102 @@ import {
   PowercardsContent,
 } from "./power-cards-styles";
 import PowerCardsHeader from "./PowerCardsHeader";
-import { CardData } from "./types";
+import { UnifiedCardData } from "./types";
 import OpenedPowerCard from "./OpenedPowerCard";
+import {
+  useAllPowerCards,
+  useUserPowerCards,
+} from "../../hooks/useUserPowerCards";
 
 const tabs = ["All Cards", "My Cards", "Burnt Cards"];
 
-const mockCards: CardData[] = [
-  {
-    id: 1,
-    name: "Breeze of Mt Fuji",
-    image: "/path/to/fuji-image.jpg",
-    effect: "Negative Fees",
-    duration: "Good for 1 day",
-    rarity: "1/2000",
-    status: "available" as const,
-  },
-  {
-    id: 2,
-    name: "Samurai Jack",
-    image: "/path/to/samurai-image.jpg",
-    effect: "Rebate",
-    duration: "On one loss up to 10 OV",
-    rarity: "1/5000",
-    status: "owned" as const,
-  },
-  {
-    id: 3,
-    name: "Zen Garden Gateway",
-    image: "/path/to/zen-image.jpg",
-    effect: "Zero Fees",
-    duration: "Good for 1 day",
-    rarity: "1/2000",
-    status: "burnt" as const,
-  },
-  {
-    id: 4,
-    name: "Zen Garden Gateway",
-    image: "/path/to/zen-image.jpg",
-    effect: "Zero Fees",
-    duration: "Good for 1 day",
-    rarity: "1/2000",
-    status: "burnt" as const,
-  },
-];
+interface ERC1155Token {
+  __typename: string;
+  address: string;
+  id: string;
+  tokenId: string;
+  tokenUri: string;
+  totalBurnt: string;
+  totalSupply: string;
+  ipfsData?: ERC1155Token;
+}
 
 const PowerCards = () => {
   const [activeTab, setActiveTab] = useState(0);
-  const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
+  const [selectedCard, setSelectedCard] = useState<UnifiedCardData | null>(
+    null
+  );
   const [isOwned, setIsOwned] = useState<boolean>(false);
+  const {
+    loading: allCardsLoading,
+    error: allCardsError,
+    data: allCardsData,
+  } = useAllPowerCards();
+  const {
+    loading: userCardsLoading,
+    error: userCardsError,
+    data: userCardsData,
+  } = useUserPowerCards();
+  const [allCardsWithIpfs, setAllCardsWithIpfs] = useState<UnifiedCardData[]>(
+    []
+  );
 
-  const handleSetSelectedCard = (card: CardData, isOwned: boolean) => {
+  const handleSetSelectedCard = (card: UnifiedCardData, isOwned: boolean) => {
     setSelectedCard(card);
     setIsOwned(isOwned);
   };
 
+  useEffect(() => {
+    const fetchIpfsData = async (tokens: ERC1155Token[]) => {
+      if (!tokens?.length) return [];
+
+      const updatedCards = await Promise.all(
+        tokens.map(async (token: ERC1155Token) => {
+          try {
+            if (token.tokenUri) {
+              const ipfsUrl = `https://blush-select-dog-727.mypinata.cloud/ipfs/${token.tokenUri.replace(
+                "ipfs://",
+                ""
+              )}`;
+              const response = await fetch(ipfsUrl);
+              const file = await response.json();
+              return {
+                id: parseInt(token.tokenId),
+                name: token.tokenUri || "Unknown Name",
+                image: token.address,
+                status: "available",
+                address: token.address,
+                ipfsData: file,
+              };
+            }
+          } catch (error) {
+            console.error("Error processing token:", error);
+          }
+          return null;
+        })
+      );
+
+      return updatedCards.filter(Boolean) as UnifiedCardData[];
+    };
+
+    // Process all cards only
+    if (allCardsData?.erc1155Tokens?.length > 0) {
+      fetchIpfsData(allCardsData.erc1155Tokens).then(setAllCardsWithIpfs);
+    }
+  }, [allCardsData]);
+
+  if (allCardsLoading || userCardsLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (allCardsError || userCardsError) {
+    return <p>Error: {allCardsError?.message || userCardsError?.message}</p>;
+  }
+
   return (
     <Container>
       <PowerCardsHeader
-        cardTitle={selectedCard?.name ?? null}
+        cardTitle={selectedCard?.ipfsData?.name ?? null}
         setSelectedCard={setSelectedCard}
       />
 
@@ -89,7 +127,8 @@ const PowerCards = () => {
         ) : (
           <PowerCardsGrid
             activeTab={activeTab}
-            cards={mockCards}
+            allCards={allCardsWithIpfs}
+            userCardsData={userCardsData}
             setSelectedCard={handleSetSelectedCard}
           />
         )}

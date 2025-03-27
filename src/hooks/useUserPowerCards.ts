@@ -7,10 +7,14 @@ import {
   DocumentNode,
   QueryHookOptions,
 } from "@apollo/client";
+import useAccount from "../hooks/useAccount";
 
 export const useUserPowerCards = () => {
-  console.log("GET_USERS_POWER_CARDS:", GET_USERS_POWER_CARDS.loc?.source.body);
-  const { loading, error, data } = useQuery(GET_USERS_POWER_CARDS);
+  const { address: account } = useAccount();
+  const { loading, error, data } = useQuery(GET_USERS_POWER_CARDS, {
+    variables: { accountId: account },
+    skip: !account,
+  });
 
   return {
     loading,
@@ -20,7 +24,6 @@ export const useUserPowerCards = () => {
 };
 
 export const useAllPowerCards = () => {
-  console.log("GET_ALL_POWER_CARDS:", GET_ALL_POWER_CARDS.loc?.source.body);
   const { loading, error, data } = useQuery(GET_ALL_POWER_CARDS);
 
   return {

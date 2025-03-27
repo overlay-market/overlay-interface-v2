@@ -1,9 +1,20 @@
-export interface CardData {
+export interface AllCardData {
   id: number;
   name: string;
   image: string;
-  effect: string;
-  duration: string;
-  rarity: string;
-  status: "available" | "owned" | "burnt";
+  status: string;
+  address: string;
+  ipfsData?: any;
+}
+export interface UnifiedCardData extends Omit<AllCardData, "id"> {
+  id: string;
+  ipfsData?: any;
+  amount?: string;
+  burnt?: string;
+  token?: {
+    tokenUri: string;
+    address: string;
+    id: string;
+    tokenId: string;
+  };
 }

@@ -21,7 +21,7 @@ import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 const client = new ApolloClient({
-  uri: "https://api.goldsky.com/api/public/project_cm3n5avsu08tw01vthbry8fl7/subgraphs/overlay-power-cards/1/gn",
+  uri: "https://api.goldsky.com/api/public/project_cm3n5avsu08tw01vthbry8fl7/subgraphs/overlay-power-cards/latest/gn",
   cache: new InMemoryCache(),
 });
 

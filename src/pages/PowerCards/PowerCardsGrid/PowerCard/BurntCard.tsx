@@ -1,9 +1,9 @@
 import { PowerCardContainer } from "./power-card-styles";
 import zengarden from "../../../../assets/images/power-cards/zengarden.png";
-import { CardData } from "../../types";
+import { UnifiedCardData } from "../../types";
 
 type BurntCardProps = {
-  card: CardData;
+  card: UnifiedCardData;
 };
 
 export const BurntCard: React.FC<BurntCardProps> = () => {
