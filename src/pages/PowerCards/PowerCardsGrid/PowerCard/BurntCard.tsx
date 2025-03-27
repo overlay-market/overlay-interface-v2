@@ -1,17 +1,56 @@
 import { PowerCardContainer } from "./power-card-styles";
-import zengarden from "../../../../assets/images/power-cards/zengarden.png";
 import { UnifiedCardData } from "../../types";
+import { useEffect, useState } from "react";
 
 type BurntCardProps = {
   card: UnifiedCardData;
 };
 
-export const BurntCard: React.FC<BurntCardProps> = () => {
+export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
+  const [cardData, setCardData] = useState<{
+    image: string;
+    name: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchIpfsData = async () => {
+      try {
+        if (card.token?.tokenUri) {
+          const ipfsUrl = `https://blush-select-dog-727.mypinata.cloud/ipfs/${card.token.tokenUri.replace(
+            "ipfs://",
+            ""
+          )}`;
+          const response = await fetch(ipfsUrl);
+          const file = await response.json();
+          setCardData(file);
+        }
+      } catch (error) {
+        console.error("Error fetching IPFS data:", error);
+      }
+    };
+
+    fetchIpfsData();
+  }, [card]);
+
+  const burntCount = parseInt(card.burnt as string) || 0;
+
+  if (!cardData || burntCount <= 0) return null;
+
   return (
-    <PowerCardContainer>
-      <div className="grayscale">
-        <img src={zengarden} alt="Example" />
-      </div>
-    </PowerCardContainer>
+    <>
+      {Array.from({ length: burntCount }).map((_, index) => (
+        <PowerCardContainer key={`burnt-${index}`}>
+          <div className="grayscale">
+            <img
+              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData.image.replace(
+                "ipfs://",
+                ""
+              )}`}
+              alt={cardData.name}
+            />
+          </div>
+        </PowerCardContainer>
+      ))}
+    </>
   );
 };

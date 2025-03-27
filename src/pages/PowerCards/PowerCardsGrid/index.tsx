@@ -39,7 +39,7 @@ export function PowerCardsGrid({
         ))}
 
       {activeTab === 2 &&
-        allCards?.map((card: UnifiedCardData) => (
+        userData?.map((card: UnifiedCardData) => (
           <BurntCard key={card.id} card={card} />
         ))}
 
