@@ -10,7 +10,7 @@ import {
   useTradeState,
 } from "../../../state/trade/hooks";
 import { useCallback, useMemo, useState } from "react";
-import { toWei, TradeStateData } from "overlay-sdk";
+import { toWei, TradeState, TradeStateData } from "overlay-sdk";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
@@ -52,7 +52,11 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   }, [tradeState]);
 
   const isDisabledTradeButton =
-    typedValue && !loading && (title === "Trade" || title === "Approve OVL")
+    typedValue &&
+    !loading &&
+    (title === TradeState.Trade ||
+      title === TradeState.NeedsApproval ||
+      title === TradeState.TradeHighPriceImpact)
       ? false
       : true;
 
@@ -209,25 +213,27 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     <>
       {loading && <GradientLoaderButton title={"Trade"} />}
 
-      {address && !loading && tradeState?.tradeState !== "Approve OVL" && (
-        <GradientOutlineButton
-          title={title ?? "Trade"}
-          width={"100%"}
-          size={isDisabledTradeButton ? "14px" : "16px"}
-          isDisabled={isDisabledTradeButton}
-          handleClick={() => {
-            setTradeConfig({
-              showConfirm: true,
-              attemptingTransaction: false,
-            });
-          }}
-        />
-      )}
+      {address &&
+        !loading &&
+        tradeState?.tradeState !== TradeState.NeedsApproval && (
+          <GradientOutlineButton
+            title={title ?? "Trade"}
+            width={"100%"}
+            size={isDisabledTradeButton ? "14px" : "16px"}
+            isDisabled={isDisabledTradeButton}
+            handleClick={() => {
+              setTradeConfig({
+                showConfirm: true,
+                attemptingTransaction: false,
+              });
+            }}
+          />
+        )}
 
       {address &&
         !loading &&
         tradeState &&
-        tradeState.tradeState === "Approve OVL" &&
+        tradeState.tradeState === TradeState.NeedsApproval &&
         (attemptingTransaction ? (
           <GradientLoaderButton title={"Pending confirmation..."} />
         ) : (
@@ -238,15 +244,17 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           />
         ))}
 
-      {tradeState && tradeState.tradeState === "Trade" && (
-        <ConfirmTxnModal
-          open={showConfirm}
-          tradeState={tradeState}
-          attemptingTransaction={attemptingTransaction}
-          handleDismiss={handleDismiss}
-          handleTrade={handleTrade}
-        />
-      )}
+      {tradeState &&
+        (tradeState.tradeState === TradeState.Trade ||
+          tradeState.tradeState === TradeState.TradeHighPriceImpact) && (
+          <ConfirmTxnModal
+            open={showConfirm}
+            tradeState={tradeState}
+            attemptingTransaction={attemptingTransaction}
+            handleDismiss={handleDismiss}
+            handleTrade={handleTrade}
+          />
+        )}
 
       {!address && (
         <GradientOutlineButton
