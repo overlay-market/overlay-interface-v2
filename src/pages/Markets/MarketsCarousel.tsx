@@ -46,7 +46,6 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
                   priceWithCurrency={formatPriceWithCurrency(
                     market.price ?? 0,
                     market.priceCurrency,
-                    market.marketId,
                     Number(market.price) > 10000 &&
                       Number(market.price) < 1000000
                       ? 5

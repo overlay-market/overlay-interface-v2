@@ -58,16 +58,12 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
       market &&
       typedValue &&
       setCurrencyEstLiquidationPrice(
-        formatPriceWithCurrency(
-          estLiquidationPrice,
-          market.priceCurrency,
-          market.marketId
-        )
+        formatPriceWithCurrency(estLiquidationPrice, market.priceCurrency)
       );
     if (!address || !typedValue) {
       market &&
         setCurrencyEstLiquidationPrice(
-          formatPriceWithCurrency(0, market.priceCurrency, market.marketId)
+          formatPriceWithCurrency(0, market.priceCurrency)
         );
     }
   }, [estLiquidationPrice, market, typedValue, address]);

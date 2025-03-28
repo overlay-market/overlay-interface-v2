@@ -158,5 +158,3 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   ],
   [CategoryName.Other]: [],
 };
-
-export const BERA_CURRENCY_MARKETS = ["Bullas", "iBGT%20%2F%20BERA"]
