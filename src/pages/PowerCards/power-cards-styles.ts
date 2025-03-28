@@ -7,7 +7,7 @@ export const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-  
+
   @media (min-width: ${theme.breakpoints.xxl}) {
     padding-left: ${theme.app.xxlPadding};
   }
@@ -36,7 +36,7 @@ export const TabsContainer = styled.div`
 `;
 
 export const Tab = styled.button.withConfig({
-  shouldForwardProp: (prop) => prop !== 'active',
+  shouldForwardProp: (prop) => prop !== "active",
 })<{ active: boolean }>`
   width: 109px;
   padding: 12px;
@@ -76,8 +76,16 @@ export const Tab = styled.button.withConfig({
 `;
 
 export const EmptyState = styled.div`
-  text-align: center;
-  padding: 48px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 190px 10px;
+  width: 320px;
+  margin: 16px;
+  border: 1px solid ${({ theme }) => theme.color.grey4};
+  border-radius: 8px;
   color: ${({ theme }) => theme.text3};
   font-size: 16px;
+  text-align: center;
 `;

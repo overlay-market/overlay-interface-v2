@@ -2,11 +2,16 @@ import { UnifiedCardData } from "../types";
 import { EmptyState } from "../power-cards-styles";
 import { AvailableCard, BurntCard, OwnedCard } from "./PowerCard";
 import { Container } from "./power-cards-grid-styles";
+import { ExternalLinkIcon } from "@radix-ui/react-icons";
 
 interface PowerCardsGridProps {
   activeTab: number;
   allCards: UnifiedCardData[];
-  userCardsData: UnifiedCardData;
+  userCardsData: {
+    account: {
+      erc1155Tokens: UnifiedCardData[];
+    };
+  };
   setSelectedCard: Function;
 }
 
@@ -16,7 +21,7 @@ export function PowerCardsGrid({
   userCardsData,
   setSelectedCard,
 }: PowerCardsGridProps) {
-  const userData = userCardsData.account.erc1155Tokens;
+  const userData = userCardsData.account?.erc1155Tokens || [];
 
   return (
     <Container>
@@ -48,7 +53,31 @@ export function PowerCardsGrid({
       )}
 
       {userData.length === 0 && activeTab === 1 && (
-        <EmptyState>You don't own any Power Cards yet</EmptyState>
+        <EmptyState>
+          No cards to display
+          <a
+            href="https://testnets.opensea.io/es/collection/powercard"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+              background: "linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+          >
+            See the full collection on OpenSea{" "}
+            <ExternalLinkIcon
+              style={{
+                color: "#ff7cd5",
+              }}
+            />
+          </a>
+        </EmptyState>
       )}
 
       {allCards?.length === 0 && activeTab === 2 && (
