@@ -21,7 +21,7 @@ export function PowerCardsGrid({
   userCardsData,
   setSelectedCard,
 }: PowerCardsGridProps) {
-  const userData = userCardsData.account?.erc1155Tokens || [];
+  const userData = userCardsData?.account?.erc1155Tokens || [];
 
   return (
     <Container>
