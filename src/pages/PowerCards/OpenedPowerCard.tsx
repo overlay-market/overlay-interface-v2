@@ -23,7 +23,7 @@ type OpenedPowerCardProps = {
 
 const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
   const { address: account } = useAccount();
-  const { data: hash, isPending, writeContract } = useWriteContract();
+  const { isPending, writeContract } = useWriteContract();
 
   const handleBurn = async () => {
     if (!account || !card.id) return;

@@ -41,7 +41,7 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({
 
   return (
     <>
-      {Array.from({ length: card.amount }, (_, index) => (
+      {Array.from({ length: Number(card.amount) || 0 }, (_, index) => (
         <PowerCardContainer
           key={`${card.token?.tokenId}-${index}`}
           style={{ paddingBottom: "136%" }}

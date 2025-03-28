@@ -67,7 +67,7 @@ const PowerCards = () => {
               const response = await fetch(ipfsUrl);
               const file = await response.json();
               return {
-                id: parseInt(token.tokenId),
+                id: token.tokenId.toString(),
                 name: token.tokenUri || "Unknown Name",
                 image: token.address,
                 status: "available",
