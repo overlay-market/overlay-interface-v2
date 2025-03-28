@@ -1,35 +1,38 @@
-import AiIndex from "../assets/images/markets-full-logos/AI-Index.png";
-import BTCDominance from "../assets/images/markets-full-logos/BTC-Dominance.png";
-import RealEstateDominance from "../assets/images/markets-full-logos/Real-Estate-Dominance.png";
-import SuperETH from "../assets/images/markets-full-logos/Super-ETH.png";
-import CatsVsDogs from "../assets/images/markets-full-logos/cats-vs-dogs.png";
-import CatsVsFrogs from "../assets/images/markets-full-logos/cats-vs-frogs.png";
-import EvIndex from "../assets/images/markets-full-logos/ev-index.png";
-import FrogsVsDogs from "../assets/images/markets-full-logos/frogs-vs-dogs.png";
-import HikaruNakamura from "../assets/images/markets-full-logos/hikaru-nakamura.png";
-import KnivesCS2Skins from "../assets/images/markets-full-logos/knives-CS2-Skins.png";
-import KnivesVsRiflesCS2Skins from "../assets/images/markets-full-logos/knives-vs-rifles-CS2-Skins.png";
-import MagnusCarlsen from "../assets/images/markets-full-logos/magnus-carlsen.png";
-import QuantumCats from "../assets/images/markets-full-logos/quantum-cats.png";
-import RiflesCS2Skins from "../assets/images/markets-full-logos/rifles-CS2-Skins.png";
-import CS2Skins from "../assets/images/markets-full-logos/cs2-index.png";
-import ETHDominance from "../assets/images/markets-full-logos/eth-dom.png";
-import BTCFrog from "../assets/images/markets-full-logos/btc-frogs.png";
-import NodeMonkes from "../assets/images/markets-full-logos/node-monkes.png";
-import ETHSOL from "../assets/images/markets-full-logos/eth-sol.png";
-import INK from "../assets/images/markets-full-logos/ink.jpeg";
+import AiIndex from "../assets/images/markets-full-logos/AI-Index.webp";
+import BTCDominance from "../assets/images/markets-full-logos/BTC-Dominance.webp";
+import RealEstateDominance from "../assets/images/markets-full-logos/Real-Estate-Dominance.webp";
+import SuperETH from "../assets/images/markets-full-logos/Super-ETH.webp";
+import CatsVsDogs from "../assets/images/markets-full-logos/cats-vs-dogs.webp";
+import CatsVsFrogs from "../assets/images/markets-full-logos/cats-vs-frogs.webp";
+import EvIndex from "../assets/images/markets-full-logos/ev-index.webp";
+import FrogsVsDogs from "../assets/images/markets-full-logos/frogs-vs-dogs.webp";
+import HikaruNakamura from "../assets/images/markets-full-logos/hikaru-nakamura.webp";
+import KnivesCS2Skins from "../assets/images/markets-full-logos/knives-CS2-Skins.webp";
+import KnivesVsRiflesCS2Skins from "../assets/images/markets-full-logos/knives-vs-rifles-CS2-Skins.webp";
+import MagnusCarlsen from "../assets/images/markets-full-logos/magnus-carlsen.webp";
+import QuantumCats from "../assets/images/markets-full-logos/quantum-cats.webp";
+import RiflesCS2Skins from "../assets/images/markets-full-logos/rifles-CS2-Skins.webp";
+import CS2Skins from "../assets/images/markets-full-logos/cs2-index.webp";
+import ETHDominance from "../assets/images/markets-full-logos/eth-dom.webp";
+import BTCFrog from "../assets/images/markets-full-logos/btc-frogs.webp";
+import NodeMonkes from "../assets/images/markets-full-logos/node-monkes.webp";
+import ETHSOL from "../assets/images/markets-full-logos/eth-sol.webp";
+import INK from "../assets/images/markets-full-logos/ink.webp";
 import ChessVideo from "../assets/videos/FuturisticChessMatch.mp4";
-import LanaDelRey from "../assets/images/markets-full-logos/lana-del-rey.png";
-import BeraNFT from "../assets/images/markets-full-logos/Bera-Nft-Index.png";
-import AiAgents from "../assets/images/markets-full-logos/AI-Agents-Index.png";
-import TrumpFamily from "../assets/images/markets-full-logos/trump-family-index.png";
-import MrBeast from "../assets/images/markets-full-logos/mrbeast-yt-index.png";
-import MemesIndex from "../assets/images/markets-full-logos/meme-index.png";
-import L2 from "../assets/images/markets-full-logos/l2-index.png";
-import L1vL2 from "../assets/images/markets-full-logos/l1-vs-l2-index.png";
-import L1 from "../assets/images/markets-full-logos/l1-index.png";
-import HoneryJar from "../assets/images/markets-full-logos/honeyjar.png";
-import DeFi from "../assets/images/markets-full-logos/defi-index.png";
+import LanaDelRey from "../assets/images/markets-full-logos/lana-del-rey.webp";
+import BeraNFT from "../assets/images/markets-full-logos/Bera-Nft-Index.webp";
+import AiAgents from "../assets/images/markets-full-logos/AI-Agents-Index.webp";
+import TrumpFamily from "../assets/images/markets-full-logos/trump-family-index.webp";
+import MrBeast from "../assets/images/markets-full-logos/mrbeast-yt-index.webp";
+import MemesIndex from "../assets/images/markets-full-logos/meme-index.webp";
+import L2 from "../assets/images/markets-full-logos/l2-index.webp";
+import L1vL2 from "../assets/images/markets-full-logos/l1-vs-l2-index.webp";
+import L1 from "../assets/images/markets-full-logos/l1-index.webp";
+import HoneryJar from "../assets/images/markets-full-logos/honeyjar.webp";
+import DeFi from "../assets/images/markets-full-logos/defi-index.webp";
+import DefaultLogo from '../assets/images/markets-full-logos/dafault-logo.webp';
+
+export const DEFAULT_LOGO = DefaultLogo;
 
 export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Counter-Strike%202%20Skins": CS2Skins,
@@ -74,6 +77,8 @@ export const MARKETSORDER = [
   "BTC%20Dominance",
   "ETH%20Dominance",
   "Bera%20NFT%20Index",
+  "Bullas",
+  "iBGT%20%2F%20BERA",
   "Mr%20Beast%20Popularity%20Index",
   "AI%20Agents%20Index",
   "AI%20Index",
@@ -105,13 +110,14 @@ export const MARKETSORDER = [
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
 
 export enum CategoryName {
-  MemeWar = 'Meme Wars',
-  CounterStrikeSkins = 'Counter-Strike',
-  OrdinalNft = 'Ordinals',
-  Crypto = 'Crypto',
-  Chess = 'Chess',
-  Artists = 'Artists',
-  Other = 'Other',
+  MemeWar = "Meme Wars",
+  CounterStrikeSkins = "Counter-Strike",
+  OrdinalNft = "Ordinals",
+  Crypto = "Crypto",
+  Chess = "Chess",
+  Artists = "Artists",
+  Bera = "Bera",
+  Other = "Other",
 }
 
 export type MarketCategoryMap = {
@@ -119,10 +125,8 @@ export type MarketCategoryMap = {
 };
 
 export const MARKET_CATEGORIES: MarketCategoryMap = {
-  [CategoryName.Chess]: [
-    "Hikaru%20Nakamura",
-    "Magnus%20Carlsen",
-  ],
+  [CategoryName.Chess]: ["Hikaru%20Nakamura", "Magnus%20Carlsen"],
+  [CategoryName.Bera]: ["Bera%20NFT%20Index", "Bullas", "iBGT%20%2F%20BERA"],
   [CategoryName.MemeWar]: [
     "Cats%20vs%20Dogs%20-%20Meme%20War",
     "Cats%20vs%20Frogs%20-%20Meme%20War",
@@ -152,7 +156,5 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "Lana%20Del%20Rey",
     "Mr%20Beast%20Popularity%20Index",
   ],
-  [CategoryName.Other]: [
-
-  ],
-}
+  [CategoryName.Other]: [],
+};

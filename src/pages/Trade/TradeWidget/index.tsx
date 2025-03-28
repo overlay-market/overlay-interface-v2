@@ -46,6 +46,16 @@ const TradeWidget: React.FC = () => {
   const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
 
   useEffect(() => {
+    setDisplayedLeverage(selectedLeverage);
+  }, [selectedLeverage]);
+
+  useEffect(() => {
+    if (debouncedSelectedLeverage !== null) {
+      handleLeverageSelect(debouncedSelectedLeverage);
+    }
+  }, [debouncedSelectedLeverage]);
+
+  useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
     setLoading(false);
 
@@ -121,12 +131,6 @@ const TradeWidget: React.FC = () => {
     setLeverageInputValue(stringValue);
     setDisplayedLeverage(stringValue);
   };
-
-  useEffect(() => {
-    if (debouncedSelectedLeverage !== null) {
-      handleLeverageSelect(debouncedSelectedLeverage);
-    }
-  }, [debouncedSelectedLeverage]);
 
   return (
     <TradeWidgetContainer

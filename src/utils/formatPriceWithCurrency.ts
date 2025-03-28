@@ -5,5 +5,5 @@ export const formatPriceWithCurrency = (price: string | number, priceCurrency: s
       ? toPercentUnit(price).toString() 
       : toScientificNumber(limitDigitsInDecimals(price.toString().replaceAll(",", "")), significantFigures);
 
-  return priceCurrency === '%' ? formattedPrice + priceCurrency : priceCurrency + formattedPrice
+  return priceCurrency === 'BERA' ? formattedPrice + ' BERA' : priceCurrency === '%' ? formattedPrice + priceCurrency : priceCurrency + formattedPrice
 }
