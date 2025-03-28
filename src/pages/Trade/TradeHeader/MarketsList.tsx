@@ -58,8 +58,7 @@ const MarketsList: React.FC = () => {
                 sortedMarkets.map((market) => {
                   const currencyPrice = formatPriceWithCurrency(
                     market.parsedMid ?? 0,
-                    market.priceCurrency,
-                    market.marketId
+                    market.priceCurrency
                   );
 
                   return (

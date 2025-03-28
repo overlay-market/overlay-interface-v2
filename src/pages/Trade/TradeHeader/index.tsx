@@ -59,9 +59,7 @@ const TradeHeader: React.FC = () => {
   useEffect(() => {
     market &&
       price &&
-      setCurrencyPrice(
-        formatPriceWithCurrency(price, market.priceCurrency, market.marketId)
-      );
+      setCurrencyPrice(formatPriceWithCurrency(price, market.priceCurrency));
   }, [price, market]);
 
   useEffect(() => {

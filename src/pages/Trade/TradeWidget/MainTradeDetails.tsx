@@ -39,9 +39,7 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
     price &&
       typedValue &&
       market &&
-      setCurrencyPrice(
-        formatPriceWithCurrency(price, market.priceCurrency, market.marketId)
-      );
+      setCurrencyPrice(formatPriceWithCurrency(price, market.priceCurrency));
   }, [price, market, typedValue]);
 
   useEffect(() => {
@@ -49,7 +47,7 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
       typedValue &&
       market &&
       setCurrencyMinPrice(
-        formatPriceWithCurrency(minPrice, market.priceCurrency, market.marketId)
+        formatPriceWithCurrency(minPrice, market.priceCurrency)
       );
   }, [minPrice, market, typedValue]);
 

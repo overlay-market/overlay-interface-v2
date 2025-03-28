@@ -183,7 +183,6 @@ const SuggestedCards: React.FC = () => {
                       priceWithCurrency={formatPriceWithCurrency(
                         market.parsedMid ?? 0,
                         market.priceCurrency,
-                        market.marketId,
                         Number(market.parsedMid) > 10000 &&
                           Number(market.parsedMid) < 1000000
                           ? 5
@@ -227,7 +226,6 @@ const SuggestedCards: React.FC = () => {
                       priceWithCurrency={formatPriceWithCurrency(
                         market.parsedMid ?? 0,
                         market.priceCurrency,
-                        market.marketId,
                         Number(market.parsedMid) > 10000 &&
                           Number(market.parsedMid) < 1000000
                           ? 5
