@@ -3,9 +3,9 @@ import styled from "styled-components";
 import theme from "./theme";
 
 export const AppContainer = styled(Flex)`
-  width: calc(100vw);
-  padding-right: 12px;
-  padding-left: 12px;
+  width: 100vw;
+  padding-right: ${theme.app.mobilePadding};
+  padding-left: ${theme.app.mobilePadding};
   min-height: 100vh;
   background: ${theme.color.background};
 
@@ -14,8 +14,12 @@ export const AppContainer = styled(Flex)`
   }
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: calc(100vw - 20px);
-    padding-right: 20px;
+    width: calc(100vw - var(--scrollbar-width));
+    padding-right: ${theme.app.rightPadding};
     padding-left: 0px;
+  }
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    padding-right: ${theme.app.xxlPadding};
   }
 `;
