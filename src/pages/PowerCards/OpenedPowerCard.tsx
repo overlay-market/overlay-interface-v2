@@ -44,6 +44,11 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
     }
   };
 
+  const handleGetCard = () => {
+    const openSeaUrl = `https://testnets.opensea.io/es/assets/arbitrum_sepolia/${card.address}/${card.id}`;
+    window.open(openSeaUrl, "_blank");
+  };
+
   const buttonText = isOwned ? "Burn this Power Card" : "Get this Power Card";
 
   const cardDescription =
@@ -103,7 +108,7 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
             title={buttonText}
             width={"100%"}
             height={"49px"}
-            handleClick={isOwned ? handleBurn : () => console.log("Get card")}
+            handleClick={isOwned ? handleBurn : handleGetCard}
             isDisabled={isPending}
           />
         </InfoBox>
