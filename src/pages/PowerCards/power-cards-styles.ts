@@ -16,6 +16,7 @@ export const Container = styled.div`
 export const PowercardsContent = styled(Flex)`
   flex-direction: column;
   padding-top: 16px;
+  padding-bottom: 80px;
 
   @media (min-width: ${theme.breakpoints.sm}) {
     padding-left: 16px;
