@@ -3,6 +3,7 @@ import { EmptyState } from "../power-cards-styles";
 import { AvailableCard, BurntCard, OwnedCard } from "./PowerCard";
 import { Container } from "./power-cards-grid-styles";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import useAccount from "../../../hooks/useAccount";
 
 interface PowerCardsGridProps {
@@ -24,9 +25,10 @@ export function PowerCardsGrid({
 }: PowerCardsGridProps) {
   const userData = userCardsData?.account?.erc1155Tokens || [];
   const { address: account } = useAccount();
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (
-    <Container>
+    <Container style={isMobile ? { alignSelf: "center" } : undefined}>
       {activeTab === 0 && (
         <>
           {allCards.map((card: UnifiedCardData) => (
