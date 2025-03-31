@@ -37,7 +37,7 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({
     fetchIpfsData();
   }, [card]);
 
-  if (!cardData) return <div>Loading...</div>;
+  if (!cardData && Number(card.amount) !== 0) return <div>Loading...</div>;
 
   return (
     <>
@@ -45,18 +45,18 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({
         <PowerCardContainer
           key={`${card.token?.tokenId}-${index}`}
           style={{ paddingBottom: "136%" }}
-          backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData.image.replace(
+          backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
             "ipfs://",
             ""
           )}`}
         >
           <div className="card-side front">
             <img
-              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData.image.replace(
+              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
                 "ipfs://",
                 ""
               )}`}
-              alt={cardData.name}
+              alt={cardData?.name}
             />
           </div>
           <div className="card-side back">

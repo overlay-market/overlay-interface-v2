@@ -34,7 +34,7 @@ export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
 
   const burntCount = parseInt(card.burnt as string) || 0;
 
-  if (!cardData || burntCount <= 0) return null;
+  if (!cardData || burntCount <= 0) return <div>Loading...</div>;
 
   return (
     <>
