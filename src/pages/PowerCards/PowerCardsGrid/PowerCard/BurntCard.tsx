@@ -34,7 +34,7 @@ export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
 
   const burntCount = parseInt(card.burnt as string) || 0;
 
-  if (!cardData || burntCount <= 0) return <div>Loading...</div>;
+  if (!cardData && Number(card.burnt) !== 0) return <div>Loading...</div>;
 
   return (
     <>
@@ -42,11 +42,11 @@ export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
         <PowerCardContainer key={`burnt-${index}`}>
           <div className="grayscale">
             <img
-              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData.image.replace(
+              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
                 "ipfs://",
                 ""
               )}`}
-              alt={cardData.name}
+              alt={cardData?.name}
             />
           </div>
         </PowerCardContainer>
