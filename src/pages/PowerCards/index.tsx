@@ -28,11 +28,23 @@ interface ERC1155Token {
 }
 
 const PowerCards = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(() => {
+    const savedTab = localStorage.getItem("powerCardsActiveTab");
+    return savedTab ? parseInt(savedTab) : 0;
+  });
+
   const [selectedCard, setSelectedCard] = useState<UnifiedCardData | null>(
-    null
+    () => {
+      const savedCard = localStorage.getItem("powerCardsSelectedCard");
+      return savedCard ? JSON.parse(savedCard) : null;
+    }
   );
-  const [isOwned, setIsOwned] = useState<boolean>(false);
+
+  const [isOwned, setIsOwned] = useState<boolean>(() => {
+    const savedIsOwned = localStorage.getItem("powerCardsIsOwned");
+    return savedIsOwned ? JSON.parse(savedIsOwned) : false;
+  });
+
   const {
     loading: allCardsLoading,
     error: allCardsError,
@@ -50,6 +62,13 @@ const PowerCards = () => {
   const handleSetSelectedCard = (card: UnifiedCardData, isOwned: boolean) => {
     setSelectedCard(card);
     setIsOwned(isOwned);
+    localStorage.setItem("powerCardsSelectedCard", JSON.stringify(card));
+    localStorage.setItem("powerCardsIsOwned", JSON.stringify(isOwned));
+  };
+
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+    localStorage.setItem("powerCardsActiveTab", index.toString());
   };
 
   useEffect(() => {
@@ -103,7 +122,13 @@ const PowerCards = () => {
     <Container>
       <PowerCardsHeader
         cardTitle={selectedCard?.ipfsData?.name ?? null}
-        setSelectedCard={setSelectedCard}
+        setSelectedCard={(card: UnifiedCardData | null) => {
+          setSelectedCard(card);
+          if (card === null) {
+            localStorage.removeItem("powerCardsSelectedCard");
+            localStorage.removeItem("powerCardsIsOwned");
+          }
+        }}
       />
 
       <PowercardsContent>
@@ -113,7 +138,7 @@ const PowerCards = () => {
               <Tab
                 key={tab}
                 active={activeTab === index}
-                onClick={() => setActiveTab(index)}
+                onClick={() => handleTabChange(index)}
                 data-text={tab}
               >
                 {tab}
