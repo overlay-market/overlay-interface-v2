@@ -5,8 +5,8 @@ import {
   CardsTitle,
 } from "./market-cards-styles";
 import { Skeleton } from "@radix-ui/themes";
-import { MARKETS_FULL_LOGOS } from "../../constants/markets";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
+import { getMarketLogo } from "../../utils/getMarketLogo";
 
 interface MarketCardsProps {
   priceWithCurrency: string;
@@ -20,7 +20,7 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
     <Skeleton loading={false}>
       <CustomCard
         style={{
-          backgroundImage: `url(${MARKETS_FULL_LOGOS[id]})`,
+          backgroundImage: `url(${getMarketLogo(id)})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           cursor: "pointer",

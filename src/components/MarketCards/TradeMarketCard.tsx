@@ -1,5 +1,4 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { MARKETS_FULL_LOGOS } from "../../constants/markets";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 import {
   CardImg,
@@ -10,6 +9,7 @@ import {
 import theme from "../../theme";
 import PercentWithSign from "./PercentWithSign";
 import { useLayoutEffect, useRef, useState } from "react";
+import { getMarketLogo } from "../../utils/getMarketLogo";
 
 interface TradeMarketCardProps {
   priceWithCurrency: string;
@@ -45,7 +45,7 @@ const TradeMarketCard = ({
 
   return (
     <CustomCard onClick={() => redirectToTradePage(id)}>
-      <CardImg style={{ backgroundImage: `url(${MARKETS_FULL_LOGOS[id]})` }} />
+      <CardImg style={{ backgroundImage: `url(${getMarketLogo(id)})` }} />
 
       <Flex
         direction={"column"}

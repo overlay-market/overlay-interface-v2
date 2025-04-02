@@ -31,10 +31,11 @@ const CollateralInputComponent: React.FC = () => {
             await sdk.trade.getMaxInputIncludingFees(
               marketId,
               address,
-              toWei(selectedLeverage)
+              toWei(selectedLeverage),
+              6
             );
           maxInputIncludingFees &&
-            setMaxInputIncludingFees(Number(maxInputIncludingFees.toFixed(6)));
+            setMaxInputIncludingFees(maxInputIncludingFees);
         } catch (error) {
           console.error("Error fetching maxInputIncludingFees:", error);
         }
