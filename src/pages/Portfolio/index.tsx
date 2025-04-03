@@ -12,15 +12,11 @@ import Overview from "./Overview";
 
 const Portfolio: React.FC = () => {
   return (
-    <PortfolioContainer direction="column" width={"100%"} overflowX={"hidden"}>
+    <PortfolioContainer direction="column">
       <HeaderEmptyPlaceholder></HeaderEmptyPlaceholder>
       <LineSeparator />
 
-      <Flex
-        direction="column"
-        width={"100%"}
-        px={{ initial: "0px", sm: "8px" }}
-      >
+      <Flex direction="column" pl={{ sm: "8px" }} overflowX={"hidden"}>
         <Overview />
         <OpenPositionsTable />
         <UnwindsTable />
