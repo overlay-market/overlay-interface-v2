@@ -16,12 +16,16 @@ import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 // import Leaderboard from "./pages/Leaderboard";
+import useScrollbarWidth from "./hooks/useScrollbarWidth";
+import BeraMarkets from "./pages/BeraMarkets";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
   useSyncChainQuery(chainIdRef);
 
   const { chainId: contextChainID } = useMultichainContext();
+
+  useScrollbarWidth();
 
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
@@ -37,6 +41,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Navigate to="/markets" />} />
                 <Route path="/markets" element={<Markets />} />
+                <Route path="/markets/bera-markets" element={<BeraMarkets />} />
                 <Route
                   path="/trade"
                   element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
