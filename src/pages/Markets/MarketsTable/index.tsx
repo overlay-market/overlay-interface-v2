@@ -307,6 +307,7 @@ export default function MarketsTable({
                   style={{ width: "100%" }}
                 >
                   <span>Funding</span>
+                  <span>24h</span>
                   {sortConfig?.key === "funding" && (
                     <span style={{ display: "flex", alignItems: "center" }}>
                       {sortConfig.direction === "ascending" ? (
