@@ -438,6 +438,7 @@ export default function MarketsTable({
                           {market.funding && Number(market.funding) < 0
                             ? market.funding
                             : `+${market.funding}`}
+                          %
                         </span>
                       </Table.Cell>
                       <Table.Cell>
