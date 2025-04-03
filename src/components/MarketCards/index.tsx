@@ -12,9 +12,15 @@ interface MarketCardsProps {
   priceWithCurrency: string;
   title: string;
   id: string;
+  mobilewidth?: string;
 }
 
-const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
+const MarketCards = ({
+  priceWithCurrency,
+  title,
+  id,
+  mobilewidth,
+}: MarketCardsProps) => {
   const redirectToTradePage = useRedirectToTradePage();
   return (
     <Skeleton loading={false}>
@@ -26,6 +32,7 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
           cursor: "pointer",
           width: 200,
         }}
+        mobilewidth={mobilewidth}
         onClick={() => redirectToTradePage(id)}
       >
         <CardContent direction="column" align="center">
