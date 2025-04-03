@@ -4,24 +4,20 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import theme from "../../theme";
 import {
-  BeraCloud1Img,
-  BeraCloud2Img,
-  BeraCloud3Img,
-  BeraCloud4Img,
+  BeraCloudImg,
   BeraMarketsContainer,
   BeraMarketsContent,
   BeraMarketsWrapper,
   BottomRightBeraBalloonsImg,
-  ImageWrapper,
   LineSeparator,
-  Title,
-  TopLeftBeraBalloonsImg,
+  MarketsText,
 } from "./bera-markets-styles";
 import { TransformedMarketData } from "overlay-sdk";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import MarketCards from "../../components/MarketCards";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
 import { BERA_MARKETS } from "../../constants/markets";
+import BerachainLogo from "../../assets/images/bera-markets-page/brown-logo+berachain-text.webp";
 
 const BeraMarkets: React.FC = () => {
   const navigate = useNavigate();
@@ -92,14 +88,13 @@ const BeraMarkets: React.FC = () => {
       <LineSeparator />
 
       <BeraMarketsContainer>
-        <TopLeftBeraBalloonsImg />
-        <BeraCloud1Img />
-        <BeraCloud2Img />
-        <BeraCloud3Img />
-        <BeraCloud4Img />
+        <BeraCloudImg />
 
         <BeraMarketsContent>
-          <Title>Berachain Markets</Title>
+          <Flex gap="8px" align="end">
+            <img alt="berachain logo" src={BerachainLogo} height="45" />
+            <MarketsText>Markets</MarketsText>
+          </Flex>
 
           <Grid
             columns={{ initial: "2", lg: "4" }}
@@ -124,14 +119,13 @@ const BeraMarkets: React.FC = () => {
                       : ""
                   }
                   title={decodeURIComponent(market.marketId)}
+                  mobilewidth={"165.5px"}
                 />
               ))}
           </Grid>
         </BeraMarketsContent>
 
-        <ImageWrapper>
-          <BottomRightBeraBalloonsImg />
-        </ImageWrapper>
+        <BottomRightBeraBalloonsImg />
       </BeraMarketsContainer>
     </BeraMarketsWrapper>
   );
