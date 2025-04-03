@@ -156,5 +156,6 @@ export const BERA_MARKETS = [
   "Bera%20NFT%20Index",
   "HoneyComb%20and%20Jars%20NFT%20Index",
   "Defi%20Index",
-  "Quantum%20Cats",
+  "Bullas",
+  "iBGT%20%2F%20BERA",
 ];
