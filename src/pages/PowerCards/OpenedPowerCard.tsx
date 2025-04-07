@@ -14,8 +14,7 @@ import theme from "../../theme";
 import { GradientSolidButton } from "../../components/Button";
 import useAccount from "../../hooks/useAccount";
 import { powerCardsABI } from "./PoweCardsABI";
-import { useWriteContract, usePublicClient } from "wagmi";
-import { useIsNewTxnHashCallback } from "../../state/powercards/hooks";
+import { useWriteContract } from "wagmi";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
@@ -27,84 +26,57 @@ type OpenedPowerCardProps = {
 
 const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
   const { address: account } = useAccount();
-  const { isPending, writeContract, data: hash, error } = useWriteContract();
-  const publicClient = usePublicClient();
-  const isNewTxnHashCallback = useIsNewTxnHashCallback();
+  const { isPending, writeContract } = useWriteContract();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
 
-  const handleBurn = async () => {
+  const handleBurn = () => {
     if (!account || !card.id) return;
 
     console.log("🔥 Initiating burn transaction for card:", card.id);
-    try {
-      writeContract({
-        address: card.token?.address as `0x${string}`,
-        abi: powerCardsABI,
-        functionName: "burn",
-        args: [
-          account as `0x${string}`,
-          BigInt(card.token?.tokenId as string),
-          BigInt("1"),
-        ],
-      });
-
-      console.log("💳 Transaction hash:", hash);
-      console.log("error:", error);
-
-      addPopup(
-        {
-          txn: {
-            hash: !hash ? "" : hash,
-            success: true,
-            message: "Burning power card...",
-            type: TransactionType.BURN_POWER_CARD,
-          },
-        },
-        hash
-      );
-
-      const receipt = await publicClient?.waitForTransactionReceipt({
-        hash,
-      });
-      console.log(
-        "✅ Burn transaction confirmed in block:",
-        receipt?.blockNumber
-      );
-
-      if (receipt?.blockNumber) {
-        console.log("🔄 Updating transaction hash state...");
-        await isNewTxnHashCallback(hash, receipt.blockNumber);
-
+    
+    writeContract({
+      address: card.token?.address as `0x${string}`,
+      abi: powerCardsABI,
+      functionName: "burn",
+      args: [
+        account as `0x${string}`,
+        BigInt(card.token?.tokenId as string),
+        BigInt("1"),
+      ],
+    }, {
+      onSuccess: (hash) => {
+        console.log("💳 Transaction hash:", hash);
         addPopup(
           {
             txn: {
               hash,
               success: true,
-              message: "Successfully burned power card",
+              message: "Burning power card...",
               type: TransactionType.BURN_POWER_CARD,
             },
           },
           hash
         );
-      }
-    } catch (error) {
-      console.error("❌ Error burning card:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to burn power card";
+      },
+      onError: (error) => {
+        console.error("❌ Error burning card:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to burn power card";
 
-      addPopup(
-        {
-          txn: {
-            hash: currentTimeForId,
-            success: false,
-            message: errorMessage,
-            type: TransactionType.BURN_POWER_CARD,
+        addPopup(
+          {
+            txn: {
+              hash: currentTimeForId,
+              success: false,
+              message: errorMessage,
+              type: TransactionType.BURN_POWER_CARD,
+            },
           },
-        },
-        currentTimeForId
-      );
-    }
+          currentTimeForId
+        );
+      }
+    });
   };
 
   const handleGetCard = () => {
