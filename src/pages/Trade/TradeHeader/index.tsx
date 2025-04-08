@@ -8,7 +8,7 @@ import {
   StyledFlex,
   TradeHeaderContainer,
 } from "./trade-header-styles";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useTradeState } from "../../../state/trade/hooks";
@@ -19,7 +19,9 @@ import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const TradeHeader: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
+
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
