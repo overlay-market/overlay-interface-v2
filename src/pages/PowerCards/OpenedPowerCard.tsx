@@ -1,4 +1,4 @@
-import { UnifiedCardData } from "./types";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import {
   Badge,
   Container,
@@ -9,7 +9,7 @@ import {
   StatsDetails,
   TextItem,
 } from "./opened-power-card-styles";
-import { Flex, Text } from "@radix-ui/themes";
+import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import { GradientSolidButton } from "../../components/Button";
 import useAccount from "../../hooks/useAccount";
@@ -18,65 +18,79 @@ import { useWriteContract } from "wagmi";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
+import PowerCardsHeader from "./PowerCardsHeader";
 
-type OpenedPowerCardProps = {
-  card: UnifiedCardData;
-  isOwned?: boolean;
-};
-
-const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
+const OpenedPowerCard: React.FC = () => {
   const { address: account } = useAccount();
   const { isPending, writeContract } = useWriteContract();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
+  const navigate = useNavigate();
+  const { state } = useLocation();
+  const card = state?.card;
+  const isOwned = state?.isOwned;
+
+  if (!card) {
+    return <Navigate to="/power-cards" replace />;
+  }
 
   const handleBurn = () => {
     if (!account || !card.id) return;
 
     console.log("🔥 Initiating burn transaction for card:", card.id);
-    
-    writeContract({
-      address: card.token?.address as `0x${string}`,
-      abi: powerCardsABI,
-      functionName: "burn",
-      args: [
-        account as `0x${string}`,
-        BigInt(card.token?.tokenId as string),
-        BigInt("1"),
-      ],
-    }, {
-      onSuccess: (hash) => {
-        console.log("💳 Transaction hash:", hash);
-        addPopup(
-          {
-            txn: {
-              hash,
-              success: true,
-              message: "Burning power card...",
-              type: TransactionType.BURN_POWER_CARD,
-            },
-          },
-          hash
-        );
-      },
-      onError: (error) => {
-        console.error("❌ Error burning card:", error);
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to burn power card";
 
-        addPopup(
-          {
-            txn: {
-              hash: currentTimeForId,
-              success: false,
-              message: errorMessage,
-              type: TransactionType.BURN_POWER_CARD,
+    writeContract(
+      {
+        address: card.token?.address as `0x${string}`,
+        abi: powerCardsABI,
+        functionName: "burn",
+        args: [
+          account as `0x${string}`,
+          BigInt(card.token?.tokenId as string),
+          BigInt("1"),
+        ],
+      },
+      {
+        onSuccess: (hash) => {
+          console.log("💳 Transaction hash:", hash);
+          addPopup(
+            {
+              txn: {
+                hash,
+                success: true,
+                message: "Burning power card...",
+                type: TransactionType.BURN_POWER_CARD,
+              },
             },
-          },
-          currentTimeForId
-        );
+            hash
+          );
+          // Navigate with refresh timestamp
+          navigate("/power-cards", {
+            replace: true,
+            state: { tab: "owned", refresh: Date.now() },
+          });
+        },
+        onError: (error) => {
+          console.error("❌ Error burning card:", error);
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to burn power card";
+
+          addPopup(
+            {
+              txn: {
+                hash: currentTimeForId,
+                success: false,
+                message: errorMessage,
+                type: TransactionType.BURN_POWER_CARD,
+              },
+            },
+            currentTimeForId
+          );
+        },
       }
-    });
+    );
   };
 
   const handleGetCard = () => {
@@ -95,8 +109,17 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
   )}`;
 
   return (
-    <Flex width={"100%"} justify={"center"}>
-      <Container>
+    <Box width={"100%"}>
+      <PowerCardsHeader
+        cardTitle={card.ipfsData?.name ?? null}
+        setSelectedCard={() => {
+          navigate("/power-cards", {
+            replace: true,
+            state: { tab: "owned", refresh: Date.now() },
+          });
+        }}
+      />
+      <Container style={{ justifySelf: "center", marginTop: "20px" }}>
         <ImgBox>
           <img src={ipfsImageUrl} alt={card.name} width={"100%"} />
         </ImgBox>
@@ -148,7 +171,7 @@ const OpenedPowerCard: React.FC<OpenedPowerCardProps> = ({ card, isOwned }) => {
           />
         </InfoBox>
       </Container>
-    </Flex>
+    </Box>
   );
 };
 

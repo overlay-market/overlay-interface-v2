@@ -2,22 +2,19 @@ import { PowerCardContainer } from "./power-card-styles";
 import { UnifiedCardData } from "../../types";
 import React, { useEffect, useState } from "react";
 import { GradientSolidButton } from "../../../../components/Button";
-import { useMediaQuery } from "../../../../hooks/useMediaQuery";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type OwnedCardProps = {
   card: UnifiedCardData;
-  setSelectedCard: Function;
 };
 
-export const OwnedCard: React.FC<OwnedCardProps> = ({
-  card,
-  setSelectedCard,
-}) => {
+export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [cardData, setCardData] = useState<{
     image: string;
     name: string;
   } | null>(null);
-  const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     const fetchIpfsData = async () => {
@@ -37,7 +34,7 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({
     };
 
     fetchIpfsData();
-  }, [card]);
+  }, [card, location.state?.refresh]);
 
   if (!cardData && Number(card.amount) !== 0) return <div>Loading...</div>;
 
@@ -47,7 +44,6 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({
         <PowerCardContainer
           key={`${card.token?.tokenId}-${index}`}
           style={{
-            // paddingBottom: isMobile ? "136%" : "70%",
             paddingBottom: "70%",
             width: "90vw",
           }}
@@ -68,7 +64,12 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({
           <div className="card-side back">
             <GradientSolidButton
               handleClick={() =>
-                setSelectedCard({ ...card, ipfsData: cardData }, true)
+                navigate(`/power-cards/${card.token?.tokenId}`, {
+                  state: {
+                    card: { ...card, ipfsData: cardData },
+                    isOwned: true,
+                  },
+                })
               }
               title="View More"
             />
