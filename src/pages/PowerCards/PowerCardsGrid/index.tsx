@@ -50,11 +50,7 @@ export function PowerCardsGrid({
         <>
           {activeTab === 1 &&
             userData.map((card: UnifiedCardData) => (
-              <OwnedCard
-                key={Number(card.id)}
-                card={card}
-                setSelectedCard={setSelectedCard}
-              />
+              <OwnedCard key={Number(card.id)} card={card} />
             ))}
 
           {activeTab === 2 &&
