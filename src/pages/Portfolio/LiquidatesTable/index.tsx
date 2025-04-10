@@ -51,7 +51,22 @@ const LiquidatesTable: React.FC = () => {
               account as Address
             );
 
-          liquidates && setLiquidatePositions(liquidates.data);
+          const validLiquidates = liquidates.data.filter(
+            (pos: LiquidatedPositionData) => {
+              return (
+                pos &&
+                pos.marketName &&
+                pos.size &&
+                pos.position &&
+                pos.entryPrice &&
+                pos.exitPrice &&
+                pos.created &&
+                pos.liquidated
+              );
+            }
+          );
+
+          validLiquidates && setLiquidatePositions(validLiquidates);
           liquidates && setPositionsTotalNumber(liquidates.total);
           if (!liquidates) {
             setLiquidatePositions(undefined);

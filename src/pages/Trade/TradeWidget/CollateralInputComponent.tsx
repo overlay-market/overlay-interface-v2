@@ -6,14 +6,15 @@ import {
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { toWei } from "overlay-sdk";
 
 const CollateralInputComponent: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { address } = useAccount();
   const { chainId } = useMultichainContext();
   const sdk = useSDK();

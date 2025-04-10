@@ -6,7 +6,7 @@ import {
   MarketName,
   MarketPrice,
 } from "./market-item-styles";
-import { useNavigate } from "react-router-dom";
+import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 
 type MarketItemProps = {
   marketLogo?: string;
@@ -23,11 +23,11 @@ const MarketItem: React.FC<MarketItemProps> = ({
   marketId,
   toggleDropdown,
 }) => {
-  const navigate = useNavigate();
+  const redirectToTradePage = useRedirectToTradePage();
 
   const handleMarketSelect = (marketId: string) => {
     toggleDropdown();
-    navigate(`/trade/${marketId}`);
+    redirectToTradePage(marketId);
   };
 
   return (

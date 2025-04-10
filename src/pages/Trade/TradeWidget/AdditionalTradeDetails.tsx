@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
 import { InfoIcon } from "../../../assets/icons/svg-icons";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
@@ -18,7 +18,8 @@ type AdditionalTradeDetailsProps = {
 const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
   tradeState,
 }) => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
   const { address } = useAccount();
   const sdk = useSDK();
