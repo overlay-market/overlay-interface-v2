@@ -1,9 +1,9 @@
 import { FC } from "react";
 
-export const TrophyIcon: FC = () => (
+export const TrophyIcon: FC<{ size?: number }> = ({ size = 16 }) => (
   <svg
-    width="16"
-    height="16"
+    width={size}
+    height={size}
     viewBox="0 0 16 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -33,41 +33,10 @@ export const TrophyIcon: FC = () => (
   </svg>
 );
 
-<svg
-  width="21"
-  height="20"
-  viewBox="0 0 21 20"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path
-    d="M10.3021 14.1665C8.90742 14.1665 7.69351 15.2207 7.0668 16.7758C6.76747 17.5186 7.19699 18.3332 7.76772 18.3332H12.8364C13.4072 18.3332 13.8367 17.5186 13.5373 16.7758C12.9107 15.2207 11.6967 14.1665 10.3021 14.1665Z"
-    stroke="#ECECEC"
-    stroke-linecap="round"
-  />
-  <path
-    d="M15.7161 4.1665H16.718C17.7187 4.1665 18.2191 4.1665 18.4801 4.48097C18.7411 4.79544 18.6326 5.26745 18.4156 6.21146L18.0899 7.6274C17.6002 9.757 15.8086 11.3405 13.6328 11.6665"
-    stroke="#ECECEC"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-  <path
-    d="M4.88542 4.1665H3.88358C2.88285 4.1665 2.38249 4.1665 2.12145 4.48097C1.86041 4.79544 1.96895 5.26745 2.18604 6.21146L2.51165 7.6274C3.00137 9.757 4.79302 11.3405 6.96875 11.6665"
-    stroke="#ECECEC"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-  <path
-    d="M10.2995 14.1665C12.8168 14.1665 14.937 10.2814 15.5742 4.99225C15.7505 3.52949 15.8386 2.79811 15.3718 2.2323C14.9051 1.6665 14.1514 1.6665 12.644 1.6665H7.95496C6.4476 1.6665 5.69392 1.6665 5.22712 2.2323C4.76032 2.79811 4.84844 3.52949 5.02469 4.99225C5.66198 10.2814 7.78217 14.1665 10.2995 14.1665Z"
-    stroke="#ECECEC"
-    stroke-linecap="round"
-  />
-</svg>;
-
-export const TrophyActiveIcon: FC = () => (
+export const TrophyActiveIcon: FC<{ size?: number }> = ({ size = 16 }) => (
   <svg
-    width="16"
-    height="16"
+    width={size}
+    height={size}
     viewBox="0 0 16 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

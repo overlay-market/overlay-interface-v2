@@ -23,7 +23,7 @@ const Wallet: React.FC = () => {
         align={"center"}
         height={"100%"}
         justify={"end"}
-        pr={{ initial: "15px", sm: "20px" }}
+        pr={{ initial: "15px", sm: theme.app.rightPadding }}
       >
         {/* <GradientOutlineButton
           title={"Buy OV"}
