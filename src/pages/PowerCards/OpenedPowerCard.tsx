@@ -1,4 +1,4 @@
-import { useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import {
   Badge,
   Container,
@@ -9,7 +9,8 @@ import {
   StatsDetails,
   TextItem,
 } from "./opened-power-card-styles";
-import { Box, Flex, Text } from "@radix-ui/themes";
+import { UnifiedCardData } from "./types";
+import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import { GradientSolidButton } from "../../components/Button";
 import useAccount from "../../hooks/useAccount";
@@ -18,19 +19,20 @@ import { useWriteContract } from "wagmi";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
-import PowerCardsHeader from "./PowerCardsHeader";
 
-const OpenedPowerCard: React.FC = () => {
+interface OpenedPowerCardProps {
+  card: UnifiedCardData;
+  isOwned: boolean;
+}
+
+const OpenedPowerCard = ({ card, isOwned }: OpenedPowerCardProps) => {
   const { address: account } = useAccount();
   const { isPending, writeContract } = useWriteContract();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const card = state?.card;
-  const isOwned = state?.isOwned;
 
-  if (!card) {
+  if (!card || !card.ipfsData) {
     return <Navigate to="/power-cards" replace />;
   }
 
@@ -64,7 +66,6 @@ const OpenedPowerCard: React.FC = () => {
             },
             hash
           );
-          // Navigate with refresh timestamp
           navigate("/power-cards", {
             replace: true,
             state: { tab: "owned", refresh: Date.now() },
@@ -94,7 +95,12 @@ const OpenedPowerCard: React.FC = () => {
   };
 
   const handleGetCard = () => {
-    const openSeaUrl = `https://testnets.opensea.io/es/assets/arbitrum_sepolia/${card.address}/${card.id}`;
+    // Remove 'es' from URL and handle undefined token properties
+    const address = card.token?.address || card.address;
+    const tokenId = card.token?.tokenId || card.id;
+    console.log("Opening OpenSea with:", { address, tokenId });
+
+    const openSeaUrl = `https://testnets.opensea.io/assets/arbitrum-sepolia/${address}/${tokenId}`;
     window.open(openSeaUrl, "_blank");
   };
 
@@ -109,69 +115,58 @@ const OpenedPowerCard: React.FC = () => {
   )}`;
 
   return (
-    <Box width={"100%"}>
-      <PowerCardsHeader
-        cardTitle={card.ipfsData?.name ?? null}
-        setSelectedCard={() => {
-          navigate("/power-cards", {
-            replace: true,
-            state: { tab: "owned", refresh: Date.now() },
-          });
-        }}
-      />
-      <Container style={{ justifySelf: "center", marginTop: "20px" }}>
-        <ImgBox>
-          <img src={ipfsImageUrl} alt={card.name} width={"100%"} />
-        </ImgBox>
+    <Container style={{ justifySelf: "center", marginTop: "20px" }}>
+      <ImgBox>
+        <img src={ipfsImageUrl} alt={card.name} width={"100%"} />
+      </ImgBox>
 
-        <InfoBox>
-          <Flex gap={{ initial: "12px", lg: "16px" }} direction={"column"}>
-            <Badge>
-              <Text
-                size={"1"}
-                weight={"medium"}
-                style={{ color: theme.color.green2 }}
-              >
-                {card.ipfsData?.attributes[0]?.value}
-              </Text>
-            </Badge>
-
-            <Text weight={"bold"} style={{ fontSize: "32px" }}>
-              {card.ipfsData?.name}
+      <InfoBox>
+        <Flex gap={{ initial: "12px", lg: "16px" }} direction={"column"}>
+          <Badge>
+            <Text
+              size={"1"}
+              weight={"medium"}
+              style={{ color: theme.color.green2 }}
+            >
+              {card.ipfsData?.attributes[0]?.value}
             </Text>
+          </Badge>
 
-            <Details>
-              <StatsDetails>
-                <Text weight={"bold"} style={{ color: theme.color.grey3 }}>
-                  Stats
-                </Text>
-                <Flex direction={"column"} align={"end"}>
-                  <TextItem>{card.ipfsData?.attributes[1]?.value}</TextItem>
-                  <TextItem>{card.ipfsData?.attributes[4]?.value}</TextItem>
-                </Flex>
-              </StatsDetails>
+          <Text weight={"bold"} style={{ fontSize: "32px" }}>
+            {card.ipfsData?.name}
+          </Text>
 
-              <InfoDetails>
-                <Text weight={"bold"} style={{ color: theme.color.grey3 }}>
-                  Info
-                </Text>
-                <Flex direction={"column"} align={"end"}>
-                  <Text>{cardDescription}</Text>
-                </Flex>
-              </InfoDetails>
-            </Details>
-          </Flex>
+          <Details>
+            <StatsDetails>
+              <Text weight={"bold"} style={{ color: theme.color.grey3 }}>
+                Stats
+              </Text>
+              <Flex direction={"column"} align={"end"}>
+                <TextItem>{card.ipfsData?.attributes[1]?.value}</TextItem>
+                <TextItem>{card.ipfsData?.attributes[4]?.value}</TextItem>
+              </Flex>
+            </StatsDetails>
 
-          <GradientSolidButton
-            title={buttonText}
-            width={"100%"}
-            height={"49px"}
-            handleClick={isOwned ? handleBurn : handleGetCard}
-            isDisabled={isPending}
-          />
-        </InfoBox>
-      </Container>
-    </Box>
+            <InfoDetails>
+              <Text weight={"bold"} style={{ color: theme.color.grey3 }}>
+                Info
+              </Text>
+              <Flex direction={"column"} align={"end"}>
+                <Text>{cardDescription}</Text>
+              </Flex>
+            </InfoDetails>
+          </Details>
+        </Flex>
+
+        <GradientSolidButton
+          title={buttonText}
+          width={"100%"}
+          height={"49px"}
+          handleClick={isOwned ? handleBurn : handleGetCard}
+          isDisabled={isPending}
+        />
+      </InfoBox>
+    </Container>
   );
 };
 

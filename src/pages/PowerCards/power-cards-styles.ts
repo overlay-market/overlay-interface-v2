@@ -90,3 +90,12 @@ export const EmptyState = styled.div`
   font-size: 16px;
   text-align: center;
 `;
+
+export const Badge = styled.div`
+  background-color: ${({ theme }) => theme.colors.green1};
+  border: 1px solid ${({ theme }) => theme.colors.green2};
+`;
+
+export const TextItem = styled.span`
+  color: ${({ theme }) => theme.colors.grey3};
+`;

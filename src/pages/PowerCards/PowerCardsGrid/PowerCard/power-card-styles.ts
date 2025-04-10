@@ -11,10 +11,6 @@ export const PowerCardContainer = styled.div<PowerCardContainerProps>`
   cursor: pointer;
   background-size: cover;
 
-  @media (min-width: 768px) {
-    max-width: 278px;
-  }
-
   .card-side {
     position: absolute;
     top: 0;

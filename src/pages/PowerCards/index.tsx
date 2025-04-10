@@ -13,6 +13,7 @@ import {
   useAllPowerCards,
   useUserPowerCards,
 } from "../../hooks/useUserPowerCards";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 const tabs = ["All Cards", "My Cards", "Burnt Cards"];
 
@@ -28,22 +29,18 @@ interface ERC1155Token {
 }
 
 const PowerCards = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
   const [activeTab, setActiveTab] = useState(() => {
-    const savedTab = localStorage.getItem("powerCardsActiveTab");
-    return savedTab ? parseInt(savedTab) : 0;
+    const tab = searchParams.get("tab");
+    return tab ? parseInt(tab) : 0;
   });
-
   const [selectedCard, setSelectedCard] = useState<UnifiedCardData | null>(
-    () => {
-      const savedCard = localStorage.getItem("powerCardsSelectedCard");
-      return savedCard ? JSON.parse(savedCard) : null;
-    }
+    null
   );
-
-  const [isOwned, setIsOwned] = useState<boolean>(() => {
-    const savedIsOwned = localStorage.getItem("powerCardsIsOwned");
-    return savedIsOwned ? JSON.parse(savedIsOwned) : false;
-  });
+  const [isOwned, setIsOwned] = useState(false);
 
   const {
     loading: allCardsLoading,
@@ -62,13 +59,21 @@ const PowerCards = () => {
   const handleSetSelectedCard = (card: UnifiedCardData, isOwned: boolean) => {
     setSelectedCard(card);
     setIsOwned(isOwned);
-    localStorage.setItem("powerCardsSelectedCard", JSON.stringify(card));
-    localStorage.setItem("powerCardsIsOwned", JSON.stringify(isOwned));
+    navigate(`/power-cards?view=details&tab=${activeTab}`, {
+      state: { card, isOwned },
+      replace: true,
+    });
   };
 
   const handleTabChange = (index: number) => {
     setActiveTab(index);
-    localStorage.setItem("powerCardsActiveTab", index.toString());
+    navigate(`/power-cards?tab=${index}`, { replace: true });
+  };
+
+  const handleHeaderBackClick = () => {
+    setSelectedCard(null);
+    setIsOwned(false);
+    navigate(`/power-cards?tab=${activeTab}`, { replace: true });
   };
 
   useEffect(() => {
@@ -104,11 +109,25 @@ const PowerCards = () => {
       return updatedCards.filter(Boolean) as UnifiedCardData[];
     };
 
-    // Process all cards only
     if (allCardsData?.erc1155Tokens?.length > 0) {
       fetchIpfsData(allCardsData.erc1155Tokens).then(setAllCardsWithIpfs);
     }
   }, [allCardsData]);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab !== null) {
+      setActiveTab(parseInt(tab));
+    }
+
+    if (!location.search && !location.state?.card) {
+      setSelectedCard(null);
+      setIsOwned(false);
+    } else if (location.state?.card) {
+      setSelectedCard(location.state.card);
+      setIsOwned(location.state.isOwned);
+    }
+  }, [location, searchParams]);
 
   if (allCardsLoading || userCardsLoading) {
     return <p>Loading...</p>;
@@ -120,16 +139,12 @@ const PowerCards = () => {
 
   return (
     <Container>
-      <PowerCardsHeader
-        cardTitle={selectedCard?.ipfsData?.name ?? null}
-        setSelectedCard={(card: UnifiedCardData | null) => {
-          setSelectedCard(card);
-          if (card === null) {
-            localStorage.removeItem("powerCardsSelectedCard");
-            localStorage.removeItem("powerCardsIsOwned");
-          }
-        }}
-      />
+      {selectedCard && (
+        <PowerCardsHeader
+          cardTitle={selectedCard?.ipfsData?.name ?? null}
+          setSelectedCard={handleHeaderBackClick}
+        />
+      )}
 
       <PowercardsContent>
         {!selectedCard && (
@@ -148,7 +163,9 @@ const PowerCards = () => {
         )}
 
         {selectedCard ? (
-          <OpenedPowerCard card={selectedCard} isOwned={isOwned} />
+          <div style={{ alignSelf: "center" }}>
+            <OpenedPowerCard card={selectedCard} isOwned={isOwned} />
+          </div>
         ) : (
           <PowerCardsGrid
             activeTab={activeTab}

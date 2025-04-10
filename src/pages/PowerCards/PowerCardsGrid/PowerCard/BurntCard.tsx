@@ -1,7 +1,6 @@
 import { PowerCardContainer } from "./power-card-styles";
 import { UnifiedCardData } from "../../types";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useMemo } from "react";
 type BurntCardProps = {
   card: UnifiedCardData;
 };
@@ -34,6 +33,14 @@ export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
 
   const burntCount = parseInt(card.burnt as string) || 0;
 
+  const imageUrl = useMemo(() => {
+    if (!cardData?.image) return "";
+    return `https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData.image.replace(
+      "ipfs://",
+      ""
+    )}`;
+  }, [cardData?.image]);
+
   if (!cardData && Number(card.burnt) !== 0) return <div>Loading...</div>;
 
   return (
@@ -41,13 +48,7 @@ export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
       {Array.from({ length: burntCount }).map((_, index) => (
         <PowerCardContainer key={`burnt-${index}`}>
           <div className="grayscale">
-            <img
-              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
-                "ipfs://",
-                ""
-              )}`}
-              alt={cardData?.name}
-            />
+            <img src={imageUrl} alt={cardData?.name} />
           </div>
         </PowerCardContainer>
       ))}

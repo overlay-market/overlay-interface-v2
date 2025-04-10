@@ -2,7 +2,8 @@ import { PowerCardContainer } from "./power-card-styles";
 import { UnifiedCardData } from "../../types";
 import React, { useEffect, useState } from "react";
 import { GradientSolidButton } from "../../../../components/Button";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useMediaQuery } from "../../../../hooks/useMediaQuery";
 
 type OwnedCardProps = {
   card: UnifiedCardData;
@@ -11,10 +12,12 @@ type OwnedCardProps = {
 export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [cardData, setCardData] = useState<{
     image: string;
     name: string;
   } | null>(null);
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     const fetchIpfsData = async () => {
@@ -41,40 +44,49 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
   return (
     <>
       {Array.from({ length: Number(card.amount) || 0 }, (_, index) => (
-        <PowerCardContainer
-          key={`${card.token?.tokenId}-${index}`}
-          style={{
-            paddingBottom: "70%",
-            width: "90vw",
-          }}
-          backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
-            "ipfs://",
-            ""
-          )}`}
-        >
-          <div className="card-side front">
-            <img
-              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
-                "ipfs://",
-                ""
-              )}`}
-              alt={cardData?.name}
-            />
-          </div>
-          <div className="card-side back">
-            <GradientSolidButton
-              handleClick={() =>
-                navigate(`/power-cards/${card.token?.tokenId}`, {
-                  state: {
-                    card: { ...card, ipfsData: cardData },
-                    isOwned: true,
-                  },
-                })
-              }
-              title="View More"
-            />
-          </div>
-        </PowerCardContainer>
+        <div className="mobile-only">
+          <PowerCardContainer
+            key={`${card.token?.tokenId}-${index}`}
+            style={{
+              paddingBottom: "70%",
+              // width: "90vw",
+              width: isMobile ? "90vw" : "none",
+            }}
+            backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
+              "ipfs://",
+              ""
+            )}`}
+          >
+            <div className="card-side front">
+              <img
+                src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
+                  "ipfs://",
+                  ""
+                )}`}
+                alt={cardData?.name}
+              />
+            </div>
+            <div className="card-side back">
+              <GradientSolidButton
+                handleClick={() =>
+                  navigate(
+                    `/power-cards?view=details&tab=${
+                      searchParams.get("tab") || "1"
+                    }`,
+                    {
+                      state: {
+                        card: { ...card, ipfsData: cardData },
+                        isOwned: true,
+                      },
+                      replace: true,
+                    }
+                  )
+                }
+                title="View More"
+              />
+            </div>
+          </PowerCardContainer>
+        </div>
       ))}
     </>
   );
