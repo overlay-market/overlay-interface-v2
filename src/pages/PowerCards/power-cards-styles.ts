@@ -92,7 +92,7 @@ export const EmptyState = styled.div`
 `;
 
 export const Badge = styled.div`
-  background-color: ${({ theme }) => theme.colo.green1};
+  background-color: ${({ theme }) => theme.color.green1};
   border: 1px solid ${({ theme }) => theme.color.green2};
 `;
 

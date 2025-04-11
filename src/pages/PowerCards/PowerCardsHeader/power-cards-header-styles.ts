@@ -32,7 +32,7 @@ export const MarketHeaderContainer = styled(Flex)`
 export const StyledFlex = styled(Flex)`
   height: 100%;
   flex-direction: column;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme }) => theme.color.white};
   font-size: 14px;
   font-weight: 500;
 
