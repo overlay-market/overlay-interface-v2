@@ -82,13 +82,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: PowercardActiveIcon,
       showOnMobile: true,
     },
-    {
-      to: "/test-erc20",
-      label: "Test ERC20",
-      icon: PowercardIcon,
-      activeIcon: PowercardActiveIcon,
-      showOnMobile: true,
-    },
+    // {
+    //   to: "/test-erc20",
+    //   label: "Test ERC20",
+    //   icon: PowercardIcon,
+    //   activeIcon: PowercardActiveIcon,
+    //   showOnMobile: true,
+    // },
     // {
     //   to: "/leaderboard",
     //   label:
