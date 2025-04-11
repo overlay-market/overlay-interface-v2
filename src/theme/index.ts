@@ -24,7 +24,8 @@ declare module "styled-components" {
       grey5: string;
       grey6: string;
       grey7: string;
-      textSecondary: string;
+      grey8: string;
+      grey9: string;
     };
     headerSize: {
       width: string;
