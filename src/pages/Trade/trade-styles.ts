@@ -9,7 +9,10 @@ export const StyledFlex = styled(Flex)`
 `;
 
 export const TradeContainer = styled(Flex)`
+  width: 100%;
+
   @media (min-width: ${theme.breakpoints.xxl}) {
-    padding-left: 16px;
+    padding-left: ${theme.app.xxlPadding};
+    width: calc(100% - ${theme.app.xxlPadding});
   }
 `;
