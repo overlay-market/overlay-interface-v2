@@ -9,7 +9,6 @@ import Wallet from "./components/Wallet";
 import { useRef } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
 import Popups from "./components/Popups";
-import { DEFAULT_MARKET_ID } from "./constants/applications";
 import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
@@ -49,11 +48,7 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<Navigate to="/markets" />} />
                   <Route path="/markets" element={<Markets />} />
-                  <Route
-                    path="/trade"
-                    element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
-                  />
-                  <Route path="/trade/:marketId" element={<Trade />} />
+                  <Route path="/trade" element={<Trade />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/power-cards" element={<PowerCards />} />
                   {/* <Route path="/test-erc20" element={<TestERC20 />} /> */}

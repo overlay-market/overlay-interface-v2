@@ -11,14 +11,15 @@ import {
 } from "./position-select-component-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals } from "overlay-sdk";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const PositionSelectComponent: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
 

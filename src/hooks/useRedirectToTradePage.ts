@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 const useRedirectToTradePage = () => {
   const navigate = useNavigate();
 
-  return (marketId: string) => {
-    navigate(`/trade/${marketId}`);
+  return (marketName: string) => {
+    const encodedMarket = encodeURIComponent(marketName);
+    navigate(`/trade?market=${encodedMarket}`, { replace: true });
   };
 };
 
