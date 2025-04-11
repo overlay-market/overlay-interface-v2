@@ -49,7 +49,7 @@ export const Tab = styled.button.withConfig({
   cursor: pointer;
   border: 1px solid ${theme.color.grey4};
   border-radius: 8px;
-  color: ${({ active }) => (active ? "transparent" : "white")};
+  color: ${({ active }) => (active ? "transparent" : theme.color.white)};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 120px;
@@ -86,16 +86,16 @@ export const EmptyState = styled.div`
   margin: 16px;
   border: 1px solid ${({ theme }) => theme.color.grey4};
   border-radius: 8px;
-  color: ${({ theme }) => theme.text3};
+  color: ${({ theme }) => theme.color.white2};
   font-size: 16px;
   text-align: center;
 `;
 
 export const Badge = styled.div`
-  background-color: ${({ theme }) => theme.colors.green1};
-  border: 1px solid ${({ theme }) => theme.colors.green2};
+  background-color: ${({ theme }) => theme.colo.green1};
+  border: 1px solid ${({ theme }) => theme.color.green2};
 `;
 
 export const TextItem = styled.span`
-  color: ${({ theme }) => theme.colors.grey3};
+  color: ${({ theme }) => theme.color.grey3};
 `;
