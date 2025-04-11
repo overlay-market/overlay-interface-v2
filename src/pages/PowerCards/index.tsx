@@ -139,12 +139,10 @@ const PowerCards = () => {
 
   return (
     <Container>
-      {selectedCard && (
-        <PowerCardsHeader
-          cardTitle={selectedCard?.ipfsData?.name ?? null}
-          setSelectedCard={handleHeaderBackClick}
-        />
-      )}
+      <PowerCardsHeader
+        cardTitle={selectedCard?.ipfsData?.name ?? null}
+        setSelectedCard={handleHeaderBackClick}
+      />
 
       <PowercardsContent>
         {!selectedCard && (

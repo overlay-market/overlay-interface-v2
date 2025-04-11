@@ -7,10 +7,6 @@ export const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
-
-  @media (min-width: ${theme.breakpoints.xxl}) {
-    padding-left: ${theme.app.xxlPadding};
-  }
 `;
 
 export const PowercardsContent = styled(Flex)`
@@ -27,7 +23,7 @@ export const PowercardsContent = styled(Flex)`
   }
 
   @media (min-width: ${theme.breakpoints.xxl}) {
-    padding-left: 0;
+    padding-left: 16px;
   }
 `;
 
