@@ -151,7 +151,11 @@ const OpenedPowerCard = ({ card, isOwned }: OpenedPowerCardProps) => {
               <Text weight={"bold"} style={{ color: theme.color.grey3 }}>
                 Info
               </Text>
-              <Flex direction={"column"} align={"end"}>
+              <Flex
+                direction={"column"}
+                align={"end"}
+                style={{ textAlign: "right" }}
+              >
                 <Text>{cardDescription}</Text>
               </Flex>
             </InfoDetails>
