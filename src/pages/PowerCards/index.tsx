@@ -129,10 +129,6 @@ const PowerCards = () => {
     }
   }, [location, searchParams]);
 
-  if (allCardsLoading || userCardsLoading) {
-    return <p>Loading...</p>;
-  }
-
   if (allCardsError || userCardsError) {
     return <p>Error: {allCardsError?.message || userCardsError?.message}</p>;
   }
@@ -143,7 +139,6 @@ const PowerCards = () => {
         cardTitle={selectedCard?.ipfsData?.name ?? null}
         setSelectedCard={handleHeaderBackClick}
       />
-
       <PowercardsContent>
         {!selectedCard && (
           <TabsContainer>
@@ -164,6 +159,8 @@ const PowerCards = () => {
           <div style={{ alignSelf: "center" }}>
             <OpenedPowerCard card={selectedCard} isOwned={isOwned} />
           </div>
+        ) : allCardsLoading || userCardsLoading ? (
+          <p>Loading...</p>
         ) : (
           <PowerCardsGrid
             activeTab={activeTab}
