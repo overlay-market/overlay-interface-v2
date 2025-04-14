@@ -1,3 +1,15 @@
+import { Address } from "viem";
+import { TOKENS } from "../constants/vaults";
+
+export interface VaultData {
+  vaultAddress: {
+    poolVault: Address;
+    rewardsVault: Address;
+  };
+  vaultName: string;
+  vaultToken: TOKENS;
+}
+
 export interface VaultDetails {
   vaultAddress: string;
   totalSupply: number;

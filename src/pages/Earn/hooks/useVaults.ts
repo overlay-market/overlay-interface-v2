@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import steerClient from "../../../services/steerClient";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { StakingPool } from "@steerprotocol/sdk";
-import { ACTIVE_VAULTS } from "../../../constants/stake";
+import { ACTIVE_VAULTS_STEER } from "../../../constants/vaults";
 import { useVaultsActionHandlers } from "../../../state/vaults/hooks";
 
 
@@ -30,7 +30,7 @@ export const useVaults = () => {
 
         const filteredVaults: StakingPool[] =
           activeVaults.data?.filter((pool) =>
-          ACTIVE_VAULTS.some((vault) => vault.vaultAddress === pool.stakingPool)
+          ACTIVE_VAULTS_STEER.some((vault) => vault.vaultAddress === pool.stakingPool)
           ) || [];
 
         setVaults(filteredVaults);
