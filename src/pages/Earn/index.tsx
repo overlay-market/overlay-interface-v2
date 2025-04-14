@@ -4,7 +4,7 @@ import theme from "../../theme";
 import { EarnContainer, EarnContent, LineSeparator } from "./earn-styles";
 import Overview from "./Overview";
 import Rewards from "./Rewards";
-import StakeTable from "./StakeTable";
+import VaultsTable from "./VaultsTable";
 
 const Earn: React.FC = () => {
   return (
@@ -24,7 +24,7 @@ const Earn: React.FC = () => {
       <EarnContent>
         <Overview />
         <Rewards />
-        <StakeTable />
+        <VaultsTable />
       </EarnContent>
     </EarnContainer>
   );

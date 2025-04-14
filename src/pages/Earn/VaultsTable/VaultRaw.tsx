@@ -1,5 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { StyledCell, StyledRow, TokenImg } from "./stake-table-styles";
+import { StyledCell, StyledRow, TokenImg } from "./vaults-table-styles";
 import theme from "../../../theme";
 import { StakingPool } from "@steerprotocol/sdk";
 import { useNavigate } from "react-router-dom";
@@ -13,11 +13,11 @@ import {
 import { formatReward } from "../utils/formatReward";
 import { useCurrentVaultDetails } from "../hooks/useCurrentVaultData";
 
-type StakeRowProps = {
+type VaultRowProps = {
   vault: StakingPool;
 };
 
-const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
+const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
 
@@ -69,14 +69,6 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
 
     return rewards;
   }, [currentVaultDetails, vault]);
-
-  // const lockUpPeriod = useMemo(() => {
-  //   const timeUnitSeconds = Number(vault.rewardsDuration);
-  //   const secondsInDay = 86400;
-  //   const timeUnitDays = Math.trunc(timeUnitSeconds / secondsInDay);
-
-  //   return `${timeUnitDays} ${timeUnitDays === 1 ? "Day" : "Days"}`;
-  // }, [vault.rewardsDuration]);
 
   const dailyRewards = useMemo(() => {
     const rewards = [
@@ -141,12 +133,6 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
         <Text>{totalSupply} OVL</Text>
       </StyledCell>
 
-      {/* {!isMobile && (
-        <StyledCell textalign="right">
-          <Text>{lockUpPeriod}</Text>
-        </StyledCell>
-      )} */}
-
       {!isMobile && (
         <StyledCell textalign="right">
           <Flex width={"100%"} justify={"end"}>
@@ -166,4 +152,4 @@ const StakeRow: React.FC<StakeRowProps> = ({ vault }) => {
   );
 };
 
-export default StakeRow;
+export default VaultRow;

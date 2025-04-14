@@ -1,13 +1,13 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { StyledHeader, StyledTable } from "./stake-table-styles";
+import { StyledHeader, StyledTable } from "./vaults-table-styles";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { useVaultsState } from "../../../state/vaults/hooks";
-import StakeRow from "./StakeRow";
+import VaultRow from "./VaultRaw";
 
-const StakeTable: React.FC = () => {
+const VaultsTable: React.FC = () => {
   const { address: account } = useAccount();
   const { vaults } = useVaultsState();
 
@@ -28,11 +28,7 @@ const StakeTable: React.FC = () => {
             <StyledHeader textalign={"right"}>My Rewards</StyledHeader>
           )}
           <StyledHeader textalign={"right"}>TVL</StyledHeader>
-          {/* {!isMobile && (
-            <StyledHeader textalign={"right"}>
-              Lock-up {!isDesktop && <br />} Period
-            </StyledHeader>
-          )} */}
+
           {!isMobile && (
             <StyledHeader textalign={"right"}>Daily Rewards</StyledHeader>
           )}
@@ -42,7 +38,7 @@ const StakeTable: React.FC = () => {
       <tbody>
         {vaults &&
           vaults.map((vault) => (
-            <StakeRow key={vault.stakingPool} vault={vault} />
+            <VaultRow key={vault.stakingPool} vault={vault} />
           ))}
 
         {!vaults && (
@@ -64,4 +60,4 @@ const StakeTable: React.FC = () => {
   );
 };
 
-export default StakeTable;
+export default VaultsTable;
