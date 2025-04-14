@@ -44,49 +44,46 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
   return (
     <>
       {Array.from({ length: Number(card.amount) || 0 }, (_, index) => (
-        <div className="mobile-only">
-          <PowerCardContainer
-            key={`${card.token?.tokenId}-${index}`}
-            style={{
-              paddingBottom: "70%",
-              // width: "90vw",
-              width: isMobile ? "90vw" : "none",
-            }}
-            backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
-              "ipfs://",
-              ""
-            )}`}
-          >
-            <div className="card-side front">
-              <img
-                src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
-                  "ipfs://",
-                  ""
-                )}`}
-                alt={cardData?.name}
-              />
-            </div>
-            <div className="card-side back">
-              <GradientSolidButton
-                handleClick={() =>
-                  navigate(
-                    `/power-cards?view=details&tab=${
-                      searchParams.get("tab") || "1"
-                    }`,
-                    {
-                      state: {
-                        card: { ...card, ipfsData: cardData },
-                        isOwned: true,
-                      },
-                      replace: true,
-                    }
-                  )
-                }
-                title="View More"
-              />
-            </div>
-          </PowerCardContainer>
-        </div>
+        <PowerCardContainer
+          key={`${card.token?.tokenId}-${index}`}
+          style={{
+            paddingBottom: "70%",
+            width: isMobile ? "348px" : "100%",
+          }}
+          backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
+            "ipfs://",
+            ""
+          )}`}
+        >
+          <div className="card-side front">
+            <img
+              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
+                "ipfs://",
+                ""
+              )}`}
+              alt={cardData?.name}
+            />
+          </div>
+          <div className="card-side back">
+            <GradientSolidButton
+              handleClick={() =>
+                navigate(
+                  `/power-cards?view=details&tab=${
+                    searchParams.get("tab") || "1"
+                  }`,
+                  {
+                    state: {
+                      card: { ...card, ipfsData: cardData },
+                      isOwned: true,
+                    },
+                    replace: true,
+                  }
+                )
+              }
+              title="View More"
+            />
+          </div>
+        </PowerCardContainer>
       ))}
     </>
   );
