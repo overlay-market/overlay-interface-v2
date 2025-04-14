@@ -6,9 +6,10 @@ export const Container = styled(Flex)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 16px;    
+  gap: 16px;
   margin-top: -16px;
   margin-bottom: 100px;
+  height: 100%;
 
   @media (min-width: ${theme.breakpoints.sm}) {
     flex-direction: row;
@@ -28,11 +29,16 @@ export const Container = styled(Flex)`
 
 export const ImgBox = styled(Flex)`
   width: 100%;
-  height: 100%;
   max-width: 414px;
   justify-content: center;
+  height: 100%;
   flex: 1;
-`
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+`;
 
 export const InfoBox = styled(Flex)`
   flex-direction: column;
@@ -53,7 +59,7 @@ export const InfoBox = styled(Flex)`
   @media (min-width: ${theme.breakpoints.lg}) {
     padding: 20px;
   }
-`
+`;
 
 export const Badge = styled(Flex)`
   align-items: center;
@@ -61,7 +67,7 @@ export const Badge = styled(Flex)`
   padding: 4px 12px;
   border-radius: 16px;
   background: ${theme.color.green2}20;
-`
+`;
 
 export const Details = styled(Flex)`
   flex-direction: column;
@@ -69,26 +75,26 @@ export const Details = styled(Flex)`
   background: ${theme.color.grey4};
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    background: ${theme.color.background}; 
+    background: ${theme.color.background};
   }
-`
+`;
 
 export const StatsDetails = styled(Flex)`
   justify-content: space-between;
   align-items: center;
   padding: 16px;
   border-bottom: 1px solid #2c2c2c;
-`
+`;
 
 export const InfoDetails = styled(Flex)`
   justify-content: space-between;
   align-items: center;
   padding: 16px;
   gap: 90px;
-`
+`;
 
 export const TextItem = styled(Text)`
   font-weight: 500;
   text-align: right;
   line-height: 17px;
-`
+`;
