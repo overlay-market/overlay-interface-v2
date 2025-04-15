@@ -115,7 +115,13 @@ const OpenedPowerCard = ({ card, isOwned }: OpenedPowerCardProps) => {
   )}`;
 
   return (
-    <Container style={{ justifySelf: "center", marginTop: "20px" }}>
+    <Container
+      style={{
+        justifySelf: "center",
+        marginTop: "20px",
+        paddingBottom: "40px",
+      }}
+    >
       <ImgBox>
         <img src={ipfsImageUrl} alt={card.name} width={"100%"} />
       </ImgBox>
