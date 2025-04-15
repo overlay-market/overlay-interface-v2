@@ -16,7 +16,6 @@ import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 // import Leaderboard from "./pages/Leaderboard";
 import PowerCards from "./pages/PowerCards";
-// import TestERC20 from "./pages/TestERC20";
 import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
@@ -51,7 +50,6 @@ const App = () => {
                   <Route path="/trade" element={<Trade />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/power-cards" element={<PowerCards />} />
-                  {/* <Route path="/test-erc20" element={<TestERC20 />} /> */}
                   {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
                 </Routes>
               </Flex>
