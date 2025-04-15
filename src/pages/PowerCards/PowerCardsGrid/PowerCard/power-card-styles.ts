@@ -9,7 +9,6 @@ export const PowerCardContainer = styled.div<PowerCardContainerProps>`
   position: relative;
   perspective: 1000px;
   cursor: pointer;
-  background-size: cover;
 
   .card-side {
     position: absolute;
@@ -49,10 +48,9 @@ export const PowerCardContainer = styled.div<PowerCardContainerProps>`
         props.backgroundImageUrl ||
         "/src/assets/images/power-cards/zengarden.png"});
       width: 100%;
-      background-size: cover;
+      background-size: 100% 100%;
       background-position: center;
-      object-fit: cover;
-      // padding-bottom: -70%;
+      background-repeat: no-repeat;
     }
   }
 
@@ -63,7 +61,7 @@ export const PowerCardContainer = styled.div<PowerCardContainerProps>`
 
   img {
     width: 100%;
-    object-fit: cover;
+    height: 100%;
   }
 
   &:hover {
