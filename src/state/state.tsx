@@ -6,6 +6,7 @@ import trade from "./trade/reducer";
 import currentMarket from "./currentMarket/reducer";
 import markets from "./markets/reducer";
 import application from "./application/reducer";
+import powerCards from "./powercards/reducer";
 
 const PERSISTED_KEYS: string[] = ["user", "transactions"];
 
@@ -15,6 +16,7 @@ const store = configureStore({
     trade,
     currentMarket,
     markets,
+    powerCards,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: true }).concat(
