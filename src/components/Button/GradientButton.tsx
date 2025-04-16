@@ -13,6 +13,7 @@ type GradientButtonProps = {
   height?: string;
   size?: string;
   isDisabled?: boolean;
+  isLoading?: boolean;
   handleClick?: () => void;
 };
 
@@ -43,13 +44,14 @@ export const GradientSolidButton: React.FC<GradientButtonProps> = ({
   height = "52px",
   size = "16px",
   isDisabled = false,
+  isLoading = false,
   handleClick,
 }) => {
   return (
     <GradientSolidBtnWrapper
       width={width}
       height={height}
-      disabled={isDisabled}
+      disabled={isDisabled || isLoading}
       onClick={handleClick}
       style={{ fontSize: size }}
     >

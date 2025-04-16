@@ -15,8 +15,8 @@ export const MobileNavBar = styled(Box)`
   display: flex;
   justify-content: center;
   width: 100%;
-  height: 89px;
-  padding: 15px 0;
+  height: 73px;
+  padding: 8px 16px;
   position: fixed;
   bottom: 0;
   background: ${theme.color.background};

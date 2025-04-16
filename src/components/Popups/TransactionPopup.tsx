@@ -51,6 +51,7 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
             "Liquidation Successful"}
           {type === TransactionType.BRIDGE_OVL && "Bridge Successful"}
           {type === TransactionType.CLAIM_OVL && "Claim Successful"}
+          {type === TransactionType.BURN_POWER_CARD && ""}
 
           {errorMessage}
         </Text>
@@ -66,7 +67,9 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
             )}
           >
             <Flex mt={"4px"}>
-              <Text weight={"regular"}>View on explorer</Text>
+              {(type === TransactionType.BURN_POWER_CARD &&
+                "Card burn transaction successful") ||
+                "View on Explorer"}
               <Box mx={"3px"}>
                 <ExternalLinkIcon width={13} height={13} />
               </Box>
