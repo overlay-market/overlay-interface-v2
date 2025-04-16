@@ -19,7 +19,7 @@ import Trackers from "./components/Trackers";
 import Earn from "./pages/Earn";
 import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import Stake from "./pages/Earn/StakePage";
-import SteerProvider from "./providers/SteerProvider";
+import VaultsProvider from "./providers/VaultsProvider";
 
 const earnRoutes = (
   <>
@@ -28,10 +28,10 @@ const earnRoutes = (
   </>
 );
 
-const SteerProviderWrapper = () => (
-  <SteerProvider>
+const VaultsProviderWrapper = () => (
+  <VaultsProvider>
     <Routes>{earnRoutes}</Routes>
-  </SteerProvider>
+  </VaultsProvider>
 );
 
 const App = () => {
@@ -67,7 +67,9 @@ const App = () => {
                 {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
 
                 {isEarnRoute ? (
-                  <Route element={<SteerProviderWrapper />}>{earnRoutes}</Route>
+                  <Route element={<VaultsProviderWrapper />}>
+                    {earnRoutes}
+                  </Route>
                 ) : (
                   earnRoutes
                 )}

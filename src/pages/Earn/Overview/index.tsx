@@ -5,15 +5,18 @@ import { useVaultsState } from "../../../state/vaults/hooks";
 import { useMemo } from "react";
 
 const Overview: React.FC = () => {
-  const { vaultDetails } = useVaultsState();
+  const { vaultsDetails } = useVaultsState();
 
   const tvl = useMemo(() => {
-    if (!vaultDetails) return "0";
+    if (!vaultsDetails) return "0";
 
-    const sum = vaultDetails.reduce((sum, vault) => sum + vault.totalSupply, 0);
+    const sum = vaultsDetails.reduce(
+      (sum, vault) => sum + vault.totalSupply,
+      0
+    );
     const formattedTVL = sum.toLocaleString();
     return formattedTVL;
-  }, [vaultDetails]);
+  }, [vaultsDetails]);
 
   return (
     <Flex
