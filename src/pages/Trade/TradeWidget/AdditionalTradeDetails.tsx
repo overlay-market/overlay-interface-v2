@@ -10,6 +10,8 @@ import useAccount from "../../../hooks/useAccount";
 import { useEffect, useMemo, useState } from "react";
 import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 type AdditionalTradeDetailsProps = {
   tradeState?: TradeStateData;
@@ -40,6 +42,9 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
     return limitDigitsInDecimals(tradeState.expectedOi);
   }, [tradeState]);
 
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
   useEffect(() => {
     const fetchFee = async () => {
       if (marketId) {
@@ -52,7 +57,7 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
       }
     };
     fetchFee();
-  }, [marketId, chainId]);
+  }, [marketId, chainId, sdk.trade]);
 
   useEffect(() => {
     estLiquidationPrice &&
@@ -93,7 +98,42 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
       <Flex justify={"between"} height={"17px"}>
         <Flex gap={"4px"} align={"center"}>
           <Text style={{ color: theme.color.grey3 }}>Expected OI</Text>
-          <InfoIcon />
+          <Tooltip.Provider>
+            <Tooltip.Root
+              open={tooltipOpen}
+              onOpenChange={setTooltipOpen}
+              delayDuration={isMobile ? 0 : 200}
+            >
+              <Tooltip.Trigger asChild>
+                <span
+                  style={{ display: "inline-flex", cursor: "pointer" }}
+                  onClick={() => isMobile && setTooltipOpen(!tooltipOpen)}
+                >
+                  <InfoIcon />
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  style={{
+                    backgroundColor: theme.color.grey4,
+                    color: theme.color.grey1,
+                    borderRadius: "6px",
+                    padding: "10px 15px",
+                    fontSize: "14px",
+                    maxWidth: "250px",
+                    lineHeight: "20px",
+                    marginLeft: isMobile ? "15px" : undefined,
+                  }}
+                  sideOffset={5}
+                  onPointerDownOutside={() => isMobile && setTooltipOpen(false)}
+                >
+                  This is the estimated Open Interest (OI) value that will be
+                  assigned to your position once it is opened.
+                  <Tooltip.Arrow style={{ fill: theme.color.grey4 }} />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
         </Flex>
         <Text style={{ color: theme.color.blue1 }}>
           {expectedOi && typedValue && address ? expectedOi : `-`}
