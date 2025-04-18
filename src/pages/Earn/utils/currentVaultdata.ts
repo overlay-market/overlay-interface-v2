@@ -1,5 +1,4 @@
-import { Reward } from "@steerprotocol/sdk";
-import { ACTIVE_VAULTS_STEER, DEFAULT_TOKEN_LOGO, TOKEN_LOGOS, TOKENS } from "../../../constants/vaults";
+import { ACTIVE_VAULTS_STEER } from "../../../constants/vaults";
 
 export const getVaultNameByVaultAddress = ( vaultAddress: string) => {
   return (
@@ -16,7 +15,3 @@ export const getVaultAddressByVaultName = ( vaultName: string | undefined) => {
     )?.vaultAddress || ""
   )
 }
-
-export const getTokenLogo = (tokenDetail: Reward) => {
-  return TOKEN_LOGOS[tokenDetail.symbol as TOKENS] || DEFAULT_TOKEN_LOGO;
-};
