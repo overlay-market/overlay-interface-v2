@@ -5,15 +5,45 @@ import { useVaultsState } from "../../../state/vaults/hooks";
 import { useMemo } from "react";
 
 const Overview: React.FC = () => {
-  const { vaultDetails } = useVaultsState();
+  const { vaultsDetails } = useVaultsState();
 
   const tvl = useMemo(() => {
-    if (!vaultDetails) return "0";
+    if (!vaultsDetails || vaultsDetails.length === 0) return "";
 
-    const sum = vaultDetails.reduce((sum, vault) => sum + vault.totalSupply, 0);
-    const formattedTVL = sum.toLocaleString();
+    const sum = vaultsDetails.reduce(
+      (sum, vault) => sum + Number(vault.tvl),
+      0
+    );
+    const formattedTVL = `$${sum.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    })}`;
     return formattedTVL;
-  }, [vaultDetails]);
+  }, [vaultsDetails]);
+
+  const maxAPR = useMemo(() => {
+    if (!vaultsDetails || vaultsDetails.length === 0) return "0";
+
+    const max = Math.max(
+      ...vaultsDetails.map((vault) => Number(vault.totalApr))
+    );
+    const formattedMax = `${max.toLocaleString(undefined, {
+      maximumFractionDigits: 2,
+    })}%`;
+    return formattedMax;
+  }, [vaultsDetails]);
+
+  const totalStakers = useMemo(() => {
+    if (!vaultsDetails || vaultsDetails.length === 0) return "0";
+
+    const total = vaultsDetails.reduce(
+      (sum, vault) => sum + vault.stakersCount,
+      0
+    );
+    const formattedTotal = `${total.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    })}`;
+    return formattedTotal;
+  }, [vaultsDetails]);
 
   return (
     <Flex
@@ -25,24 +55,24 @@ const Overview: React.FC = () => {
     >
       <InfoItem>
         <Text>TVL</Text>
-        <Text weight={"bold"}>{tvl} OVL</Text>
+        <Text weight={"bold"}>{tvl}</Text>
       </InfoItem>
 
       <GreenDot />
 
       <InfoItem>
-        <Text>Max APY</Text>
-        <Text weight={"bold"}>8,75%</Text>
+        <Text>Max APR</Text>
+        <Text weight={"bold"}>{maxAPR}</Text>
       </InfoItem>
 
-      {/* <GreenDot />
+      <GreenDot />
 
       <InfoItem>
         <Text>Total Stakers</Text>
-        <Text weight={"bold"}>18,750</Text>
+        <Text weight={"bold"}>{totalStakers}</Text>
       </InfoItem>
 
-      <GreenDot />
+      {/* <GreenDot />
 
       <InfoItem>
         <Text>Total Rewards Distributed</Text>

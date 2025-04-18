@@ -7,45 +7,28 @@ import {
 } from "./my-stats-styles";
 import theme from "../../../theme";
 import { useVaultsState } from "../../../state/vaults/hooks";
-import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import {
   useCurrentVault,
   useCurrentVaultDetails,
 } from "../hooks/useCurrentVaultData";
 import { getVaultAddressByVaultName } from "../utils/currentVaultdata";
-import { formatReward } from "../utils/formatReward";
 import steerClient from "../../../services/steerClient";
 import { useAddPopup } from "../../../state/application/hooks";
 import { TransactionType } from "../../../constants/transaction";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { UNIT } from "../../../constants/applications";
 import { handleError } from "../../../utils/handleError";
+import { Address } from "viem";
 
 const MyStats: React.FC = () => {
   const { vaultId } = useParams();
   const { userStats } = useVaultsState();
-  const vaultAddress = getVaultAddressByVaultName(vaultId);
+  const vaultAddress = getVaultAddressByVaultName(vaultId) as Address;
   const currentVault = useCurrentVault(vaultAddress);
   const currentVaultDetails = useCurrentVaultDetails(vaultAddress);
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
-
-  const pendingRewards = useMemo(() => {
-    if (!currentVaultDetails?.userRewards) return [];
-    if (!currentVault) return [];
-
-    const { userRewards } = currentVaultDetails;
-
-    const rewards = [
-      formatReward(userRewards.rewardA, currentVault.rewardTokenADetail),
-      currentVault.isDualFactory && currentVault.rewardTokenBDetail
-        ? formatReward(userRewards.rewardB, currentVault.rewardTokenBDetail)
-        : null,
-    ].filter(Boolean);
-
-    return rewards;
-  }, [currentVaultDetails, currentVault]);
 
   const handleClaimRewards = async () => {
     steerClient.staking
@@ -122,12 +105,7 @@ const MyStats: React.FC = () => {
           </Flex>
 
           <Flex gap={"10px"}>
-            {pendingRewards.map((reward, idx) => (
-              <StatValue key={idx}>
-                {idx === 1 && `+ `}
-                {reward}
-              </StatValue>
-            ))}
+            <StatValue>7,500,000 OVL + 7,500,000 BERA</StatValue>
           </Flex>
         </StatCard>
       </MyStatsContainer>

@@ -4,12 +4,11 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { useVaultsState } from "../../../state/vaults/hooks";
 import VaultRow from "./VaultRaw";
+import { VAULTS } from "../../../constants/vaults";
 
 const VaultsTable: React.FC = () => {
   const { address: account } = useAccount();
-  const { vaults } = useVaultsState();
 
   // const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -23,25 +22,25 @@ const VaultsTable: React.FC = () => {
               STAKE
             </Text>
           </StyledHeader>
-          <StyledHeader textalign={"right"}>APY</StyledHeader>
+          <StyledHeader textalign={"right"}>APR</StyledHeader>
           {account && !isMobile && (
             <StyledHeader textalign={"right"}>My Rewards</StyledHeader>
           )}
           <StyledHeader textalign={"right"}>TVL</StyledHeader>
 
           {!isMobile && (
-            <StyledHeader textalign={"right"}>Daily Rewards</StyledHeader>
+            <StyledHeader textalign={"right"}>Rewards</StyledHeader>
           )}
         </tr>
       </thead>
 
       <tbody>
-        {vaults &&
-          vaults.map((vault) => (
-            <VaultRow key={vault.stakingPool} vault={vault} />
+        {VAULTS &&
+          VAULTS.map((vault) => (
+            <VaultRow key={vault.vaultName} vault={vault} />
           ))}
 
-        {!vaults && (
+        {!VAULTS && (
           <tr>
             <td colSpan={4}>
               <Flex

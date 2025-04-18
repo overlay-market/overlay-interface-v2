@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import React, { useMemo } from "react";
 import {
   InfoBox,
@@ -8,63 +8,32 @@ import {
 } from "./info-section-styles";
 import theme from "../../../theme";
 import { useParams } from "react-router-dom";
-import {
-  getTokenLogo,
-  getVaultAddressByVaultName,
-} from "../utils/currentVaultdata";
+import { getVaultAddressByVaultName } from "../utils/currentVaultdata";
 import {
   useCurrentVault,
   useCurrentVaultDetails,
 } from "../hooks/useCurrentVaultData";
-import { formatReward } from "../utils/formatReward";
+import { Address } from "viem";
+import { TOKEN_LOGOS } from "../../../constants/vaults";
 
 const InfoSection: React.FC = () => {
   const { vaultId } = useParams();
 
-  const vaultAddress = getVaultAddressByVaultName(vaultId);
+  const vaultAddress = getVaultAddressByVaultName(vaultId) as Address;
   const currentVault = useCurrentVault(vaultAddress);
   const currentVaultDetails = useCurrentVaultDetails(vaultAddress);
 
-  const totalSupply = currentVaultDetails?.totalSupply.toLocaleString() ?? "";
+  const totalSupply = currentVaultDetails?.tvl.toLocaleString() ?? "";
 
   const tokenLogos = useMemo(() => {
     if (!currentVault) return [];
 
-    const logos = [
-      getTokenLogo(currentVault.rewardTokenADetail),
-      currentVault.isDualFactory && currentVault.rewardTokenBDetail
-        ? getTokenLogo(currentVault.rewardTokenBDetail)
-        : undefined,
-    ].filter(Boolean);
+    const logos = currentVault.rewardTokens
+      .map((token) => TOKEN_LOGOS[token.rewardTokenName])
+      .filter(Boolean);
 
     return logos;
   }, [currentVault]);
-
-  const dailyRewards = useMemo(() => {
-    if (!currentVault) return [];
-
-    const rewards = [
-      formatReward(
-        currentVault.dailyEmissionRewardA,
-        currentVault.rewardTokenADetail
-      ),
-      currentVault.isDualFactory && currentVault.rewardTokenBDetail
-        ? formatReward(
-            currentVault.dailyEmissionRewardB,
-            currentVault.rewardTokenBDetail
-          )
-        : null,
-    ]
-      .filter(
-        (reward): reward is string => reward !== null && reward !== undefined
-      )
-      .map((reward, index) => {
-        const [amount, symbol] = reward.split(" ");
-        return { amount, symbol, logo: tokenLogos[index] };
-      });
-
-    return rewards;
-  }, [currentVault, tokenLogos]);
 
   return (
     <Flex direction={"column"} gap={"16px"}>
@@ -77,23 +46,19 @@ const InfoSection: React.FC = () => {
           gap={{ initial: "8px", sm: "20px", lg: "8px" }}
         >
           {vaultId &&
-            dailyRewards.map((reward, idx) => (
+            tokenLogos.map((logo, idx) => (
               <Flex
                 justify={"between"}
                 align={"center"}
                 width={"100%"}
                 key={idx}
               >
-                <Flex gap={"8px"} align={"center"}>
-                  <img
-                    src={reward.logo}
-                    alt={"token logo"}
-                    width={"36px"}
-                    height={"36px"}
-                  />
-                  <Text size={"1"}>{reward.symbol}</Text>
-                </Flex>
-                <Text size={"6"}>{reward.amount}</Text>
+                <img
+                  src={logo}
+                  alt={"token logo"}
+                  width={"36px"}
+                  height={"36px"}
+                />
               </Flex>
             ))}
         </Flex>
