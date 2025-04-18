@@ -1,21 +1,21 @@
-import { StakingPool } from "@steerprotocol/sdk";
 import { useVaultsState } from "../../../state/vaults/hooks";
-import { VaultDetails } from "../../../types/vaultTypes";
+import { CalculatedVaultData, StaticVaultData } from "../../../types/vaultTypes";
+import { Address } from "viem";
+import { VAULTS } from "../../../constants/vaults";
 
-export const useCurrentVault = (vaultAddress: string): StakingPool | undefined => {
-  const { vaults } = useVaultsState();
+export const useCurrentVault = (vaultAddress: Address): StaticVaultData | undefined  => {
   
-  return vaults?.find(
+  return VAULTS?.find(
     (vault) =>
-      vault.stakingPool.toLowerCase() === vaultAddress.toLowerCase()
+      vault.vaultAddress.poolVault.toLowerCase() === vaultAddress.toLowerCase()
   )
 }
 
-export const useCurrentVaultDetails = (vaultAddress: string): VaultDetails | undefined => {
-  const { vaultDetails } = useVaultsState();
+export const useCurrentVaultDetails = (vaultAddress: Address): CalculatedVaultData | undefined => {
+  const { vaultsDetails } = useVaultsState();
   
-  return vaultDetails?.find(
+  return vaultsDetails?.find(
     (detail) =>
-      detail.vaultAddress.toLowerCase() === vaultAddress.toLowerCase()
+      detail.poolVaultAddress.toLowerCase() === vaultAddress.toLowerCase()
   )
 }
