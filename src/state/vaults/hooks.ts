@@ -3,7 +3,7 @@ import {useAppDispatch, useAppSelector} from '../hooks'
 import { useCallback } from 'react';
 import { updateUserStats, updateVaults, updateVaultsDetails } from './actions';
 import { StakingPool } from '@steerprotocol/sdk';
-import { UserStats, VaultDetails } from '../../types/vaultTypes';
+import { CalculatedVaultData, UserStats } from '../../types/vaultTypes';
 
 export function useVaultsState(): AppState['vaults'] {
   return useAppSelector(state => state.vaults)
@@ -11,7 +11,7 @@ export function useVaultsState(): AppState['vaults'] {
 
 export const useVaultsActionHandlers = (): {
   handleVaultsUpdate: (vaults: StakingPool[]) => void;
-  handleVaultDetailsUpdate: (vaultdetails: VaultDetails[]) => void;
+  handleVaultDetailsUpdate: (vaultsdetails: CalculatedVaultData[]) => void;
   handleUserStatsUpdate: (userStats: UserStats) => void;
 } => {
   const dispatch = useAppDispatch();
@@ -24,8 +24,8 @@ export const useVaultsActionHandlers = (): {
   )
 
   const handleVaultDetailsUpdate = useCallback(
-    (vaultDetails: VaultDetails[]) => {
-      dispatch(updateVaultsDetails({ vaultDetails }))
+    (vaultsDetails: CalculatedVaultData[]) => {
+      dispatch(updateVaultsDetails({ vaultsDetails }))
     },
     [dispatch]
   )
