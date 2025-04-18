@@ -13,7 +13,7 @@ import moment from "moment";
 import { getMarketChartUrl } from "./helpers";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import theme from "../../../theme";
 import useBidAndAsk from "./utils/useBidAndAsk";
@@ -52,7 +52,9 @@ export interface ChartContainerProps {
 const Chart: React.FC = () => {
   const chartContainerRef =
     useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
-  const { marketId } = useParams();
+
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
   const { currentMarket: market } = useCurrentMarketState();
 

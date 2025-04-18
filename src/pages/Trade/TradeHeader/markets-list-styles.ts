@@ -117,3 +117,9 @@ export const StyledScrollArea = styled.div`
     height: 645px;
   }
 `;
+
+export const SearchEmptyMessage = styled.div`
+  width: 100%;
+  color: #777;
+  padding-left: 16px;
+`

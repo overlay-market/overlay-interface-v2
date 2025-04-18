@@ -4,7 +4,7 @@ import { TRADE_POLLING_INTERVAL } from "../../../../constants/applications";
 import useMultichainContext from "../../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../../providers/SDKProvider/useSDK";
 
-const useBidAndAsk = (marketId: string | undefined): {bid: number | undefined, ask: number | undefined} => {
+const useBidAndAsk = (marketId: string | null): {bid: number | undefined, ask: number | undefined} => {
  
   const { chainId } = useMultichainContext();
   const sdk = useSDK();

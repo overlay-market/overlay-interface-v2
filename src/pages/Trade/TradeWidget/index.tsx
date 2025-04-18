@@ -13,7 +13,7 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useState } from "react";
 import { Address } from "viem";
 import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
@@ -22,7 +22,8 @@ import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 
 const TradeWidget: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
   const { address } = useAccount();
   const sdk = useSDK();
@@ -44,6 +45,16 @@ const TradeWidget: React.FC = () => {
   );
   const debouncedSelectedLeverage = useDebounce(leverageInputValue, 500);
   const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
+
+  useEffect(() => {
+    setDisplayedLeverage(selectedLeverage);
+  }, [selectedLeverage]);
+
+  useEffect(() => {
+    if (debouncedSelectedLeverage !== null) {
+      handleLeverageSelect(debouncedSelectedLeverage);
+    }
+  }, [debouncedSelectedLeverage]);
 
   useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
@@ -121,12 +132,6 @@ const TradeWidget: React.FC = () => {
     setLeverageInputValue(stringValue);
     setDisplayedLeverage(stringValue);
   };
-
-  useEffect(() => {
-    if (debouncedSelectedLeverage !== null) {
-      handleLeverageSelect(debouncedSelectedLeverage);
-    }
-  }, [debouncedSelectedLeverage]);
 
   return (
     <TradeWidgetContainer
