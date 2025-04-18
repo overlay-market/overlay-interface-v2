@@ -8,10 +8,6 @@ import {
 import theme from "../../../theme";
 import { useVaultsState } from "../../../state/vaults/hooks";
 import { useParams } from "react-router-dom";
-import {
-  useCurrentVault,
-  useCurrentVaultDetails,
-} from "../hooks/useCurrentVaultData";
 import { getVaultAddressByVaultName } from "../utils/currentVaultdata";
 import steerClient from "../../../services/steerClient";
 import { useAddPopup } from "../../../state/application/hooks";
@@ -25,8 +21,7 @@ const MyStats: React.FC = () => {
   const { vaultId } = useParams();
   const { userStats } = useVaultsState();
   const vaultAddress = getVaultAddressByVaultName(vaultId) as Address;
-  const currentVault = useCurrentVault(vaultAddress);
-  const currentVaultDetails = useCurrentVaultDetails(vaultAddress);
+
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
 
