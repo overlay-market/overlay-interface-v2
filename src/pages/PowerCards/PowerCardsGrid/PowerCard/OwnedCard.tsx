@@ -3,7 +3,6 @@ import { UnifiedCardData } from "../../types";
 import React, { useEffect, useState } from "react";
 import { GradientSolidButton } from "../../../../components/Button";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { useMediaQuery } from "../../../../hooks/useMediaQuery";
 
 type OwnedCardProps = {
   card: UnifiedCardData;
@@ -17,7 +16,6 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
     image: string;
     name: string;
   } | null>(null);
-  const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
     const fetchIpfsData = async () => {
@@ -48,7 +46,6 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
           key={`${card.token?.tokenId}-${index}`}
           style={{
             paddingBottom: "70%",
-            width: isMobile ? "348px" : "100%",
           }}
           backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
             "ipfs://",
