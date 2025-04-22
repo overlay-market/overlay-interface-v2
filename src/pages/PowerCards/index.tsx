@@ -159,9 +159,7 @@ const PowerCards = () => {
           <div style={{ alignSelf: "center" }}>
             <OpenedPowerCard card={selectedCard} isOwned={isOwned} />
           </div>
-        ) : allCardsLoading || userCardsLoading ? (
-          <p>Loading...</p>
-        ) : (
+        ) : allCardsLoading || userCardsLoading ? null : (
           <PowerCardsGrid
             activeTab={activeTab}
             allCards={allCardsWithIpfs}

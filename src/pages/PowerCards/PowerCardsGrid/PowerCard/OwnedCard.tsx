@@ -3,6 +3,7 @@ import { UnifiedCardData } from "../../types";
 import React, { useEffect, useState } from "react";
 import { GradientSolidButton } from "../../../../components/Button";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Skeleton } from "@radix-ui/themes";
 
 type OwnedCardProps = {
   card: UnifiedCardData;
@@ -37,50 +38,55 @@ export const OwnedCard: React.FC<OwnedCardProps> = ({ card }) => {
     fetchIpfsData();
   }, [card, location.state?.refresh]);
 
-  if (!cardData && Number(card.amount) !== 0) return <div>Loading...</div>;
-
   return (
     <>
       {Array.from({ length: Number(card.amount) || 0 }, (_, index) => (
-        <PowerCardContainer
-          key={`${card.token?.tokenId}-${index}`}
+        <Skeleton
+          loading={!cardData}
           style={{
-            paddingBottom: "70%",
+            borderRadius: "8px",
           }}
-          backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
-            "ipfs://",
-            ""
-          )}`}
         >
-          <div className="card-side front">
-            <img
-              src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
-                "ipfs://",
-                ""
-              )}`}
-              alt={cardData?.name}
-            />
-          </div>
-          <div className="card-side back">
-            <GradientSolidButton
-              handleClick={() =>
-                navigate(
-                  `/power-cards?view=details&tab=${
-                    searchParams.get("tab") || "1"
-                  }`,
-                  {
-                    state: {
-                      card: { ...card, ipfsData: cardData },
-                      isOwned: true,
-                    },
-                    replace: true,
-                  }
-                )
-              }
-              title="View More"
-            />
-          </div>
-        </PowerCardContainer>
+          <PowerCardContainer
+            key={`${card.token?.tokenId}-${index}`}
+            style={{
+              paddingBottom: "70%",
+            }}
+            backgroundImageUrl={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
+              "ipfs://",
+              ""
+            )}`}
+          >
+            <div className="card-side front">
+              <img
+                src={`https://blush-select-dog-727.mypinata.cloud/ipfs/${cardData?.image.replace(
+                  "ipfs://",
+                  ""
+                )}`}
+                alt={cardData?.name}
+              />
+            </div>
+            <div className="card-side back">
+              <GradientSolidButton
+                handleClick={() =>
+                  navigate(
+                    `/power-cards?view=details&tab=${
+                      searchParams.get("tab") || "1"
+                    }`,
+                    {
+                      state: {
+                        card: { ...card, ipfsData: cardData },
+                        isOwned: true,
+                      },
+                      replace: true,
+                    }
+                  )
+                }
+                title="View More"
+              />
+            </div>
+          </PowerCardContainer>
+        </Skeleton>
       ))}
     </>
   );

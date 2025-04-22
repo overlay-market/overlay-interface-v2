@@ -2,6 +2,7 @@ import { PowerCardContainer } from "./power-card-styles";
 import { UnifiedCardData } from "../../types";
 import { POWER_CARDS_LOGOS } from "../../../../constants/powercards";
 import { useState, useEffect } from "react";
+import { Skeleton } from "@radix-ui/themes";
 
 type AvailableCardProps = {
   card: UnifiedCardData;
@@ -40,20 +41,27 @@ export const AvailableCard: React.FC<AvailableCardProps> = ({
   }, [cardImage, ipfsImageUrl]);
 
   return (
-    <PowerCardContainer onClick={() => setSelectedCard(card, false)}>
-      <div>
-        {cardImage ? (
-          loading ? (
-            <p>Loading...</p>
-          ) : imageLoaded ? (
-            <img src={ipfsImageUrl} alt={card.name} />
+    <Skeleton
+      loading={loading}
+      style={{
+        height: "250px", // Adjust this value to match your card height
+        width: "100%",
+        borderRadius: "8px",
+      }}
+    >
+      <PowerCardContainer onClick={() => setSelectedCard(card, false)}>
+        <div>
+          {cardImage ? (
+            imageLoaded ? (
+              <img src={ipfsImageUrl} alt={card.name} />
+            ) : (
+              <p>Image failed to load</p>
+            )
           ) : (
-            <p>Image failed to load</p>
-          )
-        ) : (
-          <p>No image available</p>
-        )}
-      </div>
-    </PowerCardContainer>
+            <p>No image available</p>
+          )}
+        </div>
+      </PowerCardContainer>
+    </Skeleton>
   );
 };

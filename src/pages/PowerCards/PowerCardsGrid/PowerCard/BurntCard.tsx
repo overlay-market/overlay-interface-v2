@@ -1,6 +1,7 @@
 import { PowerCardContainer } from "./power-card-styles";
 import { UnifiedCardData } from "../../types";
 import { useEffect, useState, useMemo } from "react";
+import { Skeleton } from "@radix-ui/themes";
 type BurntCardProps = {
   card: UnifiedCardData;
 };
@@ -41,16 +42,23 @@ export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
     )}`;
   }, [cardData?.image]);
 
-  if (!cardData && Number(card.burnt) !== 0) return <div>Loading...</div>;
-
   return (
     <>
       {Array.from({ length: burntCount }).map((_, index) => (
-        <PowerCardContainer key={`burnt-${index}`}>
-          <div className="grayscale">
-            <img src={imageUrl} alt={cardData?.name} />
-          </div>
-        </PowerCardContainer>
+        <Skeleton
+          loading={!cardData}
+          style={{
+            height: "250px", // Adjust this value to match your card height
+            width: "100%",
+            borderRadius: "8px",
+          }}
+        >
+          <PowerCardContainer key={`burnt-${index}`}>
+            <div className="grayscale">
+              <img src={imageUrl} alt={cardData?.name} />
+            </div>
+          </PowerCardContainer>
+        </Skeleton>
       ))}
     </>
   );
