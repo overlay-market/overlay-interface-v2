@@ -1,11 +1,14 @@
 import {  PartialVault } from '../../../types/vaultTypes';
 
-export const calculateTotalAPR = ({
-  vault
-}: {
-  vault: PartialVault;
-}): void => {
-  if (vault.poolApr && vault.rewardsApr) {
-    vault.totalApr = (Number(vault.poolApr) + Number(vault.rewardsApr)).toString()
-  }  
+export const calculateTotalAPR = (vault: PartialVault): number | null => {
+  const ichi = parseFloat(vault.ichiApr ?? '0');
+  const multi = parseFloat(vault.multiRewardApr ?? '0');
+
+  const total = ichi + multi; 
+
+  if (!isNaN(total)) {
+    return total
+  } else {
+    return null
+  }
 }

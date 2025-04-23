@@ -1,17 +1,19 @@
 import { formatUnits } from 'viem';
-import { FetchedVaultData, PartialVault } from '../../../types/vaultTypes';
+import { FetchedIchiVaultData } from '../../../types/vaultTypes';
 import { PriceItem } from '../hooks/useTokenPrices';
 import { getTokenPrice } from './getTokenPrice';
 
-export const calculateTVL = ({
-  vault,
-  fetchedVault,
-  prices
-}: {
-  vault: PartialVault;
-  fetchedVault: FetchedVaultData;
-  prices: PriceItem[];
-}): void => {
+export const calculateTVL = <T>(
+  fetchedVault: T,
+  prices: PriceItem[],
+  calculator: (fetchedVault: T, prices: PriceItem[]) => number
+): number => calculator(fetchedVault, prices);
+
+
+export const tvlCalculatorWithIchi = (
+  fetchedVault: FetchedIchiVaultData,
+  prices: PriceItem[]
+): number => {
   const amount0 = parseFloat(formatUnits(fetchedVault.totalAmount0, 18));
   const amount1 = parseFloat(formatUnits(fetchedVault.totalAmount1, 18));
   const price0 = getTokenPrice(prices, fetchedVault.token0);
@@ -19,5 +21,5 @@ export const calculateTVL = ({
 
   const tvl = amount0 * price0 + amount1 * price1;
 
-  vault.tvl = tvl.toString()
-}
+  return tvl;
+};
