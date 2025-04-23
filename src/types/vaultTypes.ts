@@ -1,20 +1,27 @@
 import { Address } from "viem";
-import { TOKENS } from "../constants/vaults";
+import { TOKENS, VaultItemType } from "../constants/vaults";
 
-export interface StaticVaultData {
-  vaultAddress: {
-    poolVault: Address;
-    rewardsVault: Address;
-  };
-  vaultName: string;
-  rewardTokens: {
-      rewardTokenName: TOKENS;
-      rewardTokenAddress: Address;
-    }[]
+export interface RewardToken {
+  rewardTokenName: TOKENS; 
+  rewardTokenAddress: Address;
 }
 
-export interface FetchedVaultData {
-  id: Address;
+export interface VaultItem {
+  id: number;
+  vaultType: VaultItemType;
+  vaultAddress: Address;
+  rewardTokens: RewardToken[];
+}
+
+export interface StaticVaultData {
+  id: number;
+  vaultName: string;
+  combinationType: VaultItemType[];
+  vaultItems: number[]; 
+}
+
+export interface FetchedIchiVaultData {
+  id: number;
   feeApr_7d: string;
   holdersCount: number;
   totalAmount0: bigint;
@@ -24,32 +31,13 @@ export interface FetchedVaultData {
 }
 
 export interface CalculatedVaultData {
-  poolVaultAddress: string;
-  poolApr: string;
-  rewardsApr: string;
+  id: number;
+  ichiApr?: string;
+  multiRewardApr?: string;
   totalApr: string;
   stakersCount: number;
   tvl: string;
 }
 
 export type PartialVault = Partial<CalculatedVaultData>;
-
-export interface VaultDetails {
-  vaultAddress: string;
-  totalSupply: number;
-  // apr: number;
-  // stakers: number;
-  // totalRewards: number;
-  userRewards: {
-    rewardA: number;
-    rewardB?: number;
-  } | undefined;
-}
-
-export interface UserStats {
-  currentStakedBalance: string;
-  // earnedRewards: {
-  //   rewardA: number;
-  //   rewardB?: number;
-  // } | undefined;
-}
+export const MR_types = [VaultItemType.MR_SINGLE, VaultItemType.MR_DUAL]
