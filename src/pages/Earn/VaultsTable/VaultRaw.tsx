@@ -6,8 +6,8 @@ import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { useEffect, useMemo, useState } from "react";
 import { useCurrentVaultDetails } from "../hooks/useCurrentVaultData";
-import { StaticVaultData } from "../../../types/vaultTypes";
-import { TOKEN_LOGOS } from "../../../constants/vaults";
+import { MR_types, StaticVaultData } from "../../../types/vaultTypes";
+import { TOKEN_LOGOS, VAULT_ITEMS } from "../../../constants/vaults";
 import { getUserRewards } from "../utils/getUserRewards";
 
 type VaultRowProps = {
@@ -22,9 +22,10 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
   const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const currentVaultDetails = useCurrentVaultDetails(
-    vault.vaultAddress.poolVault
-  );
+  const currentVaultDetails = useCurrentVaultDetails(vault.id);
+  const currentMRVault = VAULT_ITEMS.find(
+    (vt) => vault.vaultItems.includes(vt.id) && MR_types.includes(vt.vaultType)
+  )!;
 
   const formattedVaultName = useMemo(() => {
     if (isDesktop || !vault.vaultName.includes("-")) {
@@ -41,14 +42,15 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
   }, [isDesktop, vault.vaultName]);
 
   const tokenLogos = useMemo(() => {
-    if (!vault.rewardTokens || !vault.rewardTokens.length) return [];
+    if (!currentMRVault.rewardTokens || !currentMRVault.rewardTokens.length)
+      return [];
 
-    const logos = vault.rewardTokens
+    const logos = currentMRVault.rewardTokens
       .map((token) => TOKEN_LOGOS[token.rewardTokenName])
       .filter(Boolean);
 
     return logos;
-  }, [vault]);
+  }, [vault, currentMRVault]);
 
   const apr = useMemo(() => {
     return currentVaultDetails
@@ -58,9 +60,9 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
       : null;
   }, [currentVaultDetails]);
 
-  const poolApr = useMemo(() => {
+  const ichiApr = useMemo(() => {
     return currentVaultDetails
-      ? `${Number(currentVaultDetails.poolApr).toLocaleString(undefined, {
+      ? `${Number(currentVaultDetails.ichiApr ?? 0).toLocaleString(undefined, {
           maximumFractionDigits: 2,
         })}%`
       : null;
@@ -68,9 +70,12 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
 
   const rewardsApr = useMemo(() => {
     return currentVaultDetails
-      ? `${Number(currentVaultDetails.rewardsApr).toLocaleString(undefined, {
-          maximumFractionDigits: 2,
-        })}%`
+      ? `${Number(currentVaultDetails.multiRewardApr ?? 0).toLocaleString(
+          undefined,
+          {
+            maximumFractionDigits: 2,
+          }
+        )}%`
       : null;
   }, [currentVaultDetails]);
 
@@ -84,7 +89,7 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
 
   useEffect(() => {
     const fetchRewards = async () => {
-      const rewards = await getUserRewards(vault);
+      const rewards = await getUserRewards(vault.id);
       setUserRewards(rewards);
     };
 
@@ -94,7 +99,9 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
   }, [account, vault]);
 
   const rewards = useMemo(() => {
-    const rewards = vault.rewardTokens.map((token) => token.rewardTokenName);
+    const rewards = currentMRVault.rewardTokens.map(
+      (token) => token.rewardTokenName
+    );
 
     if (rewards.length === 1) {
       return rewards[0];
@@ -110,7 +117,7 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
         );
       }
     }
-  }, [isDesktop, vault]);
+  }, [isDesktop, vault, currentMRVault]);
 
   const redirectToStakePage = (vaultId: string) => {
     navigate(`/earn/${encodeURIComponent(vaultId)}`);
@@ -154,7 +161,7 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
               <Flex gap="1" direction={"column"}>
                 <Flex gap="4" justify={"between"}>
                   <Text>Pool APR</Text>
-                  <Text>{poolApr}</Text>
+                  <Text>{ichiApr}</Text>
                 </Flex>
 
                 <Flex gap="4" justify={"between"}>
