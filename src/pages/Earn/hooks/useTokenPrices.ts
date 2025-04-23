@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 export interface PriceItem {
   address: string;
@@ -47,5 +47,9 @@ export const useTokenPrices = (): UseTokenPricesResult => {
     fetchPrices();
   }, []); 
 
-  return { prices, loading, error };
+  const result = useMemo(() => {
+    return { prices, loading, error };
+  }, [prices, loading, error]);
+
+  return result;
 };
