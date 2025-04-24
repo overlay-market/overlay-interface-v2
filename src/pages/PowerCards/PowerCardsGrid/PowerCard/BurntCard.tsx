@@ -48,7 +48,7 @@ export const BurntCard: React.FC<BurntCardProps> = ({ card }) => {
         <Skeleton
           loading={!cardData}
           style={{
-            height: "250px", // Adjust this value to match your card height
+            height: "250px",
             width: "100%",
             borderRadius: "8px",
           }}

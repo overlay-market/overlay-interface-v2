@@ -32,6 +32,7 @@ const PowerCards = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [refetchInterval, setRefetchInterval] = useState<NodeJS.Timeout>();
 
   const [activeTab, setActiveTab] = useState(() => {
     const tab = searchParams.get("tab");
@@ -51,6 +52,7 @@ const PowerCards = () => {
     loading: userCardsLoading,
     error: userCardsError,
     data: userCardsData,
+    refetch: refetchUserCards,
   } = useUserPowerCards();
   const [allCardsWithIpfs, setAllCardsWithIpfs] = useState<UnifiedCardData[]>(
     []
@@ -75,6 +77,50 @@ const PowerCards = () => {
     setIsOwned(false);
     navigate(`/power-cards?tab=${activeTab}`, { replace: true });
   };
+
+  const handleBurnComplete = async () => {
+    const burnedCardId = selectedCard?.token?.id;
+    const initialCard = userCardsData?.account?.erc1155Tokens?.find(
+      (card: { token: { id: string } }) => card.token.id === burnedCardId
+    );
+    const initialBurntAmount = Number(initialCard?.burnt || 0);
+
+    setSelectedCard(null);
+    setIsOwned(false);
+    navigate("/power-cards?tab=1", { replace: true });
+
+    if (refetchInterval) {
+      clearInterval(refetchInterval);
+    }
+
+    const interval = setInterval(async () => {
+      const { data: newData } = await refetchUserCards();
+      const updatedCard = newData?.account?.erc1155Tokens?.find(
+        (card: { token: { id: string } }) => card.token.id === burnedCardId
+      );
+      const newBurntAmount = Number(updatedCard?.burnt || 0);
+
+      if (newBurntAmount > initialBurntAmount) {
+        clearInterval(interval);
+      }
+    }, 2000);
+
+    setRefetchInterval(interval);
+
+    setTimeout(() => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    }, 120000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (refetchInterval) {
+        clearInterval(refetchInterval);
+      }
+    };
+  }, [refetchInterval]);
 
   useEffect(() => {
     const fetchIpfsData = async (tokens: ERC1155Token[]) => {
@@ -157,7 +203,11 @@ const PowerCards = () => {
 
         {selectedCard ? (
           <div style={{ alignSelf: "center" }}>
-            <OpenedPowerCard card={selectedCard} isOwned={isOwned} />
+            <OpenedPowerCard
+              card={selectedCard}
+              isOwned={isOwned}
+              onBurnComplete={handleBurnComplete}
+            />
           </div>
         ) : allCardsLoading || userCardsLoading ? null : (
           <PowerCardsGrid

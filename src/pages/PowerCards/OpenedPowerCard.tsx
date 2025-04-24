@@ -1,4 +1,4 @@
-import { useNavigate, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import {
   Badge,
   Container,
@@ -23,14 +23,18 @@ import { currentTimeParsed } from "../../utils/currentTime";
 interface OpenedPowerCardProps {
   card: UnifiedCardData;
   isOwned: boolean;
+  onBurnComplete: () => void;
 }
 
-const OpenedPowerCard = ({ card, isOwned }: OpenedPowerCardProps) => {
+const OpenedPowerCard = ({
+  card,
+  isOwned,
+  onBurnComplete,
+}: OpenedPowerCardProps) => {
   const { address: account } = useAccount();
   const { isPending, writeContract } = useWriteContract();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
-  const navigate = useNavigate();
 
   if (!card || !card.ipfsData) {
     return <Navigate to="/power-cards" replace />;
@@ -66,10 +70,8 @@ const OpenedPowerCard = ({ card, isOwned }: OpenedPowerCardProps) => {
             },
             hash
           );
-          navigate("/power-cards", {
-            replace: true,
-            state: { tab: "owned", refresh: Date.now() },
-          });
+
+          onBurnComplete();
         },
         onError: (error) => {
           console.error("❌ Error burning card:", error);
