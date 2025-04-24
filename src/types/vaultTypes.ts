@@ -41,3 +41,9 @@ export interface CalculatedVaultData {
 
 export type PartialVault = Partial<CalculatedVaultData>;
 export const MR_types = [VaultItemType.MR_SINGLE, VaultItemType.MR_DUAL]
+
+export interface UserCurrentBalance {
+  tokenSymbol: string;
+  amount: string;
+  tokenValue: string | number;
+}

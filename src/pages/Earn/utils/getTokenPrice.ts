@@ -10,8 +10,7 @@ export const getTokenPrice = (
 
   if (price === undefined) {
     console.warn(`Missing price for token ${tokenAddress}`);
-    // return 0;
-    return prices[0].price
+    return 0;
   }
 
   return price;

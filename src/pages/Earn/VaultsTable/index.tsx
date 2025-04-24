@@ -4,13 +4,12 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import VaultRow from "./VaultRaw";
+import VaultRow from "./VaultRow";
 import { VAULTS } from "../../../constants/vaults";
 
 const VaultsTable: React.FC = () => {
   const { address: account } = useAccount();
 
-  // const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   return (

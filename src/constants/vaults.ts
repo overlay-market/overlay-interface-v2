@@ -52,11 +52,11 @@ export const VAULT_ITEMS: VaultItem[] = [
   {
     id: 3,
     vaultType: VaultItemType.ICHI,
-    vaultAddress: '0x20a49a266ae70d07ba066ef1f8b6e670216ab2a6',
+    vaultAddress: '0x3efF586Be3a907D8dEC40178eb35215215F58Af7',
     rewardTokens: [
       {
         rewardTokenName: TOKENS.ICHI,
-        rewardTokenAddress: `0x20a49a266ae70d07ba066ef1f8b6e670216ab2a6`,
+        rewardTokenAddress: `0x3efF586Be3a907D8dEC40178eb35215215F58Af7`,
       }
     ]
   },
