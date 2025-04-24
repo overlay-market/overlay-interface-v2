@@ -4,11 +4,14 @@ import theme from "../../../theme";
 import { useNavigate } from "react-router-dom";
 import useAccount from "../../../hooks/useAccount";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { useEffect, useMemo, useState } from "react";
-import { useCurrentVaultDetails } from "../hooks/useCurrentVaultData";
-import { MR_types, StaticVaultData } from "../../../types/vaultTypes";
-import { TOKEN_LOGOS, VAULT_ITEMS } from "../../../constants/vaults";
-import { getUserRewards } from "../utils/getUserRewards";
+import { useMemo } from "react";
+import {
+  useCurrentMRVault,
+  useCurrentVaultDetails,
+} from "../hooks/useCurrentVaultData";
+import { StaticVaultData } from "../../../types/vaultTypes";
+import { TOKEN_LOGOS } from "../../../constants/vaults";
+import { useUserRewards } from "../hooks/useUserRewards";
 
 type VaultRowProps = {
   vault: StaticVaultData;
@@ -17,15 +20,13 @@ type VaultRowProps = {
 const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
-  const [userRewards, setUserRewards] = useState<string[]>([]);
+  const { rewards: userRewards } = useUserRewards(vault.id);
 
   const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const currentVaultDetails = useCurrentVaultDetails(vault.id);
-  const currentMRVault = VAULT_ITEMS.find(
-    (vt) => vault.vaultItems.includes(vt.id) && MR_types.includes(vt.vaultType)
-  )!;
+  const currentMRVault = useCurrentMRVault(vault);
 
   const formattedVaultName = useMemo(() => {
     if (isDesktop || !vault.vaultName.includes("-")) {
@@ -42,7 +43,11 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
   }, [isDesktop, vault.vaultName]);
 
   const tokenLogos = useMemo(() => {
-    if (!currentMRVault.rewardTokens || !currentMRVault.rewardTokens.length)
+    if (
+      !currentMRVault ||
+      !currentMRVault.rewardTokens ||
+      !currentMRVault.rewardTokens.length
+    )
       return [];
 
     const logos = currentMRVault.rewardTokens
@@ -87,18 +92,9 @@ const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
       : null;
   }, [currentVaultDetails]);
 
-  useEffect(() => {
-    const fetchRewards = async () => {
-      const rewards = await getUserRewards(vault.id);
-      setUserRewards(rewards);
-    };
-
-    if (account && vault) {
-      fetchRewards();
-    }
-  }, [account, vault]);
-
   const rewards = useMemo(() => {
+    if (!currentMRVault) return null;
+
     const rewards = currentMRVault.rewardTokens.map(
       (token) => token.rewardTokenName
     );
