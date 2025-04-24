@@ -1,21 +1,30 @@
 import { useVaultsState } from "../../../state/vaults/hooks";
-import { CalculatedVaultData, StaticVaultData } from "../../../types/vaultTypes";
-import { Address } from "viem";
-import { VAULTS } from "../../../constants/vaults";
+import { CalculatedVaultData, MR_types, StaticVaultData, VaultItem } from "../../../types/vaultTypes";
+import { VAULT_ITEMS, VAULTS } from "../../../constants/vaults";
 
-export const useCurrentVault = (vaultAddress: Address): StaticVaultData | undefined  => {
-  
+export const useCurrentVault = (vaultName: string | undefined): StaticVaultData | undefined  => {
+  if (!vaultName) return undefined;
+
   return VAULTS?.find(
     (vault) =>
-      vault.vaultAddress.poolVault.toLowerCase() === vaultAddress.toLowerCase()
+      vault.vaultName.toLowerCase() === vaultName.toLowerCase()
   )
 }
 
-export const useCurrentVaultDetails = (vaultAddress: Address): CalculatedVaultData | undefined => {
+export const useCurrentVaultDetails = (vaultId: number | undefined): CalculatedVaultData | undefined => {
   const { vaultsDetails } = useVaultsState();
-  
+  if (!vaultId) return undefined;
+
   return vaultsDetails?.find(
     (detail) =>
-      detail.poolVaultAddress.toLowerCase() === vaultAddress.toLowerCase()
+      detail.id === vaultId
+  )
+}
+
+export const useCurrentMRVault = (vault: StaticVaultData): VaultItem | undefined  => {
+  if (!vault) return undefined;
+
+  return VAULT_ITEMS.find(
+    (vt) => vault.vaultItems.includes(vt.id) && MR_types.includes(vt.vaultType)
   )
 }
