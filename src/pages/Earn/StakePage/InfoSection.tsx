@@ -8,75 +8,81 @@ import {
 } from "./info-section-styles";
 import theme from "../../../theme";
 import { useParams } from "react-router-dom";
-import { getVaultAddressByVaultName } from "../utils/currentVaultdata";
 import {
   useCurrentVault,
   useCurrentVaultDetails,
 } from "../hooks/useCurrentVaultData";
-import { Address } from "viem";
-import { TOKEN_LOGOS } from "../../../constants/vaults";
 
 const InfoSection: React.FC = () => {
   const { vaultId } = useParams();
 
-  const vaultAddress = getVaultAddressByVaultName(vaultId) as Address;
-  const currentVault = useCurrentVault(vaultAddress);
-  const currentVaultDetails = useCurrentVaultDetails(vaultAddress);
+  const currentVault = useCurrentVault(vaultId);
+  const currentVaultDetails = useCurrentVaultDetails(currentVault?.id);
 
-  const totalSupply = currentVaultDetails?.tvl.toLocaleString() ?? "";
+  const tvl = useMemo(() => {
+    return currentVaultDetails
+      ? `$${Number(currentVaultDetails.tvl).toLocaleString(undefined, {
+          maximumFractionDigits: 0,
+        })}`
+      : null;
+  }, [currentVaultDetails]);
 
-  const tokenLogos = useMemo(() => {
-    if (!currentVault) return [];
+  const totalApr = useMemo(() => {
+    return currentVaultDetails
+      ? `${Number(currentVaultDetails.totalApr).toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        })}%`
+      : null;
+  }, [currentVaultDetails]);
 
-    const logos = currentVault.rewardTokens
-      .map((token) => TOKEN_LOGOS[token.rewardTokenName])
-      .filter(Boolean);
+  const ichiApr = useMemo(() => {
+    return currentVaultDetails
+      ? `${Number(currentVaultDetails.ichiApr ?? 0).toLocaleString(undefined, {
+          maximumFractionDigits: 2,
+        })}%`
+      : null;
+  }, [currentVaultDetails]);
 
-    return logos;
-  }, [currentVault]);
+  const rewardsApr = useMemo(() => {
+    return currentVaultDetails
+      ? `${Number(currentVaultDetails.multiRewardApr ?? 0).toLocaleString(
+          undefined,
+          {
+            maximumFractionDigits: 2,
+          }
+        )}%`
+      : null;
+  }, [currentVaultDetails]);
 
   return (
     <Flex direction={"column"} gap={"16px"}>
-      <RewardBox>
-        <TextLabel>Daily Reward</TextLabel>
-
-        <Flex
-          direction={{ initial: "column", sm: "row", lg: "column" }}
-          justify={"between"}
-          gap={{ initial: "8px", sm: "20px", lg: "8px" }}
-        >
-          {vaultId &&
-            tokenLogos.map((logo, idx) => (
-              <Flex
-                justify={"between"}
-                align={"center"}
-                width={"100%"}
-                key={idx}
-              >
-                <img
-                  src={logo}
-                  alt={"token logo"}
-                  width={"36px"}
-                  height={"36px"}
-                />
-              </Flex>
-            ))}
-        </Flex>
-      </RewardBox>
-
       <Flex
         direction={{ initial: "column", sm: "row", lg: "column" }}
         gap={"16px"}
       >
         <InfoBox>
           <TextLabel>TVL</TextLabel>
-          <TextValue>{totalSupply} OVL</TextValue>
-        </InfoBox>
-        <InfoBox>
-          <TextLabel>APY</TextLabel>
-          <TextValue style={{ color: theme.color.green2 }}>5.2%</TextValue>
+          <TextValue>{tvl} </TextValue>
         </InfoBox>
       </Flex>
+
+      <RewardBox>
+        <Flex justify={"between"} align={"center"}>
+          <TextLabel>Total return</TextLabel>
+          <TextValue style={{ color: theme.color.green2 }}>
+            {totalApr}
+          </TextValue>
+        </Flex>
+
+        <Flex justify={"between"} align={"center"} width={"100%"}>
+          <TextLabel>Strategy yield</TextLabel>
+          <TextValue>{ichiApr}</TextValue>
+        </Flex>
+        <Flex justify={"between"} align={"center"} width={"100%"}>
+          <TextLabel>Rewards yield</TextLabel>
+          <TextValue>{rewardsApr}</TextValue>
+        </Flex>
+      </RewardBox>
     </Flex>
   );
 };
