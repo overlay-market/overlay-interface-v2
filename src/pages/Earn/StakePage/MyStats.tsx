@@ -6,24 +6,53 @@ import {
   StatValue,
 } from "./my-stats-styles";
 import theme from "../../../theme";
-import { useVaultsState } from "../../../state/vaults/hooks";
 import { useParams } from "react-router-dom";
-import { getVaultAddressByVaultName } from "../utils/currentVaultdata";
 import steerClient from "../../../services/steerClient";
 import { useAddPopup } from "../../../state/application/hooks";
 import { TransactionType } from "../../../constants/transaction";
 import { currentTimeParsed } from "../../../utils/currentTime";
-import { UNIT } from "../../../constants/applications";
 import { handleError } from "../../../utils/handleError";
-import { Address } from "viem";
+import { useMemo } from "react";
+import { useCurrentVault } from "../hooks/useCurrentVaultData";
+import { useUserRewards } from "../hooks/useUserRewards";
+import { useUserCurrentBalance } from "../hooks/useUserCurrentBalance";
 
 const MyStats: React.FC = () => {
   const { vaultId } = useParams();
-  const { userStats } = useVaultsState();
-  const vaultAddress = getVaultAddressByVaultName(vaultId) as Address;
+  const vaultAddress = "";
+  // const { address: account } = useAccount();
+  const account = `0x9A45122d496983bdfDE3aE464C92b4610ad690fE`;
 
+  const curVault = useCurrentVault(vaultId);
+  const { rewards: userRewards } = useUserRewards(curVault?.id);
+  const { curBalance, loading } = useUserCurrentBalance(3);
   const addPopup = useAddPopup();
+
   const currentTimeForId = currentTimeParsed();
+
+  const userTokensBalance = curBalance.map((tokenBalance) => {
+    return {
+      tokenSymbol: tokenBalance.tokenSymbol,
+      amount: Number(tokenBalance.amount).toLocaleString(undefined, {
+        maximumSignificantDigits: 4,
+      }),
+      tokenValue: tokenBalance.tokenValue.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    };
+  });
+
+  const totalTokensValue = useMemo(() => {
+    if (loading) return "";
+    const total = curBalance.reduce((acc, tokenData) => {
+      return acc + Number(tokenData.tokenValue);
+    }, 0);
+    return `$${total.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }, [curBalance, loading]);
 
   const handleClaimRewards = async () => {
     steerClient.staking
@@ -80,27 +109,48 @@ const MyStats: React.FC = () => {
 
       <MyStatsContainer>
         <StatCard>
-          <Text size={"1"}>Current Balance</Text>
-          <StatValue>
-            {userStats?.currentStakedBalance} {UNIT}
-          </StatValue>
-        </StatCard>
-
-        <StatCard>
-          <Text size={"1"}>Earned Rewards</Text>
-          <StatValue>7,500,000 OVL + 7,500,000 BERA</StatValue>
+          <Flex justify={"between"} align={"center"}>
+            <Text size={"1"}>Current Balance</Text>
+            <Text size={"4"} weight={"bold"}>
+              {totalTokensValue}
+            </Text>
+          </Flex>
+          {userTokensBalance.map((tokenData) => (
+            <Flex
+              justify={"between"}
+              align={"center"}
+              key={tokenData.tokenSymbol + tokenData.amount}
+            >
+              <StatValue>{tokenData.tokenSymbol}</StatValue>
+              <StatValue>
+                {tokenData.amount}{" "}
+                <span
+                  style={{ color: theme.color.grey3, fontWeight: "normal" }}
+                >
+                  /
+                </span>{" "}
+                ${tokenData.tokenValue}
+              </StatValue>
+            </Flex>
+          ))}
         </StatCard>
 
         <StatCard>
           <Flex justify={"between"} align={"center"}>
-            <Text size={"1"}>Pending Rewards</Text>
-            <ClaimRewardsButton onClick={handleClaimRewards}>
-              Claim Rewards
-            </ClaimRewardsButton>
+            {userRewards.length === 0 ? (
+              <Text size={"1"}>No Pending Rewards</Text>
+            ) : (
+              <Text size={"1"}>Pending Rewards</Text>
+            )}
+            {userRewards.length > 0 && (
+              <ClaimRewardsButton onClick={handleClaimRewards}>
+                Claim Rewards
+              </ClaimRewardsButton>
+            )}
           </Flex>
 
           <Flex gap={"10px"}>
-            <StatValue>7,500,000 OVL + 7,500,000 BERA</StatValue>
+            <StatValue>{userRewards.join(" + ")}</StatValue>
           </Flex>
         </StatCard>
       </MyStatsContainer>
