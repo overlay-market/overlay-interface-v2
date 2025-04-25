@@ -20,8 +20,6 @@ import { useUserCurrentBalance } from "../hooks/useUserCurrentBalance";
 const MyStats: React.FC = () => {
   const { vaultId } = useParams();
   const vaultAddress = "";
-  // const { address: account } = useAccount();
-  const account = `0x9A45122d496983bdfDE3aE464C92b4610ad690fE`;
 
   const curVault = useCurrentVault(vaultId);
   const { rewards: userRewards } = useUserRewards(curVault?.id);

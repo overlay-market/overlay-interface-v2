@@ -17,7 +17,7 @@ const TopSection: React.FC = () => {
         <ApyBagdeText>Variable APY</ApyBagdeText>
       </ApyBadge>
 
-      <TitleText>{vaultId} VAULT</TitleText>
+      <TitleText>{vaultId}</TitleText>
       <Text size={"1"} style={{ color: "#F2F2F2", lineHeight: "15px" }}>
         Deposit Kodiak v3 USDC/OVL LP Token {vaultId}. Earn daily rewards based
         on your staked amount. This reward is distributed automatically to your

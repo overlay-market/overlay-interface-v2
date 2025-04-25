@@ -16,23 +16,18 @@ import steerClient from "../../../../services/steerClient";
 import { TransactionType } from "../../../../constants/transaction";
 import { useAddPopup } from "../../../../state/application/hooks";
 import { currentTimeParsed } from "../../../../utils/currentTime";
-import { useParams } from "react-router-dom";
-import { getVaultAddressByVaultName } from "../../utils/currentVaultdata";
 import { parseUnits } from "viem";
 import { handleError } from "../../../../utils/handleError";
 import useSDK from "../../../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../../../providers/MultichainContextProvider/useMultichainContext";
 import { formatDecimals } from "../../utils/formatDecimals";
-import { useVaultsState } from "../../../../state/vaults/hooks";
 
 const TransactSection: React.FC = () => {
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const { openModal } = useModalHelper();
-  const { vaultId } = useParams();
-  const { userStats } = useVaultsState();
-  const vaultAddress = getVaultAddressByVaultName(vaultId);
+  const vaultAddress = "";
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
 
@@ -63,8 +58,8 @@ const TransactSection: React.FC = () => {
   const isTypedAmountExceeded = useMemo(() => {
     return stakeSelected
       ? Number(typedAmount) > Number(ovlBalance)
-      : Number(typedAmount) > Number(userStats?.currentStakedBalance);
-  }, [stakeSelected, typedAmount, ovlBalance, userStats?.currentStakedBalance]);
+      : Number(typedAmount) > Number(0);
+  }, [stakeSelected, typedAmount, ovlBalance]);
 
   const isDisabledButton = useMemo(() => {
     return !typedAmount || Number(typedAmount) === 0 || isTypedAmountExceeded;
@@ -224,7 +219,7 @@ const TransactSection: React.FC = () => {
       <InputComponent
         typedAmount={typedAmount}
         setTypedAmount={setTypedAmount}
-        balance={stakeSelected ? ovlBalance : userStats?.currentStakedBalance}
+        balance={stakeSelected ? ovlBalance : "0"}
       />
 
       {account &&
