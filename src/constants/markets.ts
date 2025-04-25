@@ -30,6 +30,9 @@ import L1vL2 from "../assets/images/markets-full-logos/l1-vs-l2-index.webp";
 import L1 from "../assets/images/markets-full-logos/l1-index.webp";
 import HoneryJar from "../assets/images/markets-full-logos/honeyjar.webp";
 import DeFi from "../assets/images/markets-full-logos/defi-index.webp";
+import HenloUsd from '../assets/images/markets-full-logos/henlo-usd.webp';
+import Bullas from '../assets/images/markets-full-logos/bullas.webp';
+import IbgtBera from '../assets/images/markets-full-logos/iBGT-bera.webp';
 import DefaultLogo from '../assets/images/markets-full-logos/dafault-logo.webp';
 
 export const DEFAULT_LOGO = DefaultLogo;
@@ -66,6 +69,9 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Layer%201%20Index": L1,
   "HoneyComb%20and%20Jars%20NFT%20Index": HoneryJar,
   "Defi%20Index": DeFi,
+  "HENLO%20%2F%20USD": HenloUsd,
+  "Bullas": Bullas,
+  "iBGT%20%2F%20BERA": IbgtBera,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -73,6 +79,7 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 };
 
 export const MARKETSORDER = [
+  "HENLO%20%2F%20USD",
   "Counter-Strike%202%20Skins",
   "BTC%20Dominance",
   "ETH%20Dominance",
@@ -126,7 +133,7 @@ export type MarketCategoryMap = {
 
 export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Chess]: ["Hikaru%20Nakamura", "Magnus%20Carlsen"],
-  [CategoryName.Bera]: ["Bera%20NFT%20Index", "Bullas", "iBGT%20%2F%20BERA"],
+  [CategoryName.Bera]: ["Bera%20NFT%20Index", "Bullas", "iBGT%20%2F%20BERA", "HENLO%20%2F%20USD"],
   [CategoryName.MemeWar]: [
     "Cats%20vs%20Dogs%20-%20Meme%20War",
     "Cats%20vs%20Frogs%20-%20Meme%20War",
