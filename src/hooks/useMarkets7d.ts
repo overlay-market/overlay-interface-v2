@@ -22,7 +22,9 @@ interface MarketDataWithOpenPrice {
 
 export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
   const [marketsData, setMarketsData] = useState<MarketDataWithOpenPrice[]>([]);
-  const [marketAddressMapping, setMarketAddressMapping] = useState<Record<string, string>>({});
+  const [marketAddressMapping, setMarketAddressMapping] = useState<
+    Record<string, string>
+  >({});
 
   // Memoized version of marketIds to avoid unnecessary re-fetches
   const stableMarketIds = useMemo(() => marketIds, [marketIds]);
@@ -31,12 +33,20 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
   useEffect(() => {
     const fetchMarketAddressMapping = async () => {
       try {
-        const response2 = await axios.get("https://api.overlay.market/data/api/markets");
+        const response2 = await axios.get(
+          "https://api.overlay.market/data/api/markets"
+        );
         const mapping: Record<string, string> = {};
 
-        response2.data[421614].forEach((item: { marketId: string; chains: { deploymentAddress: string }[] }) => {
-          mapping[item.marketId] = item.chains[0]?.deploymentAddress.toLowerCase();
-        });
+        response2.data[421614].forEach(
+          (item: {
+            marketId: string;
+            chains: { deploymentAddress: string }[];
+          }) => {
+            mapping[item.marketId] =
+              item.chains[0]?.deploymentAddress.toLowerCase();
+          }
+        );
 
         setMarketAddressMapping(mapping);
       } catch (error) {
@@ -50,7 +60,11 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
   // Fetch marketsPricesOverview whenever marketIds or the mapping changes
   useEffect(() => {
     const fetchMarketsPricesOverview = async () => {
-      if (Object.keys(marketAddressMapping).length === 0 || stableMarketIds.length === 0) return;
+      if (
+        Object.keys(marketAddressMapping).length === 0 ||
+        stableMarketIds.length === 0
+      )
+        return;
 
       try {
         const responseOverview = await axios.get<MarketDataPoint[]>(
@@ -61,21 +75,38 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
         const updatedMarketsData = stableMarketIds.map((marketId) => {
           try {
             const marketAddressSepolia = marketAddressMapping[marketId];
-            const chartData = chartDataArray.find((item) => item.marketAddress === marketAddressSepolia);
+            const chartData = chartDataArray.find(
+              (item) => item.marketAddress === marketAddressSepolia
+            );
 
             if (!chartData) {
               throw new Error(`No chart data available for ${marketId}`);
             }
 
+            const calculatePercentageChange = (
+              current: number,
+              previous: number
+            ): number => {
+              if (previous === 0 || !previous) return 0;
+              const change = (100 * (current - previous)) / previous;
+              return Number.isFinite(change) ? change : 0;
+            };
+
             return {
               marketId,
               latestPrice: chartData.latestPrice,
-              oneHourChange:
-                (100 * (chartData.latestPrice - chartData.priceOneHourAgo)) / chartData.priceOneHourAgo,
-              twentyFourHourChange:
-                (100 * (chartData.latestPrice - chartData.priceOneDayAgo)) / chartData.priceOneDayAgo,
-              sevenDayChange:
-                (100 * (chartData.latestPrice - chartData.priceSevenDaysAgo)) / chartData.priceSevenDaysAgo,
+              oneHourChange: calculatePercentageChange(
+                chartData.latestPrice,
+                chartData.priceOneHourAgo
+              ),
+              twentyFourHourChange: calculatePercentageChange(
+                chartData.latestPrice,
+                chartData.priceOneDayAgo
+              ),
+              sevenDayChange: calculatePercentageChange(
+                chartData.latestPrice,
+                chartData.priceSevenDaysAgo
+              ),
               sevenDaysChartData: chartData.prices,
             };
           } catch (err) {
@@ -92,7 +123,10 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
 
         if (updatedMarketsData.length > 0) {
           setMarketsData((prevMarketsData) =>
-            JSON.stringify(prevMarketsData) !== JSON.stringify(updatedMarketsData) ? updatedMarketsData : prevMarketsData
+            JSON.stringify(prevMarketsData) !==
+            JSON.stringify(updatedMarketsData)
+              ? updatedMarketsData
+              : prevMarketsData
           );
         }
       } catch (error) {
