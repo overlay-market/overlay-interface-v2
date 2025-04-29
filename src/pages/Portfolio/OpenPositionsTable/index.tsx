@@ -1,5 +1,4 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { ColorButton } from "../../../components/Button";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useState } from "react";
 import useAccount from "../../../hooks/useAccount";
@@ -13,6 +12,11 @@ import ClosePositionsModal from "../../../components/ClosePositionsModal";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { usePositionRefresh } from "../../../state/portfolio/hooks";
 import { triggerLoader } from "../UnwindsTable";
+import {
+  ButtonTitle,
+  GradientOutlineBtnWrapper,
+  GradientSolidBtnWrapper,
+} from "../../../components/Button/gradient-button-styles";
 
 const POSITIONS_COLUMNS = [
   "Market",
@@ -95,33 +99,41 @@ const OpenPositionsTable: React.FC = () => {
         <Flex gap="2" style={{ display: isMobile ? "none" : "flex" }}>
           {showCheckboxes ? (
             <>
-              <ColorButton
+              <GradientOutlineBtnWrapper
                 onClick={() => {
                   setShowCheckboxes(false);
                   setSelectedPositions(new Set());
                 }}
-                width="140px"
-                bgColor={theme.color.grey4}
-                color={theme.color.grey1}
+                width="150px"
+                height="45px"
               >
-                Cancel Selection
-              </ColorButton>
-              <ColorButton
+                <ButtonTitle>Cancel Selection</ButtonTitle>
+              </GradientOutlineBtnWrapper>
+              <GradientSolidBtnWrapper
                 onClick={() => setShowCloseModal(true)}
                 width="180px"
+                height="45px"
                 disabled={selectedPositions.size === 0}
               >
-                Close Selected ({selectedPositions.size})
-              </ColorButton>
+                {" "}
+                <Text
+                  style={{
+                    color: selectedPositions.size === 0 ? "" : "black",
+                  }}
+                >
+                  Close Selected ({selectedPositions.size})
+                </Text>
+              </GradientSolidBtnWrapper>
             </>
           ) : (
-            <ColorButton
+            <GradientSolidBtnWrapper
               onClick={() => setShowCheckboxes(true)}
-              width="140px"
+              width="150px"
+              height="45px"
               style={{ display: positionsTotalNumber === 0 ? "none" : "block" }}
             >
-              Select Positions
-            </ColorButton>
+              <Text style={{ color: "black" }}> Select Positions</Text>
+            </GradientSolidBtnWrapper>
           )}
         </Flex>
       </Flex>

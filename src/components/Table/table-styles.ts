@@ -1,7 +1,13 @@
 import styled from "styled-components";
 import theme from "../../theme";
-import { Button, Flex } from "@radix-ui/themes";
+import { Button, Flex, Checkbox as RadixCheckbox } from "@radix-ui/themes";
 import { ChevronDown } from "react-feather";
+
+export const StyledCheckbox = styled(RadixCheckbox)`
+  &[data-state="checked"]::before {
+    background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+  }
+`;
 
 export const Table = styled.table<{ width?: string, minwidth?: string }>`
   width: ${(props) => (props.width ?? '100%')};

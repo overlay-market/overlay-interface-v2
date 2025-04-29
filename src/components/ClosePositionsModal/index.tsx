@@ -4,12 +4,16 @@ import { OpenPositionData, SDKError } from "overlay-sdk";
 import useAccount from "../../hooks/useAccount";
 import useSDK from "../../hooks/useSDK";
 import theme from "../../theme";
-import { ColorButton } from "../Button/ColorButton";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { TransactionResult } from "overlay-sdk/dist/core/types";
+import {
+  ButtonTitle,
+  GradientOutlineBtnWrapper,
+  GradientSolidBtnWrapper,
+} from "../Button/gradient-button-styles";
 
 type ClosePositionsModalProps = {
   open: boolean;
@@ -114,22 +118,23 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
 
         <Flex gap="3" justify="end" mt={"4"}>
           {" "}
-          <ColorButton
+          <GradientOutlineBtnWrapper
             onClick={handleDismiss}
             width="140px"
-            bgColor={theme.color.grey4}
-            color={theme.color.grey1}
             disabled={isUnwinding}
+            height="45px"
           >
-            Cancel
-          </ColorButton>
-          <ColorButton
+            <ButtonTitle>Cancel</ButtonTitle>
+          </GradientOutlineBtnWrapper>
+          <GradientSolidBtnWrapper
             onClick={multipleUnwind}
             width="140px"
             disabled={isUnwinding}
+            style={{ color: "black" }}
+            height="45px"
           >
             {isUnwinding ? "Pending..." : "Confirm"}
-          </ColorButton>
+          </GradientSolidBtnWrapper>
         </Flex>
       </Dialog.Content>
     </Dialog.Root>

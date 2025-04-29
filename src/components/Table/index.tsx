@@ -1,4 +1,4 @@
-import { Flex, ScrollArea, Text, Checkbox } from "@radix-ui/themes";
+import { Flex, ScrollArea, Text } from "@radix-ui/themes";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import {
   Dropdown,
@@ -7,6 +7,7 @@ import {
   RotatingChevron,
   StyledHeader,
   Table,
+  StyledCheckbox,
 } from "./table-styles";
 import theme from "../../theme";
 import { useState, useEffect } from "react";
@@ -20,8 +21,8 @@ type TableProps = {
   currentPage: number;
   positionsTotalNumber: number;
   itemsPerPage: number;
-  setCurrentPage: Function;
-  setItemsPerPage: Function;
+  setCurrentPage: (page: number) => void;
+  setItemsPerPage: (items: number) => void;
   body?: React.ReactNode;
   showCheckbox?: boolean;
   onSelectAll?: (selectAll: boolean) => void;
@@ -85,7 +86,7 @@ const StyledTable: React.FC<TableProps> = ({
                     paddingLeft: "10px",
                   }}
                 >
-                  <Checkbox
+                  <StyledCheckbox
                     checked={allSelected}
                     onCheckedChange={handleSelectAll}
                     size="3"
@@ -251,4 +252,4 @@ const StyledTable: React.FC<TableProps> = ({
 
 export default StyledTable;
 
-export { StyledCell, StyledRow } from "./table-styles";
+export { StyledCell, StyledRow, StyledCheckbox } from "./table-styles";

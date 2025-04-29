@@ -1,5 +1,5 @@
-import { Flex, Text, Checkbox } from "@radix-ui/themes";
-import { StyledCell, StyledRow } from "../../../components/Table";
+import { Flex, Text } from "@radix-ui/themes";
+import { StyledCell, StyledRow, StyledCheckbox } from "../../../components/Table";
 import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
 import { useState } from "react";
@@ -54,11 +54,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
               justifyContent: "center",
             }}
           >
-            <Checkbox
+            <StyledCheckbox
               checked={isChecked}
               onCheckedChange={handleCheckboxChange}
               size="3"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
             />
           </StyledCell>
         )}
