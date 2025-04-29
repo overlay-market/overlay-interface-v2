@@ -6,5 +6,5 @@ export const PopupsContainer = styled.div`
   z-index: 69420;
   width: 100%;
   bottom: 0;
-  right: 0;
-`
+  right: 42px;
+`;

@@ -14,6 +14,11 @@ export const PopupContainer = styled.div`
   border-radius: 8px;
   background: ${theme.color.grey4};
   overflow: hidden;
+  max-width: 321px;
+  width: 100%;
+
+  word-wrap: break-word;
+  word-break: break-word;
 `;
 
 const Fader = styled.div`

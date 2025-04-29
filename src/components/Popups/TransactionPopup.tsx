@@ -33,7 +33,7 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
   }
 
   return (
-    <Flex style={{ zIndex: 420 }} align={"center"}>
+    <Flex style={{ zIndex: 420, width: "100%" }} align={"center"}>
       <Box>
         {success ? (
           <CheckCircle width={22} height={22} color={theme.color.green1} />
@@ -41,8 +41,8 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
           <AlertTriangle width={22} height={22} color={theme.color.red1} />
         )}
       </Box>
-      <Flex direction={"column"} align={"start"} mr={"16px"} ml={"12px"}>
-        <Text weight={"bold"}>
+      <Flex direction={"column"} align={"start"} mr={"16px"} ml={"12px"} style={{ flex: 1 }}>
+        <Text weight={"bold"} style={{ width: "100%", wordWrap: "break-word" }}>
           {type === TransactionType.APPROVAL && "Spending Limit Approved"}
           {type === TransactionType.BUILD_OVL_POSITION &&
             "Position Successfully Built"}
@@ -51,11 +51,14 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
             "Liquidation Successful"}
           {type === TransactionType.BRIDGE_OVL && "Bridge Successful"}
           {type === TransactionType.CLAIM_OVL && "Claim Successful"}
-
-          {errorMessage}
+          {!success && errorMessage}
         </Text>
 
-        {errorDetails && <Text>{errorDetails}</Text>}
+        {errorDetails && (
+          <Text style={{ width: "100%", wordWrap: "break-word", fontSize: "12px" }}>
+            {errorDetails}
+          </Text>
+        )}
 
         {chainId && hash && success && (
           <ExternalLink
