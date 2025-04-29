@@ -31,4 +31,8 @@ export interface MarketDataParsed {
   capleverage?: string;
   volumeAsk: string;
   volumeBid: string;
+  buttons?: {
+    long: string;
+    short: string;
+  };
 }
