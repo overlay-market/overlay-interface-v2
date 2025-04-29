@@ -38,7 +38,9 @@ const NavBar: React.FC = () => {
           height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "97vh" }}
           align={"center"}
         >
-          <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
+          <a href="/markets">
+            <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
+          </a>
 
           <LinksWrapper direction="column" justify={"between"} flexGrow={"1"}>
             <NavLinksSection />
