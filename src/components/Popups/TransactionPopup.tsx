@@ -41,21 +41,35 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
           <AlertTriangle width={22} height={22} color={theme.color.red1} />
         )}
       </Box>
-      <Flex direction={"column"} align={"start"} mr={"16px"} ml={"12px"} style={{ flex: 1 }}>
+      <Flex
+        direction={"column"}
+        align={"start"}
+        mr={"16px"}
+        ml={"12px"}
+        style={{ flex: 1 }}
+      >
         <Text weight={"bold"} style={{ width: "100%", wordWrap: "break-word" }}>
-          {type === TransactionType.APPROVAL && "Spending Limit Approved"}
-          {type === TransactionType.BUILD_OVL_POSITION &&
-            "Position Successfully Built"}
-          {type === TransactionType.UNWIND_OVL_POSITION && "Unwind Successful"}
-          {type === TransactionType.LIQUIDATE_OVL_POSITION &&
-            "Liquidation Successful"}
-          {type === TransactionType.BRIDGE_OVL && "Bridge Successful"}
-          {type === TransactionType.CLAIM_OVL && "Claim Successful"}
-          {!success && errorMessage}
+          {success ? (
+            <>
+              {type === TransactionType.APPROVAL && "Spending Limit Approved"}
+              {type === TransactionType.BUILD_OVL_POSITION &&
+                "Position Successfully Built"}
+              {type === TransactionType.UNWIND_OVL_POSITION &&
+                "Unwind Successful"}
+              {type === TransactionType.LIQUIDATE_OVL_POSITION &&
+                "Liquidation Successful"}
+              {type === TransactionType.BRIDGE_OVL && "Bridge Successful"}
+              {type === TransactionType.CLAIM_OVL && "Claim Successful"}
+            </>
+          ) : (
+            errorMessage
+          )}
         </Text>
 
         {errorDetails && (
-          <Text style={{ width: "100%", wordWrap: "break-word", fontSize: "12px" }}>
+          <Text
+            style={{ width: "100%", wordWrap: "break-word", fontSize: "12px" }}
+          >
             {errorDetails}
           </Text>
         )}
