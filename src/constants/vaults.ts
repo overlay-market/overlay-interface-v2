@@ -2,6 +2,7 @@ import OVLToken from "../assets/images/token-logos/OVL-token.webp";
 import USDCToken from "../assets/images/token-logos/USDC-token.webp";
 import BGTToken from "../assets/images/token-logos/BGT-token.webp";
 import { StaticVaultData, VaultItem } from "../types/vaultTypes";
+import { Address } from "viem";
 
 export enum TOKENS {
   USDC = 'USDC', 
@@ -19,6 +20,14 @@ export const TOKEN_LOGOS: Partial<{ [key in TOKENS]: string }> = {
 export const DEFAULT_TOKEN_LOGO = BGTToken
 
 export const BERA_VAULTS_SUBGRAPH_URL = 'https://api.studio.thegraph.com/query/88584/berachain-v2-kodiak/version/latest'
+
+export const ICHIVaultDepositGuard: {
+  depositGuardAddress: Address;
+  vaultDeployerAddress: Address;
+} = {
+  depositGuardAddress: `0xc0c6D4178410849eC9765B4267A73F4F64241832`,
+  vaultDeployerAddress: `0x9Fbba6c87923af2561A2391198166b51Cf5736E8`,
+}
 
 export enum VaultItemType {
   ICHI = 'ICHI',
