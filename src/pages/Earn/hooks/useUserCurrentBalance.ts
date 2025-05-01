@@ -6,6 +6,7 @@ import { getTokenSymbol } from "../utils/getTokenSymbol";
 import { getTokenPrice } from "../utils/getTokenPrice";
 import { useTokenPrices } from "./useTokenPrices";
 import { UserCurrentBalance } from "../../../types/vaultTypes";
+import { usePublicClient } from "wagmi";
 // import useAccount from "../../../hooks/useAccount";
 
 const document = gql`
@@ -30,6 +31,7 @@ const document = gql`
 `;
 
 export const useUserCurrentBalance = (vaultId: number) => {
+  const publicClient = usePublicClient();
   // const { address: account } = useAccount();
   const account = `0x1D5b02978d14F9111A685D746d3e360d9e33A541`;
 
@@ -40,7 +42,7 @@ export const useUserCurrentBalance = (vaultId: number) => {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (pricesLoading || pricesError || !prices || !account) return;
+    if (pricesLoading || pricesError || !prices || !account || !publicClient) return;
 
     const fetchUserCurrentBalance = async () => {
       setLoading(true);
@@ -96,8 +98,8 @@ export const useUserCurrentBalance = (vaultId: number) => {
           const token0 = vaultShare.vault.token0 as Address;
           const token1 = vaultShare.vault.token1 as Address;
           const [token0Symbol, token1Symbol] = await Promise.all([
-            getTokenSymbol(token0),
-            getTokenSymbol(token1),
+            getTokenSymbol(token0, publicClient),
+            getTokenSymbol(token1, publicClient),
           ]);
         
           const price0 = getTokenPrice(prices, token0);

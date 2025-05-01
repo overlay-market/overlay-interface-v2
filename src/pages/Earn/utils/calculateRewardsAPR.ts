@@ -1,5 +1,4 @@
-import { createPublicClient, formatUnits, getContract, http } from 'viem';
-import { berachain } from 'viem/chains';
+import { formatUnits, getContract, PublicClient } from 'viem';
 import {rewardsVaultABI} from '../abi/rewardsVaultABI';
 import { MR_types } from '../../../types/vaultTypes';
 import { PriceItem } from '../hooks/useTokenPrices';
@@ -16,12 +15,7 @@ type RewardDataTuple = [
   bigint         // rewardPerTokenStored
 ];
 
-const publicClient = createPublicClient({
-  chain: berachain,
-  transport: http(),
-});
-
-export const calculateRewardsAPR = async(vaultId: number, prices: PriceItem[]): Promise<number | null> => {
+export const calculateRewardsAPR = async(vaultId: number, prices: PriceItem[], publicClient: PublicClient): Promise<number | null> => {
   try {
     const currentVault = vaultsById[vaultId]; 
     const currentMRVault = VAULT_ITEMS.find(vt => currentVault.vaultItems.includes(vt.id) && MR_types.includes(vt.vaultType))!;
@@ -39,7 +33,7 @@ export const calculateRewardsAPR = async(vaultId: number, prices: PriceItem[]): 
       
     ] as [Promise<bigint>, Promise<`0x${string}`>]);
     
-    const decimals = await getTokenDecimals(stakingTokenAddress)
+    const decimals = await getTokenDecimals(stakingTokenAddress, publicClient)
   
     // const totalStakedFormatted = parseFloat(formatUnits(totalStaked, 18));
     const stakingTokenPrice = getTokenPrice(prices, stakingTokenAddress);

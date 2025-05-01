@@ -1,5 +1,4 @@
-import { Address, createPublicClient, getContract, http } from "viem";
-import { berachain } from "viem/chains";
+import { Address, getContract, PublicClient } from "viem";
 
 const minimalERC20ABI = [
   {
@@ -14,13 +13,9 @@ const minimalERC20ABI = [
 // EIP-1967 slot for proxy implementation address
 const IMPLEMENTATION_SLOT = '0x360894A13BA1A3210667C828492DB98DCA3E2076CC3735A920A3CA505D382BBC'
 
-const publicClient = createPublicClient({
-  chain: berachain,
-  transport: http(),
-});
-
 export const getTokenSymbol = async(
-  tokenAddress: Address
+  tokenAddress: Address,
+  publicClient: PublicClient,
 ): Promise<string> => {
 
   const tryReadSymbol = async (address: Address): Promise<string> => {

@@ -1,19 +1,13 @@
-import { Address, createPublicClient, getContract, http } from "viem";
-import { berachain } from "viem/chains";
-import {stakingTokenABI} from '../abi/stakingTokenABI'
-
-const publicClient = createPublicClient({
-  chain: berachain,
-  transport: http(),
-});
+import { Address,  erc20Abi,  getContract, PublicClient } from "viem";
 
 export const getTokenDecimals = async(
-  tokenAddress: Address
+  tokenAddress: Address,
+  publicClient: PublicClient,
 ): Promise<number> => {
 
   const contract = getContract({
     address: tokenAddress,
-    abi: stakingTokenABI,
+    abi: erc20Abi,
     client: publicClient,
   });
 

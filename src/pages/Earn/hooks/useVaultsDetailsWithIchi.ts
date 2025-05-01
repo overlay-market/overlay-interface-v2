@@ -8,9 +8,11 @@ import { calculateTVL, tvlCalculatorWithIchi } from "../utils/calculateTVL";
 import { calculateRewardsAPR } from "../utils/calculateRewardsAPR";
 import { calculateTotalAPR } from "../utils/calculateTotalAPR";
 import { vaultsById } from "../../../constants/vaults";
+import { usePublicClient } from "wagmi";
 
 export const useVaultsDetailsWithIchi = (vaultsWithIchiIds: number[]): CalculatedVaultData[] => {
- 
+  const publicClient = usePublicClient();
+
   const { prices, loading: pricesLoading, error: pricesError } = useTokenPrices();
 
   const { fetchedIchiVaultsData, loading } =
@@ -19,7 +21,7 @@ export const useVaultsDetailsWithIchi = (vaultsWithIchiIds: number[]): Calculate
   const [vaultsDetails, setVaultsDetails] = useState<CalculatedVaultData[]>([]);
 
   useEffect(() => {
-    if (!fetchedIchiVaultsData.length || pricesLoading || pricesError) return;
+    if (!fetchedIchiVaultsData.length || pricesLoading || pricesError || !publicClient) return;
 
     let cancelled = false;
 
@@ -27,15 +29,18 @@ export const useVaultsDetailsWithIchi = (vaultsWithIchiIds: number[]): Calculate
       let calculatedVaults = initializeVaults(vaultsWithIchiIds, fetchedIchiVaultsData, mapperWithIchi);  
 
       for (const vault of calculatedVaults) {
+        if (!vault.id) continue;
+        const vaultData = vaultsById[vault.id];
+
         const fetchedVault = fetchedIchiVaultsData.find(fetched =>
-          vaultsById[vault.id!].vaultItems.includes(fetched.id)
+          vaultData.vaultItems.includes(fetched.id)
         );
         if (!fetchedVault) continue;
       
         const tvl = calculateTVL(fetchedVault, prices, tvlCalculatorWithIchi);
         vault.tvl = tvl.toString();
       
-        const apr = await calculateRewardsAPR(vault.id!, prices);
+        const apr = await calculateRewardsAPR(vault.id, prices, publicClient);
         if (apr !== null) {
           vault.multiRewardApr = apr.toString();
         }

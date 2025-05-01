@@ -1,27 +1,22 @@
 import { useEffect, useState } from 'react';
 import { getContract, formatEther } from 'viem';
-import { createPublicClient, http } from 'viem';
-import { berachain } from 'viem/chains';
 import { vaultItemsById, vaultsById } from '../../../constants/vaults';
 import { MR_types } from '../../../types/vaultTypes';
 import { rewardsVaultABI } from '../abi/rewardsVaultABI';
+import { usePublicClient } from 'wagmi';
 // import useAccount from '../../../hooks/useAccount';
-
-const publicClient = createPublicClient({
-  chain: berachain,
-  transport: http(),
-});
 
 export const useUserRewards = (curVaultId: number | undefined) => {
   // const { address: account } = useAccount();
   const account = `0x9A45122d496983bdfDE3aE464C92b4610ad690fE`
-
+  const publicClient = usePublicClient();
+  
   const [rewards, setRewards] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchRewards = async () => {
-      if (!account || !curVaultId) return;
+      if (!account || !curVaultId || !publicClient) return;
       
       const vault = vaultsById[curVaultId];
       if (!vault) return;
