@@ -7,11 +7,6 @@ import {
 } from "./my-stats-styles";
 import theme from "../../../theme";
 import { useParams } from "react-router-dom";
-import steerClient from "../../../services/steerClient";
-import { useAddPopup } from "../../../state/application/hooks";
-import { TransactionType } from "../../../constants/transaction";
-import { currentTimeParsed } from "../../../utils/currentTime";
-import { handleError } from "../../../utils/handleError";
 import { useMemo } from "react";
 import { useCurrentVault } from "../hooks/useCurrentVaultData";
 import { useUserRewards } from "../hooks/useUserRewards";
@@ -19,14 +14,14 @@ import { useUserCurrentBalance } from "../hooks/useUserCurrentBalance";
 
 const MyStats: React.FC = () => {
   const { vaultId } = useParams();
-  const vaultAddress = "";
+  const currentVault = useCurrentVault(vaultId);
 
-  const curVault = useCurrentVault(vaultId);
-  const { rewards: userRewards } = useUserRewards(curVault?.id);
+  if (!currentVault) {
+    return null;
+  }
+
+  const { rewards: userRewards } = useUserRewards(currentVault?.id);
   const { curBalance, loading } = useUserCurrentBalance(3);
-  const addPopup = useAddPopup();
-
-  const currentTimeForId = currentTimeParsed();
 
   const userTokensBalance = curBalance.map((tokenBalance) => {
     return {
@@ -52,54 +47,7 @@ const MyStats: React.FC = () => {
     })}`;
   }, [curBalance, loading]);
 
-  const handleClaimRewards = async () => {
-    steerClient.staking
-      .getReward({
-        stakingPool: vaultAddress as `0x${string}`,
-      })
-      .then((claimTx) => {
-        if (claimTx.success && claimTx.data) {
-          addPopup(
-            {
-              txn: {
-                hash: claimTx.data as string,
-                success: claimTx.success,
-                message: "",
-                type: TransactionType.CLAIM_REWARDS,
-              },
-            },
-            claimTx.data
-          );
-        } else {
-          addPopup(
-            {
-              txn: {
-                hash: currentTimeForId,
-                success: false,
-                message: claimTx.error ?? "Claim rewards failed",
-                type: claimTx.status,
-              },
-            },
-            currentTimeForId
-          );
-        }
-      })
-      .catch((error: Error) => {
-        const { errorCode, errorMessage } = handleError(error);
-
-        addPopup(
-          {
-            txn: {
-              hash: currentTimeForId,
-              success: false,
-              message: errorMessage,
-              type: errorCode,
-            },
-          },
-          currentTimeForId
-        );
-      });
-  };
+  const handleClaimRewards = async () => {};
 
   return (
     <Flex direction={"column"}>

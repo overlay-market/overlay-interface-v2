@@ -17,6 +17,11 @@ const InfoSection: React.FC = () => {
   const { vaultId } = useParams();
 
   const currentVault = useCurrentVault(vaultId);
+
+  if (!currentVault) {
+    return null;
+  }
+
   const currentVaultDetails = useCurrentVaultDetails(currentVault?.id);
 
   const tvl = useMemo(() => {
