@@ -12,29 +12,49 @@ import {
 import InputComponent from "./InputComponent";
 import useAccount from "../../../../hooks/useAccount";
 import { useModalHelper } from "../../../../components/ConnectWalletModal/utils";
-import steerClient from "../../../../services/steerClient";
-import { TransactionType } from "../../../../constants/transaction";
-import { useAddPopup } from "../../../../state/application/hooks";
-import { currentTimeParsed } from "../../../../utils/currentTime";
-import { parseUnits } from "viem";
-import { handleError } from "../../../../utils/handleError";
 import useSDK from "../../../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../../../providers/MultichainContextProvider/useMultichainContext";
 import { formatDecimals } from "../../utils/formatDecimals";
+import { useStake } from "../../hooks/useStake";
+import { useWithdraw } from "../../hooks/useWithdraw";
+import { useParams } from "react-router-dom";
+import { useCurrentVault } from "../../hooks/useCurrentVaultData";
 
 const TransactSection: React.FC = () => {
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const { openModal } = useModalHelper();
-  const vaultAddress = "";
-  const addPopup = useAddPopup();
-  const currentTimeForId = currentTimeParsed();
+  const { vaultId } = useParams();
+  const currentVault = useCurrentVault(vaultId);
 
   const [stakeSelected, setStakeSelected] = useState(true);
   const [typedAmount, setTypedAmount] = useState("");
-  const [attemptingTransaction, setAttemptingTransaction] = useState(false);
   const [ovlBalance, setOvlBalance] = useState<string | undefined>(undefined);
+
+  if (!currentVault) {
+    return null;
+  }
+
+  const {
+    handleStake,
+    buttonTitle: stakeBtnTitle,
+    attemptingTransaction: stakeAttemptingTx,
+  } = useStake({
+    vaultId: currentVault!.id,
+    typedAmount,
+    setTypedAmount,
+  });
+
+  const {
+    handleWithdraw,
+    buttonTitle: withdrawBtnTitle,
+    attemptingTransaction: withdrawAttemptingTx,
+  } = useWithdraw({
+    vaultId: currentVault!.id,
+    typedAmount,
+    setTypedAmount,
+  });
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -69,127 +89,9 @@ const TransactSection: React.FC = () => {
     return isTypedAmountExceeded
       ? "Amount exceeds max input"
       : stakeSelected
-      ? "Stake"
-      : "Withdraw";
-  }, [isTypedAmountExceeded, stakeSelected]);
-
-  const handleStake = async () => {
-    if (!typedAmount) return;
-
-    setAttemptingTransaction(true);
-    const parsedAmount = parseUnits(typedAmount, 18);
-
-    steerClient.staking
-      .stake({
-        stakingPool: vaultAddress as `0x${string}`,
-        amount: parsedAmount,
-      })
-      .then((stakeTx) => {
-        if (stakeTx.success && stakeTx.data) {
-          addPopup(
-            {
-              txn: {
-                hash: stakeTx.data as string,
-                success: stakeTx.success,
-                message: "",
-                type: TransactionType.STAKE_OVL,
-              },
-            },
-            stakeTx.data
-          );
-        } else {
-          addPopup(
-            {
-              txn: {
-                hash: currentTimeForId,
-                success: false,
-                message: stakeTx.error ?? "Stake OVL failed",
-                type: stakeTx.status,
-              },
-            },
-            currentTimeForId
-          );
-        }
-      })
-      .catch((error: Error) => {
-        const { errorCode, errorMessage } = handleError(error);
-
-        addPopup(
-          {
-            txn: {
-              hash: currentTimeForId,
-              success: false,
-              message: errorMessage,
-              type: errorCode,
-            },
-          },
-          currentTimeForId
-        );
-      })
-      .finally(() => {
-        setAttemptingTransaction(false);
-        setTypedAmount("");
-      });
-  };
-
-  const handleWithdraw = async () => {
-    if (!typedAmount) return;
-
-    setAttemptingTransaction(true);
-    const parsedAmount = parseUnits(typedAmount, 18);
-
-    steerClient.staking
-      .withdraw({
-        stakingPool: vaultAddress as `0x${string}`,
-        amount: parsedAmount,
-      })
-      .then((withdrawTx) => {
-        if (withdrawTx.success && withdrawTx.data) {
-          addPopup(
-            {
-              txn: {
-                hash: withdrawTx.data as string,
-                success: withdrawTx.success,
-                message: "",
-                type: TransactionType.WITHDRAW_OVL,
-              },
-            },
-            withdrawTx.data
-          );
-        } else {
-          addPopup(
-            {
-              txn: {
-                hash: currentTimeForId,
-                success: false,
-                message: withdrawTx.error ?? "Withdraw OVL failed",
-                type: withdrawTx.status,
-              },
-            },
-            currentTimeForId
-          );
-        }
-      })
-      .catch((error: Error) => {
-        const { errorCode, errorMessage } = handleError(error);
-
-        addPopup(
-          {
-            txn: {
-              hash: currentTimeForId,
-              success: false,
-              message: errorMessage,
-              type: errorCode,
-            },
-          },
-          currentTimeForId
-        );
-      })
-      .finally(() => {
-        setAttemptingTransaction(false);
-        setTypedAmount("");
-      });
-  };
+      ? stakeBtnTitle
+      : withdrawBtnTitle;
+  }, [isTypedAmountExceeded, stakeSelected, stakeBtnTitle, withdrawBtnTitle]);
 
   return (
     <TransactContainer>
@@ -223,9 +125,9 @@ const TransactSection: React.FC = () => {
       />
 
       {account &&
-        (attemptingTransaction ? (
+        (stakeAttemptingTx || withdrawAttemptingTx ? (
           <GradientLoaderButton
-            title={"Pending confirmation..."}
+            title={buttonTitle ?? "Pending confirmation..."}
             height={"40px"}
           />
         ) : (
