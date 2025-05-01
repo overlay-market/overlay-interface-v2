@@ -6,6 +6,7 @@ import { TransactionType } from "../../../constants/transaction";
 import { ichiVaultDepositGuardABI } from "../abi/ichiVaultDepositGuardABI";
 import { ICHIVaultDepositGuard } from "../../../constants/vaults";
 import { usePublicClient, useWalletClient, useReadContract } from "wagmi";
+import { useVaultsState } from "../../../state/vaults/hooks";
 
 const ichiVaultAbi = [
   {
@@ -40,6 +41,7 @@ export const useStakeWithGuard = ({
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+  const { slippageValue } = useVaultsState();
  
   const { sendTransaction: sendApproveTransaction } = useTransaction({
     type: TransactionType.APPROVAL,
@@ -125,7 +127,9 @@ export const useStakeWithGuard = ({
         chain,
       });
 
-      const minLpAmount = (estimatedLp * 99n) / 100n;
+      const slippageBasisPoints = BigInt(Math.floor(parseFloat(slippageValue) * 100));
+      const denominator = 10000n;
+      const minLpAmount = (estimatedLp * (denominator - slippageBasisPoints)) / denominator;
 
       setStakeStep("pending");
 

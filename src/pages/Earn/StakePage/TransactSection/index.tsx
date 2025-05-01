@@ -19,6 +19,7 @@ import { useStake } from "../../hooks/useStake";
 import { useWithdraw } from "../../hooks/useWithdraw";
 import { useParams } from "react-router-dom";
 import { useCurrentVault } from "../../hooks/useCurrentVaultData";
+import { StakeSlippageModal } from "../../../../components/SlippageModal";
 
 const TransactSection: React.FC = () => {
   const sdk = useSDK();
@@ -123,6 +124,10 @@ const TransactSection: React.FC = () => {
         setTypedAmount={setTypedAmount}
         balance={stakeSelected ? ovlBalance : "0"}
       />
+
+      <Flex justify={"end"}>
+        <StakeSlippageModal />
+      </Flex>
 
       {account &&
         (stakeAttemptingTx || withdrawAttemptingTx ? (

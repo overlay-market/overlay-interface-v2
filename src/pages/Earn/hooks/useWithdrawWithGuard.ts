@@ -6,6 +6,7 @@ import { TransactionType } from "../../../constants/transaction";
 import { ichiVaultDepositGuardABI } from "../abi/ichiVaultDepositGuardABI";
 import { ICHIVaultDepositGuard } from "../../../constants/vaults";
 import { usePublicClient, useWalletClient } from "wagmi";
+import { useVaultsState } from "../../../state/vaults/hooks";
 
 type UseWithdrawWithGuardProps = {
   ichiVaultAddress: Address;
@@ -29,6 +30,7 @@ export const useWithdrawWithGuard = ({
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+  const { slippageValue } = useVaultsState();
 
   const { sendTransaction } = useTransaction({
     type: TransactionType.WITHDRAW_OVL,
@@ -71,8 +73,11 @@ export const useWithdrawWithGuard = ({
 
       let [minAmount0, minAmount1] = estimatedAmounts;
 
-      minAmount0 = (minAmount0 * BigInt(99)) / BigInt(100);
-      minAmount1 = (minAmount1 * BigInt(99)) / BigInt(100);
+      const slippageBasisPoints = BigInt(Math.floor(parseFloat(slippageValue) * 100));
+      const denominator = 10000n;
+
+      minAmount0 = (minAmount0 * (denominator - slippageBasisPoints)) / denominator;
+      minAmount1 = (minAmount1 * (denominator - slippageBasisPoints)) / denominator;
 
       const withdrawArgs = [
         ichiVaultAddress,
