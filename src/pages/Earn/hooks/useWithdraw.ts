@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
-import { VaultItemType, vaultsById } from '../../../constants/vaults';
 import { getIchiVaultItemByVaultId } from '../utils/getVaultData';
 import { useWithdrawWithGuard } from './useWithdrawWithGuard';
-
-type VaultType = 'vaultWithGuard'
+import { getVaultType, VaultType } from '../utils/getVaultType';
+import { zeroAddress } from 'viem';
 
 interface WithdrawParams {
   vaultId: number;
@@ -20,27 +19,20 @@ interface WithdrawResult {
 export const useWithdraw = (params: WithdrawParams): WithdrawResult => {
   const { vaultId, typedAmount, setTypedAmount } = params;
 
-  const vaultType = useMemo(() => {
-    if (vaultsById[vaultId].combinationType.includes(VaultItemType.ICHI)) {
-      return 'vaultWithGuard' as VaultType;
-    }
-    
-    throw new Error(`Unsupported vault type for vault: ${vaultsById[vaultId].vaultName}`);
-  }, [vaultId]);
+  const vaultType = useMemo(() => getVaultType(vaultId), [vaultId]);
 
-  if (vaultType === 'vaultWithGuard') {
-    const ichiVaultAddress = getIchiVaultItemByVaultId(vaultId)?.vaultAddress;
-    if (!ichiVaultAddress) {
-      throw new Error(
-        `No valid ICHI vault found for vault: ${vaultsById[vaultId].vaultName}`
-      );
-    }
-    return useWithdrawWithGuard({
-      ichiVaultAddress,
-      typedAmount,
-      setTypedAmount,
-    });
-  }
+  const ichiVaultAddress =
+    getIchiVaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;
 
-  throw new Error(`No staking hook for vault type: ${vaultType}`);
+  const withdrawWithGuard = useWithdrawWithGuard({
+    ichiVaultAddress,
+    typedAmount,
+    setTypedAmount,
+  });  
+
+  const allHooks: Record<VaultType, WithdrawResult> = {
+    vaultWithGuard: withdrawWithGuard,
+  };
+
+  return allHooks[vaultType];
 };

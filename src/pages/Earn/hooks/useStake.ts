@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import { useStakeWithGuard } from './useStakeWithGuard';
-import { VaultItemType, vaultsById } from '../../../constants/vaults';
 import { getIchiVaultItemByVaultId } from '../utils/getVaultData';
-
-type VaultType = 'vaultWithGuard'
+import { getVaultType, VaultType } from '../utils/getVaultType';
+import { zeroAddress } from 'viem';
 
 interface StakeParams {
   vaultId: number;
@@ -20,27 +19,20 @@ interface StakeResult {
 export const useStake = (params: StakeParams): StakeResult => {
   const { vaultId, typedAmount, setTypedAmount } = params;
 
-  const vaultType = useMemo(() => {
-    if (vaultsById[vaultId].combinationType.includes(VaultItemType.ICHI)) {
-      return 'vaultWithGuard' as VaultType;
-    }
-    
-    throw new Error(`Unsupported vault type for vault: ${vaultsById[vaultId].vaultName}`);
-  }, [vaultId]);
+  const vaultType = useMemo(() => getVaultType(vaultId), [vaultId]);
 
-  if (vaultType === 'vaultWithGuard') {
-    const ichiVaultAddress = getIchiVaultItemByVaultId(vaultId)?.vaultAddress;
-    if (!ichiVaultAddress) {
-      throw new Error(
-        `No valid ICHI vault found for vault: ${vaultsById[vaultId].vaultName}`
-      );
-    }
-    return useStakeWithGuard({
-      ichiVaultAddress,
-      typedAmount,
-      setTypedAmount,
-    });
-  }
+  const ichiVaultAddress =
+    getIchiVaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;
 
-  throw new Error(`No staking hook for vault type: ${vaultType}`);
+  const stakeWithGuard = useStakeWithGuard({
+    ichiVaultAddress,
+    typedAmount,
+    setTypedAmount,
+  });  
+
+  const allHooks: Record<VaultType, StakeResult> = {
+    vaultWithGuard: stakeWithGuard,
+  };
+
+  return allHooks[vaultType];
 };

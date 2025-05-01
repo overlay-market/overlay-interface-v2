@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Address, erc20Abi, parseUnits } from "viem";
+import { Address, erc20Abi, parseUnits, zeroAddress } from "viem";
 import useAccount from "../../../hooks/useAccount";
 import { useTransaction } from "./useTransaction";
 import { TransactionType } from "../../../constants/transaction";
@@ -29,6 +29,14 @@ export const useStakeWithGuard = ({
   typedAmount,
   setTypedAmount,
 }: UseStakeWithGuardProps) => {
+  if (ichiVaultAddress === zeroAddress) {
+    return {
+      handleStake: async () => {},
+      buttonTitle: 'Stake',
+      attemptingTransaction: false,
+    };
+  }
+
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();

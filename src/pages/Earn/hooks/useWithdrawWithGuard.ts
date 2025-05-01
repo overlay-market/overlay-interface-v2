@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Address,  parseUnits } from "viem";
+import { Address,  parseUnits, zeroAddress } from "viem";
 import useAccount from "../../../hooks/useAccount";
 import { useTransaction } from "./useTransaction";
 import { TransactionType } from "../../../constants/transaction";
@@ -18,6 +18,14 @@ export const useWithdrawWithGuard = ({
   typedAmount,
   setTypedAmount,
 }: UseWithdrawWithGuardProps) => {
+  if (ichiVaultAddress === zeroAddress) {
+    return {
+      handleWithdraw: async () => {},
+      buttonTitle: 'Withdraw',
+      attemptingTransaction: false,
+    };
+  }
+
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
