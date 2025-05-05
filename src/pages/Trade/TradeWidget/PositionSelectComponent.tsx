@@ -79,7 +79,7 @@ const PositionSelectComponent: React.FC = () => {
       >
         <Flex direction={"column"} justify={"center"} align={"center"}>
           <Text size={"3"} weight={"bold"}>
-            Buy
+            {market?.buttons?.long ?? "Buy"}
           </Text>
           <Text size={"1"} style={{ color: theme.color.blue1 }}>
             {currencyAsk}
@@ -93,7 +93,7 @@ const PositionSelectComponent: React.FC = () => {
       >
         <Flex direction={"column"} justify={"center"} align={"center"}>
           <Text size={"3"} weight={"bold"}>
-            Sell
+            {market?.buttons?.short ?? "Sell"}
           </Text>
           <Text size={"1"} style={{ color: theme.color.blue1 }}>
             {currencyBid}
