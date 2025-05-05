@@ -45,10 +45,9 @@ export const useTransaction = (options: UseTransactionOptions) => {
       const { request } = await publicClient.simulateContract(simulationConfig);
 
       const hash = await walletClient.writeContract(request);
-      setTxHash(hash);
-
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
+      setTxHash(receipt.transactionHash);
+      
       addPopup({
         txn: {
           hash: receipt.transactionHash,

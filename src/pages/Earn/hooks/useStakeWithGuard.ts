@@ -7,6 +7,7 @@ import { ichiVaultDepositGuardABI } from "../abi/ichiVaultDepositGuardABI";
 import { ICHIVaultDepositGuard } from "../../../constants/vaults";
 import { usePublicClient, useWalletClient, useReadContract } from "wagmi";
 import { useVaultsState } from "../../../state/vaults/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 const ichiVaultAbi = [
   {
@@ -42,6 +43,7 @@ export const useStakeWithGuard = ({
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const { slippageValue } = useVaultsState();
+  const queryClient = useQueryClient();
  
   const { sendTransaction: sendApproveTransaction } = useTransaction({
     type: TransactionType.APPROVAL,
@@ -160,7 +162,12 @@ export const useStakeWithGuard = ({
         chain,
       });
 
-      if (!depositHash) throw new Error('Deposit transaction failed');
+      if (depositHash) {
+        await queryClient.refetchQueries({
+          queryKey: ['userCurrentBalance', account, ichiVaultAddress],
+          exact: true,
+        });
+      }
 
     } catch (err) {
       console.error("Stake error:", err);
