@@ -1,10 +1,9 @@
 import { formatUnits, getContract, PublicClient } from 'viem';
 import {rewardsVaultABI} from '../abi/rewardsVaultABI';
-import { MR_types } from '../../../types/vaultTypes';
 import { PriceItem } from '../hooks/useTokenPrices';
 import { getTokenPrice } from './getTokenPrice';
-import { VAULT_ITEMS, vaultsById } from '../../../constants/vaults';
 import { getTokenDecimals } from './getTokenDecimals';
+import { getMRVaultItemByVaultId } from './getVaultItem';
 
 type RewardDataTuple = [
   `0x${string}`, // rewardsDistributor
@@ -15,11 +14,13 @@ type RewardDataTuple = [
   bigint         // rewardPerTokenStored
 ];
 
-export const calculateRewardsAPR = async(vaultId: number, prices: PriceItem[], publicClient: PublicClient): Promise<number | null> => {
+export const getRewardsAPRForMRType = async(vaultId: number, prices: PriceItem[], publicClient: PublicClient): Promise<number | null> => {
   try {
-    const currentVault = vaultsById[vaultId]; 
-    const currentMRVault = VAULT_ITEMS.find(vt => currentVault.vaultItems.includes(vt.id) && MR_types.includes(vt.vaultType))!;
-    const contractAddress = currentMRVault && currentMRVault.vaultAddress;
+    const currentMRVault = getMRVaultItemByVaultId(vaultId);
+    
+    if (!currentMRVault) return null;
+
+    const contractAddress = currentMRVault.vaultAddress;
     
     const contract = getContract({
       address: contractAddress,
