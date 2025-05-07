@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { getContract, formatEther } from 'viem';
-import { vaultItemsById, vaultsById } from '../../../constants/vaults';
+import { VaultItemType, vaultsById } from '../../../constants/vaults';
 import { MR_types } from '../../../types/vaultTypes';
-import { rewardsVaultABI } from '../abi/rewardsVaultABI';
 import { usePublicClient } from 'wagmi';
-// import useAccount from '../../../hooks/useAccount';
+import { getUserRewardsForMRType } from '../utils/getUserRewardsForMRType';
+import { getUserRewardsForERC4626 } from '../utils/getUserRewardsForERC4626';
+import useAccount from '../../../hooks/useAccount';
 
 export const useUserRewards = (curVaultId: number | undefined) => {
-  // const { address: account } = useAccount();
-  const account = `0x9A45122d496983bdfDE3aE464C92b4610ad690fE`
+  const { address: account } = useAccount();
+
   const publicClient = usePublicClient();
   
   const [rewards, setRewards] = useState<string[]>([]);
@@ -18,56 +18,31 @@ export const useUserRewards = (curVaultId: number | undefined) => {
     const fetchRewards = async () => {
       if (!account || !curVaultId || !publicClient) return;
       
-      const vault = vaultsById[curVaultId];
-      if (!vault) return;
+      const currentVault = vaultsById[curVaultId];
+      if (!currentVault) return;
 
-      const hasMRVault = vault.combinationType.some(type =>
+      setLoading(true);
+      const hasMRVault = currentVault.combinationType.some(type =>
         MR_types.includes(type)
       );
 
-      if (!hasMRVault) return;
-
-      const mrVaultItemId = vault.vaultItems.find(vaultId =>
-        MR_types.includes(vaultItemsById[vaultId].vaultType)
-      );
-
-      if (!mrVaultItemId) return;
-
-      const mrVaultItem = vaultItemsById[mrVaultItemId];
-      const contract = getContract({
-        address: mrVaultItem.vaultAddress,
-        abi: rewardsVaultABI,
-        client: publicClient,
-      });
-
-      setLoading(true);
-      try {
-        const fetchedRewards = await Promise.all(
-          mrVaultItem.rewardTokens.map(async (token) => {
-            const earned = await contract.read.earned([
-              account,
-              token.rewardTokenAddress,
-            ]) as bigint;
-
-            const amount = Number(formatEther(earned));
-            if (amount > 0) {
-              return `${amount.toLocaleString(undefined, {
-                maximumFractionDigits: 2,
-              })} ${token.rewardTokenName}`;
-            }
-          })
-        );
+      if (hasMRVault) {
+        const fetchedRewards = await getUserRewardsForMRType(currentVault.id, account, publicClient);
         setRewards(fetchedRewards.filter((r): r is string => typeof r === 'string'));
-      } catch (err) {
-        console.error('Failed to fetch rewards', err);
-        setRewards([]);
-      } finally {
-        setLoading(false);
       }
+
+      const hasERC4626 = currentVault.combinationType.includes(VaultItemType.ERC4626);
+ 
+      if (hasERC4626) {
+        const fetchedRewards = await getUserRewardsForERC4626(currentVault.id, account, publicClient);
+        setRewards(fetchedRewards.filter((r): r is string => typeof r === 'string'));
+      }
+
+      setLoading(false);      
     };
 
     fetchRewards();
-  }, [curVaultId, account]);
+  }, [curVaultId, account, publicClient]);
 
   return { rewards, loading };
 };
