@@ -15,6 +15,14 @@ import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 // import Leaderboard from "./pages/Leaderboard";
+import PowerCards from "./pages/PowerCards";
+import useScrollbarWidth from "./hooks/useScrollbarWidth";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+
+const client = new ApolloClient({
+  uri: "https://api.goldsky.com/api/public/project_cm3n5avsu08tw01vthbry8fl7/subgraphs/overlay-power-cards/latest/gn",
+  cache: new InMemoryCache(),
+});
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -22,30 +30,34 @@ const App = () => {
 
   const { chainId: contextChainID } = useMultichainContext();
 
+  useScrollbarWidth();
+
   return (
-    <MultichainContextProvider initialChainId={contextChainID as number}>
-      <SDKProvider>
-        <Theme>
-          <AppContainer>
-            <Trackers.WalletConnectionTracker />
-            <ScrollToTop />
-            <Popups />
-            <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
-              <NavBar />
-              <Wallet />
-              <Routes>
-                <Route path="/" element={<Navigate to="/markets" />} />
-                <Route path="/markets" element={<Markets />} />
-                <Route path="/trade" element={<Trade />} />
-                <Route path="/portfolio" element={<Portfolio />} />
-                {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
-                <Route path="*" element={<Navigate to="/markets" />} />
-              </Routes>
-            </Flex>
-          </AppContainer>
-        </Theme>
-      </SDKProvider>
-    </MultichainContextProvider>
+    <ApolloProvider client={client}>
+      <MultichainContextProvider initialChainId={contextChainID as number}>
+        <SDKProvider>
+          <Theme>
+            <AppContainer>
+              <Trackers.WalletConnectionTracker />
+              <ScrollToTop />
+              <Popups />
+              <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
+                <NavBar />
+                <Wallet />
+                <Routes>
+                  <Route path="/" element={<Navigate to="/markets" />} />
+                  <Route path="/markets" element={<Markets />} />
+                  <Route path="/trade" element={<Trade />} />
+                  <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/power-cards" element={<PowerCards />} />
+                  {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
+                </Routes>
+              </Flex>
+            </AppContainer>
+          </Theme>
+        </SDKProvider>
+      </MultichainContextProvider>
+    </ApolloProvider>
   );
 };
 
