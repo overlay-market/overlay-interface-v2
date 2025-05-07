@@ -5,10 +5,10 @@ import { initializeVaults, mapperWithIchi } from "../utils/initializeVaults";
 import { useFetchIchiVaultsData } from "./useFetchIchiVaultsData";
 import { isCompleteVault } from "../utils/isCompleteVault";
 import { calculateTVL, tvlCalculatorWithIchi } from "../utils/calculateTVL";
-import { calculateRewardsAPR } from "../utils/calculateRewardsAPR";
 import { calculateTotalAPR } from "../utils/calculateTotalAPR";
 import { vaultsById } from "../../../constants/vaults";
 import { usePublicClient } from "wagmi";
+import { getRewardsAPR } from "../utils/getRewardsAPR";
 
 export const useVaultsDetailsWithIchi = (vaultsWithIchiIds: number[]): CalculatedVaultData[] => {
   const publicClient = usePublicClient();
@@ -40,7 +40,7 @@ export const useVaultsDetailsWithIchi = (vaultsWithIchiIds: number[]): Calculate
         const tvl = calculateTVL(fetchedVault, prices, tvlCalculatorWithIchi);
         vault.tvl = tvl.toString();
       
-        const apr = await calculateRewardsAPR(vault.id, prices, publicClient);
+        const apr = await getRewardsAPR(vault.id, prices, publicClient);
         if (apr !== null) {
           vault.multiRewardApr = apr.toString();
         }
@@ -65,7 +65,7 @@ export const useVaultsDetailsWithIchi = (vaultsWithIchiIds: number[]): Calculate
     return () => {
       cancelled = true; 
     };
-  }, [fetchedIchiVaultsData, vaultsWithIchiIds, prices, pricesLoading, loading ]);
+  }, [fetchedIchiVaultsData, vaultsWithIchiIds, prices, pricesLoading, loading, publicClient]);
 
  return vaultsDetails
 };
