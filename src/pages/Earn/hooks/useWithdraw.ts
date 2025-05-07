@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getIchiVaultItemByVaultId } from '../utils/getVaultData';
+import { getIchiVaultItemByVaultId } from '../utils/getVaultItem';
 import { useWithdrawWithGuard } from './useWithdrawWithGuard';
 import { getVaultType, VaultType } from '../utils/getVaultType';
 import { zeroAddress } from 'viem';

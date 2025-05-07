@@ -8,7 +8,7 @@ import { useTokenPrices } from "./useTokenPrices";
 import { UserCurrentBalance } from "../../../types/vaultTypes";
 import { usePublicClient } from "wagmi";
 import useAccount from "../../../hooks/useAccount";
-import { getIchiVaultItemByVaultId } from "../utils/getVaultData";
+import { getIchiVaultItemByVaultId } from "../utils/getVaultItem";
 
 const document = gql`
   query MyQuery($userId: String!, $vaultId: String!) {

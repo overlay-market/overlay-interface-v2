@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useStakeWithGuard } from './useStakeWithGuard';
-import { getIchiVaultItemByVaultId } from '../utils/getVaultData';
+import { getIchiVaultItemByVaultId } from '../utils/getVaultItem';
 import { getVaultType, VaultType } from '../utils/getVaultType';
 import { zeroAddress } from 'viem';
 
