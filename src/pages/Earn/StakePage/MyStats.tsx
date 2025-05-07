@@ -11,17 +11,30 @@ import { useMemo } from "react";
 import { useCurrentVault } from "../hooks/useCurrentVaultData";
 import { useUserRewards } from "../hooks/useUserRewards";
 import { useUserCurrentBalance } from "../hooks/useUserCurrentBalance";
+import { usePublicClient } from "wagmi";
+import { useClaimRewards } from "../hooks/useClaimRewards";
+import Loader from "../../../components/Loader";
 
 const MyStats: React.FC = () => {
   const { vaultId } = useParams();
+  const publicClient = usePublicClient();
   const currentVault = useCurrentVault(vaultId);
 
   if (!currentVault) {
     return null;
   }
 
-  const { rewards: userRewards } = useUserRewards(currentVault?.id);
-  const { curBalance, loading } = useUserCurrentBalance(currentVault?.id);
+  if (!publicClient) {
+    return null;
+  }
+
+  const { rewards: userRewards } = useUserRewards(currentVault.id);
+  const { curBalance, loading } = useUserCurrentBalance(currentVault.id);
+  const {
+    handleClaimRewards,
+    isLoading: loadingClaimRewards,
+    txHash,
+  } = useClaimRewards(currentVault.id);
 
   const userTokensBalance = curBalance.map((tokenBalance) => {
     return {
@@ -46,8 +59,6 @@ const MyStats: React.FC = () => {
       maximumFractionDigits: 2,
     })}`;
   }, [curBalance, loading]);
-
-  const handleClaimRewards = async () => {};
 
   return (
     <Flex direction={"column"}>
@@ -96,7 +107,11 @@ const MyStats: React.FC = () => {
           </Flex>
 
           <Flex gap={"10px"}>
-            <StatValue>{userRewards.join(" + ")}</StatValue>
+            {loadingClaimRewards ? (
+              <Loader />
+            ) : (
+              <StatValue>{userRewards.join(" + ")}</StatValue>
+            )}
           </Flex>
         </StatCard>
       </MyStatsContainer>
