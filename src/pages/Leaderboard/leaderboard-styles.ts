@@ -2,6 +2,18 @@ import { Flex } from "@radix-ui/themes";
 import styled from "styled-components";
 import theme from "../../theme";
 
+export const LeaderboardContainer = styled(Flex)`
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    padding-left: ${theme.app.xxlPadding};
+  }
+`;
+
+export const LeaderboardContent = styled(Flex)`
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    padding-left: 0;
+  }
+`;
+
 export const LineSeparator = styled(Flex)`
   @media (min-width: ${theme.breakpoints.sm}) {
     height: 0;
