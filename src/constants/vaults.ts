@@ -9,12 +9,14 @@ export enum TOKENS {
   OVL = 'OVL',
   BGT = 'BGT',
   ICHI = 'LP_ICHI',
+  yBGT = 'yBGT'
 }
 
 export const TOKEN_LOGOS: Partial<{ [key in TOKENS]: string }> = {
   [TOKENS.USDC]: USDCToken,
   [TOKENS.OVL]: OVLToken,
   [TOKENS.BGT]: BGTToken,
+  [TOKENS.yBGT]: BGTToken,
 }
 
 export const DEFAULT_TOKEN_LOGO = BGTToken
@@ -29,10 +31,13 @@ export const ICHIVaultDepositGuard: {
   vaultDeployerAddress: `0x9Fbba6c87923af2561A2391198166b51Cf5736E8`,
 }
 
+export const ERC4626HelperContract = `0xD36e0A4Ae7258Dd1FfE0D7f9f851461369a1AA0E`;
+
 export enum VaultItemType {
   ICHI = 'ICHI',
   MR_SINGLE = 'MultiRewardSingle',
   MR_DUAL = 'MultiRewardDual',
+  ERC4626 = 'ERC4626',
 }
 
 export const VAULT_ITEMS: VaultItem[] = [
@@ -95,18 +100,29 @@ export const VAULT_ITEMS: VaultItem[] = [
       }
     ]
   },
+  {
+    id: 6,
+    vaultType: VaultItemType.ERC4626,
+    vaultAddress: '0xC95079cC2972562A1d72Cfcf02Ed9d819147Fde6',
+    rewardTokens: [
+      {
+        rewardTokenName: TOKENS.yBGT,
+        rewardTokenAddress: `0x7e768f47dfdd5dae874aac233f1bc5817137e453`,
+      },
+    ],
+  },
 ]
      
 export const VAULTS: StaticVaultData[] = [
   {
     id: 1,
-    vaultName: 'OVL Vault',
+    vaultName: 'WBERA-HENLO Vault',
     combinationType: [VaultItemType.ICHI, VaultItemType.MR_SINGLE],
     vaultItems: [1, 2]   
   },
   {
     id: 2,
-    vaultName: 'BERA Vault',
+    vaultName: 'WBERA-HONEY Vault',
     combinationType: [VaultItemType.ICHI, VaultItemType.MR_SINGLE],
     vaultItems: [3, 2]   
   },
@@ -115,6 +131,12 @@ export const VAULTS: StaticVaultData[] = [
     vaultName: 'BERA-OVL Vault',
     combinationType: [VaultItemType.ICHI, VaultItemType.MR_DUAL],
     vaultItems: [4, 5]   
+  },
+  {
+    id: 4,
+    vaultName: 'ICHI + ERC4626 Vault',
+    combinationType: [VaultItemType.ICHI, VaultItemType.ERC4626],
+    vaultItems: [3, 6]   
   },
 ]
 
