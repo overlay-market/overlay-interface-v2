@@ -40,6 +40,11 @@ const theme = {
     xl: '1640px',
     xxl: '1920px', 
   },
+  app: {
+    rightPadding: '16px',
+    xxlPadding: '60px',
+    mobilePadding: '16px'
+  },
 };
 
 export default theme;
