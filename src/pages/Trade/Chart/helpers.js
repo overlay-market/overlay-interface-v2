@@ -13,6 +13,10 @@ export const isBartio = (chainId) => {
   return chainId === Number(SUPPORTED_CHAINID.BARTIO)
 }
 
+export const isBscTestnet = (chainId) => {
+  return chainId === Number(SUPPORTED_CHAINID.BSC_TESTNET)
+}
+
 export const getMarketChartUrl = (value) => {
   const chainId = typeof value === 'number' ? value : JSON.parse(value.ticker).chainId
 
