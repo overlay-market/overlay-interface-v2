@@ -3,6 +3,7 @@ import { arbitrumSepolia, berachainTestnetbArtio, bscTestnet } from "viem/chains
 import ArbitrumSepoliaLogo from "../assets/images/arbitrum-testnet-logo.webp";
 import ImolaLogo from "../assets/images/imola-logo.webp";
 import BartioLogo from "../assets/images/bartio-logo.webp";
+import BscTestnetLogo from "../assets/images/bsc-testnet-logo.webp";
 
 export enum SUPPORTED_CHAINID {
   MAINNET = 1, //at launch
@@ -59,7 +60,7 @@ export const NETWORK_ICONS: {
   [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: ArbitrumSepoliaLogo,
   [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
   [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
-  [SUPPORTED_CHAINID.BSC_TESTNET]: BartioLogo, // TODO: add bsc testnet logo
+  [SUPPORTED_CHAINID.BSC_TESTNET]: BscTestnetLogo,
 };
 
 export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
