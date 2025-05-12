@@ -20,7 +20,7 @@ type VaultRowProps = {
 const VaultRow: React.FC<VaultRowProps> = ({ vault }) => {
   const navigate = useNavigate();
   const { address: account } = useAccount();
-  const { rewards: userRewards, loading } = useUserRewards(vault.id);
+  const { rewards: userRewards } = useUserRewards(vault.id);
 
   const isDesktop = useMediaQuery("(min-width: 1280px)");
   const isMobile = useMediaQuery("(max-width: 767px)");
