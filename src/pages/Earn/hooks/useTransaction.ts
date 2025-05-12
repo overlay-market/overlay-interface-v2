@@ -1,22 +1,32 @@
 import { useState } from "react";
 import { useAddPopup } from "../../../state/application/hooks";
 import { TransactionType } from "../../../constants/transaction";
-import {  WriteContractParameters } from "viem";
+import {  Account, Address, TransactionReceipt, WriteContractParameters } from "viem";
 import { usePublicClient, useWalletClient } from "wagmi";
 
 interface UseTransactionOptions {
   successMessage?: string;
   type: TransactionType; 
+  skipGasEstimation?: boolean;
 }
 
-export const useTransaction = (options: UseTransactionOptions) => {
-  const addPopup = useAddPopup();
+interface TransactionResult {
+  sendTransaction: (config: WriteContractParameters) => Promise<Address | null>;
+  txHash: Address | null;
+  txReceipt: TransactionReceipt | null;
+  loading: boolean;
+  error: Error | null;
+}
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
-  const [error, setError] = useState<Error | null>(null);
+export const useTransaction = (options: UseTransactionOptions): TransactionResult => {
+  const addPopup = useAddPopup();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
+
+  const [loading, setLoading] = useState(false);
+  const [txHash, setTxHash] = useState<Address | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [txReceipt, setTxReceipt] = useState<TransactionReceipt | null>(null);  
     
   const sendTransaction = async (config: WriteContractParameters) => {
     if (!walletClient) {
@@ -32,12 +42,27 @@ export const useTransaction = (options: UseTransactionOptions) => {
       return null;
     }
 
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
 
     try {
+      const defaultGasLimit = BigInt(100_000);
+      let gasWithBuffer = defaultGasLimit;
+
+      if (!options.skipGasEstimation) {
+        const estimatedGas = await publicClient.estimateContractGas({
+          address: config.address,
+          abi: config.abi,
+          functionName: config.functionName,
+          args: config.args,
+          account: config.account as `0x${string}` | Account,
+        });
+        gasWithBuffer = BigInt(Math.floor(Number(estimatedGas) * 1.15));
+      } 
+
       const simulationConfig = {
         ...config,
+        gas: gasWithBuffer,
         account: walletClient.account,
         chain: config.chain ?? walletClient.chain, 
       };
@@ -47,6 +72,7 @@ export const useTransaction = (options: UseTransactionOptions) => {
       const hash = await walletClient.writeContract(request);
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       setTxHash(receipt.transactionHash);
+      setTxReceipt(receipt);
       
       addPopup({
         txn: {
@@ -57,7 +83,7 @@ export const useTransaction = (options: UseTransactionOptions) => {
         },
       }, receipt.transactionHash);
 
-      setIsLoading(false);
+      setLoading(false);
       return hash;
     } catch (err) {
       console.error("Transaction error:", err);
@@ -73,7 +99,7 @@ export const useTransaction = (options: UseTransactionOptions) => {
         },
       }, fallbackId);
 
-      setIsLoading(false);
+      setLoading(false);
       setError(err as Error);
       return null;
     }
@@ -81,8 +107,9 @@ export const useTransaction = (options: UseTransactionOptions) => {
 
   return {
     sendTransaction,
-    isLoading,
     txHash,
+    txReceipt,
+    loading,
     error,
   };
 };
