@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
-import { useStakeWithGuard } from './useStakeWithGuard';
-import { getIchiVaultItemByVaultId } from '../utils/getVaultItem';
 import { getVaultType, VaultType } from '../utils/getVaultType';
-import { zeroAddress } from 'viem';
+import { useStakeWithGuardAndERC4626 } from './useStakeWithGuardAndERC4626';
 
 interface StakeParams {
   vaultId: number;
@@ -10,7 +8,7 @@ interface StakeParams {
   setTypedAmount: (amount: string) => void;
 }
 
-interface StakeResult {
+export interface StakeResult {
   handleStake: () => Promise<void>;
   buttonTitle: string;
   attemptingTransaction: boolean;
@@ -21,17 +19,14 @@ export const useStake = (params: StakeParams): StakeResult => {
 
   const vaultType = useMemo(() => getVaultType(vaultId), [vaultId]);
 
-  const ichiVaultAddress =
-    getIchiVaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;
-
-  const stakeWithGuard = useStakeWithGuard({
-    ichiVaultAddress,
+  const stakeWithGuardAndERC4626 = useStakeWithGuardAndERC4626({
+    vaultId,
     typedAmount,
     setTypedAmount,
   });  
 
   const allHooks: Record<VaultType, StakeResult> = {
-    vaultWithGuard: stakeWithGuard,
+    vaultWithGuardAndERC4626: stakeWithGuardAndERC4626,
   };
 
   return allHooks[vaultType];

@@ -31,7 +31,7 @@ export const useWithdraw = (params: WithdrawParams): WithdrawResult => {
   });  
 
   const allHooks: Record<VaultType, WithdrawResult> = {
-    vaultWithGuard: withdrawWithGuard,
+    vaultWithGuardAndERC4626: withdrawWithGuard,
   };
 
   return allHooks[vaultType];
