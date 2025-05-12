@@ -30,11 +30,9 @@ const MyStats: React.FC = () => {
 
   const { rewards: userRewards } = useUserRewards(currentVault.id);
   const { curBalance, loading } = useUserCurrentBalance(currentVault.id);
-  const {
-    handleClaimRewards,
-    isLoading: loadingClaimRewards,
-    txHash,
-  } = useClaimRewards(currentVault.id);
+  const { handleClaimRewards, loading: loadingClaimRewards } = useClaimRewards(
+    currentVault.id
+  );
 
   const userTokensBalance = curBalance.map((tokenBalance) => {
     return {

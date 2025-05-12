@@ -10,7 +10,7 @@ export const useClaimRewards = (vaultId: number) => {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   
-  const { sendTransaction, isLoading, txHash, error } = useTransaction(
+  const { sendTransaction, loading, txHash, error } = useTransaction(
     {
       type: TransactionType.CLAIM_REWARDS,
       successMessage: 'Successfully claimed rewards!',
@@ -27,21 +27,11 @@ export const useClaimRewards = (vaultId: number) => {
       const chain = walletClient.chain;
       const vaultAddress = ERC4626Vault.vaultAddress;
 
-      const estimatedGas = await publicClient.estimateContractGas({
-        address: vaultAddress,
-        abi: ERC4626ABI,
-        functionName: 'getReward',
-        args: [], 
-        account,
-      });
-      const gasWithBuffer = BigInt(Math.floor(Number(estimatedGas) * 1.2)); 
-
       await sendTransaction({
         address: vaultAddress,
         abi: ERC4626ABI,
         functionName: 'getReward',
         args: [], 
-        gas: gasWithBuffer,
         account,
         chain: chain, 
       });
@@ -68,7 +58,7 @@ export const useClaimRewards = (vaultId: number) => {
 
   return {
     handleClaimRewards,
-    isLoading,
+    loading,
     txHash,
     error,
   };
