@@ -5,21 +5,28 @@ import NumericalInput from "../../../../components/NumericalInput";
 import useAccount from "../../../../hooks/useAccount";
 import { useModalHelper } from "../../../../components/ConnectWalletModal/utils";
 import { UNIT } from "../../../../constants/applications";
+import { useWithdrawSymbol } from "../../hooks/useWithdrawSymbol";
 
 type InputComponentProps = {
   typedAmount: string;
   setTypedAmount: Function;
   balance: string | undefined;
+  stakeSelected: boolean;
+  currentVaultId: number;
 };
 
 const InputComponent: React.FC<InputComponentProps> = ({
   typedAmount,
   setTypedAmount,
   balance,
+  stakeSelected,
+  currentVaultId,
 }) => {
   const { address: account } = useAccount();
   const { openModal } = useModalHelper();
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
+
+  const withdrawSymbol = useWithdrawSymbol(currentVaultId);
 
   const handleUserInput = (input: string) => {
     if (Number(input) !== Number(balance)) {
@@ -83,8 +90,12 @@ const InputComponent: React.FC<InputComponentProps> = ({
             value={typedAmount}
             handleUserInput={handleUserInput}
           />
-          <Text size="3" weight={"bold"} style={{ color: theme.color.blue1 }}>
-            {UNIT}
+          <Text
+            size="3"
+            weight={"bold"}
+            style={{ color: theme.color.blue1, whiteSpace: "nowrap" }}
+          >
+            {stakeSelected ? UNIT : withdrawSymbol}
           </Text>
         </Flex>
       </Flex>

@@ -123,6 +123,8 @@ const TransactSection: React.FC = () => {
         typedAmount={typedAmount}
         setTypedAmount={setTypedAmount}
         balance={stakeSelected ? ovlBalance : "0"}
+        stakeSelected={stakeSelected}
+        currentVaultId={currentVault.id}
       />
 
       <Flex justify={"end"}>
