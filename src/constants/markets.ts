@@ -30,10 +30,13 @@ import L1vL2 from "../assets/images/markets-full-logos/l1-vs-l2-index.webp";
 import L1 from "../assets/images/markets-full-logos/l1-index.webp";
 import HoneryJar from "../assets/images/markets-full-logos/honeyjar.webp";
 import DeFi from "../assets/images/markets-full-logos/defi-index.webp";
-import HenloUsd from '../assets/images/markets-full-logos/henlo-usd.webp';
-import Bullas from '../assets/images/markets-full-logos/bullas.webp';
-import IbgtBera from '../assets/images/markets-full-logos/iBGT-bera.webp';
-import DefaultLogo from '../assets/images/markets-full-logos/dafault-logo.webp';
+import HenloUsd from "../assets/images/markets-full-logos/henlo-usd.webp";
+import Bullas from "../assets/images/markets-full-logos/bullas.webp";
+import IbgtBera from "../assets/images/markets-full-logos/iBGT-bera.webp";
+import DefaultLogo from "../assets/images/markets-full-logos/dafault-logo.webp";
+import FanslyBlonde from "../assets/images/markets-full-logos/fansly-blonde.png";
+import FanslyFight from "../assets/images/markets-full-logos/fansly-fight.png";
+import FanslyBrunette from "../assets/images/markets-full-logos/fansly-brunette.png";
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -70,8 +73,11 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "HoneyComb%20and%20Jars%20NFT%20Index": HoneryJar,
   "Defi%20Index": DeFi,
   "HENLO%20%2F%20USD": HenloUsd,
-  "Bullas": Bullas,
+  Bullas: Bullas,
   "iBGT%20%2F%20BERA": IbgtBera,
+  "Amouranth%20vs%20peachJars": FanslyFight,
+  "Jessicanigri%20vs%20Monalita": FanslyBlonde,
+  "Monalita%20vs%20Elvasnaps": FanslyBrunette,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -124,6 +130,7 @@ export enum CategoryName {
   Chess = "Chess",
   Artists = "Artists",
   Bera = "Bera",
+  Fansly = "Fansly",
   Other = "Other",
 }
 
@@ -133,7 +140,12 @@ export type MarketCategoryMap = {
 
 export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Chess]: ["Hikaru%20Nakamura", "Magnus%20Carlsen"],
-  [CategoryName.Bera]: ["Bera%20NFT%20Index", "Bullas", "iBGT%20%2F%20BERA", "HENLO%20%2F%20USD"],
+  [CategoryName.Bera]: [
+    "Bera%20NFT%20Index",
+    "Bullas",
+    "iBGT%20%2F%20BERA",
+    "HENLO%20%2F%20USD",
+  ],
   [CategoryName.MemeWar]: [
     "Cats%20vs%20Dogs%20-%20Meme%20War",
     "Cats%20vs%20Frogs%20-%20Meme%20War",
@@ -162,6 +174,11 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
     "Mr%20Beast%20Popularity%20Index",
+  ],
+  [CategoryName.Fansly]: [
+    "Amouranth%20vs%20peachJars",
+    "Jessicanigri%20vs%20Monalita",
+    "Monalita%20vs%20Elvasnaps",
   ],
   [CategoryName.Other]: [],
 };
