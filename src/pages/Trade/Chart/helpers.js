@@ -26,6 +26,8 @@ export const getMarketChartUrl = (value) => {
     return MARKET_CHART_URL.IMOLA
   } else if (isBartio(chainId)) {
     return MARKET_CHART_URL.BARTIO
+  } else if (isBscTestnet(chainId)) {
+    return MARKET_CHART_URL.BSC_TESTNET
   } else {
     return MARKET_CHART_URL.DEFAULT
   }
