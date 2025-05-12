@@ -62,8 +62,9 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
               "Liquidation Successful"}
             {type === TransactionType.CLAIM_REWARDS &&
               "Claim Rewards Successful"}
-            {type === TransactionType.STAKE_OVL && "Stake OVL Successful"}
-            {type === TransactionType.WITHDRAW_OVL && "Withdraw OVL Successful"}
+            {type === TransactionType.STAKE_OVL && "Tokens staked successfully"}
+            {type === TransactionType.WITHDRAW_OVL &&
+              "Tokens withdrawn successfully"}
           </Text>
         ) : (
           <Text weight={"bold"}>{errorMessage}</Text>
