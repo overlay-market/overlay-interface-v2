@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Address, erc20Abi, parseUnits, zeroAddress } from "viem";
+import { Address, erc20Abi, parseEventLogs, parseUnits, zeroAddress } from "viem";
 import useAccount from "../../../hooks/useAccount";
 import { useTransaction } from "./useTransaction";
 import { TransactionType } from "../../../constants/transaction";
@@ -8,30 +8,27 @@ import { ICHIVaultDepositGuard } from "../../../constants/vaults";
 import { usePublicClient, useWalletClient, useReadContract } from "wagmi";
 import { useVaultsState } from "../../../state/vaults/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import { ichiVaultABI } from "../abi/ichiVaultABI";
+import { getERC4626VaultItemByVaultId, getIchiVaultItemByVaultId } from "../utils/getVaultItem";
+import { StakeResult } from "./useStake";
+import { ERC4626ABI } from "../abi/ERC4626ABI";
 
-const ichiVaultAbi = [
-  {
-    constant: true,
-    inputs: [],
-    name: "token0",
-    outputs: [{ name: "", type: "address" }],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const;
-
-type UseStakeWithGuardProps = {
-  ichiVaultAddress: Address;
+type UseStakeWithGuardAndERC4626Props = {
+  vaultId: number;
   typedAmount: string;
   setTypedAmount: (val: string) => void;
 };
 
-export const useStakeWithGuard = ({
-  ichiVaultAddress,
+export const useStakeWithGuardAndERC4626 = ({
+  vaultId,
   typedAmount,
   setTypedAmount,
-}: UseStakeWithGuardProps) => {
-  if (ichiVaultAddress === zeroAddress) {
+}: UseStakeWithGuardAndERC4626Props): StakeResult => {
+  const ichiVaultAddress =
+    getIchiVaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;
+  const ERC4626VaultAddress = getERC4626VaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;  
+
+  if (ichiVaultAddress === zeroAddress || ERC4626VaultAddress === zeroAddress) {
     return {
       handleStake: async () => {},
       buttonTitle: 'Stake',
@@ -48,9 +45,15 @@ export const useStakeWithGuard = ({
   const { sendTransaction: sendApproveTransaction } = useTransaction({
     type: TransactionType.APPROVAL,
     successMessage: "Approval successful!",
+    skipGasEstimation: true,
   });
 
-  const { sendTransaction: sendStakeTransaction } = useTransaction({
+  const { sendTransaction: sendStakeToIchiVault, txReceipt } = useTransaction({
+    type: TransactionType.STAKE_OVL,
+    successMessage: "Successfully staked!",
+  });
+
+  const { sendTransaction: sendStakeToERC4626, txHash } = useTransaction({
     type: TransactionType.STAKE_OVL,
     successMessage: "Successfully staked!",
   });
@@ -62,7 +65,7 @@ export const useStakeWithGuard = ({
 
   const { data: token0 } = useReadContract({
     address: ichiVaultAddress,
-    abi: ichiVaultAbi,
+    abi: ichiVaultABI,
     functionName: "token0",
     query: {
       enabled: !!ichiVaultAddress, 
@@ -86,7 +89,7 @@ export const useStakeWithGuard = ({
       setTokenDecimals(decimals as number);
     }
   }, [token0, decimals]);
-
+console.log(depositTokenAddress)
   const buttonTitle = useMemo(() => {
     if (stakeStep === "wallet") return "Confirm in wallet";
     if (stakeStep === "pending") return "Pending confirmation...";
@@ -144,25 +147,55 @@ export const useStakeWithGuard = ({
         account,
       ] as const;
 
-      const estimatedGas = await publicClient.estimateContractGas({
-        address: ICHIVaultDepositGuard.depositGuardAddress,
-        abi: ichiVaultDepositGuardABI,
-        functionName: 'forwardDepositToICHIVault',
-        args: depositArgs,
-        account,
-      });
-
-      const depositHash = await sendStakeTransaction({
+      await sendStakeToIchiVault({
         address: ICHIVaultDepositGuard.depositGuardAddress,
         abi: ichiVaultDepositGuardABI,
         functionName: "forwardDepositToICHIVault",
         args: depositArgs,
-        gas: estimatedGas,
         account,
         chain,
       });
 
-      if (depositHash) {
+      if (!txReceipt) throw new Error('Stake tx failed');
+
+      setStakeStep("wallet");
+      
+      const log = parseEventLogs({
+        abi: ichiVaultABI,
+        logs: txReceipt.logs,
+        eventName: 'Deposit', 
+      });
+
+      const stakedTokensAmount = log[0].args.shares;
+    
+      if (!stakedTokensAmount || stakedTokensAmount === 0n) {
+        throw new Error('Invalid staked tokens amount');
+      }
+     
+      const approveERC4626Hash = await sendApproveTransaction({
+        address: ichiVaultAddress,
+        abi: ichiVaultABI,
+        functionName: 'approve',
+        args: [ERC4626VaultAddress, stakedTokensAmount],
+        account,
+        chain,
+      });
+      if (!approveERC4626Hash) throw new Error('Approve tx failed');
+
+      setStakeStep("pending");
+
+      await sendStakeToERC4626({
+        address: ERC4626VaultAddress,
+        abi: ERC4626ABI,
+        functionName: "deposit",
+        args: [stakedTokensAmount, ERC4626VaultAddress],
+        account,
+        chain,
+      });
+
+      if (!txHash) throw new Error('Stake tx failed');
+
+      if (txHash) {
         await queryClient.refetchQueries({
           queryKey: ['userCurrentBalance', account, ichiVaultAddress],
           exact: true,
