@@ -17,9 +17,9 @@ import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
+import theme from "../../../theme";
 
 const TradeWidget: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -37,7 +37,7 @@ const TradeWidget: React.FC = () => {
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
     undefined
   );
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
   const debouncedTypedValue = useDebounce(typedValue, 500);
   const [leverageInputValue, setLeverageInputValue] = useState<string | null>(
@@ -157,20 +157,32 @@ const TradeWidget: React.FC = () => {
       />
 
       <CollateralInputComponent />
+      <TradeButtonComponent loading={loading} tradeState={tradeState} />
+      <button
+        onClick={() => setDetailsOpen((o) => !o)}
+        style={{
+          background: "none",
+          border: "none",
+          padding: 0,
+          // marginTop: "12px",
+          marginBottom: "8px",
+          fontSize: "16px",
+          fontWeight: 500,
+          color: theme.color.grey3,
+          cursor: "pointer",
+          textAlign: "right",
+        }}
+      >
+        {detailsOpen ? "Hide Info ▲" : "More Info ▼"}
+      </button>
 
-      {isMobile ? (
-        <>
-          <TradeButtonComponent loading={loading} tradeState={tradeState} />
+      {/* Conditionally render details */}
+      {detailsOpen && (
+        <div>
           <MainTradeDetails tradeState={tradeState} />
-        </>
-      ) : (
-        <>
-          <MainTradeDetails tradeState={tradeState} />
-          <TradeButtonComponent loading={loading} tradeState={tradeState} />
-        </>
+          <AdditionalTradeDetails tradeState={tradeState} />
+        </div>
       )}
-
-      <AdditionalTradeDetails tradeState={tradeState} />
     </TradeWidgetContainer>
   );
 };
