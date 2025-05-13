@@ -13,6 +13,7 @@ export const PopupContainer = styled.div`
   margin-top: 4px;
   border-radius: 8px;
   background: ${theme.color.grey4};
+  box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
   overflow: hidden;
 `;
 

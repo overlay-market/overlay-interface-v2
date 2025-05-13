@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import NumericalInput from "../../NumericalInput";
 import theme from "../../../theme";
-import SetSlippageModal from "../../SetSlippageModal";
+import { TradeSlippageModal } from "../../SlippageModal";
 
 type NumericalInputContainerProps = {
   inputValue: string;
@@ -31,7 +31,7 @@ const NumericalInputContainer: React.FC<NumericalInputContainerProps> = ({
       </Flex>
       <Flex justify={"between"}>
         <Flex pt={"10px"}>
-          <SetSlippageModal />
+          <TradeSlippageModal />
         </Flex>
 
         <Text style={{ fontSize: "12px" }}>minimum: 0.01%</Text>

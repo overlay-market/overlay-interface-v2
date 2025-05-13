@@ -15,6 +15,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       chainId: chainId ? (chainId as number) : (DEFAULT_CHAINID as number),
       rpcUrls: {
         [SUPPORTED_CHAINID.BARTIO]: import.meta.env.VITE_BARTIO_RPC,
+        [SUPPORTED_CHAINID.BERACHAIN]: "https://rpc.berachain.com",
         [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: import.meta.env
           .VITE_ARBITRUM_SEPOLIA_RPC,
       },

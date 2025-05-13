@@ -22,13 +22,13 @@ const NavBar: React.FC = () => {
           md: `${theme.headerSize.width}`,
         }}
         height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "100vh" }}
-        py={{ initial: "0", sm: "10px" }}
-        px={{ initial: "3px", sm: "6px" }}
+        py={{ sm: "10px" }}
+        px={{ sm: "6px" }}
         position={{ initial: "static", sm: "sticky" }}
         top={"0"}
         style={{
           borderRight: isMobile
-            ? "0px solid transparent" // Remove the border
+            ? "0px solid transparent"
             : `1px solid ${theme.color.darkBlue}`,
         }}
       >
