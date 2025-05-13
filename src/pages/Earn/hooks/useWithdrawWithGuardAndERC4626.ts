@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Address,  parseUnits, zeroAddress } from "viem";
+import { erc4626Abi,  parseEventLogs,  parseUnits, zeroAddress } from "viem";
 import useAccount from "../../../hooks/useAccount";
 import { useTransaction } from "./useTransaction";
 import { TransactionType } from "../../../constants/transaction";
@@ -7,19 +7,26 @@ import { ichiVaultDepositGuardABI } from "../abi/ichiVaultDepositGuardABI";
 import { ICHIVaultDepositGuard } from "../../../constants/vaults";
 import { usePublicClient, useWalletClient } from "wagmi";
 import { useVaultsState } from "../../../state/vaults/hooks";
+import { getERC4626VaultItemByVaultId, getIchiVaultItemByVaultId } from "../utils/getVaultItem";
+import { ERC4626ABI } from "../abi/ERC4626ABI";
+import { useQueryClient } from "@tanstack/react-query";
 
-type UseWithdrawWithGuardProps = {
-  ichiVaultAddress: Address;
+type UseWithdrawWithGuardAndERC4626Props = {
+  vaultId: number;
   typedAmount: string;
   setTypedAmount: (val: string) => void;
 };
 
-export const useWithdrawWithGuard = ({
-  ichiVaultAddress,
+export const useWithdrawWithGuardAndERC4626 = ({
+  vaultId,
   typedAmount,
   setTypedAmount,
-}: UseWithdrawWithGuardProps) => {
-  if (ichiVaultAddress === zeroAddress) {
+}: UseWithdrawWithGuardAndERC4626Props) => {
+  const ichiVaultAddress =
+    getIchiVaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;
+  const ERC4626VaultAddress = getERC4626VaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;  
+
+  if (ichiVaultAddress === zeroAddress || ERC4626VaultAddress === zeroAddress) {
     return {
       handleWithdraw: async () => {},
       buttonTitle: 'Withdraw',
@@ -31,8 +38,14 @@ export const useWithdrawWithGuard = ({
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const { slippageValue } = useVaultsState();
+  const queryClient = useQueryClient();
 
-  const { sendTransaction } = useTransaction({
+  const { sendTransaction: sendWithdrawFromERC4626, txReceipt } = useTransaction({
+    type: TransactionType.WITHDRAW_OVL,
+    successMessage: "Withdrawal successful!",
+  });
+
+  const { sendTransaction: sendWithdrawFromIchi, txHash } = useTransaction({
     type: TransactionType.WITHDRAW_OVL,
     successMessage: "Withdrawal successful!",
   });
@@ -55,6 +68,29 @@ export const useWithdrawWithGuard = ({
       const parsedAmount = parseUnits(typedAmount, 18);
       const chain = walletClient.chain;
 
+      await sendWithdrawFromERC4626({
+        address: ERC4626VaultAddress,
+        abi: ERC4626ABI,
+        functionName: "withdraw",
+        args: [parsedAmount, ICHIVaultDepositGuard.depositGuardAddress, account],
+        account,
+        chain,
+      });
+
+      if (!txReceipt) throw new Error('Withdraw tx failed');
+      
+      const log = parseEventLogs({
+        abi: erc4626Abi,
+        logs: txReceipt.logs,
+        eventName: 'Withdraw', 
+      });
+
+      const lpTokensForIchi = log[0].args.assets;
+    
+      if (!lpTokensForIchi || lpTokensForIchi === 0n) {
+        throw new Error('Invalid withdrawn tokens amount');
+      }
+
       const {result: estimatedAmounts} = await publicClient.simulateContract({
         address: ICHIVaultDepositGuard.depositGuardAddress,
         abi: ichiVaultDepositGuardABI,
@@ -62,7 +98,7 @@ export const useWithdrawWithGuard = ({
         args: [
           ichiVaultAddress,
           ICHIVaultDepositGuard.vaultDeployerAddress,
-          parsedAmount,
+          lpTokensForIchi,
           account,
           0n,
           0n,          
@@ -82,31 +118,29 @@ export const useWithdrawWithGuard = ({
       const withdrawArgs = [
         ichiVaultAddress,
           ICHIVaultDepositGuard.vaultDeployerAddress,
-          parsedAmount,
+          lpTokensForIchi,
           account,
           minAmount0,
           minAmount1,
       ] as const;
 
-      const estimatedGas = await publicClient.estimateContractGas({
-        address: ICHIVaultDepositGuard.depositGuardAddress,
-        abi: ichiVaultDepositGuardABI,
-        functionName: 'forwardWithdrawFromICHIVault',
-        args: withdrawArgs,
-        account,
-      });
-
-      const withdrawHash = await sendTransaction({
+      await sendWithdrawFromIchi({
         address: ICHIVaultDepositGuard.depositGuardAddress,
         abi: ichiVaultDepositGuardABI,
         functionName: "forwardWithdrawFromICHIVault",
         args: withdrawArgs,
-        gas: estimatedGas,
         account,
         chain,
       });
 
-      if (!withdrawHash) throw new Error('Withdraw transaction failed');
+      if (!txHash) throw new Error('Withdraw tx failed');
+
+      if (txHash) {
+        await queryClient.refetchQueries({
+          queryKey: ['userCurrentBalance', account, ichiVaultAddress],
+          exact: true,
+        });
+      }
 
     } catch (err) {
       console.error("Withdraw error:", err);
