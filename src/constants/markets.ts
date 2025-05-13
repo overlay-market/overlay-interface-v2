@@ -37,6 +37,11 @@ import DefaultLogo from "../assets/images/markets-full-logos/dafault-logo.webp";
 import FanslyBlonde from "../assets/images/markets-full-logos/fansly-blonde-nologo.jpg";
 import FanslyBrunette from "../assets/images/markets-full-logos/fansly-brunette-nologo.jpg";
 import FanslyFight from "../assets/images/markets-full-logos/fansly-fight-nologo.jpg";
+import BinanceAlfa from "../assets/images/markets-full-logos/binance-alpha.jpg";
+import BnbUsd from "../assets/images/markets-full-logos/bnb-usd.jpg";
+import MadeInUsa from "../assets/images/markets-full-logos/made-in-usa.jpg";
+import SolIndex from "../assets/images/markets-full-logos/sol-index.jpg";
+import SolUsd from "../assets/images/markets-full-logos/sol-usd.jpg";
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -78,6 +83,11 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Amouranth%20vs%20peachJars": FanslyFight,
   "Jessicanigri%20vs%20Monalita": FanslyBlonde,
   "Monalita%20vs%20Elvasnaps": FanslyBrunette,
+  "Binance%20Alpha%20Index": BinanceAlfa,
+  "BNB%20%2F%20USD": BnbUsd,
+  "Made%20In%20USA%20Index": MadeInUsa,
+  "SOL%20Index": SolIndex,
+  "SOL%2FUSD": SolUsd,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -85,8 +95,16 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 };
 
 export const MARKETSORDER = [
-  "HENLO%20%2F%20USD",
+  "amouranth%20vs%20peachJars",
+  "binance%20alpha%20index",
   "Counter-Strike%202%20Skins",
+  "Monalita%20vs%20Elvasnaps",
+  "SOL%20Index",
+  "BNB%20%2F%20USD",
+  "Jessicanigri%20vs%20Monalita",
+  "Made%20In%20USA%20Index",
+  "SOL%2FUSD",
+  "HENLO%20%2F%20USD",
   "BTC%20Dominance",
   "ETH%20Dominance",
   "Bera%20NFT%20Index",
