@@ -89,7 +89,7 @@ export const useStakeWithGuardAndERC4626 = ({
       setTokenDecimals(decimals as number);
     }
   }, [token0, decimals]);
-console.log(depositTokenAddress)
+
   const buttonTitle = useMemo(() => {
     if (stakeStep === "wallet") return "Confirm in wallet";
     if (stakeStep === "pending") return "Pending confirmation...";
