@@ -27,7 +27,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 }) => {
   const { address: account } = useAccount();
   const isMobile = useMediaQuery("(max-width: 767px)");
-  const isMultipleSessions = false;
+  const isMultipleSessions = true;
 
   return (
     <Table>
@@ -42,10 +42,10 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
           </StyledHeader>
           {!isMobile && isMultipleSessions && (
             <StyledHeader textalign={"right"}>
-              Points-Previous Week
+              Points-Last Day
             </StyledHeader>
           )}
-          <StyledHeader textalign={"right"}>Total PnL</StyledHeader>
+          <StyledHeader textalign={"right"}>Total Points</StyledHeader>
         </tr>
       </thead>
 
@@ -80,7 +80,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               </StyledCell>
             )}
             <StyledCell textalign="right">
-              {currentUserData?.totalPoints ? (+currentUserData?.totalPoints).toFixed(2) + "%" : "0"}
+              {currentUserData?.totalPoints ?? "0"}
             </StyledCell>
           </CurrentUserRankingRow>
           <BgRow></BgRow>
@@ -128,10 +128,10 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               </StyledCell>
               {!isMobile && isMultipleSessions && (
                 <StyledCell textalign="right">
-                  {rank.previousWeekPoints}
+                  {rank.previousWeekPoints ?? "0"}
                 </StyledCell>
               )}
-              <StyledCell textalign="right">{rank.totalPoints.toFixed(2) + "%"}</StyledCell>
+              <StyledCell textalign="right">{rank.totalPoints}</StyledCell>
             </StyledRow>
           ))}
       </tbody>
