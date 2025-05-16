@@ -22,7 +22,7 @@ import { GradientText } from "./user-points-section-styles";
 
 const INITIAL_NUMBER_OF_ROWS = 10;
 const ROWS_PER_LOAD = 20;
-const comingSoon = false;
+const comingSoon = true;
 
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
@@ -235,7 +235,7 @@ const Leaderboard: React.FC = () => {
               Coming Soon
             </GradientText>
             <Text size="2" style={{textAlign: "center"}}>
-              This feature is currently under development. Stay tuned!
+              BSC testnet points campaign. Stay tuned!
             </Text>
           </Flex>
         </Flex>

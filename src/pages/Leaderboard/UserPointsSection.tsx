@@ -35,7 +35,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
             }}
           >
-            You have {isLoading ? <Loader /> : `${userPoints ? userPoints.toFixed(2) + "%" : "0"} PnL`}
+            You have {isLoading ? <Loader /> : `${userPoints ?? "0"} Points`}
           </Text>
         </Flex>
       ) : (
@@ -64,7 +64,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
 
       <Flex gap={"8px"} align={"center"}>
         <Text size={"1"} style={{ color: theme.color.grey3 }}>
-          Leaderboard is updated every minute!
+          Leaderboard is updated every day!
         </Text>
         {false && <Link target="_blank" href={LEADERBOARD_LEARN_MORE_LINK}>
           <GradientText>Learn more</GradientText>
