@@ -235,7 +235,7 @@ const Leaderboard: React.FC = () => {
               Coming Soon
             </GradientText>
             <Text size="2" style={{textAlign: "center"}}>
-              This feature is currently under development. Stay tuned!
+              BSC testnet points campaign. Stay tuned!
             </Text>
           </Flex>
         </Flex>
