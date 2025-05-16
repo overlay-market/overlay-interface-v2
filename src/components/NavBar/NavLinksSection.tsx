@@ -23,11 +23,11 @@ import {
 // } from "../../assets/icons/navBar-icons/stake";
 import { DEFAULT_MARKET, NAVBAR_MODE } from "../../constants/applications";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
-// import {
-//   TrophyActiveIcon,
-//   TrophyIcon,
-// } from "../../assets/icons/navBar-icons/trophy";
-// import { useMediaQuery } from "../../hooks/useMediaQuery";
+import {
+  TrophyActiveIcon,
+  TrophyIcon,
+} from "../../assets/icons/navBar-icons/trophy";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export interface NavLinkAsset {
   to: string;
@@ -48,7 +48,7 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
 
   const activeMarket = currentMarket?.marketName ?? DEFAULT_MARKET;
   const encodedMarket = encodeURIComponent(activeMarket);
-  // const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const NAV_LINKS: Array<NavLinkAsset> = [
     {
@@ -79,14 +79,14 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
     //   activeIcon: <PowercardActiveIcon />,
     //   showOnMobile: !isMobile,
     // },
-    // {
-    //   to: "/leaderboard",
-    //   label:
-    //     isMobile && mode === NAVBAR_MODE.DEFAULT ? "Leaders" : "Leaderboard",
-    //   icon: <TrophyIcon />,
-    //   activeIcon: <TrophyActiveIcon />,
-    //   showOnMobile: true,
-    // },
+    {
+      to: "/leaderboard",
+      label:
+        isMobile && mode === NAVBAR_MODE.DEFAULT ? "Leaders" : "Leaderboard",
+      icon: <TrophyIcon />,
+      activeIcon: <TrophyActiveIcon />,
+      showOnMobile: true,
+    },
     // {
     //   to: "/stake",
     //   label: "Stake",

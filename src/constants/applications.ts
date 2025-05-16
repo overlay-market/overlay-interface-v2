@@ -17,4 +17,4 @@ export enum NAVBAR_MODE {
   DEFAULT = "default",
 }
 
-export const LEADERBOARD_POINTS_API = 'https://api.overlay.market/leaderboard-pnl/points/leaderboard'
+export const LEADERBOARD_POINTS_API = 'https://api.overlay.market/points-bsc/points/leaderboard'
