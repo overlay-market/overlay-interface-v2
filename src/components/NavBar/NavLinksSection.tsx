@@ -17,10 +17,10 @@ import {
 //   PowercardIcon,
 //   PowercardActiveIcon,
 // } from "../../assets/icons/navBar-icons/powercard";
-// import {
-//   StakeIcon,
-//   StakeActiveIcon,
-// } from "../../assets/icons/navBar-icons/stake";
+import {
+  StakeIcon,
+  StakeActiveIcon,
+} from "../../assets/icons/navBar-icons/stake";
 import { DEFAULT_MARKET, NAVBAR_MODE } from "../../constants/applications";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
 import {
@@ -85,6 +85,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
         isMobile && mode === NAVBAR_MODE.DEFAULT ? "Leaders" : "Leaderboard",
       icon: <TrophyIcon />,
       activeIcon: <TrophyActiveIcon />,
+      showOnMobile: true,
+    },
+    {
+      to: "/faucet",
+      label: "Faucet",
+      icon: <StakeIcon />,
+      activeIcon: <StakeActiveIcon />,
       showOnMobile: true,
     },
     // {
