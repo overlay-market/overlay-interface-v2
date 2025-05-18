@@ -94,6 +94,20 @@ export const getExplorerLink = (chainId: number, data: string, type: ExplorerDat
     }
   }
 
+  if (chainId === SUPPORTED_CHAINID.BSC_TESTNET) {
+    switch (type) {
+      case ExplorerDataType.TRANSACTION:
+        return `https://testnet.bscscan.com/tx/${data}`
+      case ExplorerDataType.ADDRESS:
+      case ExplorerDataType.TOKEN:
+        return `https://testnet.bscscan.com/address/${data}`
+      case ExplorerDataType.BLOCK:
+        return `https://testnet.bscscan.com/block/${data}`
+      default:
+        return `https://testnet.bscscan.com/`
+    }
+  }
+
   const prefix = `https://${ETHERSCAN_PREFIXES[chainId] ?? ''}etherscan.io`
 
   switch (type) {

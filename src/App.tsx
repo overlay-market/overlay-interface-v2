@@ -14,7 +14,8 @@ import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
-// import Leaderboard from "./pages/Leaderboard";
+import Leaderboard from "./pages/Leaderboard";
+import Faucet from "./pages/Faucet";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -38,7 +39,8 @@ const App = () => {
                 <Route path="/markets" element={<Markets />} />
                 <Route path="/trade" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
-                {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/faucet" element={<Faucet />} />
                 <Route path="*" element={<Navigate to="/markets" />} />
               </Routes>
             </Flex>

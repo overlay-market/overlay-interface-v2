@@ -27,6 +27,7 @@ const networkLabel = (chainId: number) => {
     SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
     SUPPORTED_CHAINID.BARTIO,
     SUPPORTED_CHAINID.IMOLA,
+    SUPPORTED_CHAINID.BSC_TESTNET,
   ].includes(chainId);
 
   return (
