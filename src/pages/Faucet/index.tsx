@@ -80,7 +80,6 @@ const Faucet: React.FC = () => {
       {!address && (
         <GradientOutlineButton
           title={"Connect Wallet"}
-          width={"100%"}
           handleClick={openModal}
         />
       )}
