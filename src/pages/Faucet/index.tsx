@@ -68,7 +68,7 @@ const Faucet: React.FC = () => {
         Get Test OVL for BSC Testnet
       </Text>
       <Text size="2" style={{ margin: 12 }}>
-        ✓ 0.002 BNB for 3 days on BSC Mainnet is needed for test funding.
+        ✓ Your wallet neets to have held 0.002 BNB for at leats 3 days on BSC Mainnet in order to receive OVL.
       </Text>
       {address && (
         <GradientSolidButton
