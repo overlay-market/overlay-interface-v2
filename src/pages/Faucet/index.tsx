@@ -37,7 +37,7 @@ const Faucet: React.FC = () => {
     try {
       const { data } = await refetch({
         data: {
-          tokens: ["ovl"],
+          tokens: ["ovl", "eth"],
           chains: ["bnb-testnet"],            
           recipient: address
         },
