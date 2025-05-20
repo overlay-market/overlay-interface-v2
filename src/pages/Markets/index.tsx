@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
-import { Link } from "react-router-dom";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
@@ -43,15 +42,19 @@ const Markets: React.FC = () => {
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
-      <Link
-        to="/faucet"
-        style={{ display: window.innerWidth <= 768 ? "none" : "block" }}
+      <div
+        onClick={() => (window.location.href = "/faucet")}
+        style={{
+          display: window.innerWidth <= 768 ? "none" : "block",
+          cursor: "pointer",
+        }}
       >
         <img
           src="/src/assets/images/banner/torch-trading-campaign.png"
           style={{ width: "100%" }}
+          alt="Trading Campaign Banner"
         />
-      </Link>
+      </div>
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} />
       <MarketsTable marketsData={marketsData} />
