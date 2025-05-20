@@ -50,7 +50,7 @@ const Markets: React.FC = () => {
         }}
       >
         <img
-          src="/src/assets/images/banner/torch-trading-campaign.png"
+          src="src/assets/images/banner/torch-trading-campaign.png"
           style={{ width: "100%" }}
           alt="Trading Campaign Banner"
         />
