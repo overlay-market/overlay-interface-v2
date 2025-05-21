@@ -24,7 +24,7 @@ export const TradeHeaderContainer = styled(Flex)`
 
   @media (min-width: ${theme.breakpoints.xxl}) {
     margin-left: -16px;
-    padding-left: 60px;
+    padding-left: 16px;
     width: calc(100% + 20px + 16px);
   }
 `;

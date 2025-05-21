@@ -77,7 +77,7 @@ export const DropdownContainer = styled(Box)`
     height: 562px;
   }
   @media (min-width: ${theme.breakpoints.xxl}) {
-    width: calc(272px + 60px);
+    width: calc(272px + 16px);
     height: 645px;
     left: 0;
   }
