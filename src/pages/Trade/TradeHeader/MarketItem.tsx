@@ -31,17 +31,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
   };
 
   return (
-    <MarketInfo
-      width={"100%"}
-      height={"49px"}
-      py={"12px"}
-      pr={"8px"}
-      pl={"16px"}
-      justify={"between"}
-      align={"center"}
-      gap={"8px"}
-      onClick={() => handleMarketSelect(marketId)}
-    >
+    <MarketInfo onClick={() => handleMarketSelect(marketId)}>
       <MarketLogo src={marketLogo} alt={`logo`} />
       <Flex gap={"8px"} width={"100%"} justify={"between"} align={"center"}>
         <MarketName>{marketName}</MarketName>
