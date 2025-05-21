@@ -5,6 +5,15 @@ import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
 export const SearchContainer = styled(Flex)`
   position: relative;
+  width: 100%;
+  height: 49px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 8px;
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    padding: 12px 8px 12px 16px;
+  }
 `;
 
 export const SearchIcon = styled(MagnifyingGlassIcon)`
@@ -17,6 +26,10 @@ export const SearchIcon = styled(MagnifyingGlassIcon)`
   width: 16px;
   height: 16px;
   pointer-events: none;
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    left: 24px;
+  }
 `
 
 export const SearchInput = styled.input`

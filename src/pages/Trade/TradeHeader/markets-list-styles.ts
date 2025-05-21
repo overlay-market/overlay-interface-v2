@@ -25,14 +25,14 @@ export const MarketsListContainer = styled(Flex)`
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 334px;
-    padding-left: 16px;
+    padding-left: 8px;
     padding-right: 16px;
     border-right: 1px solid ${theme.color.darkBlue};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
     width: 260px;
-    padding-left: 10px;
+    padding-left: 8px;
     padding-right: 10px;
   }
 
@@ -77,7 +77,7 @@ export const DropdownContainer = styled(Box)`
     height: 562px;
   }
   @media (min-width: ${theme.breakpoints.xxl}) {
-    width: calc(272px + 60px);
+    width: calc(272px + 16px);
     height: 645px;
     left: 0;
   }
