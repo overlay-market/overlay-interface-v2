@@ -41,9 +41,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
             Leaderboard Rankings
           </StyledHeader>
           {!isMobile && isMultipleSessions && (
-            <StyledHeader textalign={"right"}>
-              Points-Last Day
-            </StyledHeader>
+            <StyledHeader textalign={"right"}>Points-Last Day</StyledHeader>
           )}
           <StyledHeader textalign={"right"}>Total Points</StyledHeader>
         </tr>
@@ -76,7 +74,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
             </StyledCell>
             {!isMobile && isMultipleSessions && (
               <StyledCell textalign="right">
-                {currentUserData?.previousWeekPoints ?? "0"}
+                {currentUserData?.previousRunPoints ?? "0"}
               </StyledCell>
             )}
             <StyledCell textalign="right">
@@ -128,7 +126,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               </StyledCell>
               {!isMobile && isMultipleSessions && (
                 <StyledCell textalign="right">
-                  {rank.previousWeekPoints ?? "0"}
+                  {rank.previousRunPoints ?? "0"}
                 </StyledCell>
               )}
               <StyledCell textalign="right">{rank.totalPoints}</StyledCell>
