@@ -24,6 +24,7 @@ import ReferralModal from "./ReferralSection/ReferralModal";
 import { useSearchParams } from "react-router-dom";
 import { fetchPointsData } from "./utils/fetchPointsData";
 import { fetchUserReferralData } from "./utils/fetchUserReferralData";
+import { useAddPopup } from "../../state/application/hooks";
 
 const INITIAL_NUMBER_OF_ROWS = 15;
 const ROWS_PER_LOAD = 20;
@@ -33,7 +34,7 @@ const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
   const [searchParams] = useSearchParams();
   const referralCodeFromURL = searchParams.get("referrer");
-
+  const addPopup = useAddPopup();
   const getEnsName = useGetEnsName();
 
   const [pointsData, setPointsData] = useState<
@@ -62,11 +63,15 @@ const Leaderboard: React.FC = () => {
     const fetchReferralData = async () => {
       if (!account) return;
 
-      const data = await fetchUserReferralData(
+      const { data, errorMessage } = await fetchUserReferralData(
         account,
         setFetchingReferralsData
       );
       setUserReferralData(data);
+
+      if (errorMessage) {
+        addPopup({ message: errorMessage }, Date.now().toString());
+      }
     };
 
     fetchReferralData();
@@ -76,12 +81,16 @@ const Leaderboard: React.FC = () => {
     const fetchReferralData = async () => {
       if (!account || !triggerRefetchReferralData) return;
 
-      const data = await fetchUserReferralData(
+      const { data, errorMessage } = await fetchUserReferralData(
         account,
         setFetchingReferralsData
       );
       setUserReferralData(data);
       setTriggerRefetchReferralData(false);
+
+      if (errorMessage) {
+        addPopup({ message: errorMessage }, Date.now().toString());
+      }
     };
 
     fetchReferralData();
