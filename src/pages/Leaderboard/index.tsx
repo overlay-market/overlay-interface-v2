@@ -25,7 +25,7 @@ import { useSearchParams } from "react-router-dom";
 import { fetchPointsData } from "./utils/fetchPointsData";
 import { fetchUserReferralData } from "./utils/fetchUserReferralData";
 
-const INITIAL_NUMBER_OF_ROWS = 10;
+const INITIAL_NUMBER_OF_ROWS = 15;
 const ROWS_PER_LOAD = 20;
 const comingSoon = false;
 
