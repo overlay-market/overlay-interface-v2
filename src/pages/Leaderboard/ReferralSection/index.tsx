@@ -189,7 +189,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
             <Flex gap="8px">
               <Text>Your referral code is active </Text>
               <GradientText weight={"medium"}>
-                {"referralCode".toUpperCase()}
+                {referralCode.toUpperCase()}
               </GradientText>
             </Flex>
             <Flex gap={"8px"}>
