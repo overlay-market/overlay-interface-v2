@@ -52,7 +52,7 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     }
 
     try {
-      const url = new URL("/referral/message-to-sign", REFERRAL_API_BASE_URL);
+      const url = new URL("/points-bsc/referral/message-to-sign", REFERRAL_API_BASE_URL);
       url.searchParams.append("walletAddress", walletAddress);
       url.searchParams.append("referralCode", referralCode);
 
@@ -99,7 +99,7 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
         referralCode,
         signature,
       };
-      const url = new URL("/referral/use-referral-code", REFERRAL_API_BASE_URL);
+      const url = new URL("/points-bsc/referral/use-referral-code", REFERRAL_API_BASE_URL);
       const response = await fetch(url.toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
