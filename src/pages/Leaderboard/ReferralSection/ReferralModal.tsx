@@ -77,11 +77,11 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     }
   }, [walletAddress, referralCode]);
 
-  const signReferralMessage = async (): Promise<`0x${string}` | null> => {
+  const signReferralMessage = async (message?: string): Promise<`0x${string}` | null> => {
     try {
       const signature = await signMessageAsync({
         account: walletAddress,
-        message: messageToSign,
+        message: message ?? messageToSign,
       });
       return signature;
     } catch (error) {
@@ -92,12 +92,12 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     }
   };
 
-  const submitReferralToServer = async () => {
+  const submitReferralToServer = async (sig?: `0x${string}`) => {
     try {
       const payload = {
         walletAddress,
         referralCode,
-        signature,
+        signature: sig ?? signature,
       };
       const url = new URL("/points-bsc/referral/use-referral-code", REFERRAL_API_BASE_URL);
       const response = await fetch(url.toString(), {
@@ -130,14 +130,14 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
       const messageToSign = await fetchMessageToSign();
       if (!messageToSign) return;
 
-      const sig = await signReferralMessage();
+      const sig = await signReferralMessage(messageToSign);
       if (!sig) return;
 
       if (sig) {
         setSignature(sig);
       }
 
-      const submissionResult = await submitReferralToServer();
+      const submissionResult = await submitReferralToServer(sig);
       if (submissionResult) {
         triggerRefetch(true);
         handleDismiss();
