@@ -42,6 +42,19 @@ const Markets: React.FC = () => {
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
+      <div
+        onClick={() => (window.location.href = "/faucet")}
+        style={{
+          display: window.innerWidth <= 768 ? "none" : "block",
+          cursor: "pointer",
+        }}
+      >
+        <img
+          src="src/assets/images/banner/torch-trading-campaign.png"
+          style={{ width: "100%" }}
+          alt="Trading Campaign Banner"
+        />
+      </div>
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} />
       <MarketsTable marketsData={marketsData} />
