@@ -173,7 +173,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
       {((!hasJoinedReferralCampaign && !isActivatingAffiliateStatus) ||
         userStatus === UserReferralStatus.NotReferredByAffiliate) && (
         <GradientSolidButton
-          title="Join the Referral Campaign"
+          title="Join Referral Campaign"
           height={"49px"}
           handleClick={handleJoinReferralCampaign}
         />
@@ -181,11 +181,15 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
 
       {userStatus === UserReferralStatus.IsAffiliate && referralCode && (
         <GradientBorderBox>
-          <Flex width={"100%"} justify={"between"}>
+          <Flex
+            width={"100%"}
+            direction={{ initial: "column", sm: "row" }}
+            style={{ justifyContent: "space-evenly" }}
+          >
             <Flex gap="8px">
               <Text>Your referral code is active </Text>
-              <GradientText weight={"medium"} size={"4"}>
-                {referralCode.toUpperCase()}
+              <GradientText weight={"medium"}>
+                {"referralCode".toUpperCase()}
               </GradientText>
             </Flex>
             <Flex gap={"8px"}>
@@ -221,7 +225,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
       {userStatus === UserReferralStatus.IsReferredByAffiliate && (
         <GradientBorderBox>
           <Flex width={"100%"} justify={"center"}>
-            <Text weight={"medium"}>
+            <Text weight={"medium"} align={"center"}>
               You are already signed up for the referral program
             </Text>
           </Flex>

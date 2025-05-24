@@ -3,12 +3,16 @@ import styled from "styled-components";
 import theme from "../../../theme";
 
 export const GradientBorderBox = styled(Flex)`
+  padding: 14px 20px;
+  border: solid 1px transparent; 
+  border-radius: 16px;
+  background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
+      linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
+  
   @media (min-width: ${theme.breakpoints.sm}) {
-    border: solid 1px transparent; 
-    border-radius: 16px;
-    background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
-        linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
-  } 
+    padding: 14px;
+    border-radius: 32px;
+  }     
 `;
 
 export const GradientText = styled(Text)`
@@ -23,24 +27,6 @@ export const GradientText = styled(Text)`
 export const CopyLink = styled(Box)`
   cursor: pointer;
   position: relative;
-
-  &::after {
-    content: 'Copy Link';
-    position: absolute;
-    top: 50%;
-    left: 100%; 
-    transform: translate(8px, -50%); 
-    color: #888;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden; 
-    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-  }
-
-  &:hover::after {
-    opacity: 1; 
-    visibility: visible;
 `;
 
 export const Toast = styled.div<{visible: string}>`
