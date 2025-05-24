@@ -87,6 +87,16 @@ const Leaderboard: React.FC = () => {
     fetchReferralData();
   }, [triggerRefetchReferralData, account]);
 
+  const userBonusInfo = useMemo(() => {
+    if (!userReferralData) return;
+
+    return {
+      affiliateBonus: userReferralData.previousRunAffiliateBonus,
+      referralBonus: userReferralData.previousRunReferralBonus,
+      walletBoostBonus: userReferralData.previousRunWalletBoostBonus,
+    };
+  }, [account, triggerRefetchReferralData, userReferralData]);
+
   const hasJoinedReferralCampaign = useMemo(() => {
     if (!account || !userReferralData) {
       return false;
@@ -325,7 +335,11 @@ const Leaderboard: React.FC = () => {
           />
         )}
 
-        <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
+        <LeaderboardTable
+          ranks={ranks}
+          currentUserData={currentUserData}
+          userBonusInfo={userBonusInfo}
+        />
 
         {loading && (
           <Flex
