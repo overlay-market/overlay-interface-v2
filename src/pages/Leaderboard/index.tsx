@@ -106,7 +106,7 @@ const Leaderboard: React.FC = () => {
       userReferralData.referredByAffiliate !== null ||
       userReferralData.myReferralCode !== null
     );
-  }, [account, userReferralData]);
+  }, [account, userReferralData, triggerRefetchReferralData]);
 
   useEffect(() => {
     if (referralCodeFromURL && !hasJoinedReferralCampaign) {
@@ -339,6 +339,7 @@ const Leaderboard: React.FC = () => {
           ranks={ranks}
           currentUserData={currentUserData}
           userBonusInfo={userBonusInfo}
+          hasJoinedReferralCampaign={hasJoinedReferralCampaign}
         />
 
         {loading && (

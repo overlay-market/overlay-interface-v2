@@ -27,12 +27,14 @@ type LeaderboardTableProps = {
         walletBoostBonus: number;
       }
     | undefined;
+  hasJoinedReferralCampaign: boolean;
 };
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   ranks,
   currentUserData,
   userBonusInfo,
+  hasJoinedReferralCampaign,
 }) => {
   const { address: account } = useAccount();
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -81,7 +83,9 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
                     {currentUserData?.username ?? shortenAddress(account)}
                   </Text>
                 </Flex>
-                <UserReferralBonusInfo userBonusInfo={userBonusInfo} />
+                {hasJoinedReferralCampaign && (
+                  <UserReferralBonusInfo userBonusInfo={userBonusInfo} />
+                )}
               </Flex>
             </StyledCell>
 
