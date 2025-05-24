@@ -8,8 +8,10 @@ import theme from "../../theme";
 import { PopupContent } from "../../state/application/actions";
 import { TransactionType } from "../../constants/transaction";
 
+type TxnPopupContent = Extract<PopupContent, { txn: any }>;
+
 type TxnPopupProps = {
-  content: PopupContent;
+  content: TxnPopupContent;
 };
 
 const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
