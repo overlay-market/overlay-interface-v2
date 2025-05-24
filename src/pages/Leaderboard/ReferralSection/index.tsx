@@ -137,9 +137,10 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
       };
 
       const url = new URL(
-        "/referral/create-referral-code",
+        "/points-bsc/referral/create-referral-code",
         REFERRAL_API_BASE_URL
       );
+      console.log({url})
       const response = await fetch(url.toString(), {
         method: "POST",
         headers: {
