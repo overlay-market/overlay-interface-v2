@@ -18,12 +18,14 @@ export function useIsNewUnwindTxn(): boolean {
   const activePopups = useAppSelector((state) => state.application.popupList);
 
   const currentTxnPopup = activePopups.find(
-    (popup) => popup.content.txn.hash === txnHash && popup.show
+    (popup) => 'txn' in popup.content && popup.content.txn.hash === txnHash && popup.show
   );
 
   return Boolean(
-    currentTxnPopup?.content.txn.type === TransactionType.UNWIND_OVL_POSITION &&
-      currentTxnPopup?.content.txn.success === true
+    currentTxnPopup &&
+    'txn' in currentTxnPopup.content &&
+    currentTxnPopup.content.txn.type === TransactionType.UNWIND_OVL_POSITION &&
+    currentTxnPopup.content.txn.success === true
   );
 }
 
