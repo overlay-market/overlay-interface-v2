@@ -62,13 +62,13 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
           "Content-Type": "application/json",
         },
       });
+      const data = await response.json();
 
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error);
+        setError(data.error || data.message || "Fetch message to sign failed");
       }
 
-      const { messageToSign } = await response.json();
+      const { messageToSign } = data;
       setMessageToSign(messageToSign);
       return messageToSign;
     } catch (err) {
@@ -106,12 +106,13 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
         body: JSON.stringify(payload),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error);
+        setError(data.error || data.message || "Failed to submit referral.");
       }
 
-      return await response.json();
+      return data;
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Failed to submit referral."
