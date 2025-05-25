@@ -52,7 +52,10 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     }
 
     try {
-      const url = new URL("/points-bsc/referral/message-to-sign", REFERRAL_API_BASE_URL);
+      const url = new URL(
+        "/points-bsc/referral/message-to-sign",
+        REFERRAL_API_BASE_URL
+      );
       url.searchParams.append("walletAddress", walletAddress);
       url.searchParams.append("referralCode", referralCode);
 
@@ -66,6 +69,7 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
 
       if (!response.ok) {
         setError(data.error || data.message || "Fetch message to sign failed");
+        return undefined;
       }
 
       const { messageToSign } = data;
@@ -77,7 +81,9 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     }
   }, [walletAddress, referralCode]);
 
-  const signReferralMessage = async (message?: string): Promise<`0x${string}` | null> => {
+  const signReferralMessage = async (
+    message?: string
+  ): Promise<`0x${string}` | null> => {
     try {
       const signature = await signMessageAsync({
         account: walletAddress,
@@ -99,7 +105,10 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
         referralCode,
         signature: sig ?? signature,
       };
-      const url = new URL("/points-bsc/referral/use-referral-code", REFERRAL_API_BASE_URL);
+      const url = new URL(
+        "/points-bsc/referral/use-referral-code",
+        REFERRAL_API_BASE_URL
+      );
       const response = await fetch(url.toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,6 +119,7 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
 
       if (!response.ok) {
         setError(data.error || data.message || "Failed to submit referral.");
+        return undefined;
       }
 
       return data;
