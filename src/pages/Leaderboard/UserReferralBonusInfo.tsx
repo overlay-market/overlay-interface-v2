@@ -51,19 +51,31 @@ const UserReferralBonusInfo: React.FC<UserReferralBonusInfoProps> = ({
             padding: "10px",
           }}
         >
-          <DropdownMenu.Item>
+          <DropdownMenu.Item
+            style={{
+              background: "transparent",
+            }}
+          >
             <Flex width={"100%"} justify={"between"} gap={"20px"}>
               <Text>Affiliate bonus</Text>
               <Text>{userBonusInfo?.affiliateBonus}</Text>
             </Flex>
           </DropdownMenu.Item>
-          <DropdownMenu.Item>
+          <DropdownMenu.Item
+            style={{
+              background: "transparent",
+            }}
+          >
             <Flex width={"100%"} justify={"between"} gap={"20px"}>
               <Text>Referral bonus</Text>
               <Text>{userBonusInfo?.referralBonus}</Text>
             </Flex>
           </DropdownMenu.Item>
-          <DropdownMenu.Item>
+          <DropdownMenu.Item
+            style={{
+              background: "transparent",
+            }}
+          >
             <Flex width={"100%"} justify={"between"} gap={"20px"}>
               <Text>Wallet boost bonus</Text>
               <Text>{userBonusInfo?.walletBoostBonus}</Text>
