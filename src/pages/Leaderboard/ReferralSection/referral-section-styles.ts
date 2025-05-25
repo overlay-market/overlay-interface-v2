@@ -1,17 +1,19 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import theme from "../../../theme";
 
 export const GradientBorderBox = styled(Flex)`
-  padding: 14px 20px;
+  padding: 10px 20px;
+  width: 100%;
+  justify-content: center;
   border: solid 1px transparent; 
-  border-radius: 16px;
+  border-radius: 32px;
   background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
       linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
   
   @media (min-width: ${theme.breakpoints.sm}) {
-    padding: 14px;
-    border-radius: 32px;
+    padding: 14px 50px;
+    width: auto;
   }     
 `;
 
@@ -50,4 +52,28 @@ export const Toast = styled.div<{visible: string}>`
     bottom: 20px;
     left: 52.5%;
   } 
+`;
+
+const colorCycle = keyframes`
+  0%, 100% {
+    background-color: #ffc955;
+  }
+  50% {
+    background-color: #ff7cd5;
+  }
+`;
+
+export const Dot = styled("span")<{ delay: string }>`
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background-color: #ffc955;
+  animation: ${colorCycle} 0.8s infinite ease-in-out;
+  animation-delay: ${({ delay }) => delay};
+`;
+
+export const DotContainer = styled(Flex)`
+  gap: 5px;
+  align-items: end;
+  padding-bottom: 4px;
 `;

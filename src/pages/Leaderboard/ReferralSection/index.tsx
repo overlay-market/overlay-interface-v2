@@ -8,6 +8,8 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CopyLink,
+  Dot,
+  DotContainer,
   GradientBorderBox,
   GradientText,
   Toast,
@@ -69,13 +71,13 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
       return;
     }
 
-    if (userData.isEligibleForAffiliate) {
-      setUserStatus(UserReferralStatus.IsEligibleForAffiliate);
+    if (userData.referredByAffiliate !== null) {
+      setUserStatus(UserReferralStatus.IsReferredByAffiliate);
       return;
     }
 
-    if (userData.referredByAffiliate !== null) {
-      setUserStatus(UserReferralStatus.IsReferredByAffiliate);
+    if (userData.isEligibleForAffiliate) {
+      setUserStatus(UserReferralStatus.IsEligibleForAffiliate);
       return;
     }
 
@@ -140,7 +142,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
         "/points-bsc/referral/create-referral-code",
         REFERRAL_API_BASE_URL
       );
-      console.log({url})
+
       const response = await fetch(url.toString(), {
         method: "POST",
         headers: {
@@ -173,26 +175,32 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
     <Flex width={"100%"} height={"100%"} direction={"column"}>
       {((!hasJoinedReferralCampaign && !isActivatingAffiliateStatus) ||
         userStatus === UserReferralStatus.NotReferredByAffiliate) && (
-        <GradientSolidButton
-          title="Join Referral Campaign"
-          height={"49px"}
-          handleClick={handleJoinReferralCampaign}
-        />
+        <Flex>
+          <GradientBorderBox>
+            <Flex gap="8px">
+              <GradientText
+                weight={"medium"}
+                style={{ cursor: "pointer" }}
+                onClick={handleJoinReferralCampaign}
+              >
+                Join Referral Campaign
+              </GradientText>
+            </Flex>
+          </GradientBorderBox>
+        </Flex>
       )}
 
       {userStatus === UserReferralStatus.IsAffiliate && referralCode && (
-        <GradientBorderBox>
-          <Flex
-            width={"100%"}
-            direction={{ initial: "column", sm: "row" }}
-            style={{ justifyContent: "space-evenly" }}
-          >
+        <Flex direction={{ initial: "column", sm: "row" }} gap={"16px"}>
+          <GradientBorderBox>
             <Flex gap="8px">
               <Text>Your referral code is active </Text>
               <GradientText weight={"medium"}>
                 {referralCode.toUpperCase()}
               </GradientText>
             </Flex>
+          </GradientBorderBox>
+          <GradientBorderBox>
             <Flex gap={"8px"}>
               <Text weight={"medium"}>Copy referral link</Text>
               <CopyLink onClick={handleCopyLink}>
@@ -202,8 +210,42 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
                 Link copied to clipboard
               </Toast>
             </Flex>
-          </Flex>
-        </GradientBorderBox>
+          </GradientBorderBox>
+        </Flex>
+      )}
+
+      {userStatus === UserReferralStatus.IsReferredByAffiliate && (
+        <Flex direction={{ initial: "column", sm: "row" }} gap={"16px"}>
+          <GradientBorderBox>
+            <Text weight={"medium"}>
+              Joined with{" "}
+              <GradientText weight={"medium"}>
+                {userData?.referredByAffiliate?.referralCodeUsed.toUpperCase()}
+              </GradientText>
+            </Text>
+          </GradientBorderBox>
+
+          {userData?.isEligibleForAffiliate && !referralCode && (
+            <GradientBorderBox>
+              {!isLoading ? (
+                <GradientText weight={"medium"} style={{ cursor: "pointer" }}>
+                  Create your own code
+                </GradientText>
+              ) : (
+                <Flex gap={"8px"}>
+                  <GradientText weight={"medium"} style={{ cursor: "pointer" }}>
+                    Processing
+                  </GradientText>
+                  <DotContainer>
+                    <Dot delay="0s" />
+                    <Dot delay="0.15s" />
+                    <Dot delay="0.25s" />
+                  </DotContainer>
+                </Flex>
+              )}
+            </GradientBorderBox>
+          )}
+        </Flex>
       )}
 
       {userStatus === UserReferralStatus.IsEligibleForAffiliate &&
@@ -222,16 +264,6 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
             handleClick={handleGenerateReferralCode}
           />
         ))}
-
-      {userStatus === UserReferralStatus.IsReferredByAffiliate && (
-        <GradientBorderBox>
-          <Flex width={"100%"} justify={"center"}>
-            <Text weight={"medium"} align={"center"}>
-              You are already signed up for the referral program
-            </Text>
-          </Flex>
-        </GradientBorderBox>
-      )}
     </Flex>
   );
 };
