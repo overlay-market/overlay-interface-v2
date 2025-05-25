@@ -314,7 +314,7 @@ const Leaderboard: React.FC = () => {
         >
           <UserPointsSection
             userPoints={currentUserData?.totalPoints}
-            isLoading={fetchingPointsData}
+            isLoading={fetchingPointsData || status === "connecting"}
           />
           <PointsUpdateSection
             pointsUpdatedAt={

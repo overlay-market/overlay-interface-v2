@@ -26,7 +26,9 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
       gap={"8px"}
       align={{ initial: "center", sm: "start" }}
     >
-      {account ? (
+      {isLoading ? (
+        <Loader />
+      ) : account ? (
         <Flex>
           <Text
             size={{ initial: "5", sm: "6" }}
@@ -35,7 +37,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
             }}
           >
-            You have {isLoading ? <Loader /> : `${userPoints ?? "0"} Points`}
+            You have {userPoints ?? 0} Points
           </Text>
         </Flex>
       ) : (
