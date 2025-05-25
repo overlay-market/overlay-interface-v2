@@ -30,7 +30,7 @@ const ROWS_PER_LOAD = 20;
 const comingSoon = false;
 
 const Leaderboard: React.FC = () => {
-  const { address: account } = useAccount();
+  const { address: account, status } = useAccount();
   const [searchParams] = useSearchParams();
   const referralCodeFromURL = searchParams.get("referrer");
   const getEnsName = useGetEnsName();
@@ -323,8 +323,12 @@ const Leaderboard: React.FC = () => {
           />
         </Flex>
 
-        {fetchingReferralsData ? (
-          <Skeleton width="100%" height="50px" />
+        {fetchingReferralsData || status === "connecting" ? (
+          <Skeleton
+            width={{ initial: "100%", sm: "260px" }}
+            height="50px"
+            style={{ borderRadius: "32px" }}
+          />
         ) : (
           <ReferralSection
             hasJoinedReferralCampaign={hasJoinedReferralCampaign}
