@@ -17,13 +17,13 @@ export const fetchUserReferralData = async (
 
     if (!response.ok) {
       const errorMessage = data.error || `Error ${response.status}`;
-      return { data: undefined, errorMessage };
+      throw new Error(errorMessage);
     }
 
-    return { data, errorMessage: undefined };
+    return data;
   } catch (error) {
     console.error("Error in getting user referrals  data:", error);
-    return { data: undefined, errorMessage: error instanceof Error ? error.message : "Unknown error" };
+    return undefined;
   } finally {
     setFetchingReferralsData(false);
   }
