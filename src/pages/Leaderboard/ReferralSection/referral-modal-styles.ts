@@ -5,11 +5,11 @@ import styled from "styled-components";
 export const ContentContainer = styled(Flex)`
   flex-direction: column;
   width: 100%;
-  gap: 20px;
+  gap: 16px;
   padding: 0;
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    padding: 20px;
+    padding: 0 10px 10px;
   } 
 `;
 

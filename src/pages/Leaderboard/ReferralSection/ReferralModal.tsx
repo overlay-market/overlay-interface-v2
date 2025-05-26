@@ -11,9 +11,13 @@ import { REFERRAL_API_BASE_URL } from "../../../constants/applications";
 import theme from "../../../theme";
 import Modal from "../../../components/Modal";
 import { ContentContainer, StyledInput } from "./referral-modal-styles";
+import { Link } from "react-router-dom";
+import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
+import { generateReferralCode } from "../utils/generateReferralCode";
 
 type ReferralsModalProps = {
   referralCodeFromURL: string | null;
+  isEligibleForAffiliate: boolean | undefined;
   open: boolean;
   triggerRefetch: Function;
   handleDismiss: () => void;
@@ -21,6 +25,7 @@ type ReferralsModalProps = {
 
 const ReferralModal: React.FC<ReferralsModalProps> = ({
   referralCodeFromURL,
+  isEligibleForAffiliate,
   open,
   triggerRefetch,
   handleDismiss,
@@ -33,7 +38,11 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
   const [messageToSign, setMessageToSign] = useState("");
   const [signature, setSignature] = useState<`0x${string}` | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [generatingCodeError, setGeneratingCodeError] = useState<string | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
+  const [generatingReferralCode, setGeneratingReferralCode] = useState(false);
 
   useEffect(() => {
     if (referralCodeFromURL) {
@@ -43,6 +52,7 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
 
   useEffect(() => {
     setError(null);
+    setGeneratingCodeError(null);
   }, [referralCode, walletAddress]);
 
   const fetchMessageToSign = useCallback(async () => {
@@ -160,45 +170,108 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     }
   };
 
+  const handleGenerateReferralCode = async () => {
+    setGeneratingCodeError(null);
+    if (!walletAddress) return;
+    setGeneratingReferralCode(true);
+
+    try {
+      const error = await generateReferralCode(walletAddress);
+      if (!error) {
+        triggerRefetch(true);
+      } else {
+        setGeneratingCodeError(error);
+      }
+    } catch (err) {
+      setGeneratingCodeError(
+        err instanceof Error ? err.message : "Failed to generate referral code."
+      );
+    } finally {
+      setGeneratingReferralCode(false);
+    }
+  };
+
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
       <ContentContainer>
-        <Text size={{ initial: "2", sm: "4" }} weight={"bold"} align={"center"}>
-          Referral code
+        <Text size={{ initial: "2", sm: "4" }} weight={"bold"} align={"left"}>
+          Join the Referral campaign
         </Text>
 
-        <Flex direction={"column"} gap="8px">
-          <StyledInput
-            type="text"
-            value={referralCode.toUpperCase()}
-            disabled={isLoading}
-            onChange={(e) => setReferralCode(e.target.value.trim())}
-            placeholder="Enter referral code"
-          />
+        <Flex gap={"8px"}>
+          <Text style={{ color: theme.color.grey3, fontSize: "14px" }}>
+            For more details, follow the link
+          </Text>
+          <Link
+            to={"https://overlayprotocol.medium.com/t-o-r-c-h-b0213aa3ae85"}
+            target="_blank"
+            style={{ textDecoration: "none" }}
+          >
+            <GradientOpenInNewIcon />
+          </Link>
         </Flex>
 
-        {!walletAddress ? (
-          <GradientSolidButton
-            title="Connect Wallet"
-            height={"49px"}
-            handleClick={openModal}
-          />
-        ) : isLoading ? (
-          <GradientLoaderButton title={"Processing ..."} height={"49px"} />
-        ) : (
-          <GradientSolidButton
-            title="Sign Referral"
-            height={"49px"}
-            isDisabled={referralCode === ""}
-            handleClick={handleSignReferral}
-          />
-        )}
+        <Flex direction={"column"} gap={"32px"}>
+          <Flex direction={"column"} gap={"16px"}>
+            <Text style={{ fontSize: "14px" }}>1. Join with referral code</Text>
 
-        {error && (
-          <Text style={{ color: theme.color.red1, fontSize: "12px" }}>
-            {error}
-          </Text>
-        )}
+            <Flex direction={"column"} gap="8px">
+              <StyledInput
+                type="text"
+                value={referralCode.toUpperCase()}
+                disabled={isLoading}
+                onChange={(e) => setReferralCode(e.target.value.trim())}
+                placeholder="Enter referral code"
+              />
+            </Flex>
+
+            {!walletAddress ? (
+              <GradientSolidButton
+                title="Connect Wallet"
+                height={"49px"}
+                handleClick={openModal}
+              />
+            ) : isLoading ? (
+              <GradientLoaderButton title={"Processing ..."} height={"49px"} />
+            ) : (
+              <GradientSolidButton
+                title="Sign Referral"
+                height={"49px"}
+                isDisabled={referralCode === ""}
+                handleClick={handleSignReferral}
+              />
+            )}
+
+            {error && (
+              <Text style={{ color: theme.color.red1, fontSize: "12px" }}>
+                {error}
+              </Text>
+            )}
+          </Flex>
+
+          <Flex direction={"column"} gap={"16px"}>
+            <Text style={{ fontSize: "14px" }}>
+              2. Create your own code (if eligible)
+            </Text>
+
+            {generatingReferralCode ? (
+              <GradientLoaderButton title={"Generating..."} height={"49px"} />
+            ) : (
+              <GradientSolidButton
+                title={"Generate referral code"}
+                height={"49px"}
+                isDisabled={!isEligibleForAffiliate || !walletAddress}
+                handleClick={handleGenerateReferralCode}
+              />
+            )}
+
+            {generatingCodeError && (
+              <Text style={{ color: theme.color.red1, fontSize: "12px" }}>
+                {generatingCodeError}
+              </Text>
+            )}
+          </Flex>
+        </Flex>
       </ContentContainer>
     </Modal>
   );

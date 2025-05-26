@@ -361,6 +361,7 @@ const Leaderboard: React.FC = () => {
       {openReferralModal && (
         <ReferralModal
           referralCodeFromURL={referralCodeFromURL}
+          isEligibleForAffiliate={userReferralData?.isEligibleForAffiliate}
           open={openReferralModal}
           triggerRefetch={setTriggerRefetchReferralData}
           handleDismiss={() => setOpenReferralModal(false)}
