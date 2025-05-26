@@ -228,7 +228,11 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
           {userData?.isEligibleForAffiliate && !referralCode && (
             <GradientBorderBox>
               {!isLoading ? (
-                <GradientText weight={"medium"} style={{ cursor: "pointer" }}>
+                <GradientText
+                  weight={"medium"}
+                  style={{ cursor: "pointer" }}
+                  onClick={handleGenerateReferralCode}
+                >
                   Create your own code
                 </GradientText>
               ) : (
