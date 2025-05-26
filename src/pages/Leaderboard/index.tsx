@@ -202,10 +202,11 @@ const Leaderboard: React.FC = () => {
       {comingSoon && (
         <Flex
           position="fixed"
-          top="0"
-          left="0"
-          width="100%"
-          height="100%"
+          top="55px"
+          bottom="20"
+          left="20"
+          width="95%"
+          height={{ initial: "85%", sm: "100%" }}
           style={{
             zIndex: "1000",
           }}
@@ -233,7 +234,7 @@ const Leaderboard: React.FC = () => {
             >
               T🔥O🔥R🔥C🔥H
             </GradientText>
-            <Text size="2" style={{textAlign: "center"}}>
+            <Text size="2" style={{ textAlign: "center" }}>
               Campaign has begun! Points will update on May 27.
             </Text>
 
@@ -241,7 +242,11 @@ const Leaderboard: React.FC = () => {
               href="https://overlayprotocol.medium.com/t-o-r-c-h-b0213aa3ae85"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: theme.color.grey3, fontWeight: "600", textDecoration: "underline" }}
+              style={{
+                color: theme.color.grey3,
+                fontWeight: "600",
+                textDecoration: "underline",
+              }}
             >
               Learn more
             </a>
@@ -267,7 +272,11 @@ const Leaderboard: React.FC = () => {
             userPoints={currentUserData?.totalPoints}
             isLoading={fetchingPointsData}
           />
-          <PointsUpdateSection pointsUpdatedAt={sessionDetails?.sessionLastUpdated || prevWeekDetails?.sessionEnd} />
+          <PointsUpdateSection
+            pointsUpdatedAt={
+              sessionDetails?.sessionLastUpdated || prevWeekDetails?.sessionEnd
+            }
+          />
         </Flex>
 
         <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
