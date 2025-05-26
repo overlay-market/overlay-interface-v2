@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { MARKET_CHART_URL } from "../constants/applications";
+import { CHAINS } from "overlay-sdk";
 
 interface MarketDataPoint {
   latestPrice: number;
@@ -38,7 +39,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
         );
         const mapping: Record<string, string> = {};
 
-        response2.data[421614].forEach(
+        response2.data[CHAINS.BscTestnet].forEach(
           (item: {
             marketId: string;
             chains: { deploymentAddress: string }[];
@@ -68,7 +69,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
 
       try {
         const responseOverview = await axios.get<MarketDataPoint[]>(
-          `${MARKET_CHART_URL.SEPOLIA}/marketsPricesOverview`
+          `${MARKET_CHART_URL.BSC_TESTNET}/marketsPricesOverview`
         );
         const chartDataArray = responseOverview.data;
 

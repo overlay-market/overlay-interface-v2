@@ -265,7 +265,6 @@ const Leaderboard: React.FC = () => {
           height="100%"
           style={{
             zIndex: "1000",
-            pointerEvents: "none",
           }}
           justify="center"
           align="center"
@@ -289,11 +288,24 @@ const Leaderboard: React.FC = () => {
                 cursor: "pointer",
               }}
             >
-              Coming Soon
+              T🔥O🔥R🔥C🔥H
             </GradientText>
             <Text size="2" style={{ textAlign: "center" }}>
-              BSC testnet points campaign. Stay tuned!
+              Campaign has begun! Points will update on May 27.
             </Text>
+
+            <a
+              href="https://overlayprotocol.medium.com/t-o-r-c-h-b0213aa3ae85"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: theme.color.grey3,
+                fontWeight: "600",
+                textDecoration: "underline",
+              }}
+            >
+              Learn more
+            </a>
           </Flex>
         </Flex>
       )}
