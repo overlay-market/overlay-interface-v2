@@ -1,10 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
 import useAccount from "../../../hooks/useAccount";
 import { UserReferralData } from "../types";
-import {
-  GradientLoaderButton,
-  GradientSolidButton,
-} from "../../../components/Button";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CopyLink,
@@ -15,9 +11,8 @@ import {
   Toast,
 } from "./referral-section-styles";
 import { CopyGradientIcon } from "../../../assets/icons/svg-icons";
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { REFERRAL_API_BASE_URL } from "../../../constants/applications";
 import { useAddPopup } from "../../../state/application/hooks";
+import { generateReferralCode } from "../utils/generateReferralCode";
 
 export enum UserReferralStatus {
   IsAffiliate = "isAffiliate",
@@ -41,7 +36,6 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
 }) => {
   const { address: account } = useAccount();
 
-  const isMobile = useMediaQuery("(max-width: 767px)");
   const addPopup = useAddPopup();
   const lastShownError = useRef<string | null>(null);
 
@@ -49,8 +43,6 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
     UserReferralStatus.NotReferredByAffiliate
   );
   const [toastVisible, setToastVisible] = useState(false);
-  const [isActivatingAffiliateStatus, setIsActivatingAffiliateStatus] =
-    useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -85,10 +77,6 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
   }, [account, referralCode, userData]);
 
   useEffect(() => {
-    setIsActivatingAffiliateStatus(false);
-  }, [account]);
-
-  useEffect(() => {
     if (!error) return;
 
     addPopup({ message: error }, Date.now().toString());
@@ -103,12 +91,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
   }, [error]);
 
   const handleJoinReferralCampaign = () => {
-    if (userStatus === UserReferralStatus.NotReferredByAffiliate) {
-      setOpenReferralModal(true);
-    }
-    if (userStatus === UserReferralStatus.IsEligibleForAffiliate) {
-      setIsActivatingAffiliateStatus(true);
-    }
+    setOpenReferralModal(true);
   };
 
   const showToast = (duration = 3000) => {
@@ -134,32 +117,11 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
     setIsLoading(true);
 
     try {
-      const payload = {
-        walletAddress: account,
-      };
-
-      const url = new URL(
-        "/points-bsc/referral/create-referral-code",
-        REFERRAL_API_BASE_URL
-      );
-
-      const response = await fetch(url.toString(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-      if (response.status === 201) {
+      const error = await generateReferralCode(account);
+      if (!error) {
         triggerRefetch(true);
-        return;
-      }
-
-      if (response.status !== 201) {
-        setError(data.error || "Unexpected error occurred.");
-        return;
+      } else {
+        setError(error);
       }
     } catch (err) {
       setError(
@@ -167,13 +129,12 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
       );
     } finally {
       setIsLoading(false);
-      setIsActivatingAffiliateStatus(false);
     }
   };
 
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
-      {((!hasJoinedReferralCampaign && !isActivatingAffiliateStatus) ||
+      {(!hasJoinedReferralCampaign ||
         userStatus === UserReferralStatus.NotReferredByAffiliate) && (
         <Flex>
           <GradientBorderBox>
@@ -238,7 +199,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
               ) : (
                 <Flex gap={"8px"}>
                   <GradientText weight={"medium"} style={{ cursor: "pointer" }}>
-                    Processing
+                    Generating
                   </GradientText>
                   <DotContainer>
                     <Dot delay="0s" />
@@ -251,23 +212,6 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
           )}
         </Flex>
       )}
-
-      {userStatus === UserReferralStatus.IsEligibleForAffiliate &&
-        isActivatingAffiliateStatus &&
-        (isLoading ? (
-          <GradientLoaderButton
-            title={"Generating..."}
-            width={isMobile ? "100%" : "240px"}
-            height={"49px"}
-          />
-        ) : (
-          <GradientSolidButton
-            title={"Generate referral code"}
-            width={isMobile ? "100%" : "240px"}
-            height={"49px"}
-            handleClick={handleGenerateReferralCode}
-          />
-        ))}
     </Flex>
   );
 };
