@@ -1,6 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
 import {
   GradientLoaderButton,
+  GradientOutlineButton,
   GradientSolidButton,
 } from "../../../components/Button";
 import { useCallback, useEffect, useState } from "react";
@@ -22,6 +23,8 @@ type ReferralsModalProps = {
   triggerRefetch: Function;
   handleDismiss: () => void;
 };
+
+const POINTS_THRESHOLD = 10;
 
 const ReferralModal: React.FC<ReferralsModalProps> = ({
   referralCodeFromURL,
@@ -54,6 +57,13 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     setError(null);
     setGeneratingCodeError(null);
   }, [referralCode, walletAddress]);
+
+  useEffect(() => {
+    if (!open) {
+      setReferralCode(referralCodeFromURL || "");
+      setError(null);
+    }
+  }, [open]);
 
   const fetchMessageToSign = useCallback(async () => {
     setError(null);
@@ -176,11 +186,12 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
     setGeneratingReferralCode(true);
 
     try {
-      const error = await generateReferralCode(walletAddress);
-      if (!error) {
+      const result = await generateReferralCode(walletAddress);
+      if (result.success) {
         triggerRefetch(true);
+        handleDismiss();
       } else {
-        setGeneratingCodeError(error);
+        setGeneratingCodeError(result.error ?? null);
       }
     } catch (err) {
       setGeneratingCodeError(
@@ -256,13 +267,23 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
 
             {generatingReferralCode ? (
               <GradientLoaderButton title={"Generating..."} height={"49px"} />
-            ) : (
+            ) : isEligibleForAffiliate ? (
               <GradientSolidButton
                 title={"Generate referral code"}
                 height={"49px"}
-                isDisabled={!isEligibleForAffiliate || !walletAddress}
                 handleClick={handleGenerateReferralCode}
               />
+            ) : (
+              <>
+                <GradientOutlineButton
+                  title={"Generate referral code"}
+                  height={"49px"}
+                  isDisabled={true}
+                />
+                <Text style={{ color: theme.color.grey3, fontSize: "12px" }}>
+                  You need {POINTS_THRESHOLD} points to create your code
+                </Text>
+              </>
             )}
 
             {generatingCodeError && (
