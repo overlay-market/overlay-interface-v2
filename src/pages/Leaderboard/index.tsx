@@ -259,10 +259,11 @@ const Leaderboard: React.FC = () => {
       {comingSoon && (
         <Flex
           position="fixed"
-          top="0"
-          left="0"
-          width="100%"
-          height="100%"
+          top="55px"
+          bottom="20"
+          left="20"
+          width="95%"
+          height={{ initial: "85%", sm: "100%" }}
           style={{
             zIndex: "1000",
           }}
