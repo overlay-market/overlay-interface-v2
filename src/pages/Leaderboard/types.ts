@@ -12,7 +12,7 @@ export interface SessionDetails {
 export interface UserData {
   _id: string
   totalPoints: number
-  previousWeekPoints: number
+  previousRunPoints: number
   rank?: number
 }
 export interface ExtendedUserData extends UserData {
