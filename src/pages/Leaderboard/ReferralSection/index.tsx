@@ -117,11 +117,11 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
     setIsLoading(true);
 
     try {
-      const error = await generateReferralCode(account);
-      if (!error) {
+      const result = await generateReferralCode(account);
+      if (result.success) {
         triggerRefetch(true);
       } else {
-        setError(error);
+        setError(result.error ?? null);
       }
     } catch (err) {
       setError(
