@@ -3,7 +3,7 @@ import {  REFERRAL_API_BASE_URL } from "../../../constants/applications";
 
 export const generateReferralCode = async (
   account: Address,
-) => {
+): Promise<{ success: boolean; error?: string }> => {
     try {
       const payload = {
         walletAddress: account,
@@ -24,15 +24,14 @@ export const generateReferralCode = async (
 
       const data = await response.json();
       if (response.status === 201) {
-        return null;
+        return { success: true };
       }
 
-      if (response.status !== 201) {
-        return (data.error || "Unexpected error occurred.");
-      }
+      return { success: false, error: data.error || "Unexpected error occurred." };
     } catch (err) {
-      return(
-        err instanceof Error ? err.message : "Failed to generate referral code."
-      );
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : "Failed to generate referral code.",
+      };
     } 
 };
