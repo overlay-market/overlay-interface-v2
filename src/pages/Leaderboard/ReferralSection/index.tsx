@@ -14,6 +14,8 @@ import { CopyGradientIcon } from "../../../assets/icons/svg-icons";
 import { useAddPopup } from "../../../state/application/hooks";
 import { generateReferralCode } from "../utils/generateReferralCode";
 import ReferralBanner from "../../../assets/images/torch-referral-program-banner.webp";
+import ReferralBannerMobile from "../../../assets/images/torch-referral-banner-mobile.webp";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
 
 export enum UserReferralStatus {
   IsAffiliate = "isAffiliate",
@@ -39,6 +41,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
 
   const addPopup = useAddPopup();
   const lastShownError = useRef<string | null>(null);
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const [userStatus, setUserStatus] = useState(
     UserReferralStatus.NotReferredByAffiliate
@@ -145,8 +148,8 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
           }}
         >
           <img
-            src={ReferralBanner}
-            style={{ width: "100%" }}
+            src={isMobile ? ReferralBannerMobile : ReferralBanner}
+            style={{ width: "100%", height: "auto" }}
             alt="Torch Referral Program Banner"
           />
         </Flex>
