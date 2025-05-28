@@ -13,6 +13,7 @@ import {
 import { CopyGradientIcon } from "../../../assets/icons/svg-icons";
 import { useAddPopup } from "../../../state/application/hooks";
 import { generateReferralCode } from "../utils/generateReferralCode";
+import ReferralBanner from "../../../assets/images/torch-referral-program-banner.webp";
 
 export enum UserReferralStatus {
   IsAffiliate = "isAffiliate",
@@ -136,18 +137,18 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
     <Flex width={"100%"} height={"100%"} direction={"column"}>
       {(!hasJoinedReferralCampaign ||
         userStatus === UserReferralStatus.NotReferredByAffiliate) && (
-        <Flex>
-          <GradientBorderBox>
-            <Flex gap="8px">
-              <GradientText
-                weight={"medium"}
-                style={{ cursor: "pointer" }}
-                onClick={handleJoinReferralCampaign}
-              >
-                Join Referral Campaign
-              </GradientText>
-            </Flex>
-          </GradientBorderBox>
+        <Flex
+          onClick={handleJoinReferralCampaign}
+          ml={{ initial: "0px", sm: "-17px", md: "-13px" }}
+          style={{
+            cursor: "pointer",
+          }}
+        >
+          <img
+            src={ReferralBanner}
+            style={{ width: "100%" }}
+            alt="Torch Referral Program Banner"
+          />
         </Flex>
       )}
 
