@@ -26,7 +26,9 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
       gap={"8px"}
       align={{ initial: "center", sm: "start" }}
     >
-      {account ? (
+      {isLoading ? (
+        <Loader />
+      ) : account ? (
         <Flex>
           <Text
             size={{ initial: "5", sm: "6" }}
@@ -35,11 +37,15 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
             }}
           >
-            You have {isLoading ? <Loader /> : `${userPoints ?? "0"} Points`}
+            You have {userPoints ?? 0} Points
           </Text>
         </Flex>
       ) : (
-        <Flex gap={"8px"}>
+        <Flex
+          gap={"8px"}
+          direction={{ initial: "column", md: "row" }}
+          align={{ initial: "center", sm: "start" }}
+        >
           <GradientText
             size={{ initial: "5", sm: "6" }}
             style={{
@@ -52,6 +58,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
           </GradientText>
           <Text
             size={{ initial: "5", sm: "6" }}
+            align={{ initial: "center", sm: "left" }}
             style={{
               fontWeight: isMobile ? "700" : "600",
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
@@ -66,9 +73,11 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
         <Text size={"1"} style={{ color: theme.color.grey3 }}>
           Leaderboard is updated every day!
         </Text>
-        {false && <Link target="_blank" href={LEADERBOARD_LEARN_MORE_LINK}>
-          <GradientText>Learn more</GradientText>
-        </Link>}
+        {false && (
+          <Link target="_blank" href={LEADERBOARD_LEARN_MORE_LINK}>
+            <GradientText>Learn more</GradientText>
+          </Link>
+        )}
       </Flex>
     </Flex>
   );

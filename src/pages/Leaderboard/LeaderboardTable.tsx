@@ -15,15 +15,26 @@ import Avatar from "boring-avatars";
 import theme from "../../theme";
 import Loader from "../../components/Loader";
 import useAccount from "../../hooks/useAccount";
+import UserReferralBonusInfo from "./UserReferralBonusInfo";
 
 type LeaderboardTableProps = {
   ranks?: ExtendedUserData[];
   currentUserData?: ExtendedUserData;
+  userBonusInfo:
+    | {
+        affiliateBonus: number;
+        referralBonus: number;
+        walletBoostBonus: number;
+      }
+    | undefined;
+  hasJoinedReferralCampaign: boolean;
 };
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   ranks,
   currentUserData,
+  userBonusInfo,
+  hasJoinedReferralCampaign,
 }) => {
   const { address: account } = useAccount();
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -41,9 +52,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
             Leaderboard Rankings
           </StyledHeader>
           {!isMobile && isMultipleSessions && (
-            <StyledHeader textalign={"right"}>
-              Points-Last Day
-            </StyledHeader>
+            <StyledHeader textalign={"right"}>Points-Last Day</StyledHeader>
           )}
           <StyledHeader textalign={"right"}>Total Points</StyledHeader>
         </tr>
@@ -63,17 +72,23 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               textalign="left"
               style={{ paddingLeft: isMobile ? "12px" : "20px" }}
             >
-              <Flex align={"baseline"} gap={"8px"}>
-                <Text>{isMobile ? `Your rank` : `Your current rank`}</Text>
-                <Text
-                  style={{ color: theme.color.grey8 }}
-                  weight={"regular"}
-                  size={"1"}
-                >
-                  {currentUserData?.username ?? shortenAddress(account)}
-                </Text>
+              <Flex justify={"between"}>
+                <Flex align={"baseline"} gap={"8px"}>
+                  <Text>{isMobile ? `Your rank` : `Your current rank`}</Text>
+                  <Text
+                    style={{ color: theme.color.grey8 }}
+                    weight={"regular"}
+                    size={"1"}
+                  >
+                    {currentUserData?.username ?? shortenAddress(account)}
+                  </Text>
+                </Flex>
+                {hasJoinedReferralCampaign && (
+                  <UserReferralBonusInfo userBonusInfo={userBonusInfo} />
+                )}
               </Flex>
             </StyledCell>
+
             {!isMobile && isMultipleSessions && (
               <StyledCell textalign="right">
                 {currentUserData?.previousRunPoints ?? "0"}

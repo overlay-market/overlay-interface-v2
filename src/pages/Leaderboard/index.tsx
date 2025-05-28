@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import { LineSeparator } from "./leaderboard-styles";
 import UserPointsSection from "./UserPointsSection";
@@ -6,27 +6,33 @@ import LeaderboardTable from "./LeaderboardTable";
 import PointsUpdateSection from "./PointsUpdateSection";
 import useAccount from "../../hooks/useAccount";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { LEADERBOARD_POINTS_API } from "../../constants/applications";
 import {
   ExtendedUserData,
   LeaderboardPointsData,
   PrevWeekDetails,
   SessionDetails,
   UserData,
+  UserReferralData,
 } from "./types";
 import { Address } from "viem";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
 import { useGetEnsName } from "../../utils/viemEnsUtils";
 import { GradientText } from "./user-points-section-styles";
+import ReferralSection from "./ReferralSection";
+import ReferralModal from "./ReferralSection/ReferralModal";
+import { useSearchParams } from "react-router-dom";
+import { fetchPointsData } from "./utils/fetchPointsData";
+import { fetchUserReferralData } from "./utils/fetchUserReferralData";
 
-const INITIAL_NUMBER_OF_ROWS = 10;
+const INITIAL_NUMBER_OF_ROWS = 15;
 const ROWS_PER_LOAD = 20;
 const comingSoon = false;
 
 const Leaderboard: React.FC = () => {
-  const { address: account } = useAccount();
-
+  const { address: account, status } = useAccount();
+  const [searchParams] = useSearchParams();
+  const referralCodeFromURL = searchParams.get("referrer");
   const getEnsName = useGetEnsName();
 
   const [pointsData, setPointsData] = useState<
@@ -35,38 +41,85 @@ const Leaderboard: React.FC = () => {
   const [currentUserData, setCurrentUserData] = useState<
     ExtendedUserData | undefined
   >(undefined);
+  const [userReferralData, setUserReferralData] = useState<
+    UserReferralData | undefined
+  >(undefined);
   const [fetchingPointsData, setFetchingPointsData] = useState(false);
+  const [fetchingReferralsData, setFetchingReferralsData] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [loadedNumberOfRows, setLoadedNumberOfRows] = useState(
     INITIAL_NUMBER_OF_ROWS
   );
+  const [openReferralModal, setOpenReferralModal] = useState(false);
+  const [triggerRefetchReferralData, setTriggerRefetchReferralData] =
+    useState(false);
+
   const observerRef = useRef<HTMLDivElement>(null);
 
-  const getPointsData = async (numberOfRows: number, account?: Address) => {
-    setFetchingPointsData(true);
-    try {
-      const response = await fetch(
-        LEADERBOARD_POINTS_API +
-          `/${numberOfRows}${account ? `/${account}` : ""}`
-      );
+  useEffect(() => {
+    const fetchReferralData = async () => {
+      if (!account) return;
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch points data: ${response.statusText}`);
-      }
-      const data: LeaderboardPointsData = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error in getting points data:", error);
-      return undefined;
-    } finally {
-      setFetchingPointsData(false);
+      const data = await fetchUserReferralData(
+        account,
+        setFetchingReferralsData
+      );
+      setUserReferralData(data);
+    };
+
+    fetchReferralData();
+  }, [account]);
+
+  useEffect(() => {
+    const fetchReferralData = async () => {
+      if (!account || !triggerRefetchReferralData) return;
+
+      const data = await fetchUserReferralData(
+        account,
+        setFetchingReferralsData
+      );
+      setUserReferralData(data);
+      setTriggerRefetchReferralData(false);
+    };
+
+    fetchReferralData();
+  }, [triggerRefetchReferralData, account]);
+
+  const userBonusInfo = useMemo(() => {
+    if (!userReferralData) return;
+
+    return {
+      affiliateBonus: userReferralData.previousRunAffiliateBonus,
+      referralBonus: userReferralData.previousRunReferralBonus,
+      walletBoostBonus: userReferralData.previousRunWalletBoostBonus,
+    };
+  }, [account, triggerRefetchReferralData, userReferralData]);
+
+  const hasJoinedReferralCampaign = useMemo(() => {
+    if (!account || !userReferralData) {
+      return false;
     }
-  };
+
+    return (
+      userReferralData.referredByAffiliate !== null ||
+      userReferralData.myReferralCode !== null
+    );
+  }, [account, userReferralData, triggerRefetchReferralData]);
+
+  useEffect(() => {
+    if (referralCodeFromURL && !hasJoinedReferralCampaign) {
+      setOpenReferralModal(true);
+    }
+  }, [account, referralCodeFromURL, hasJoinedReferralCampaign]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getPointsData(INITIAL_NUMBER_OF_ROWS, account);
+      const data = await fetchPointsData(
+        INITIAL_NUMBER_OF_ROWS,
+        account,
+        setFetchingPointsData
+      );
       setPointsData(data);
     };
 
@@ -109,7 +162,7 @@ const Leaderboard: React.FC = () => {
     };
 
     const fetchUserData = async () => {
-      const data = await getPointsData(0, account);
+      const data = await fetchPointsData(0, account, setFetchingPointsData);
       if (data && data.user) {
         const user = {
           ...data.user,
@@ -138,7 +191,11 @@ const Leaderboard: React.FC = () => {
     if (loading || !hasMore) return;
     setLoading(true);
 
-    const data = await getPointsData(loadedNumberOfRows + ROWS_PER_LOAD);
+    const data = await fetchPointsData(
+      loadedNumberOfRows + ROWS_PER_LOAD,
+      undefined,
+      setFetchingPointsData
+    );
 
     if (data) {
       setPointsData(data);
@@ -270,7 +327,7 @@ const Leaderboard: React.FC = () => {
         >
           <UserPointsSection
             userPoints={currentUserData?.totalPoints}
-            isLoading={fetchingPointsData}
+            isLoading={fetchingPointsData || status === "connecting"}
           />
           <PointsUpdateSection
             pointsUpdatedAt={
@@ -279,7 +336,27 @@ const Leaderboard: React.FC = () => {
           />
         </Flex>
 
-        <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
+        {fetchingReferralsData || status === "connecting" ? (
+          <Skeleton
+            width={{ initial: "100%", sm: "260px" }}
+            height="50px"
+            style={{ borderRadius: "32px" }}
+          />
+        ) : (
+          <ReferralSection
+            hasJoinedReferralCampaign={hasJoinedReferralCampaign}
+            userData={userReferralData}
+            setOpenReferralModal={setOpenReferralModal}
+            triggerRefetch={setTriggerRefetchReferralData}
+          />
+        )}
+
+        <LeaderboardTable
+          ranks={ranks}
+          currentUserData={currentUserData}
+          userBonusInfo={userBonusInfo}
+          hasJoinedReferralCampaign={hasJoinedReferralCampaign}
+        />
 
         {loading && (
           <Flex
@@ -293,6 +370,16 @@ const Leaderboard: React.FC = () => {
         )}
         <Flex ref={observerRef} width={"10px"} height={"10px"} />
       </Flex>
+
+      {openReferralModal && (
+        <ReferralModal
+          referralCodeFromURL={referralCodeFromURL}
+          isEligibleForAffiliate={userReferralData?.isEligibleForAffiliate}
+          open={openReferralModal}
+          triggerRefetch={setTriggerRefetchReferralData}
+          handleDismiss={() => setOpenReferralModal(false)}
+        />
+      )}
     </Flex>
   );
 };

@@ -2,13 +2,15 @@ import {createAction} from '@reduxjs/toolkit'
 import { TransactionType } from '../../constants/transaction'
 
 export type PopupContent =
-  {
+  | {
     txn: {
       hash: string
       success: boolean
       message: string
       type: TransactionType | number | string
     }
+  } | {
+    message: string;
   }
 
 export const addPopup = createAction<{

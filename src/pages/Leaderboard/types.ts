@@ -1,3 +1,5 @@
+import { Address } from "viem"
+
 export interface PrevWeekDetails {
   sessionId: string
   sessionStart: string
@@ -26,4 +28,20 @@ export interface LeaderboardPointsData {
   leaderboardTable: [UserData]
   sessionDetails: SessionDetails
   user?: UserData
+}
+
+export interface UserReferralData {
+  walletAddress: Address;
+  sessionTotalPoints: number;
+  previousRunPoints: number;
+  previousRunWalletBoostBonus: number;
+  previousRunReferralBonus: number;
+  previousRunAffiliateBonus: number;
+  myReferralCode: string | null;
+  isEligibleForAffiliate: boolean;
+  referrals: { walletAddress: Address }[];
+  referredByAffiliate: {
+    walletAddress: Address;
+    referralCodeUsed: string;
+  } | null;
 }
