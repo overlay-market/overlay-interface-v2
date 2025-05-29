@@ -214,7 +214,7 @@ const ReferralModal: React.FC<ReferralsModalProps> = ({
             For more details, follow the link
           </Text>
           <Link
-            to={"https://overlayprotocol.medium.com/t-o-r-c-h-b0213aa3ae85"}
+            to={"https://x.com/overlayprotocol/status/1927744022271160411?s=46"}
             target="_blank"
             style={{ textDecoration: "none" }}
           >
