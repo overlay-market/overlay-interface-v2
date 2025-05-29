@@ -90,8 +90,8 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Made%20In%20USA%20Index": MadeInUsa,
   "SOL%20Index": SolIndex,
   "SOL%2FUSD": SolUsd,
-  "Spotify%20-%20The%20Weeknd%20Index": TheWeekend,
-  "Spotify%20-%20Billie%20Eilish%20Index": BillieEilish,
+  "The%20Weeknd%20Index": TheWeekend,
+  "Billie%20Eilish%20Index": BillieEilish,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -102,9 +102,9 @@ export const MARKETSORDER = [
   "amouranth%20vs%20peachJars",
   "binance%20alpha%20index",
   "Counter-Strike%202%20Skins",
-  "Spotify%20-%20The%20Weeknd%20Index",
+  "The%20Weeknd%20Index",
   "Monalita%20vs%20Elvasnaps",
-  "Spotify%20-%20Billie%20Eilish%20Index",
+  "Billie%20Eilish%20Index",
   "SOL%20Index",
   "BNB%20%2F%20USD",
   "Jessicanigri%20vs%20Monalita",
