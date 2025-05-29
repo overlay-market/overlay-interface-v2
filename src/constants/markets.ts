@@ -44,6 +44,7 @@ import SolIndex from "../assets/images/markets-full-logos/sol-index.jpg";
 import SolUsd from "../assets/images/markets-full-logos/sol-usd.jpg";
 import TheWeekend from "../assets/images/markets-full-logos/the-weekend.jpg";
 import BillieEilish from "../assets/images/markets-full-logos/billie-eilish.jpg";
+import StrategicReverseIndex from '../assets/images/markets-full-logos/strategic-reserve-index.webp';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -92,6 +93,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "SOL%2FUSD": SolUsd,
   "The%20Weeknd%20Index": TheWeekend,
   "Billie%20Eilish%20Index": BillieEilish,
+  "Strategic%20Reserve%20Index": StrategicReverseIndex,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -103,6 +105,7 @@ export const MARKETSORDER = [
   "binance%20alpha%20index",
   "Counter-Strike%202%20Skins",
   "The%20Weeknd%20Index",
+  "Strategic%20Reserve%20Index",
   "Monalita%20vs%20Elvasnaps",
   "Billie%20Eilish%20Index",
   "SOL%20Index",
