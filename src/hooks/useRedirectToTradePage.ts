@@ -6,6 +6,7 @@ const useRedirectToTradePage = () => {
   return (marketName: string) => {
     const encodedMarket = encodeURIComponent(marketName);
     navigate(`/trade?market=${encodedMarket}`, { replace: true });
+    window.scrollTo(0, 0);
   };
 };
 
