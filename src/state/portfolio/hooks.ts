@@ -44,6 +44,8 @@ export function usePositionRefresh(
   const [isUpdating, setIsUpdating] = useState(false);
   const isUnwindTxn = useIsNewUnwindTxn();
 
+  const previousTotalRef = useRef(0);
+
   const fetchPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
       if (!account) {
@@ -78,10 +80,11 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData = validPositions.length !== positionsTotalNumber;
+        const hasNewData = validPositions.length !== previousTotalRef.current;
 
         setPositions(validPositions);
         setPositionsTotalNumber(result.total);
+        previousTotalRef.current = result.total;
 
         return hasNewData;
       } catch (error) {
@@ -105,8 +108,7 @@ export function usePositionRefresh(
       account,
       isNewTxnHash,
       currentPage,
-      itemsPerPage,
-      positionsTotalNumber,
+      itemsPerPage,  
     ]
   );
 
@@ -158,6 +160,7 @@ export function useUnwindPositionRefresh(
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const isUnwindTxn = useIsNewUnwindTxn();
+  const previousTotalRef = useRef(0);
 
   const fetchUnwindPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
@@ -197,10 +200,11 @@ export function useUnwindPositionRefresh(
         );
 
         const hasNewData =
-          validUnwindPositions.length !== unwindPositionsTotalNumber;
+          validUnwindPositions.length !== previousTotalRef.current;
 
         setUnwindPositions(validUnwindPositions);
         setUnwindPositionsTotalNumber(result.total);
+        previousTotalRef.current = result.total;
 
         return hasNewData;
       } catch (error) {
@@ -225,7 +229,6 @@ export function useUnwindPositionRefresh(
       isNewTxnHash,
       currentPage,
       itemsPerPage,
-      unwindPositionsTotalNumber,
     ]
   );
 
