@@ -15,6 +15,7 @@ export enum ExplorerDataType {
   TOKEN = 'token',
   ADDRESS = 'address',
   BLOCK = 'block',
+  BRIDGE = 'bridge',
 }
 
 /**
@@ -103,6 +104,8 @@ export const getExplorerLink = (chainId: number, data: string, type: ExplorerDat
         return `https://testnet.bscscan.com/address/${data}`
       case ExplorerDataType.BLOCK:
         return `https://testnet.bscscan.com/block/${data}`
+      case ExplorerDataType.BRIDGE:
+        return `https://testnet.layerzeroscan.com/tx/${data}`
       default:
         return `https://testnet.bscscan.com/`
     }
