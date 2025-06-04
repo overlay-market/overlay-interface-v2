@@ -94,6 +94,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: <StakeActiveIcon />,
       showOnMobile: true,
     },
+    {
+      to: "/bridge",
+      label: "Bridge",
+      icon: <StakeIcon />,
+      activeIcon: <StakeActiveIcon />,
+      showOnMobile: true,
+    },
     // {
     //   to: "/stake",
     //   label: "Stake",
