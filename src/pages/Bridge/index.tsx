@@ -11,6 +11,9 @@ import { erc20Abi, maxUint256, parseUnits } from "viem";
 import bs58 from "bs58";
 import { TransactionType } from "../../constants/transaction";
 import { BRIDGE_ABI, BRIDGE_CONTRACT_ADDRESS, OVL_TOKEN_ADDRESS, SOLANA_DEVNET_EID } from "../../constants/bridge";
+import { StyledInput } from "../Leaderboard/ReferralSection/referral-modal-styles";
+import { readContract } from '@wagmi/core'
+import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -37,7 +40,7 @@ const Bridge: React.FC = () => {
   });
 
   const { writeContractAsync } = useWriteContract();
-  const { waitForTransactionReceipt } = useWaitForTransactionReceipt();
+  const waitForTransactionReceipt = useWaitForTransactionReceipt;
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -76,35 +79,51 @@ const Bridge: React.FC = () => {
       }
 
       const sendParam = {
-        dstEid: BigInt(SOLANA_DEVNET_EID),
+        dstEid: SOLANA_DEVNET_EID,
         to: toBytes32(destination),
         amountLD: amountWei,
-        minAmountLD: 0n,
+        minAmountLD: amountWei,
         extraOptions: "0x",
         composeMsg: "0x",
         oftCmd: "0x",
       } as const;
-      const feeObj = { nativeFee: 0n, zroFee: 0n, adapterParams: "0x" } as const;
+
+      const msgFee = await readContract(wagmiConfig, {
+        address: BRIDGE_CONTRACT_ADDRESS,
+        abi: BRIDGE_ABI,
+        functionName: "quoteSend",
+        args: [sendParam, false],
+      });
 
       const hash = await writeContractAsync({
         address: BRIDGE_CONTRACT_ADDRESS,
         abi: BRIDGE_ABI,
         functionName: "send",
-        args: [sendParam, feeObj, address],
-        value: feeObj.nativeFee,
+        args: [sendParam, msgFee, address],
+        value: msgFee.nativeFee,
       });
       addPopup(
         { txn: { hash, success: true, message: "", type: TransactionType.BRIDGE_OVL } },
         hash
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
+      let message = "Bridge failed";
+      let type = "ERROR";
+      if (error && typeof error === "object") {
+        if ("message" in error && typeof (error as { message?: unknown }).message === "string") {
+          message = (error as { message: string }).message;
+        }
+        if ("code" in error && typeof (error as { code?: unknown }).code === "string") {
+          type = (error as { code: string }).code;
+        }
+      }
       addPopup(
         {
           txn: {
             hash: Date.now().toString(),
             success: false,
-            message: error?.message ?? "Bridge failed",
-            type: error?.code ?? "ERROR",
+            message,
+            type,
           },
         },
         Date.now().toString()
@@ -127,7 +146,12 @@ const Bridge: React.FC = () => {
       </Text>
       <Text size="2">Balance: {balance} OVL</Text>
       <NumericalInput value={amount} handleUserInput={setAmount} placeholder="Amount" />
-      <NumericalInput value={destination} handleUserInput={setDestination} placeholder="Solana Address" />
+      <StyledInput
+        type="text"
+        value={destination}
+        onChange={(e) => setDestination(e.target.value.trim())}
+        placeholder="Solana Address"
+      />
       {address ? (
         <GradientSolidButton title="Bridge" handleClick={handleBridge} />
       ) : (
