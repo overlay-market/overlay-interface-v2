@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
 import { Address } from "viem";
+import useAccount from "../../../hooks/useAccount";
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
@@ -11,15 +12,14 @@ const MAX_POLLING_TIME = 60000;
 
 export function useOverviewDataRefresh(
   sdk: OverlaySDK,
-  account: Address | undefined,
   selectedInterval: IntervalType,
   refreshData: boolean,
 ) {
+  const { address: account } = useAccount();
   const [loading, setLoading] = useState(false);
   const [overviewData, setOverviewData] = useState<OverviewData | undefined>(
     undefined
   );
-  
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -38,18 +38,15 @@ export function useOverviewDataRefresh(
       obj1.realizedPnl === obj2.realizedPnl &&
       obj1.totalValueLocked === obj2.totalValueLocked &&
       obj1.unrealizedPnL === obj2.unrealizedPnL &&
-      obj1.lockedPlusUnrealized === obj2.lockedPlusUnrealized &&
-      JSON.stringify(obj1.dataByPeriod) === JSON.stringify(obj2.dataByPeriod)
+      obj1.lockedPlusUnrealized === obj2.lockedPlusUnrealized
     );
   };
 
   const fetchOverviewDetails = useCallback(
     async (retryCount = 0): Promise<boolean> => {
       if (!account) {
-        setOverviewData(undefined);
         return false;
       }
-
       try {
         const result = await sdk.accountDetails.getOverview(
           selectedInterval,
@@ -63,7 +60,6 @@ export function useOverviewDataRefresh(
 
         const hasNewData = !areOverviewDataEqual(result, previousOverviewData) && Boolean(result);
         setOverviewData(result);
-        
         return hasNewData;
       } catch (error) {
         console.error(
@@ -75,8 +71,7 @@ export function useOverviewDataRefresh(
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
           return fetchOverviewDetails(retryCount + 1);
         } else {
-          setOverviewData(undefined);
-          
+          console.warn("Max retries reached. Keeping previous overviewData.");          
           return false;
         }
       }
@@ -112,13 +107,20 @@ export function useOverviewDataRefresh(
   }, [fetchOverviewDetails]);
 
   useEffect(() => {
+    let isMounted = true;
+
     const refresh = async () => {
       setLoading(true);
       await fetchOverviewDetails();
+      if (!isMounted) return;
       setLoading(false);
     };
 
     refresh();
+
+    return () => {
+      isMounted = false;
+    };
   }, [fetchOverviewDetails]);
 
   useEffect(() => {
@@ -132,7 +134,7 @@ export function useOverviewDataRefresh(
         clearTimeout(pollingTimeoutRef.current);
       }
     };
-  }, [refreshData, isNewUnwindTxn, startPolling]);
+  }, [refreshData, isNewUnwindTxn, fetchOverviewDetails]);
 
   return {
     loading: loading || isUpdating,

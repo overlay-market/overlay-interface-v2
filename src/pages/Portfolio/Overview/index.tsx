@@ -4,7 +4,6 @@ import { InfoCardsGrid, MainCardsGrid } from "./overview-styles";
 import OverviewCard from "./OverviewCard";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
-import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import MainOverviewCard from "./MainOverviewCard";
 import OverviewChart from "./OverviewChart";
@@ -29,7 +28,6 @@ const Overview: React.FC = () => {
 
   const { overviewData, refreshOverviewData } = useOverviewDataRefresh(
     sdk,
-    account as Address | undefined,
     selectedInterval,
     isNewTxnHash || isNewUnwindTxn || isNewSelectedInterval
   );
