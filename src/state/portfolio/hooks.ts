@@ -7,6 +7,7 @@ import type {
 import type { Address } from "viem";
 import { useAppSelector } from "../hooks";
 import { TransactionType } from "../../constants/transaction";
+import usePrevious from "../../hooks/usePrevious";
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
@@ -41,8 +42,27 @@ export function usePositionRefresh(
     undefined
   );
   const [positionsTotalNumber, setPositionsTotalNumber] = useState(0);
+  const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const isUnwindTxn = useIsNewUnwindTxn();
+  const isNewUnwindTxn = useIsNewUnwindTxn();
+  const previousValidPositions = usePrevious(positions);
+
+  const arePositionsEqual = (
+    arr1: OpenPositionData[] | undefined,
+    arr2: OpenPositionData[] | undefined
+  ): boolean => {
+    if (!arr1 || !arr2 || arr1.length !== arr2.length) return false;
+    if (arr1 === arr2) return true;
+  
+    return arr1.every((pos1, i) => {
+      const pos2 = arr2[i];
+      if (!pos2) return false;
+  
+      const keys1 = Object.keys(pos1) as (keyof OpenPositionData)[];
+      return keys1.every(key => pos1[key] === pos2[key]);
+    });
+  };
 
   const fetchPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
@@ -78,11 +98,9 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData = validPositions.length !== positionsTotalNumber;
-
+        const hasNewData = !arePositionsEqual(validPositions, previousValidPositions) && Boolean(validPositions);
         setPositions(validPositions);
         setPositionsTotalNumber(result.total);
-
         return hasNewData;
       } catch (error) {
         console.error(
@@ -104,11 +122,32 @@ export function usePositionRefresh(
       sdk,
       account,
       isNewTxnHash,
+      isNewUnwindTxn,
       currentPage,
-      itemsPerPage,
-      positionsTotalNumber,
+      itemsPerPage,  
     ]
   );
+
+  const startPolling = useCallback(() => {
+    if (pollingTimeoutRef.current) {
+      clearTimeout(pollingTimeoutRef.current);
+    }
+    startTimeRef.current = Date.now();
+
+    const poll = async () => {
+      const hasNewData = await fetchPositions();
+      const elapsedTime = Date.now() - (startTimeRef.current || 0);
+
+      if (hasNewData || elapsedTime >= MAX_POLLING_TIME) {
+        setIsUpdating(false);
+        return;
+      }
+
+      pollingTimeoutRef.current = setTimeout(poll, POLLING_INTERVAL);
+    };
+
+    poll();
+  }, [fetchPositions]);
 
   useEffect(() => {
     const refresh = async () => {
@@ -121,17 +160,17 @@ export function usePositionRefresh(
   }, [fetchPositions]);
 
   useEffect(() => {
-    if (isNewTxnHash && isUnwindTxn) {
+    if (isNewTxnHash || isNewUnwindTxn) {
       setIsUpdating(true);
-      const poll = async () => {
-        const hasNewData = await fetchPositions();
-        if (hasNewData) {
-          setIsUpdating(false);
-        }
-      };
-      poll();
+      startPolling();
     }
-  }, [isNewTxnHash, isUnwindTxn, fetchPositions]);
+
+    return () => {
+      if (pollingTimeoutRef.current) {
+        clearTimeout(pollingTimeoutRef.current);
+      }
+    };
+  }, [isNewTxnHash, isNewUnwindTxn, startPolling]);
 
   return {
     loading: loading || isUpdating,
@@ -157,7 +196,8 @@ export function useUnwindPositionRefresh(
     useState(0);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const isUnwindTxn = useIsNewUnwindTxn();
+  const isNewUnwindTxn = useIsNewUnwindTxn();
+  const previousTotalRef = useRef(0);
 
   const fetchUnwindPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
@@ -196,11 +236,11 @@ export function useUnwindPositionRefresh(
           }
         );
 
-        const hasNewData =
-          validUnwindPositions.length !== unwindPositionsTotalNumber;
+        const hasNewData = result.total !== previousTotalRef.current;
 
         setUnwindPositions(validUnwindPositions);
         setUnwindPositionsTotalNumber(result.total);
+        previousTotalRef.current = result.total;
 
         return hasNewData;
       } catch (error) {
@@ -223,9 +263,9 @@ export function useUnwindPositionRefresh(
       sdk,
       account,
       isNewTxnHash,
+      isNewUnwindTxn,
       currentPage,
       itemsPerPage,
-      unwindPositionsTotalNumber,
     ]
   );
 
@@ -261,7 +301,7 @@ export function useUnwindPositionRefresh(
   }, [fetchUnwindPositions]);
 
   useEffect(() => {
-    if (isNewTxnHash && isUnwindTxn) {
+    if (isNewTxnHash || isNewUnwindTxn) {
       setIsUpdating(true);
       startPolling();
     }
@@ -271,7 +311,7 @@ export function useUnwindPositionRefresh(
         clearTimeout(pollingTimeoutRef.current);
       }
     };
-  }, [isNewTxnHash, isUnwindTxn, startPolling]);
+  }, [isNewTxnHash, isNewUnwindTxn, startPolling]);
 
   return {
     loading: loading || isUpdating,
