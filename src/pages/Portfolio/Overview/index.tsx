@@ -19,6 +19,7 @@ const Overview: React.FC = () => {
   const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
+  const isNewUnwindTxn = useIsNewUnwindTxn();
 
   const [overviewData, setOverviewData] = useState<OverviewData | undefined>(
     undefined
@@ -37,7 +38,7 @@ const Overview: React.FC = () => {
           const overviewData = await sdk.accountDetails.getOverview(
             selectedInterval,
             account as Address,
-            isNewTxnHash || isNewSelectedInterval
+            isNewTxnHash || isNewUnwindTxn || isNewSelectedInterval
           );
           overviewData && setOverviewData(overviewData);
         } catch (error) {
@@ -53,14 +54,14 @@ const Overview: React.FC = () => {
     isNewTxnHash,
     selectedInterval,
     isNewSelectedInterval,
-    useIsNewUnwindTxn,
+    isNewUnwindTxn,
   ]);
 
   const isOver1000OpenPositions = useMemo(() => {
     if (overviewData) {
       return Number(overviewData.numberOfOpenPositions) > 1000;
     } else return false;
-  }, [account, isNewTxnHash]);
+  }, [account, overviewData, isNewTxnHash, isNewUnwindTxn]);
 
   return (
     <Flex
