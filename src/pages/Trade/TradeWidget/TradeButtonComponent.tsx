@@ -6,7 +6,6 @@ import useAccount from "../../../hooks/useAccount";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
-  useIsNewTxnHash,
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
@@ -47,7 +46,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   });
   const [isApprovalPending, setIsApprovalPending] = useState<boolean>(false);
   const arcxAnalytics = useArcxAnalytics();
-  const isNewTxnHash = useIsNewTxnHash();
   const title: string | undefined = useMemo(() => {
     if (!tradeState) return undefined;
     return tradeState.tradeState;
