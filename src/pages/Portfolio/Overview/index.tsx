@@ -7,23 +7,19 @@ import useAccount from "../../../hooks/useAccount";
 import { Address } from "viem";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import MainOverviewCard from "./MainOverviewCard";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import OverviewChart from "./OverviewChart";
 import { UNIT } from "../../../constants/applications";
-import { IntervalType, OverviewData } from "overlay-sdk";
+import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
+import { useOverviewDataRefresh } from "./hooks";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
-  const { chainId } = useMultichainContext();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
   const isNewUnwindTxn = useIsNewUnwindTxn();
 
-  const [overviewData, setOverviewData] = useState<OverviewData | undefined>(
-    undefined
-  );
   const [selectedInterval, setSelectedInterval] = useState<IntervalType>("1M");
   const previousSelectedInterval = usePrevious(selectedInterval);
 
@@ -31,37 +27,22 @@ const Overview: React.FC = () => {
     return selectedInterval !== previousSelectedInterval;
   }, [selectedInterval, previousSelectedInterval]);
 
-  useEffect(() => {
-    const fetchOverviewDetails = async () => {
-      if (account) {
-        try {
-          const overviewData = await sdk.accountDetails.getOverview(
-            selectedInterval,
-            account as Address,
-            isNewTxnHash || isNewUnwindTxn || isNewSelectedInterval
-          );
-          overviewData && setOverviewData(overviewData);
-        } catch (error) {
-          console.error("Error fetching overview details:", error);
-        }
-      }
-    };
-
-    fetchOverviewDetails();
-  }, [
-    account,
-    chainId,
-    isNewTxnHash,
+  const { overviewData, refreshOverviewData } = useOverviewDataRefresh(
+    sdk,
+    account as Address | undefined,
     selectedInterval,
-    isNewSelectedInterval,
-    isNewUnwindTxn,
-  ]);
+    isNewTxnHash || isNewUnwindTxn || isNewSelectedInterval
+  );
 
   const isOver1000OpenPositions = useMemo(() => {
     if (overviewData) {
       return Number(overviewData.numberOfOpenPositions) > 1000;
     } else return false;
   }, [account, overviewData, isNewTxnHash, isNewUnwindTxn]);
+
+  useEffect(() => {
+    setTimeout(refreshOverviewData, 1000);
+  }, [isNewTxnHash, isNewUnwindTxn, isNewSelectedInterval]);
 
   return (
     <Flex
