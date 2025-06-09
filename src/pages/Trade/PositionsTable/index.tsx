@@ -2,7 +2,7 @@ import { Text } from "@radix-ui/themes";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LineSeparator,
   PositionsTableContainer,
@@ -16,7 +16,6 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import usePrevious from "../../../hooks/usePrevious";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -45,12 +44,6 @@ const PositionsTable: React.FC = () => {
 
   const isTablet = useMediaQuery("(max-width: 1279px)");
 
-  const previousMarketId = usePrevious(marketId);
-
-  const isNewMarketId = useMemo(() => {
-    return marketId !== previousMarketId;
-  }, [marketId, previousMarketId]);
-
   useEffect(() => {
     const fetchOpenPositions = async () => {
       if (!account || !marketId) {
@@ -59,6 +52,7 @@ const PositionsTable: React.FC = () => {
       }
 
       if (marketId && account) {
+        const refreshData = isNewTxnHash;
         setLoading(true);
         try {
           const positions = await sdk.openPositions.transformOpenPositions(
@@ -66,7 +60,7 @@ const PositionsTable: React.FC = () => {
             itemsPerPage,
             marketId,
             account as Address,
-            isNewTxnHash || isNewMarketId
+            refreshData
           );
 
           positions && setPositions(positions.data);
@@ -85,11 +79,11 @@ const PositionsTable: React.FC = () => {
 
     fetchOpenPositions();
   }, [
+    sdk.openPositions,
     chainId,
     marketId,
     account,
     isNewTxnHash,
-    isNewMarketId,
     currentPage,
     itemsPerPage,
     setItemsPerPage,
