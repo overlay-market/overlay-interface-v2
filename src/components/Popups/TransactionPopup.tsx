@@ -64,7 +64,7 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
             href={getExplorerLink(
               chainId as number,
               hash,
-              ExplorerDataType.TRANSACTION
+              type === TransactionType.BRIDGE_OVL ? ExplorerDataType.BRIDGE : ExplorerDataType.TRANSACTION
             )}
           >
             <Flex mt={"4px"}>
