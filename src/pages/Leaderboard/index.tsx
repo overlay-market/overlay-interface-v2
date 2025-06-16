@@ -117,7 +117,7 @@ const Leaderboard: React.FC = () => {
     const fetchData = async () => {
       const data = await fetchPointsData(
         INITIAL_NUMBER_OF_ROWS,
-        account,
+        undefined,
         setFetchingPointsData
       );
       setPointsData(data);
@@ -138,12 +138,6 @@ const Leaderboard: React.FC = () => {
     }
   }, [pointsData]);
 
-  const initialUserData = useMemo<UserData | undefined>(() => {
-    if (pointsData) {
-      return pointsData.user;
-    }
-  }, [pointsData]);
-
   const ranks = useMemo<UserData[] | undefined>(() => {
     if (pointsData) {
       return pointsData.leaderboardTable;
@@ -151,9 +145,9 @@ const Leaderboard: React.FC = () => {
   }, [pointsData]);
 
   useEffect(() => {
-    const resolveUsername = async (user: ExtendedUserData) => {
+    const resolveUsername = async (user: UserData) => {
       const username = await getEnsName(user._id as Address);
-      const resolvedUser = {
+      const resolvedUser: ExtendedUserData = {
         ...user,
         username: username ?? undefined,
       };
@@ -161,31 +155,18 @@ const Leaderboard: React.FC = () => {
       setCurrentUserData(resolvedUser);
     };
 
-    const fetchUserData = async () => {
-      const data = await fetchPointsData(0, account, setFetchingPointsData);
-      if (data && data.user) {
-        const user = {
-          ...data.user,
-          username: undefined,
-        };
-        resolveUsername(user);
-      }
-    };
-
-    if (account && initialUserData !== undefined) {
-      const user = {
-        ...initialUserData,
-        username: undefined,
+    if (account && userReferralData) {
+      const userDataFromReferral: UserData = {
+        _id: userReferralData.walletAddress,
+        totalPoints: userReferralData.sessionTotalPoints,
+        previousRunPoints: userReferralData.previousRunPoints,
+        rank: userReferralData.rank,
       };
-      resolveUsername(user);
-    }
-    if (account && pointsData && initialUserData === undefined) {
-      fetchUserData();
-    }
-    if (!account) {
+      resolveUsername(userDataFromReferral);
+    } else {
       setCurrentUserData(undefined);
     }
-  }, [account, pointsData, initialUserData]);
+  }, [account, userReferralData]);
 
   const loadMoreData = async () => {
     if (loading || !hasMore) return;
