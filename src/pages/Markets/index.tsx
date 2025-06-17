@@ -25,7 +25,7 @@ const Markets: React.FC = () => {
         });
         sdk.ovl.totalSupplyDayChange().then((supplyChange) => {
           supplyChange &&
-            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
+            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%"));
         });
       } catch (error) {
         console.error("Error fetching markets:", error);
