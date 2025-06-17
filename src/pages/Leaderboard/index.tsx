@@ -9,8 +9,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ExtendedUserData,
   LeaderboardPointsData,
-  PrevWeekDetails,
-  SessionDetails,
   UserData,
   UserReferralData,
 } from "./types";
@@ -125,18 +123,6 @@ const Leaderboard: React.FC = () => {
 
     fetchData();
   }, []);
-
-  const prevWeekDetails = useMemo<PrevWeekDetails | undefined>(() => {
-    if (pointsData) {
-      return pointsData.previousWeekDetails;
-    }
-  }, [pointsData]);
-
-  const sessionDetails = useMemo<SessionDetails | undefined>(() => {
-    if (pointsData) {
-      return pointsData.sessionDetails;
-    }
-  }, [pointsData]);
 
   const ranks = useMemo<UserData[] | undefined>(() => {
     if (pointsData) {
@@ -312,7 +298,8 @@ const Leaderboard: React.FC = () => {
           />
           <PointsUpdateSection
             pointsUpdatedAt={
-              sessionDetails?.sessionLastUpdated || prevWeekDetails?.sessionEnd
+              userReferralData?.sessionLastUpdated ||
+              pointsData?.sessionDetails?.sessionLastUpdated
             }
           />
         </Flex>
