@@ -44,4 +44,5 @@ export interface UserReferralData {
     walletAddress: Address;
     referralCodeUsed: string;
   } | null;
+  rank: number;
 }
