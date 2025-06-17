@@ -31,6 +31,10 @@ export interface LeaderboardPointsData {
 }
 
 export interface UserReferralData {
+  sessionId: string;
+  sessionStart: string;
+  sessionEnd: string;
+  sessionLastUpdated: string;
   walletAddress: Address;
   sessionTotalPoints: number;
   previousRunPoints: number;
