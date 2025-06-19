@@ -164,25 +164,33 @@ const Chart: React.FC = () => {
             if (symbolInfo === null) {
               return null;
             }
+            const marketFormattingPrice  = [
+              "BTC / USD",
+              "ETH / USD",
+            ];
+            const marketName = market?.marketName || "";
+            if (marketFormattingPrice.some((name) => marketName === name)) {
+              return {
+                format: (price) => {
+                  return Math.round(price).toString();
+                },
+              };
+            }
             if (symbolInfo.format === "volume") {
               return {
                 format: (price) => {
                   if (price >= 1000000000) {
                     return `${(price / 1000000000).toFixed(3)}B`;
                   }
-
                   if (price >= 1000000) {
                     return `${(price / 1000000).toFixed(3)}M`;
                   }
-
                   if (price >= 1000) {
                     return `${(price / 1000).toFixed(3)}K`;
                   }
-
                   if (price >= 1 && price < 10) {
                     return price.toFixed(fractionDigitsAmount);
                   }
-
                   if (price < 1) {
                     if (market.priceCurrency === "%") {
                       return (price * 100).toFixed(2);
@@ -194,7 +202,6 @@ const Chart: React.FC = () => {
                 },
               };
             }
-
             return null; // The default formatter will be used.
           },
         },
