@@ -27,7 +27,6 @@ const TradeHeader: React.FC = () => {
   const { currentMarket: market } = useCurrentMarketState();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
 
-  const [price, setPrice] = useState<string>("");
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
   const [funding, setFunding] = useState<string | undefined>(undefined);
   const [shortPercentageOfTotalOi, setShortPercentageOfTotalOi] =
@@ -52,7 +51,16 @@ const TradeHeader: React.FC = () => {
           isLong,
           8
         );
-        price && setPrice(limitDigitsInDecimals(price as string));
+
+        if (price) {
+          const limited = limitDigitsInDecimals(price as string);
+
+          if (market) {
+            setCurrencyPrice(
+              formatPriceWithCurrency(limited, market.priceCurrency)
+            );
+          }
+        }
       } catch (error) {
         console.error("Error fetching price:", error);
       }
@@ -61,48 +69,33 @@ const TradeHeader: React.FC = () => {
     fetchPrice();
     const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, typedValue, selectedLeverage, isLong, chainId]);
+  }, [marketId, typedValue, selectedLeverage, isLong, chainId, market]);
 
   useEffect(() => {
-    market &&
-      price &&
-      setCurrencyPrice(formatPriceWithCurrency(price, market.priceCurrency));
-  }, [price, market]);
+    if (!marketId) return;
 
-  useEffect(() => {
-    const fetchFunding = async () => {
-      if (marketId) {
-        try {
-          const funding = await sdkRef.current.trade.getFunding(marketId);
-          funding && setFunding(funding);
-        } catch (error) {
-          console.error("Error fetching funding:", error);
+    const fetchStaticMarketData = async () => {
+      try {
+        const [funding, oiBalance] = await Promise.all([
+          sdkRef.current.trade.getFunding(marketId),
+          sdkRef.current.trade.getOIBalance(marketId),
+        ]);
+
+        if (funding) setFunding(funding);
+        if (oiBalance) {
+          setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
+          setLongPercentageOfTotalOi(oiBalance.longPercentageOfTotalOi);
         }
+      } catch (error) {
+        console.error("Error fetching static market data:", error);
       }
     };
 
-    fetchFunding();
-    const intervalId = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(intervalId);
-  }, [marketId, chainId]);
-
-  useEffect(() => {
-    const fetchOiBalance = async () => {
-      if (marketId) {
-        try {
-          const oiBalance = await sdkRef.current.trade.getOIBalance(marketId);
-          oiBalance &&
-            setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
-          oiBalance &&
-            setLongPercentageOfTotalOi(oiBalance.longPercentageOfTotalOi);
-        } catch (error) {
-          console.error("Error fetching oi balance:", error);
-        }
-      }
-    };
-
-    fetchOiBalance();
-    const intervalId = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
+    fetchStaticMarketData();
+    const intervalId = setInterval(
+      fetchStaticMarketData,
+      TRADE_POLLING_INTERVAL
+    );
     return () => clearInterval(intervalId);
   }, [marketId, chainId]);
 
