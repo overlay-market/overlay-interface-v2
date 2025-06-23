@@ -10,46 +10,21 @@ import {
   ShortPositionSelectButton,
 } from "./position-select-component-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { limitDigitsInDecimals } from "overlay-sdk";
 import { useSearchParams } from "react-router-dom";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import useSDK from "../../../providers/SDKProvider/useSDK";
-import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import useBidAndAsk from "../../../hooks/useBidAndAsk";
 
 const PositionSelectComponent: React.FC = () => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
-  const { chainId } = useMultichainContext();
-  const sdk = useSDK();
+  const { bid, ask } = useBidAndAsk(marketId);
 
   const { currentMarket: market } = useCurrentMarketState();
   const { isLong } = useTradeState();
   const { handlePositionSideSelect } = useTradeActionHandlers();
 
-  const [ask, setAsk] = useState<string>("");
-  const [bid, setBid] = useState<string>("");
   const [currencyAsk, setCurrencyAsk] = useState<string>("-");
   const [currencyBid, setCurrencyBid] = useState<string>("-");
-
-  useEffect(() => {
-    const fetchBidAndAsk = async () => {
-      if (marketId) {
-        try {
-          const bidAndAsk = await sdk.trade.getBidAndAsk(marketId, 8);
-
-          bidAndAsk && setAsk(limitDigitsInDecimals(bidAndAsk.ask as number));
-          bidAndAsk && setBid(limitDigitsInDecimals(bidAndAsk.bid as number));
-        } catch (error) {
-          console.error("Error fetching bid and ask:", error);
-        }
-      }
-    };
-
-    fetchBidAndAsk();
-    const intervalId = setInterval(fetchBidAndAsk, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
 
   useEffect(() => {
     ask &&
