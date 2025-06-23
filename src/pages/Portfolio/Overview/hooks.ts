@@ -26,6 +26,11 @@ export function useOverviewDataRefresh(
   const isNewUnwindTxn = useIsNewUnwindTxn();
   const previousOverviewData = usePrevious(overviewData);
 
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
   const areOverviewDataEqual = (
     obj1: OverviewData | undefined,
     obj2: OverviewData | undefined
@@ -48,7 +53,7 @@ export function useOverviewDataRefresh(
         return false;
       }
       try {
-        const result = await sdk.accountDetails.getOverview(
+        const result = await sdkRef.current.accountDetails.getOverview(
           selectedInterval,
           account as Address,
           refreshData
@@ -77,7 +82,6 @@ export function useOverviewDataRefresh(
       }
     },
     [
-      sdk,
       account,
       refreshData,
       isNewUnwindTxn,

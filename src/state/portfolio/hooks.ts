@@ -48,6 +48,11 @@ export function usePositionRefresh(
   const isNewUnwindTxn = useIsNewUnwindTxn();
   const previousValidPositions = usePrevious(positions);
 
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
   const arePositionsEqual = (
     arr1: OpenPositionData[] | undefined,
     arr2: OpenPositionData[] | undefined
@@ -73,7 +78,7 @@ export function usePositionRefresh(
       }
 
       try {
-        const result = await sdk.openPositions.transformOpenPositions(
+        const result = await sdkRef.current.openPositions.transformOpenPositions(
           currentPage,
           itemsPerPage,
           undefined,
@@ -119,7 +124,6 @@ export function usePositionRefresh(
       }
     },
     [
-      sdk,
       account,
       isNewTxnHash,
       isNewUnwindTxn,

@@ -1,6 +1,6 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import NumericalInput from "../../../components/NumericalInput";
 import {
   useTradeActionHandlers,
@@ -24,12 +24,17 @@ const CollateralInputComponent: React.FC = () => {
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
   const [maxInputIncludingFees, setMaxInputIncludingFees] = useState<number>(0);
 
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
   useEffect(() => {
     const fetchMaxInputIncludingFees = async () => {
       if (marketId && address) {
         try {
           const maxInputIncludingFees =
-            await sdk.trade.getMaxInputIncludingFees(
+            await sdkRef.current.trade.getMaxInputIncludingFees(
               marketId,
               address,
               toWei(selectedLeverage),
