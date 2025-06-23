@@ -52,7 +52,7 @@ const useBidAndAsk = (marketId: string | null): {bid: number | undefined, ask: n
     const fetchBidAndAsk = async () => {
       try {
         const bidAndAsk = await sdkRef.current.trade.getBidAndAsk(marketId, 8); 
-        console.log({bidAndAsk})
+       
         const processedAsk = bidAndAsk && limitDigitsInDecimals(bidAndAsk.ask as number).replaceAll(",", "");  
         const processedBid = bidAndAsk && limitDigitsInDecimals(bidAndAsk.bid as number).replaceAll(",", "");
         
