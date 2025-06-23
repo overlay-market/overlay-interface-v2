@@ -9,7 +9,7 @@ import {
   TradeHeaderContainer,
 } from "./trade-header-styles";
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
@@ -35,28 +35,33 @@ const TradeHeader: React.FC = () => {
   const [longPercentageOfTotalOi, setLongPercentageOfTotalOi] =
     useState<string>("0");
 
+  const sdkRef = useRef(sdk);
   useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
+  useEffect(() => {
+    if (!marketId) return;
+
     const fetchPrice = async () => {
-      if (marketId) {
-        try {
-          const price = await sdk.trade.getPrice(
-            marketId,
-            typedValue ? toWei(typedValue) : undefined,
-            toWei(selectedLeverage),
-            isLong,
-            8
-          );
-          price && setPrice(limitDigitsInDecimals(price as string));
-        } catch (error) {
-          console.error("Error fetching price:", error);
-        }
+      try {
+        const price = await sdkRef.current.trade.getPrice(
+          marketId,
+          typedValue ? toWei(typedValue) : undefined,
+          toWei(selectedLeverage),
+          isLong,
+          8
+        );
+        price && setPrice(limitDigitsInDecimals(price as string));
+      } catch (error) {
+        console.error("Error fetching price:", error);
       }
     };
 
     fetchPrice();
     const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, typedValue, selectedLeverage, isLong, chainId, sdk]);
+  }, [marketId, typedValue, selectedLeverage, isLong, chainId]);
 
   useEffect(() => {
     market &&
@@ -68,7 +73,7 @@ const TradeHeader: React.FC = () => {
     const fetchFunding = async () => {
       if (marketId) {
         try {
-          const funding = await sdk.trade.getFunding(marketId);
+          const funding = await sdkRef.current.trade.getFunding(marketId);
           funding && setFunding(funding);
         } catch (error) {
           console.error("Error fetching funding:", error);
@@ -79,13 +84,13 @@ const TradeHeader: React.FC = () => {
     fetchFunding();
     const intervalId = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
+  }, [marketId, chainId]);
 
   useEffect(() => {
     const fetchOiBalance = async () => {
       if (marketId) {
         try {
-          const oiBalance = await sdk.trade.getOIBalance(marketId);
+          const oiBalance = await sdkRef.current.trade.getOIBalance(marketId);
           oiBalance &&
             setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
           oiBalance &&
@@ -99,7 +104,7 @@ const TradeHeader: React.FC = () => {
     fetchOiBalance();
     const intervalId = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
+  }, [marketId, chainId]);
 
   const isFundingRatePositive = useMemo(() => {
     return Math.sign(Number(funding)) > 0;

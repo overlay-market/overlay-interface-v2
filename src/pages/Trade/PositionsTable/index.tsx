@@ -2,7 +2,7 @@ import { Text } from "@radix-ui/themes";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   LineSeparator,
   PositionsTableContainer,
@@ -44,6 +44,11 @@ const PositionsTable: React.FC = () => {
 
   const isTablet = useMediaQuery("(max-width: 1279px)");
 
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
   useEffect(() => {
     const fetchOpenPositions = async () => {
       if (!account || !marketId) {
@@ -55,13 +60,14 @@ const PositionsTable: React.FC = () => {
         const refreshData = isNewTxnHash;
         setLoading(true);
         try {
-          const positions = await sdk.openPositions.transformOpenPositions(
-            currentPage,
-            itemsPerPage,
-            marketId,
-            account as Address,
-            refreshData
-          );
+          const positions =
+            await sdkRef.current.openPositions.transformOpenPositions(
+              currentPage,
+              itemsPerPage,
+              marketId,
+              account as Address,
+              refreshData
+            );
 
           positions && setPositions(positions.data);
           positions && setPositionsTotalNumber(positions.total);
@@ -78,17 +84,7 @@ const PositionsTable: React.FC = () => {
     };
 
     fetchOpenPositions();
-  }, [
-    sdk.openPositions,
-    chainId,
-    marketId,
-    account,
-    isNewTxnHash,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    setCurrentPage,
-  ]);
+  }, [chainId, marketId, account, isNewTxnHash, currentPage, itemsPerPage]);
 
   useEffect(() => {
     setCurrentPage(1);
