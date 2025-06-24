@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Text } from "@radix-ui/themes";
 import useAccount from "../../hooks/useAccount";
 import Loader from "../../components/Loader";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -20,14 +20,20 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
   const { openModal } = useModalHelper();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
+  const shouldShowLoader = isLoading && userPoints === undefined;
+
   return (
     <Flex
       direction={"column"}
       gap={"8px"}
       align={{ initial: "center", sm: "start" }}
     >
-      {isLoading ? (
-        <Loader />
+      {shouldShowLoader ? (
+        <Skeleton
+          width="200px"
+          height="32px"
+          style={{ borderRadius: "22px" }}
+        />
       ) : account ? (
         <Flex>
           <Text
@@ -37,7 +43,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
             }}
           >
-            You have {userPoints ?? 0} Points
+            You have {userPoints ?? <Loader />} Points
           </Text>
         </Flex>
       ) : (
