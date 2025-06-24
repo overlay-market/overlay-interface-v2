@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Text } from "@radix-ui/themes";
 import useAccount from "../../../hooks/useAccount";
 import { UserReferralData } from "../types";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -22,10 +22,11 @@ export enum UserReferralStatus {
   IsEligibleForAffiliate = "isEligibleForAffiliate",
   IsReferredByAffiliate = "isReferredByAffiliate",
   NotReferredByAffiliate = "notReferredByAffiliate",
+  IsUndefined = "isUndefined",
 }
 
 type ReferralSectionProps = {
-  hasJoinedReferralCampaign: boolean | undefined;
+  hasJoinedReferralCampaign: boolean;
   userData: UserReferralData | undefined;
   setOpenReferralModal: Function;
   triggerRefetch: Function;
@@ -43,9 +44,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
   const lastShownError = useRef<string | null>(null);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const [userStatus, setUserStatus] = useState(
-    UserReferralStatus.NotReferredByAffiliate
-  );
+  const [userStatus, setUserStatus] = useState(UserReferralStatus.IsUndefined);
   const [toastVisible, setToastVisible] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -62,7 +61,7 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
       return;
     }
 
-    if (referralCode !== null) {
+    if (referralCode) {
       setUserStatus(UserReferralStatus.IsAffiliate);
       return;
     }
@@ -137,7 +136,15 @@ const ReferralSection: React.FC<ReferralSectionProps> = ({
   };
 
   return (
-    <Flex width={"100%"} height={"100%"} direction={"column"}>
+    <Flex width={"100%"} height={"auto"} direction={"column"}>
+      {userStatus === UserReferralStatus.IsUndefined && (
+        <Skeleton
+          width={{ initial: "100%", sm: "360px" }}
+          height="50px"
+          style={{ borderRadius: "32px" }}
+        />
+      )}
+
       {(!hasJoinedReferralCampaign ||
         userStatus === UserReferralStatus.NotReferredByAffiliate) && (
         <Flex
