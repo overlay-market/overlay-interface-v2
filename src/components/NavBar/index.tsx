@@ -5,8 +5,11 @@ import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
 import { LinksWrapper, MobileNavBar } from "./navbar-styles";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { useNavigate } from "react-router-dom";
 
 const NavBar: React.FC = () => {
+  const navigate = useNavigate();
+
   const isMobile = useMediaQuery("(max-width: 767px)");
   return (
     <>
@@ -28,7 +31,7 @@ const NavBar: React.FC = () => {
         top={"0"}
         style={{
           borderRight: isMobile
-            ? "0px solid transparent" // Remove the border
+            ? "0px solid transparent"
             : `1px solid ${theme.color.darkBlue}`,
         }}
       >
@@ -38,7 +41,14 @@ const NavBar: React.FC = () => {
           height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "97vh" }}
           align={"center"}
         >
-          <img src={LogoImg} alt="Logo" width={"32px"} height={"32px"} />
+          <img
+            src={LogoImg}
+            alt="Logo"
+            width={"32px"}
+            height={"32px"}
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate(`/markets`)}
+          />
 
           <LinksWrapper direction="column" justify={"between"} flexGrow={"1"}>
             <NavLinksSection />
