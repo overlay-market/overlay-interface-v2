@@ -59,7 +59,7 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
   }, [address, typedValue]);
 
   return (
-    <Flex direction={"column"} gap="16px">
+    <Flex direction={"column"} gap="8px" style={{marginBottom: "8px"}}>
       <Flex justify={"between"} height={"17px"}>
         <Text style={{ color: theme.color.grey3 }}>Est. Price</Text>
         <Text style={{ color: theme.color.blue1 }}>{currencyPrice}</Text>

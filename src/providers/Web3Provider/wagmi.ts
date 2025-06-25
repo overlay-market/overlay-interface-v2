@@ -1,5 +1,5 @@
 import { http, createConfig } from 'wagmi'
-import { arbitrumSepolia, berachain } from 'wagmi/chains'
+import { bscTestnet } from 'wagmi/chains'
 import { getDefaultConfig } from 'connectkit'
 
 const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string
@@ -7,10 +7,9 @@ const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string
 export const wagmiConfig = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [arbitrumSepolia, berachain],
+    chains: [bscTestnet],
     transports: {
-      [arbitrumSepolia.id]: http(),
-      [berachain.id]: http('https://rpc.berachain.com'),
+      [bscTestnet.id]: http(),
     },
 
     // Required API Keys

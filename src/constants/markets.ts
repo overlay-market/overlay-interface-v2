@@ -30,7 +30,23 @@ import L1vL2 from "../assets/images/markets-full-logos/l1-vs-l2-index.webp";
 import L1 from "../assets/images/markets-full-logos/l1-index.webp";
 import HoneryJar from "../assets/images/markets-full-logos/honeyjar.webp";
 import DeFi from "../assets/images/markets-full-logos/defi-index.webp";
-import DefaultLogo from '../assets/images/markets-full-logos/dafault-logo.webp';
+import HenloUsd from "../assets/images/markets-full-logos/henlo-usd.webp";
+import Bullas from "../assets/images/markets-full-logos/bullas.webp";
+import IbgtBera from "../assets/images/markets-full-logos/iBGT-bera.webp";
+import DefaultLogo from "../assets/images/markets-full-logos/dafault-logo.webp";
+import FanslyBlonde from "../assets/images/markets-full-logos/fansly-blonde-nologo.jpg";
+import FanslyBrunette from "../assets/images/markets-full-logos/fansly-brunette-nologo.jpg";
+import FanslyFight from "../assets/images/markets-full-logos/fansly-fight-nologo.jpg";
+import BinanceAlfa from "../assets/images/markets-full-logos/binance-alpha.jpg";
+import BnbUsd from "../assets/images/markets-full-logos/bnb-usd.jpg";
+import MadeInUsa from "../assets/images/markets-full-logos/made-in-usa.jpg";
+import SolIndex from "../assets/images/markets-full-logos/sol-index.jpg";
+import SolUsd from "../assets/images/markets-full-logos/sol-usd.jpg";
+import TheWeekend from "../assets/images/markets-full-logos/the-weekend.jpg";
+import BillieEilish from "../assets/images/markets-full-logos/billie-eilish.jpg";
+import StrategicReverseIndex from '../assets/images/markets-full-logos/strategic-reserve-index.webp';
+import BtcUsdLogo from '../assets/images/markets-full-logos/BTC-USD.webp';
+import EthUsdLogo from '../assets/images/markets-full-logos/ETH-USD.webp';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -66,6 +82,22 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Layer%201%20Index": L1,
   "HoneyComb%20and%20Jars%20NFT%20Index": HoneryJar,
   "Defi%20Index": DeFi,
+  "HENLO%20%2F%20USD": HenloUsd,
+  Bullas: Bullas,
+  "iBGT%20%2F%20BERA": IbgtBera,
+  "Amouranth%20vs%20peachJars": FanslyFight,
+  "Jessicanigri%20vs%20Monalita": FanslyBlonde,
+  "Monalita%20vs%20Elvasnaps": FanslyBrunette,
+  "Binance%20Alpha%20Index": BinanceAlfa,
+  "BNB%20%2F%20USD": BnbUsd,
+  "Made%20In%20USA%20Index": MadeInUsa,
+  "SOL%20Index": SolIndex,
+  "SOL%2FUSD": SolUsd,
+  "The%20Weeknd%20Index": TheWeekend,
+  "Billie%20Eilish%20Index": BillieEilish,
+  "Strategic%20Reserve%20Index": StrategicReverseIndex,
+  "ETH%20%2F%20USD": EthUsdLogo,
+  "BTC%20%2F%20USD": BtcUsdLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -73,7 +105,21 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 };
 
 export const MARKETSORDER = [
+  "amouranth%20vs%20peachJars",
+  "binance%20alpha%20index",
   "Counter-Strike%202%20Skins",
+  "ETH%20%2F%20USD",
+  "BTC%20%2F%20USD",
+  "The%20Weeknd%20Index",
+  "Strategic%20Reserve%20Index",
+  "Monalita%20vs%20Elvasnaps",
+  "Billie%20Eilish%20Index",
+  "SOL%20Index",
+  "BNB%20%2F%20USD",
+  "Jessicanigri%20vs%20Monalita",
+  "Made%20In%20USA%20Index",
+  "SOL%2FUSD",
+  "HENLO%20%2F%20USD",
   "BTC%20Dominance",
   "ETH%20Dominance",
   "Bera%20NFT%20Index",
@@ -117,6 +163,7 @@ export enum CategoryName {
   Chess = "Chess",
   Artists = "Artists",
   Bera = "Bera",
+  Fansly = "Fansly",
   Other = "Other",
 }
 
@@ -126,7 +173,12 @@ export type MarketCategoryMap = {
 
 export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Chess]: ["Hikaru%20Nakamura", "Magnus%20Carlsen"],
-  [CategoryName.Bera]: ["Bera%20NFT%20Index", "Bullas", "iBGT%20%2F%20BERA"],
+  [CategoryName.Bera]: [
+    "Bera%20NFT%20Index",
+    "Bullas",
+    "iBGT%20%2F%20BERA",
+    "HENLO%20%2F%20USD",
+  ],
   [CategoryName.MemeWar]: [
     "Cats%20vs%20Dogs%20-%20Meme%20War",
     "Cats%20vs%20Frogs%20-%20Meme%20War",
@@ -151,10 +203,17 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",
     "SUPER%20%2F%20ETH",
+    "ETH%20%2F%20USD",
+    "BTC%20%2F%20USD",
   ],
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
     "Mr%20Beast%20Popularity%20Index",
+  ],
+  [CategoryName.Fansly]: [
+    "Amouranth%20vs%20peachJars",
+    "Jessicanigri%20vs%20Monalita",
+    "Monalita%20vs%20Elvasnaps",
   ],
   [CategoryName.Other]: [],
 };

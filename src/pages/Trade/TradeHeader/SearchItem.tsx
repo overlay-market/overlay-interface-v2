@@ -16,14 +16,7 @@ const SearchItem: React.FC<SearchItemProps> = ({
   setSearchTerm,
 }) => {
   return (
-    <SearchContainer
-      width={"100%"}
-      height={"49px"}
-      py={"12px"}
-      px={"8px"}
-      justify={"between"}
-      align={"center"}
-    >
+    <SearchContainer>
       <SearchIcon />
       <SearchInput
         type="text"

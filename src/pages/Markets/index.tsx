@@ -26,7 +26,7 @@ const Markets: React.FC = () => {
         });
         sdk.ovl.totalSupplyDayChange().then((supplyChange) => {
           supplyChange &&
-            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
+            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%"));
         });
       } catch (error) {
         console.error("Error fetching markets:", error);
@@ -45,6 +45,19 @@ const Markets: React.FC = () => {
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
 
       <Flex direction="column">
+        <div
+          onClick={() => (window.location.href = "/faucet")}
+          style={{
+            display: window.innerWidth <= 768 ? "none" : "block",
+            cursor: "pointer",
+          }}
+        >
+          <img
+            src="/images/torch-trading-campaign.webp"
+            style={{ width: "100%" }}
+            alt="Trading Campaign Banner"
+          />
+        </div>
         <FirstSection marketsData={marketsData} />
         <Carousel marketsData={marketsData} />
         <MarketsTable marketsData={marketsData} />

@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Text } from "@radix-ui/themes";
 import useAccount from "../../hooks/useAccount";
 import Loader from "../../components/Loader";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -20,13 +20,21 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
   const { openModal } = useModalHelper();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
+  const shouldShowLoader = isLoading && userPoints === undefined;
+
   return (
     <Flex
       direction={"column"}
       gap={"8px"}
       align={{ initial: "center", sm: "start" }}
     >
-      {account ? (
+      {shouldShowLoader ? (
+        <Skeleton
+          width="200px"
+          height="32px"
+          style={{ borderRadius: "22px" }}
+        />
+      ) : account ? (
         <Flex>
           <Text
             size={{ initial: "5", sm: "6" }}
@@ -35,11 +43,15 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
             }}
           >
-            You have {isLoading ? <Loader /> : `${userPoints ? userPoints.toFixed(2) + "%" : "0"} PnL`}
+            You have {userPoints ?? <Loader />} Points
           </Text>
         </Flex>
       ) : (
-        <Flex gap={"8px"}>
+        <Flex
+          gap={"8px"}
+          direction={{ initial: "column", md: "row" }}
+          align={{ initial: "center", sm: "start" }}
+        >
           <GradientText
             size={{ initial: "5", sm: "6" }}
             style={{
@@ -52,6 +64,7 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
           </GradientText>
           <Text
             size={{ initial: "5", sm: "6" }}
+            align={{ initial: "center", sm: "left" }}
             style={{
               fontWeight: isMobile ? "700" : "600",
               color: isMobile ? theme.color.grey1 : theme.color.grey2,
@@ -64,11 +77,13 @@ const UserPointsSection: React.FC<UserPointsSectionProps> = ({
 
       <Flex gap={"8px"} align={"center"}>
         <Text size={"1"} style={{ color: theme.color.grey3 }}>
-          Leaderboard is updated every minute!
+          Leaderboard is updated every day!
         </Text>
-        {false && <Link target="_blank" href={LEADERBOARD_LEARN_MORE_LINK}>
-          <GradientText>Learn more</GradientText>
-        </Link>}
+        {false && (
+          <Link target="_blank" href={LEADERBOARD_LEARN_MORE_LINK}>
+            <GradientText>Learn more</GradientText>
+          </Link>
+        )}
       </Flex>
     </Flex>
   );

@@ -14,11 +14,12 @@ import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
-// import Leaderboard from "./pages/Leaderboard";
 import Earn from "./pages/Earn";
 import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import Stake from "./pages/Earn/StakePage";
 import VaultsProvider from "./providers/VaultsProvider";
+import Leaderboard from "./pages/Leaderboard";
+import Faucet from "./pages/Faucet";
 
 const earnRoutes = (
   <>
@@ -59,7 +60,8 @@ const App = () => {
                 <Route path="/markets" element={<Markets />} />
                 <Route path="/trade" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
-                {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/faucet" element={<Faucet />} />
 
                 {isEarnRoute ? (
                   <Route element={<VaultsProviderWrapper />}>
@@ -68,6 +70,7 @@ const App = () => {
                 ) : (
                   earnRoutes
                 )}
+
                 <Route path="*" element={<Navigate to="/markets" />} />
               </Routes>
             </Flex>

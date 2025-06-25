@@ -94,17 +94,17 @@ export const getExplorerLink = (chainId: number, data: string, type: ExplorerDat
     }
   }
 
-  if (chainId === SUPPORTED_CHAINID.BERACHAIN) {
+  if (chainId === SUPPORTED_CHAINID.BSC_TESTNET) {
     switch (type) {
       case ExplorerDataType.TRANSACTION:
-        return `https://berascan.com/tx/${data}`
+        return `https://testnet.bscscan.com/tx/${data}`
       case ExplorerDataType.ADDRESS:
       case ExplorerDataType.TOKEN:
-        return `https://berascan.com/address/${data}`
+        return `https://testnet.bscscan.com/address/${data}`
       case ExplorerDataType.BLOCK:
-        return `https://berascan.com/block/${data}`
+        return `https://testnet.bscscan.com/block/${data}`
       default:
-        return `https://berascan.com/`
+        return `https://testnet.bscscan.com/`
     }
   }
 

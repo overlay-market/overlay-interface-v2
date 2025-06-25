@@ -30,11 +30,7 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
                 Name={decodeURIComponent(market?.marketId ?? "")}
                 Value={formatPriceWithCurrency(
                   market?.price ?? 0,
-                  market?.priceCurrency ?? "",
-                  Number(market?.price) > 10000 &&
-                    Number(market?.price) < 1000000
-                    ? 5
-                    : 4
+                  market?.priceCurrency ?? ""
                 )}
                 Id={market?.marketId ?? ""}
               />
@@ -53,8 +49,7 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
                 Name={decodeURIComponent(market?.marketId ?? "")}
                 Value={formatPriceWithCurrency(
                   market?.price ?? 0,
-                  market?.priceCurrency ?? "",
-                  Number(market?.price) > 100 ? 5 : 4
+                  market?.priceCurrency ?? ""
                 )}
                 Id={market?.marketId ?? ""}
               />
