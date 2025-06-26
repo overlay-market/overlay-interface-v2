@@ -66,7 +66,11 @@ const TradeWidget: React.FC = () => {
     setLoading(false);
 
     const fetchTradeState = async () => {
-      if (!debouncedTypedValue || debouncedTypedValue === "") {
+      if (
+        !debouncedTypedValue ||
+        debouncedTypedValue === "" ||
+        Number(debouncedTypedValue) === 0
+      ) {
         setTradeState(undefined);
         return;
       }
