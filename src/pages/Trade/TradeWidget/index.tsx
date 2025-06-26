@@ -57,11 +57,15 @@ const TradeWidget: React.FC = () => {
   }, [debouncedSelectedLeverage]);
 
   useEffect(() => {
-    let isCancelled = false; // Flag to track if the effect should be cancelled
+    let isCancelled = false;
     setLoading(false);
 
     const fetchTradeState = async () => {
-      if (!debouncedTypedValue || debouncedTypedValue === "") {
+      if (
+        !debouncedTypedValue ||
+        debouncedTypedValue === "" ||
+        Number(debouncedTypedValue) === 0
+      ) {
         setTradeState(undefined);
         return;
       }
@@ -94,7 +98,6 @@ const TradeWidget: React.FC = () => {
 
     fetchTradeState();
 
-    // Cleanup function to cancel the fetch if conditions change
     return () => {
       isCancelled = true;
     };
