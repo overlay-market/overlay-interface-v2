@@ -9,8 +9,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ExtendedUserData,
   LeaderboardPointsData,
-  PrevWeekDetails,
-  SessionDetails,
   UserData,
   UserReferralData,
 } from "./types";
@@ -96,7 +94,11 @@ const Leaderboard: React.FC = () => {
     };
   }, [account, triggerRefetchReferralData, userReferralData]);
 
-  const hasJoinedReferralCampaign = useMemo(() => {
+  const hasJoinedReferralCampaign: boolean | undefined = useMemo(() => {
+    if (status === "connecting" || fetchingReferralsData) {
+      return undefined;
+    }
+
     if (!account || !userReferralData) {
       return false;
     }
@@ -105,7 +107,13 @@ const Leaderboard: React.FC = () => {
       userReferralData.referredByAffiliate !== null ||
       userReferralData.myReferralCode !== null
     );
-  }, [account, userReferralData, triggerRefetchReferralData]);
+  }, [
+    account,
+    userReferralData,
+    triggerRefetchReferralData,
+    status,
+    fetchingReferralsData,
+  ]);
 
   useEffect(() => {
     if (referralCodeFromURL && !hasJoinedReferralCampaign) {
@@ -117,7 +125,7 @@ const Leaderboard: React.FC = () => {
     const fetchData = async () => {
       const data = await fetchPointsData(
         INITIAL_NUMBER_OF_ROWS,
-        account,
+        undefined,
         setFetchingPointsData
       );
       setPointsData(data);
@@ -126,24 +134,6 @@ const Leaderboard: React.FC = () => {
     fetchData();
   }, []);
 
-  const prevWeekDetails = useMemo<PrevWeekDetails | undefined>(() => {
-    if (pointsData) {
-      return pointsData.previousWeekDetails;
-    }
-  }, [pointsData]);
-
-  const sessionDetails = useMemo<SessionDetails | undefined>(() => {
-    if (pointsData) {
-      return pointsData.sessionDetails;
-    }
-  }, [pointsData]);
-
-  const initialUserData = useMemo<UserData | undefined>(() => {
-    if (pointsData) {
-      return pointsData.user;
-    }
-  }, [pointsData]);
-
   const ranks = useMemo<UserData[] | undefined>(() => {
     if (pointsData) {
       return pointsData.leaderboardTable;
@@ -151,41 +141,44 @@ const Leaderboard: React.FC = () => {
   }, [pointsData]);
 
   useEffect(() => {
-    const resolveUsername = async (user: ExtendedUserData) => {
-      const username = await getEnsName(user._id as Address);
-      const resolvedUser = {
-        ...user,
-        username: username ?? undefined,
-      };
+    let isCancelled = false;
 
-      setCurrentUserData(resolvedUser);
-    };
-
-    const fetchUserData = async () => {
-      const data = await fetchPointsData(0, account, setFetchingPointsData);
-      if (data && data.user) {
-        const user = {
-          ...data.user,
-          username: undefined,
-        };
-        resolveUsername(user);
+    const resolveUsername = async (user: UserData) => {
+      try {
+        const username = await getEnsName(user._id as Address);
+        if (!isCancelled && username) {
+          setCurrentUserData({
+            ...user,
+            username,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to resolve ENS:", err);
       }
     };
 
-    if (account && initialUserData !== undefined) {
-      const user = {
-        ...initialUserData,
-        username: undefined,
+    if (account && userReferralData) {
+      const userDataFromReferral: UserData = {
+        _id: userReferralData.walletAddress,
+        totalPoints: userReferralData.sessionTotalPoints,
+        previousRunPoints: userReferralData.previousRunPoints,
+        rank: userReferralData.rank,
       };
-      resolveUsername(user);
-    }
-    if (account && pointsData && initialUserData === undefined) {
-      fetchUserData();
-    }
-    if (!account) {
+
+      setCurrentUserData({
+        ...userDataFromReferral,
+        username: undefined,
+      });
+
+      resolveUsername(userDataFromReferral);
+    } else {
       setCurrentUserData(undefined);
     }
-  }, [account, pointsData, initialUserData]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [account, userReferralData]);
 
   const loadMoreData = async () => {
     if (loading || !hasMore) return;
@@ -326,28 +319,29 @@ const Leaderboard: React.FC = () => {
           gap={"12px"}
         >
           <UserPointsSection
-            userPoints={currentUserData?.totalPoints}
+            userPoints={userReferralData?.sessionTotalPoints}
             isLoading={fetchingPointsData || status === "connecting"}
           />
           <PointsUpdateSection
             pointsUpdatedAt={
-              sessionDetails?.sessionLastUpdated || prevWeekDetails?.sessionEnd
+              userReferralData?.sessionLastUpdated ||
+              pointsData?.sessionDetails?.sessionLastUpdated
             }
           />
         </Flex>
 
-        {fetchingReferralsData || status === "connecting" ? (
-          <Skeleton
-            width={{ initial: "100%", sm: "260px" }}
-            height="50px"
-            style={{ borderRadius: "32px" }}
-          />
-        ) : (
+        {hasJoinedReferralCampaign !== undefined ? (
           <ReferralSection
             hasJoinedReferralCampaign={hasJoinedReferralCampaign}
             userData={userReferralData}
             setOpenReferralModal={setOpenReferralModal}
             triggerRefetch={setTriggerRefetchReferralData}
+          />
+        ) : (
+          <Skeleton
+            width={{ initial: "100%", sm: "360px" }}
+            height="50px"
+            style={{ borderRadius: "32px" }}
           />
         )}
 
@@ -355,7 +349,7 @@ const Leaderboard: React.FC = () => {
           ranks={ranks}
           currentUserData={currentUserData}
           userBonusInfo={userBonusInfo}
-          hasJoinedReferralCampaign={hasJoinedReferralCampaign}
+          hasJoinedReferralCampaign={Boolean(hasJoinedReferralCampaign)}
         />
 
         {loading && (

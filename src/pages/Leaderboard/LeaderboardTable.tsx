@@ -66,7 +66,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               weight={"400"}
               width={isMobile ? "36px" : "60px"}
             >
-              {currentUserData?.rank ?? "N/A"}
+              {currentUserData?.rank ?? <Loader />}
             </StyledCell>
             <StyledCell
               textalign="left"
@@ -91,11 +91,11 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 
             {!isMobile && isMultipleSessions && (
               <StyledCell textalign="right">
-                {currentUserData?.previousRunPoints ?? "0"}
+                {currentUserData?.previousRunPoints ?? <Loader />}
               </StyledCell>
             )}
             <StyledCell textalign="right">
-              {currentUserData?.totalPoints ?? "0"}
+              {currentUserData?.totalPoints ?? <Loader />}
             </StyledCell>
           </CurrentUserRankingRow>
           <BgRow></BgRow>

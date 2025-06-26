@@ -3,7 +3,7 @@ import { SUPPORTED_CHAINID } from "../../constants/chains";
 import Loader from "../Loader";
 import NumberSpring from "../NumberSpring";
 import theme from "../../theme";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../hooks/useAccount";
@@ -16,11 +16,14 @@ const TokenBalance: React.FC = () => {
   const isNewTxnHash = useIsNewTxnHash();
   const [ovlBalance, setOvlBalance] = useState<number | undefined>(undefined);
 
+  const sdkRef = useRef(sdk)
+  useEffect(() => { sdkRef.current = sdk }, [sdk])
+
   useEffect(() => {
     const fetchBalance = async () => {
       if (account) {
         try {
-          const ovlBalance = await sdk.ovl.balance(account, 8);
+          const ovlBalance = await sdkRef.current.ovl.balance(account, 8);
           ovlBalance && setOvlBalance(Number(ovlBalance));
         } catch (error) {
           console.error("Error fetching ovlBalance:", error);
@@ -29,7 +32,7 @@ const TokenBalance: React.FC = () => {
     };
 
     fetchBalance();
-  }, [chainId, account, sdk, isNewTxnHash]);
+  }, [chainId, account, isNewTxnHash]);
 
   return (
     <Text
