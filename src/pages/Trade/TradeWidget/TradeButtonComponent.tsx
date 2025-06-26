@@ -148,8 +148,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
 
     try {
-      const result = await sdk.ovl.approve({
-        to: market?.id as Address,
+      const result = await sdk.shiva.approveShiva({
+        account: address,
         amount: maxUint256,
       });
 
