@@ -10,7 +10,7 @@ import PositionSelectComponent from "./PositionSelectComponent";
 import CollateralInputComponent from "./CollateralInputComponent";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Address } from "viem";
 import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
 import { useSearchParams } from "react-router-dom";
@@ -46,6 +46,11 @@ const TradeWidget: React.FC = () => {
   const debouncedSelectedLeverage = useDebounce(leverageInputValue, 500);
   const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
 
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
   useEffect(() => {
     setDisplayedLeverage(selectedLeverage);
   }, [selectedLeverage]);
@@ -74,7 +79,7 @@ const TradeWidget: React.FC = () => {
         setLoading(true);
 
         try {
-          const tradeState = await sdk.trade.getTradeState(
+          const tradeState = await sdkRef.current.trade.getTradeState(
             marketId,
             toWei(debouncedTypedValue),
             toWei(selectedLeverage),
@@ -113,22 +118,25 @@ const TradeWidget: React.FC = () => {
   ]);
 
   useEffect(() => {
+    if (!market?.id) return;
+
     const fetchCapLeverage = async () => {
-      if (market) {
-        try {
-          const capLeverage = await sdk.market.getCapLeverage(
-            market.id as Address
+      try {
+        const capLeverage = await sdkRef.current.market.getCapLeverage(
+          market.id as Address
+        );
+        const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
+        parsedCapLeverage &&
+          setCapleverage((prev) =>
+            prev === parsedCapLeverage ? prev : parsedCapLeverage
           );
-          const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
-          parsedCapLeverage && setCapleverage(parsedCapLeverage);
-        } catch (error) {
-          console.error("Error fetching capLeverage:", error);
-        }
+      } catch (error) {
+        console.error("Error fetching capLeverage:", error);
       }
     };
 
     fetchCapLeverage();
-  }, [market]);
+  }, [market?.id]);
 
   const handleLeverageInput = (newValue: number[]) => {
     const stringValue = newValue[0].toString();
