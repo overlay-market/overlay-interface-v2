@@ -11,6 +11,7 @@ import {
   GradientSolidButton,
 } from "../../../components/Button";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
+import { formatNumberForDisplay } from "../../../utils/formatNumberForDisplay";
 
 type ConfirnTxnModalProps = {
   open: boolean;
@@ -112,7 +113,9 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
       <Flex mt={"48px"} direction={"column"} width={"100%"}>
         <DetailRow
           detail={"Estimated Collateral"}
-          value={`${tradeState.estimatedCollateral} OVL`}
+          value={`${formatNumberForDisplay(
+            tradeState.estimatedCollateral
+          )} OVL`}
         />
         <DetailRow detail={"Estimated OI"} value={expectedOi} />
       </Flex>
