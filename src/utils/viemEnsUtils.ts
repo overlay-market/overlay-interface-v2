@@ -25,13 +25,23 @@ const useGetClient = (): PublicClient => {
   return sdk.core.chainId as number === SUPPORTED_CHAINID.MAINNET ? sdk.core.rpcProvider : publicClient;
 };
 
+const ensNameCache = new Map<Address, string | null>();
 
 export const useGetEnsName = (): GetEnsNameFunction => {
   const client = useGetClient();
 
   const getEnsName: GetEnsNameFunction = async (address) => {
-    const name = await client.getEnsName({ address });
-    return name;
+    if (ensNameCache.has(address)) {
+      return ensNameCache.get(address)!;
+    }
+    try {
+      const name = await client.getEnsName({ address });
+      ensNameCache.set(address, name ?? null);
+      return name;
+    } catch (err) {
+      console.error(`Failed to resolve ENS name for ${address}:`, err);
+      return null;
+    }  
   };
 
   return getEnsName;

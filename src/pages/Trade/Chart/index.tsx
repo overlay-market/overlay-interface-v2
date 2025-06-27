@@ -281,6 +281,20 @@ const Chart: React.FC = () => {
             if (symbolInfo === null) {
               return null;
             }
+            const marketFormattingPrice = [
+              "BTC / USD",
+              "ETH / USD",
+              "Magnus Carlsen",
+              "Hikaru Nakamura",
+            ];
+            const marketName = market?.marketName || "";
+            if (marketFormattingPrice.some((name) => marketName === name)) {
+              return {
+                format: (price) => {
+                  return Math.round(price).toLocaleString("en-US");
+                },
+              };
+            }
             if (symbolInfo.format === "volume") {
               return {
                 format: (price) => {
@@ -307,7 +321,7 @@ const Chart: React.FC = () => {
                 },
               };
             }
-            return null;
+            return null; // The default formatter will be used.
           },
         },
       };
