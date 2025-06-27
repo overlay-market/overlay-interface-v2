@@ -102,7 +102,7 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
       </Flex>
 
       <Flex mt={"48px"} direction={"column"} width={"100%"}>
-        <DetailRow detail={"Fee"} value={tradeState.tradingFeeRate} />
+        <DetailRow detail={"Fee"} value={`${tradeState.tradingFeeRate}%`} />
         <DetailRow detail={"Slippage"} value={`${slippageValue}%`} />
         <DetailRow
           detail={"Est. Liquidation"}
