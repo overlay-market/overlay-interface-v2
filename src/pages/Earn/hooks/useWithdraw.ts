@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { useWithdrawWithGuardAndERC4626 } from './useWithdrawWithGuardAndERC4626';
-import { getVaultType, VaultType } from '../utils/getVaultType';
+import { getVaultConfig, VaultConfig } from '../utils/getVaultConfig';
+import { useWithdrawWithIchiAndErc4626 } from './useWithdrawWithIchiAndErc4626';
+import { useWithdrawWithIchiAndMR } from './useWithdrawWithIchiAndMR';
 
 interface WithdrawParams {
   vaultId: number;
@@ -17,17 +18,24 @@ interface WithdrawResult {
 export const useWithdraw = (params: WithdrawParams): WithdrawResult => {
   const { vaultId, typedAmount, setTypedAmount } = params;
 
-  const vaultType = useMemo(() => getVaultType(vaultId), [vaultId]); 
+  const vaultConfig = useMemo(() => getVaultConfig(vaultId), [vaultId]); 
 
-  const withdrawWithGuardAndERC4626 = useWithdrawWithGuardAndERC4626({
+  const withdrawWithIchiAndErc4626 = useWithdrawWithIchiAndErc4626({
     vaultId,
     typedAmount,
     setTypedAmount,
   });  
 
-  const allHooks: Record<VaultType, WithdrawResult> = {
-    vaultWithGuardAndERC4626: withdrawWithGuardAndERC4626,
+  const withdrawWithIchiAndMR = useWithdrawWithIchiAndMR({
+    vaultId,
+    typedAmount,
+    setTypedAmount,
+  });
+
+  const allHooks: Record<VaultConfig, WithdrawResult> = {
+    ichiPlusErc4626: withdrawWithIchiAndErc4626,
+    ichiPlusMR: withdrawWithIchiAndMR,
   };
 
-  return allHooks[vaultType];
+  return allHooks[vaultConfig];
 };
