@@ -7,6 +7,7 @@ import { Address } from "viem";
 export enum TOKENS {
   USDC = 'USDC', 
   OVL = 'OVL',
+  BNB = 'BNB',
   BGT = 'BGT',
   ICHI = 'LP_ICHI',
   yBGT = 'yBGT'
@@ -15,13 +16,25 @@ export enum TOKENS {
 export const TOKEN_LOGOS: Partial<{ [key in TOKENS]: string }> = {
   [TOKENS.USDC]: USDCToken,
   [TOKENS.OVL]: OVLToken,
+  [TOKENS.BNB]: OVLToken,
   [TOKENS.BGT]: BGTToken,
   [TOKENS.yBGT]: BGTToken,
 }
 
-export const DEFAULT_TOKEN_LOGO = BGTToken
+export const DEFAULT_TOKEN_LOGO = OVLToken
 
 export const BERA_VAULTS_SUBGRAPH_URL = 'https://api.studio.thegraph.com/query/88584/berachain-v2-kodiak/version/latest'
+
+export const VOLATILITY_THRESHOLD = 100;
+export const VOLATILITY_CHECK_ADDRESS = '0x2454e75749322d59278Bca48cBD96DD62274359b';
+
+// export const ICHIVaultDepositGuard: {
+//   depositGuardAddress: Address;
+//   vaultDeployerAddress: Address;
+// } = {
+//   depositGuardAddress: `0x2174154294729e593001CBF0232fb787a914b232`,
+//   vaultDeployerAddress: `0x05cC3CA6E768a68A7f86b09e3ceE754437bd5f12`,
+// }
 
 export const ICHIVaultDepositGuard: {
   depositGuardAddress: Address;
@@ -63,80 +76,70 @@ export const VAULT_ITEMS: VaultItem[] = [
       }
     ]
   },
-  {
-    id: 3,
-    vaultType: VaultItemType.ICHI,
-    vaultAddress: '0x3efF586Be3a907D8dEC40178eb35215215F58Af7',
-    rewardTokens: [
-      {
-        rewardTokenName: TOKENS.ICHI,
-        rewardTokenAddress: `0x3efF586Be3a907D8dEC40178eb35215215F58Af7`,
-      }
-    ]
-  },
-  {
-    id: 4,
-    vaultType: VaultItemType.ICHI,
-    vaultAddress: '0x2c6be3eaa0b4fb479b031ac58b1c4c338d5c908b',
-    rewardTokens: [
-      {
-        rewardTokenName: TOKENS.ICHI,
-        rewardTokenAddress: `0x2c6be3eaa0b4fb479b031ac58b1c4c338d5c908b`,
-      }
-    ]
-  },
-  {
-    id: 5,
-    vaultType: VaultItemType.MR_DUAL,
-    vaultAddress: '0xb9F539d43C894bd335405e2430303594d014356A',
-    rewardTokens: [
-      {
-        rewardTokenName: TOKENS.BGT,
-        rewardTokenAddress: `0x6969696969696969696969696969696969696969`,
-      },
-      {
-        rewardTokenName: TOKENS.OVL,
-        rewardTokenAddress: `0x6969696969696969696969696969696969696969`,
-      }
-    ]
-  },
-  {
-    id: 6,
-    vaultType: VaultItemType.ERC4626,
-    vaultAddress: '0xC95079cC2972562A1d72Cfcf02Ed9d819147Fde6',
-    rewardTokens: [
-      {
-        rewardTokenName: TOKENS.yBGT,
-        rewardTokenAddress: `0x7e768f47dfdd5dae874aac233f1bc5817137e453`,
-      },
-    ],
-  },
+ // {
+  //   id: 1,
+  //   vaultType: VaultItemType.ICHI,
+  //   vaultAddress: '0xeB184FD678854dE991FFF9a715A42eB933b9170E',
+  //   rewardTokens: [
+  //     {
+  //       rewardTokenName: TOKENS.ICHI,
+  //       rewardTokenAddress: `0xeB184FD678854dE991FFF9a715A42eB933b9170E`,
+  //     }
+  //   ]
+  // },
+  // {
+  //   id: 2,
+  //   vaultType: VaultItemType.MR_SINGLE,
+  //   vaultAddress: '0xb9F539d43C894bd335405e2430303594d014356A',
+  //   rewardTokens: [
+  //     {
+  //       rewardTokenName: TOKENS.OVL,
+  //       rewardTokenAddress: `0x6969696969696969696969696969696969696969`,
+  //     }
+  //   ]
+  // },
+  // {
+  //   id: 3,
+  //   vaultType: VaultItemType.MR_SINGLE,
+  //   vaultAddress: '0xb9F539d43C894bd335405e2430303594d014356A',
+  //   rewardTokens: [
+  //     {
+  //       rewardTokenName: TOKENS.BNB,
+  //       rewardTokenAddress: `0x6969696969696969696969696969696969696969`,
+  //     }
+  //   ]
+  // },
+  // {
+  //   id: 4,
+  //   vaultType: VaultItemType.ICHI,
+  //   vaultAddress: '0xdf097f374107bfa24f8ab6011fb1b8c599b70bf7',
+  //   rewardTokens: [
+  //     {
+  //       rewardTokenName: TOKENS.ICHI,
+  //       rewardTokenAddress: `0xdf097f374107bfa24f8ab6011fb1b8c599b70bf7`,
+  //     }
+  //   ]
+  // },
 ]
      
 export const VAULTS: StaticVaultData[] = [
-  {
-    id: 1,
-    vaultName: 'WBERA-HENLO Vault',
-    combinationType: [VaultItemType.ICHI, VaultItemType.MR_SINGLE],
-    vaultItems: [1, 2]   
-  },
-  {
-    id: 2,
-    vaultName: 'WBERA-HONEY Vault',
-    combinationType: [VaultItemType.ICHI, VaultItemType.MR_SINGLE],
-    vaultItems: [3, 2]   
-  },
+  // {
+  //   id: 1,
+  //   vaultName: 'OVL Vault',
+  //   combinationType: [VaultItemType.ICHI, VaultItemType.MR_SINGLE],
+  //   vaultItems: [4, 2]   
+  // },
+  // {
+  //   id: 2,
+  //   vaultName: 'BNB Vault',
+  //   combinationType: [VaultItemType.ICHI, VaultItemType.MR_SINGLE],
+  //   vaultItems: [1, 3]   
+  // },
   {
     id: 3,
     vaultName: 'BERA-OVL Vault',
     combinationType: [VaultItemType.ICHI, VaultItemType.MR_DUAL],
-    vaultItems: [4, 5]   
-  },
-  {
-    id: 4,
-    vaultName: 'ICHI + ERC4626 Vault',
-    combinationType: [VaultItemType.ICHI, VaultItemType.ERC4626],
-    vaultItems: [3, 6]   
+    vaultItems: [1, 2]   
   },
 ]
 
