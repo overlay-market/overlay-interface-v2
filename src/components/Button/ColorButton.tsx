@@ -15,6 +15,7 @@ export const ColorButton = styled.button<ColorButtonProps>`
   cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
   height: 42px;
   font-size: 14px;
+  font-family: "Inter", sans-serif;
   font-weight: 700;
   border-radius: 8px;
   border: none;
