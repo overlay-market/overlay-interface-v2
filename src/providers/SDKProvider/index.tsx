@@ -19,6 +19,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         [SUPPORTED_CHAINID.BSC_TESTNET]: import.meta.env.VITE_BSC_TESTNET_RPC,
       },
       web3Provider: walletClient as any,
+      useShiva: true,
     });
   }, [chainId, walletClient]);
 

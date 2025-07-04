@@ -2,7 +2,6 @@ import { Dialog, Flex, Text } from "@radix-ui/themes";
 import { useState } from "react";
 import { OpenPositionData, SDKError } from "overlay-sdk";
 import useAccount from "../../hooks/useAccount";
-import useSDK from "../../hooks/useSDK";
 import theme from "../../theme";
 import { ColorButton } from "../Button/ColorButton";
 import { useAddPopup } from "../../state/application/hooks";
@@ -10,6 +9,7 @@ import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { TransactionResult } from "overlay-sdk/dist/core/types";
+import useSDK from "../../providers/SDKProvider/useSDK";
 
 type ClosePositionsModalProps = {
   open: boolean;

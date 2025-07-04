@@ -1,7 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -19,6 +19,7 @@ import { ExpandedMarketData } from "overlay-sdk";
 import { StyledFlex, TradeContainer } from "./trade-styles";
 import SuggestedCards from "./SuggestedCards";
 import { DEFAULT_MARKET } from "../../constants/applications";
+import { deepEqual } from "../../utils/equalityUtils";
 
 const Trade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,28 +38,42 @@ const Trade: React.FC = () => {
     undefined
   );
 
+  const sdkRef = useRef(sdk);
   useEffect(() => {
-    if (!marketParam) {
-      setSearchParams({ market: DEFAULT_MARKET });
-    }
-  }, [marketParam, setSearchParams]);
+    sdkRef.current = sdk;
+  }, [sdk]);
 
   useEffect(() => {
+    if (!marketParam) {
+      setSearchParams({ market: DEFAULT_MARKET }, { replace: true });
+    }
+  }, [marketParam]);
+
+  useEffect(() => {
+    let isFetching = false;
+
     const fetchActiveMarkets = async () => {
-      if (marketParam) {
-        try {
-          const activeMarkets = await sdk.markets.getActiveMarkets();
-          activeMarkets && setMarkets(activeMarkets);
-        } catch (error) {
-          console.error("Error fetching markets:", error);
-        }
+      if (!sdkRef.current.markets.getActiveMarkets || isFetching) return;
+      isFetching = true;
+      try {
+        const activeMarkets = await sdkRef.current.markets.getActiveMarkets();
+        activeMarkets &&
+          setMarkets((prev) =>
+            deepEqual(prev, activeMarkets) ? prev : activeMarkets
+          );
+      } catch (error) {
+        console.error("Error fetching markets:", error);
+      } finally {
+        isFetching = false;
       }
     };
 
     fetchActiveMarkets();
-  }, [chainId, marketParam]);
+  }, [chainId]);
 
   useEffect(() => {
+    if (!markets || !marketParam) return;
+
     if (markets && marketParam) {
       const normalizedMarketParam =
         decodeURIComponent(marketParam).toLowerCase();
@@ -77,13 +92,13 @@ const Trade: React.FC = () => {
         navigate(`/trade?market=${encodedMarket}`, { replace: true });
       }
     }
-  }, [marketParam, chainId, markets]);
+  }, [marketParam, markets]);
 
   useEffect(() => {
     if (markets) {
       handleMarketsUpdate(markets);
     }
-  }, [chainId, markets]);
+  }, [markets]);
 
   useEffect(() => {
     handleTradeStateReset();
