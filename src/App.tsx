@@ -18,6 +18,7 @@ import Earn from "./pages/Earn";
 import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import Stake from "./pages/Earn/StakePage";
 import VaultsProvider from "./providers/VaultsProvider";
+import { VolatilityModalProvider } from "./providers/VolatilityModalProvider";
 import Leaderboard from "./pages/Leaderboard";
 import Faucet from "./pages/Faucet";
 
@@ -30,7 +31,9 @@ const earnRoutes = (
 
 const VaultsProviderWrapper = () => (
   <VaultsProvider>
-    <Routes>{earnRoutes}</Routes>
+    <VolatilityModalProvider>
+      <Routes>{earnRoutes}</Routes>
+    </VolatilityModalProvider>
   </VaultsProvider>
 );
 
