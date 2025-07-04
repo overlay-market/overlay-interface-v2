@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { getVaultType, VaultType } from '../utils/getVaultType';
-import { useStakeWithGuardAndERC4626 } from './useStakeWithGuardAndERC4626';
+import { getVaultConfig, VaultConfig } from '../utils/getVaultConfig';
+import { useStakeWithIchiAndErc4626 } from './useStakeWithIchiAndErc4626';
+import { useStakeWithIchiAndMR } from './useStakeWithIchiAndMR';
 
 interface StakeParams {
   vaultId: number;
@@ -17,17 +18,24 @@ export interface StakeResult {
 export const useStake = (params: StakeParams): StakeResult => {
   const { vaultId, typedAmount, setTypedAmount } = params;
 
-  const vaultType = useMemo(() => getVaultType(vaultId), [vaultId]);
+  const vaultConfig = useMemo(() => getVaultConfig(vaultId), [vaultId]);
 
-  const stakeWithGuardAndERC4626 = useStakeWithGuardAndERC4626({
+  const stakeWithIchiAndErc4626 = useStakeWithIchiAndErc4626({
     vaultId,
     typedAmount,
     setTypedAmount,
   });  
 
-  const allHooks: Record<VaultType, StakeResult> = {
-    vaultWithGuardAndERC4626: stakeWithGuardAndERC4626,
+  const stakeWithIchiAndMR = useStakeWithIchiAndMR({
+    vaultId,
+    typedAmount,
+    setTypedAmount,
+  });
+
+  const allHooks: Record<VaultConfig, StakeResult> = {
+    ichiPlusErc4626: stakeWithIchiAndErc4626,
+    ichiPlusMR: stakeWithIchiAndMR,
   };
 
-  return allHooks[vaultType];
+  return allHooks[vaultConfig];
 };
