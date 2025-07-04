@@ -46,7 +46,11 @@ export const TitleText = styled(Text)`
   font-size: 18px;
   font-weight: 600;
   line-height: 21px;
-  -webkit-text-stroke: 0.5px  rgba(0, 0, 0, 0.5);
+  text-shadow: 
+    -0.5px -0.5px 0 rgba(0, 0, 0, 0.2), 
+    0.5px -0.5px 0 rgba(0, 0, 0, 0.2), 
+    -0.5px  0.5px 0 rgba(0, 0, 0, 0.2), 
+    0.5px  0.5px 0 rgba(0, 0, 0, 0.2);
 
   @media (min-width: ${theme.breakpoints.sm}) {
     font-size: 24px;

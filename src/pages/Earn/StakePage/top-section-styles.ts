@@ -32,5 +32,9 @@ export const TitleText = styled(Text)`
   font-size: 24px;
   font-weight: 600;
   line-height: 29px;
-  -webkit-text-stroke: 0.5px  rgba(0, 0, 0, 0.5);
+  text-shadow: 
+    -0.5px -0.5px 0 rgba(0, 0, 0, 0.2), 
+    0.5px -0.5px 0 rgba(0, 0, 0, 0.2), 
+    -0.5px  0.5px 0 rgba(0, 0, 0, 0.2), 
+    0.5px  0.5px 0 rgba(0, 0, 0, 0.2);
 `;
