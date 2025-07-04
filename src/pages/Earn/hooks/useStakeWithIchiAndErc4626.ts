@@ -13,17 +13,17 @@ import { getERC4626VaultItemByVaultId, getIchiVaultItemByVaultId } from "../util
 import { StakeResult } from "./useStake";
 import { ERC4626ABI } from "../abi/ERC4626ABI";
 
-type UseStakeWithGuardAndERC4626Props = {
+type UseStakeWithIchiAndErc4626Props = {
   vaultId: number;
   typedAmount: string;
   setTypedAmount: (val: string) => void;
 };
 
-export const useStakeWithGuardAndERC4626 = ({
+export const useStakeWithIchiAndErc4626 = ({
   vaultId,
   typedAmount,
   setTypedAmount,
-}: UseStakeWithGuardAndERC4626Props): StakeResult => {
+}: UseStakeWithIchiAndErc4626Props): StakeResult => {
   const ichiVaultAddress =
     getIchiVaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;
   const ERC4626VaultAddress = getERC4626VaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;  

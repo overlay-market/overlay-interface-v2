@@ -11,17 +11,17 @@ import { getERC4626VaultItemByVaultId, getIchiVaultItemByVaultId } from "../util
 import { ERC4626ABI } from "../abi/ERC4626ABI";
 import { useQueryClient } from "@tanstack/react-query";
 
-type UseWithdrawWithGuardAndERC4626Props = {
+type UseWithdrawWithIchiAndErc4626Props = {
   vaultId: number;
   typedAmount: string;
   setTypedAmount: (val: string) => void;
 };
 
-export const useWithdrawWithGuardAndERC4626 = ({
+export const useWithdrawWithIchiAndErc4626 = ({
   vaultId,
   typedAmount,
   setTypedAmount,
-}: UseWithdrawWithGuardAndERC4626Props) => {
+}: UseWithdrawWithIchiAndErc4626Props) => {
   const ichiVaultAddress =
     getIchiVaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;
   const ERC4626VaultAddress = getERC4626VaultItemByVaultId(vaultId)?.vaultAddress ?? zeroAddress;  
