@@ -1,7 +1,7 @@
 import { gql, request } from "graphql-request";
 import { useEffect, useMemo, useState } from "react";
 import { FetchedIchiVaultData } from "../../../types/vaultTypes";
-import { BERA_VAULTS_SUBGRAPH_URL, VAULT_ITEMS, VaultItemType } from "../../../constants/vaults";
+import { ICHI_VAULTS_SUBGRAPH_URL, VAULT_ITEMS, VaultItemType } from "../../../constants/vaults";
 
 const document = gql`
  query MyQuery($vaultId: String!) {
@@ -30,7 +30,7 @@ export const useFetchIchiVaultsData = () => {
           VAULT_ITEMS.filter(vault => vault.vaultType === VaultItemType.ICHI).map(async (vault) => {
             try {
               const data: { ichiVault: Omit<FetchedIchiVaultData, "id"> } = await request(
-                BERA_VAULTS_SUBGRAPH_URL,
+                ICHI_VAULTS_SUBGRAPH_URL,
                 document,
                 { vaultId: vault.vaultAddress.toLowerCase() }
               );

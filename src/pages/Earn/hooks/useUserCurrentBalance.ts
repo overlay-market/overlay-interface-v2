@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { gql, request } from "graphql-request";
-import { BERA_VAULTS_SUBGRAPH_URL } from "../../../constants/vaults";
+import { ICHI_VAULTS_SUBGRAPH_URL } from "../../../constants/vaults";
 import { Address, formatUnits, parseUnits, zeroAddress } from "viem";
 import { getTokenSymbol } from "../utils/getTokenSymbol";
 import { getTokenPrice } from "../utils/getTokenPrice";
@@ -67,7 +67,7 @@ export const useUserCurrentBalance = (vaultId: number) => {
           }>;
         } | null;
       }>(
-        BERA_VAULTS_SUBGRAPH_URL,
+        ICHI_VAULTS_SUBGRAPH_URL,
         document,
         { userId: account.toLowerCase(),
           vaultId: vaultItemAddress.toLowerCase() 
