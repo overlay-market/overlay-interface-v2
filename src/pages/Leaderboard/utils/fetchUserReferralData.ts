@@ -5,13 +5,14 @@ import { UserReferralData } from "../types";
 export const fetchUserReferralData = async (
   account: Address,
   setFetchingReferralsData: (value: boolean) => void,
+  sessionId?: string,
 ): Promise<UserReferralData | undefined> => {
   setFetchingReferralsData(true);
   
   try {
     const response = await fetch(
       REFERRAL_API_BASE_URL +
-        `/sessions/current/trader/${account}`
+        `/sessions/${sessionId ?? "current"}/trader/${account}`
     );
 
     const data = await response.json();
