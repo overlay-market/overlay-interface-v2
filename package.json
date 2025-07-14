@@ -37,6 +37,7 @@
     "redux-localstorage-simple": "^2.5.1",
     "styled-components": "^6.1.13",
     "swiper": "^11.1.14",
+    "bs58": "^5.0.0",
     "viem": "^2.23.0",
     "wagmi": "^2.12.16"
   },
