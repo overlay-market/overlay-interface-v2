@@ -33,6 +33,9 @@ const Leaderboard: React.FC = () => {
   const referralCodeFromURL = searchParams.get("referrer");
   const getEnsName = useGetEnsName();
 
+  const [sessionId, setSessionId] = useState<
+    string | undefined
+  >(undefined);
   const [pointsData, setPointsData] = useState<
     LeaderboardPointsData | undefined
   >(undefined);
@@ -61,13 +64,14 @@ const Leaderboard: React.FC = () => {
 
       const data = await fetchUserReferralData(
         account,
-        setFetchingReferralsData
+        setFetchingReferralsData,
+        sessionId
       );
       setUserReferralData(data);
     };
 
     fetchReferralData();
-  }, [account]);
+  }, [account, sessionId]);
 
   useEffect(() => {
     const fetchReferralData = async () => {
@@ -75,14 +79,15 @@ const Leaderboard: React.FC = () => {
 
       const data = await fetchUserReferralData(
         account,
-        setFetchingReferralsData
+        setFetchingReferralsData,
+        sessionId
       );
       setUserReferralData(data);
       setTriggerRefetchReferralData(false);
     };
 
     fetchReferralData();
-  }, [triggerRefetchReferralData, account]);
+  }, [triggerRefetchReferralData, account, sessionId]);
 
   const userBonusInfo = useMemo(() => {
     if (!userReferralData) return;
@@ -128,6 +133,12 @@ const Leaderboard: React.FC = () => {
         undefined,
         setFetchingPointsData
       );
+
+      if (data) {
+        if (data.sessionDetails && new Date(data.sessionDetails.sessionEnd) < new Date()) {
+          setSessionId(data.sessionDetails.sessionId)
+        }
+      }
       setPointsData(data);
     };
 
@@ -193,6 +204,10 @@ const Leaderboard: React.FC = () => {
     if (data) {
       setPointsData(data);
       setLoadedNumberOfRows((prev) => prev + ROWS_PER_LOAD);
+
+      if (data.sessionDetails && new Date(data.sessionDetails.sessionEnd) < new Date()) {
+        setSessionId(data.sessionDetails.sessionId)
+      }
     }
 
     if (data && data.leaderboardTable.length >= data.totalUsers) {

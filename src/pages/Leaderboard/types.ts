@@ -7,6 +7,7 @@ export interface PrevWeekDetails {
 }
 
 export interface SessionDetails {
+  sessionId: string
   sessionStart: string
   sessionEnd: string
   sessionLastUpdated: string
