@@ -1,9 +1,11 @@
 import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectLeverage, selectPositionSide, setSlippage, typeInput, updateTxnHash } from "./actions";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setSlippage, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
+import { TokenAmount } from "@lifi/sdk";
+import { serializeWithBigInt } from "../../utils/serializeWithBigInt";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
@@ -19,6 +21,8 @@ export const useTradeActionHandlers = (): {
   handlePositionSideSelect: (isLong: boolean) => void;
   handleSlippageSet: (slippageValue: DefaultTxnSettings | string) => void;
   handleTxnHashUpdate: (txnHash: string, txnBlockNumber: number) => void;
+  handleChainSelect: (selectedChainId: number) => void;
+  handleTokenSelect: (selectedToken: TokenAmount) => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -62,6 +66,22 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   )
 
+  const handleChainSelect = useCallback(
+    (selectedChainId: number) => {
+      dispatch(selectChain({ selectedChainId }));
+      localStorage.setItem('lifiSelectedChainId', selectedChainId.toString());
+    },
+    [dispatch]
+  );
+
+  const handleTokenSelect = useCallback(
+    (selectedToken: TokenAmount) => {
+      dispatch(selectToken({ selectedToken }));
+      localStorage.setItem('lifiSelectedToken', serializeWithBigInt(selectedToken));
+    },
+    [dispatch]
+  );
+
   const handleTxnHashUpdate =  useCallback(
     async (txnHash: string, txnBlockNumber: number) => {
       const checkSubgraphBlock = async () => {
@@ -91,6 +111,8 @@ export const useTradeActionHandlers = (): {
     handleLeverageSelect,
     handlePositionSideSelect,
     handleSlippageSet,
+    handleChainSelect,
+    handleTokenSelect,
     handleTxnHashUpdate,
     handleTradeStateReset,
   }
