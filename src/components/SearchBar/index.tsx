@@ -4,15 +4,19 @@ import {
   SearchContainer,
   SearchIcon,
   SearchInput,
-} from "./search-item-styles";
+} from "./search-bar-styles";
 
-type SearchItemProps = {
+type SearchBarProps = {
   searchTerm: string;
+  placeholder: string;
+  bgcolor?: string;
   setSearchTerm: Function;
 };
 
-const SearchItem: React.FC<SearchItemProps> = ({
+const SearchBar: React.FC<SearchBarProps> = ({
   searchTerm,
+  placeholder,
+  bgcolor,
   setSearchTerm,
 }) => {
   return (
@@ -20,10 +24,10 @@ const SearchItem: React.FC<SearchItemProps> = ({
       <SearchIcon />
       <SearchInput
         type="text"
-        placeholder="Search market..."
+        placeholder={placeholder}
         value={searchTerm}
+        $bgcolor={bgcolor}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="search-input"
       />
       {searchTerm && (
         <ClearButton
@@ -43,4 +47,4 @@ const SearchItem: React.FC<SearchItemProps> = ({
   );
 };
 
-export default SearchItem;
+export default SearchBar;
