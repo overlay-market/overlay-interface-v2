@@ -21,17 +21,26 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
   } = content;
 
   let errorMessage: string | undefined;
-  let errorDetails: string | undefined;
+
+  const extractMainErrorMessage = (message: string) => {
+    if (!message) return "An unknown error occurred.";
+
+    const firstLine = message.split("\n").find((line) => line.trim() !== "");
+    const detailsMatch = message.match(/Details:\s*(.+)/);
+
+    if (firstLine && !firstLine.toLowerCase().startsWith("request arguments")) {
+      return firstLine.trim();
+    }
+
+    if (detailsMatch) {
+      return detailsMatch[1].trim();
+    }
+
+    return "An error occurred during the transaction.";
+  };
 
   if (!success) {
-    switch (type) {
-      case 4001:
-        errorMessage = "Transaction Rejected";
-        break;
-      default:
-        errorMessage = "Transaction Failed";
-        errorDetails = message;
-    }
+    errorMessage = extractMainErrorMessage(message);
   }
 
   return (
@@ -44,20 +53,24 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
         )}
       </Box>
       <Flex direction={"column"} align={"start"} mr={"16px"} ml={"12px"}>
-        <Text weight={"bold"}>
-          {type === TransactionType.APPROVAL && "Spending Limit Approved"}
-          {type === TransactionType.BUILD_OVL_POSITION &&
-            "Position Successfully Built"}
-          {type === TransactionType.UNWIND_OVL_POSITION && "Unwind Successful"}
-          {type === TransactionType.LIQUIDATE_OVL_POSITION &&
-            "Liquidation Successful"}
-          {type === TransactionType.BRIDGE_OVL && "Bridge Successful"}
-          {type === TransactionType.CLAIM_OVL && "Claim Successful"}
-
-          {errorMessage}
-        </Text>
-
-        {errorDetails && <Text>{errorDetails}</Text>}
+        {success ? (
+          <Text weight={"bold"}>
+            {type === TransactionType.APPROVAL && "Spending Limit Approved"}
+            {type === TransactionType.BUILD_OVL_POSITION &&
+              "Position Successfully Built"}
+            {type === TransactionType.UNWIND_OVL_POSITION &&
+              "Unwind Successful"}
+            {type === TransactionType.LIQUIDATE_OVL_POSITION &&
+              "Liquidation Successful"}
+            {type === TransactionType.CLAIM_REWARDS &&
+              "Claim Rewards Successful"}
+            {type === TransactionType.STAKE_OVL && "Tokens staked successfully"}
+            {type === TransactionType.WITHDRAW_OVL &&
+              "Tokens withdrawn successfully"}
+          </Text>
+        ) : (
+          <Text weight={"bold"}>{errorMessage}</Text>
+        )}
 
         {chainId && hash && success && (
           <ExternalLink

@@ -5,16 +5,16 @@ import styled from "styled-components";
 export const TradeHeaderContainer = styled(Flex)`
   flex-direction: column;
   position: relative;
-  margin-left: -12px;
-  margin-right: -12px;
-  width: calc(100% + 24px);
+  margin-left: -${theme.app.mobilePadding};
+  margin-right: -${theme.app.mobilePadding};
+  width: calc(100% + 2 * ${theme.app.mobilePadding});
   border-top: 1px solid ${theme.color.darkBlue};
   border-bottom: 1px solid ${theme.color.darkBlue};
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: calc(100% + 20px);
+    width: calc(100% + ${theme.app.rightPadding});
     margin-left: 0;
-    margin-right: -20px;
+    margin-right: -${theme.app.rightPadding};
     border-top: none;
   }
   
@@ -23,9 +23,10 @@ export const TradeHeaderContainer = styled(Flex)`
   }
 
   @media (min-width: ${theme.breakpoints.xxl}) {
-    margin-left: -16px;
-    padding-left: 16px;
-    width: calc(100% + 20px + 16px);
+    margin-left: -${theme.app.xxlPadding};
+    margin-right: 0;
+    padding-left: ${theme.app.xxlPadding};
+    width: calc(100% + 2 * ${theme.app.xxlPadding});
   }
 `;
 

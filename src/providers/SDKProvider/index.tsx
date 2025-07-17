@@ -1,4 +1,3 @@
-// context/SDKContext.tsx
 import React, { useMemo } from "react";
 import { OverlaySDK } from "overlay-sdk";
 import { useConnectorClient } from "wagmi";

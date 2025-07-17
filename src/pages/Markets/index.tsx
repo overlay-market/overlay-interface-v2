@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { MarketsContainer } from "./markets-styles";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
@@ -40,25 +41,28 @@ const Markets: React.FC = () => {
   }, [chainId]);
 
   return (
-    <Flex direction="column" width={"100%"} overflowX={"hidden"}>
+    <MarketsContainer direction="column">
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
-      <div
-        onClick={() => (window.location.href = "/faucet")}
-        style={{
-          display: window.innerWidth <= 768 ? "none" : "block",
-          cursor: "pointer",
-        }}
-      >
-        <img
-          src="/images/torch-trading-campaign.webp"
-          style={{ width: "100%" }}
-          alt="Trading Campaign Banner"
-        />
-      </div>
-      <FirstSection marketsData={marketsData} />
-      <Carousel marketsData={marketsData} />
-      <MarketsTable marketsData={marketsData} />
-    </Flex>
+
+      <Flex direction="column">
+        <div
+          onClick={() => (window.location.href = "/faucet")}
+          style={{
+            display: window.innerWidth <= 768 ? "none" : "block",
+            cursor: "pointer",
+          }}
+        >
+          <img
+            src="/images/torch-trading-campaign.webp"
+            style={{ width: "100%" }}
+            alt="Trading Campaign Banner"
+          />
+        </div>
+        <FirstSection marketsData={marketsData} />
+        <Carousel marketsData={marketsData} />
+        <MarketsTable marketsData={marketsData} />
+      </Flex>
+    </MarketsContainer>
   );
 };
 

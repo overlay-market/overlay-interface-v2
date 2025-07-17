@@ -1,6 +1,10 @@
 import { Flex, Skeleton, Text } from "@radix-ui/themes";
 import theme from "../../theme";
-import { LineSeparator } from "./leaderboard-styles";
+import {
+  LeaderboardContainer,
+  LeaderboardContent,
+  LineSeparator,
+} from "./leaderboard-styles";
 import UserPointsSection from "./UserPointsSection";
 import LeaderboardTable from "./LeaderboardTable";
 import PointsUpdateSection from "./PointsUpdateSection";
@@ -251,7 +255,7 @@ const Leaderboard: React.FC = () => {
   }, [hasMore, loadedNumberOfRows]);
 
   return (
-    <Flex width={"100%"} height={"100%"} direction={"column"}>
+    <LeaderboardContainer width={"100%"} height={"100%"} direction={"column"}>
       <Flex
         display={{ initial: "none", sm: "flex" }}
         align={"center"}
@@ -319,7 +323,7 @@ const Leaderboard: React.FC = () => {
         </Flex>
       )}
 
-      <Flex
+      <LeaderboardContent
         direction={"column"}
         gap={{ initial: "24px", sm: "28px", md: "32px" }}
         pt={"16px"}
@@ -378,7 +382,7 @@ const Leaderboard: React.FC = () => {
           </Flex>
         )}
         <Flex ref={observerRef} width={"10px"} height={"10px"} />
-      </Flex>
+      </LeaderboardContent>
 
       {openReferralModal && (
         <ReferralModal
@@ -389,7 +393,7 @@ const Leaderboard: React.FC = () => {
           handleDismiss={() => setOpenReferralModal(false)}
         />
       )}
-    </Flex>
+    </LeaderboardContainer>
   );
 };
 

@@ -1,12 +1,12 @@
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
-import SetSlippageModal from "../../../components/SetSlippageModal";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useEffect, useMemo, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
 import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import { TradeSlippageModal } from "../../../components/SlippageModal";
 
 type MainTradeDetailsProps = {
   tradeState?: TradeStateData;
@@ -68,7 +68,7 @@ const MainTradeDetails: React.FC<MainTradeDetailsProps> = ({ tradeState }) => {
       <Flex justify={"between"} height={"17px"}>
         <Flex gap={"8px"} align={"center"}>
           <Text style={{ color: theme.color.grey3 }}>Worst Price</Text>
-          <SetSlippageModal />
+          <TradeSlippageModal />
         </Flex>
         <Text style={{ color: theme.color.blue1 }}>{currencyMinPrice}</Text>
       </Flex>
