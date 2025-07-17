@@ -7,11 +7,18 @@ export type GetChainById = (
   chains?: ExtendedChain[]
 ) => ExtendedChain | undefined
 
-const useChains = (chainTypes?: ChainType[]) => {
+const supportedChainTypes = [
+  ChainType.EVM,
+  // ChainType.SVM,
+  // ChainType.UTXO,
+  // ChainType.MVM,
+];
+
+const useChains = () => {
   const { data, isLoading } = useQuery<ExtendedChain[]>({
-    queryKey: ['availableChains', chainTypes],
+    queryKey: ['availableChains'],
     queryFn: async () => {
-      const availableChains = await getChains({ chainTypes });
+      const availableChains = await getChains({ chainTypes:supportedChainTypes });
       return availableChains;
     },
     staleTime: 3_600_000,  

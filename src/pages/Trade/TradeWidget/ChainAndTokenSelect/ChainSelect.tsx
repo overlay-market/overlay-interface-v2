@@ -17,14 +17,7 @@ const ChainSelect: React.FC<ChainSelectProps> = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { handleChainSelect } = useTradeActionHandlers();
 
-  const supportedChainTypes = [
-    ChainType.EVM,
-    // ChainType.SVM,
-    // ChainType.UTXO,
-    // ChainType.MVM,
-  ];
-
-  const { chains, isLoading } = useChains(supportedChainTypes);
+  const { chains, isLoading } = useChains();
 
   const filteredChains = useMemo(() => {
     return chains?.filter((chain) =>

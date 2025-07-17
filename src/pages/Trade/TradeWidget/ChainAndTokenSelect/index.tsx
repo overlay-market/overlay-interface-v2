@@ -17,15 +17,7 @@ const ChainAndTokenSelect: React.FC = () => {
   const [loadingChain, setLoadingChain] = useState<boolean>(true);
   const { selectedChainId, selectedToken } = useTradeState();
 
-  const supportedChainTypes = [
-    ChainType.EVM,
-    // ChainType.SVM,
-    // ChainType.UTXO,
-    // ChainType.MVM,
-  ];
-
-  const { getChainById, isLoading: chainsLoading } =
-    useChains(supportedChainTypes);
+  const { getChainById, isLoading: chainsLoading } = useChains();
 
   useEffect(() => {
     let isMounted = true;
