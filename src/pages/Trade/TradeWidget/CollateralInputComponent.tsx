@@ -11,6 +11,8 @@ import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { toWei } from "overlay-sdk";
+import { WidgetDrawer } from "@lifi/widget";
+import ExchangeLiFiWidget from "./ExchangeLiFiWidget";
 
 const CollateralInputComponent: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -28,6 +30,12 @@ const CollateralInputComponent: React.FC = () => {
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
+
+  const drawerRef = useRef<WidgetDrawer>(null);
+
+  const toggleWidget = () => {
+    drawerRef.current?.toggleDrawer();
+  };
 
   useEffect(() => {
     const fetchMaxInputIncludingFees = async () => {
@@ -99,6 +107,23 @@ const CollateralInputComponent: React.FC = () => {
             Max: {maxInputIncludingFees} OVL
           </Text>
         </Flex>
+
+        {address && (
+          <Flex justify={"end"} mb={"-16px"}>
+            <Text
+              size={"1"}
+              my={"-16px"}
+              style={{
+                cursor: "pointer",
+                color: theme.color.blue2,
+              }}
+              onClick={toggleWidget}
+            >
+              Exchange on LI.FI
+            </Text>
+          </Flex>
+        )}
+
         <Flex justify="between">
           <NumericalInput
             value={typedValue}
@@ -109,6 +134,8 @@ const CollateralInputComponent: React.FC = () => {
           </Text>
         </Flex>
       </Flex>
+
+      <ExchangeLiFiWidget ref={drawerRef} />
     </Box>
   );
 };
