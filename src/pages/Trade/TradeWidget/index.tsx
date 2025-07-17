@@ -20,6 +20,7 @@ import Slider from "../../../components/Slider";
 import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
+import ChainAndTokenSelect from "./ChainAndTokenSelect";
 
 const TradeWidget: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -167,6 +168,7 @@ const TradeWidget: React.FC = () => {
         handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
       />
 
+      <ChainAndTokenSelect />
       <CollateralInputComponent />
       <TradeButtonComponent loading={loading} tradeState={tradeState} />
       <button
