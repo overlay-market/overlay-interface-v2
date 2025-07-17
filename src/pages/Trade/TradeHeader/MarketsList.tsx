@@ -19,7 +19,7 @@ import {
 } from "../../../constants/markets";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
-import SearchItem from "./SearchItem";
+import SearchBar from "../../../components/SearchBar";
 
 const MarketsList: React.FC = () => {
   const { markets } = useMarketsState();
@@ -96,8 +96,9 @@ const MarketsList: React.FC = () => {
         <DropdownContainer>
           <StyledScrollArea>
             <Flex direction="column" align={"center"}>
-              <SearchItem
+              <SearchBar
                 searchTerm={searchTerm}
+                placeholder={"Search market..."}
                 setSearchTerm={setSearchTerm}
               />
               {filteredMarkets && filteredMarkets.length > 0 ? (
