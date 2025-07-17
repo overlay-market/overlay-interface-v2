@@ -16,6 +16,7 @@ import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
 import Faucet from "./pages/Faucet";
+import { LiFiProvider } from "./providers/LiFiProvider";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -26,26 +27,28 @@ const App = () => {
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
       <SDKProvider>
-        <Theme>
-          <AppContainer>
-            <Trackers.WalletConnectionTracker />
-            <ScrollToTop />
-            <Popups />
-            <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
-              <NavBar />
-              <Wallet />
-              <Routes>
-                <Route path="/" element={<Navigate to="/markets" />} />
-                <Route path="/markets" element={<Markets />} />
-                <Route path="/trade" element={<Trade />} />
-                <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/faucet" element={<Faucet />} />
-                <Route path="*" element={<Navigate to="/markets" />} />
-              </Routes>
-            </Flex>
-          </AppContainer>
-        </Theme>
+        <LiFiProvider>
+          <Theme>
+            <AppContainer>
+              <Trackers.WalletConnectionTracker />
+              <ScrollToTop />
+              <Popups />
+              <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
+                <NavBar />
+                <Wallet />
+                <Routes>
+                  <Route path="/" element={<Navigate to="/markets" />} />
+                  <Route path="/markets" element={<Markets />} />
+                  <Route path="/trade" element={<Trade />} />
+                  <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/leaderboard" element={<Leaderboard />} />
+                  <Route path="/faucet" element={<Faucet />} />
+                  <Route path="*" element={<Navigate to="/markets" />} />
+                </Routes>
+              </Flex>
+            </AppContainer>
+          </Theme>
+        </LiFiProvider>
       </SDKProvider>
     </MultichainContextProvider>
   );
