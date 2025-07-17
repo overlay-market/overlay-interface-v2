@@ -1,0 +1,69 @@
+import styled from "styled-components";
+import { Flex } from "@radix-ui/themes";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import theme from "../../theme";
+
+export const SearchContainer = styled(Flex)`
+  position: relative;
+  width: 100%;
+  height: 49px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 8px;
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    padding: 12px 8px 12px 16px;
+  }
+`;
+
+export const SearchIcon = styled(MagnifyingGlassIcon)`
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: ${theme.color.grey3};
+  z-index:5;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    left: 24px;
+  }
+`
+
+export const SearchInput = styled.input<{ $bgcolor?: string }>`
+  width: 100%;
+  padding: 8px 28px;  
+  border-radius: 6px;
+  border: 1px solid ${({ $bgcolor }) => $bgcolor || theme.color.grey4};  
+  background: ${({ $bgcolor }) => $bgcolor || theme.color.grey4}; 
+  opacity: 0.7;
+  color: #ddd; 
+  font-size: 14px;
+  outline: none;
+    
+  &:focus {
+    opacity: 1;
+  }
+
+  &::placeholder {
+    color: #777;
+  }
+`;
+
+export const ClearButton = styled.div`
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  color: ${theme.color.grey3};
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.color.blue1};
+  }
+`
