@@ -1,12 +1,23 @@
-import { ChainType, ExtendedChain } from "@lifi/sdk";
+import { ExtendedChain } from "@lifi/sdk";
 import useChains from "../../../../hooks/lifi/useChains";
 import { Avatar, Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../../../theme";
 import { useEffect, useMemo, useState } from "react";
 import ChainSelect from "./ChainSelect";
-import { useTradeState } from "../../../../state/trade/hooks";
-import { DEFAULT_CHAIN_LOGO, DEFAULT_NET } from "../../../../constants/chains";
+import {
+  useSelectStateManager,
+  useTradeActionHandlers,
+  useTradeState,
+} from "../../../../state/trade/hooks";
+import {
+  DEFAULT_CHAIN_LOGO,
+  DEFAULT_CHAINID,
+  DEFAULT_NET,
+} from "../../../../constants/chains";
 import TokenSelect from "./TokenSelect";
+import { StyledResetIcon } from "./chain-and-token-select-styles";
+import { SelectState } from "../../../../types/selectChainAndTokenTypes";
+import * as Tooltip from "@radix-ui/react-tooltip";
 
 const ChainAndTokenSelect: React.FC = () => {
   const [showChainSelect, setShowChainSelect] = useState(false);
@@ -15,9 +26,12 @@ const ChainAndTokenSelect: React.FC = () => {
     ExtendedChain | undefined
   >();
   const [loadingChain, setLoadingChain] = useState<boolean>(true);
-  const { selectedChainId, selectedToken } = useTradeState();
-
+  const { selectedChainId, selectedToken, chainState, tokenState } =
+    useTradeState();
+  const { handleChainSelect } = useTradeActionHandlers();
   const { getChainById, isLoading: chainsLoading } = useChains();
+
+  useSelectStateManager(selectedChain);
 
   useEffect(() => {
     let isMounted = true;
@@ -41,14 +55,14 @@ const ChainAndTokenSelect: React.FC = () => {
     };
   }, [selectedChainId, chainsLoading, getChainById]);
 
-  const handleChainSelect = () => {
+  const handleChainToggle = () => {
     setShowChainSelect((prev) => {
       if (!prev) setShowTokenSelect(false);
       return !prev;
     });
   };
 
-  const handleTokenSelect = () => {
+  const handleTokenToggle = () => {
     setShowTokenSelect((prev) => {
       if (!prev) setShowChainSelect(false);
       return !prev;
@@ -65,13 +79,22 @@ const ChainAndTokenSelect: React.FC = () => {
     return selectedChain?.name || DEFAULT_NET;
   }, [loadingChain, selectedChain, chainsLoading]);
 
-  console.log({
-    selectedChainId,
-    selectedChain,
-    loadingChain,
-    chainAvatarSrc,
-    chainName,
-  });
+  const showResetIcon = useMemo(() => {
+    if (
+      chainState === SelectState.SELECTED ||
+      tokenState === SelectState.SELECTED
+    )
+      return true;
+
+    return false;
+  }, [chainState, tokenState]);
+
+  const handleResetIconClick = () => {
+    setShowChainSelect(false);
+    setShowTokenSelect(false);
+    handleChainSelect(DEFAULT_CHAINID as number);
+  };
+
   return (
     <Box style={{ position: "relative", width: "100%" }}>
       <Box
@@ -93,6 +116,27 @@ const ChainAndTokenSelect: React.FC = () => {
                 ? "token"
                 : "collateral"}
             </Text>
+
+            {showResetIcon && (
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger asChild>
+                    <StyledResetIcon onClick={handleResetIconClick} />
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    style={{
+                      backgroundColor: theme.color.background,
+                      color: theme.color.green2,
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Reset to default CHAIN / TOKEN
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+            )}
           </Flex>
 
           <Flex justify="between">
@@ -101,7 +145,7 @@ const ChainAndTokenSelect: React.FC = () => {
               align={"center"}
               gap={"1"}
               style={{ cursor: "pointer" }}
-              onClick={handleChainSelect}
+              onClick={handleChainToggle}
             >
               <Avatar radius="full" fallback="" src={chainAvatarSrc} />
               <Text
@@ -118,7 +162,7 @@ const ChainAndTokenSelect: React.FC = () => {
               align={"center"}
               gap={"1"}
               style={{ cursor: "pointer" }}
-              onClick={handleTokenSelect}
+              onClick={handleTokenToggle}
             >
               <Avatar
                 radius="full"

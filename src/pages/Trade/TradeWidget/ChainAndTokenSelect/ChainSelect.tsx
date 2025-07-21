@@ -1,4 +1,3 @@
-import { ChainType } from "@lifi/sdk";
 import useChains from "../../../../hooks/lifi/useChains";
 import { Avatar, Box, Flex } from "@radix-ui/themes";
 import theme from "../../../../theme";

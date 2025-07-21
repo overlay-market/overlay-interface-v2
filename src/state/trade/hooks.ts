@@ -146,14 +146,6 @@ export const useIsNewTxnHash = (): boolean => {
   return txnHash !== '' && txnHash !== previousTxnHash
 }
 
-export const useChainState = (): SelectState => {
-  return useAppSelector((state) => state.trade.chainState);
-};
-
-export const useTokenState = (): SelectState => {
-  return useAppSelector((state) => state.trade.tokenState);
-};
-
 export const useSelectStateManager = (selectedChain: ExtendedChain | undefined) => {
   const dispatch = useAppDispatch();
   const { selectedChainId, selectedToken, chainState, tokenState } = useAppSelector((state) => state.trade);
