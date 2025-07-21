@@ -1,59 +1,27 @@
-import { ExtendedChain } from "@lifi/sdk";
-import useChains from "../../../../hooks/lifi/useChains";
-import { Avatar, Box, Flex, Text } from "@radix-ui/themes";
+import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../../../theme";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ChainSelect from "./ChainSelect";
 import {
   useSelectStateManager,
   useTradeActionHandlers,
   useTradeState,
 } from "../../../../state/trade/hooks";
-import {
-  DEFAULT_CHAIN_LOGO,
-  DEFAULT_CHAINID,
-  DEFAULT_NET,
-} from "../../../../constants/chains";
+import { DEFAULT_CHAINID } from "../../../../constants/chains";
 import TokenSelect from "./TokenSelect";
 import { StyledResetIcon } from "./chain-and-token-select-styles";
 import { SelectState } from "../../../../types/selectChainAndTokenTypes";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import ChainDisplay from "./ChainDisplay";
+import TokenDisplay from "./TokenDisplay";
 
 const ChainAndTokenSelect: React.FC = () => {
   const [showChainSelect, setShowChainSelect] = useState(false);
   const [showTokenSelect, setShowTokenSelect] = useState(false);
-  const [selectedChain, setSelectedChain] = useState<
-    ExtendedChain | undefined
-  >();
-  const [loadingChain, setLoadingChain] = useState<boolean>(true);
-  const { selectedChainId, selectedToken, chainState, tokenState } =
-    useTradeState();
+  const { chainState, tokenState } = useTradeState();
   const { handleChainSelect } = useTradeActionHandlers();
-  const { getChainById, isLoading: chainsLoading } = useChains();
 
-  useSelectStateManager(selectedChain);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    setSelectedChain(undefined);
-    setLoadingChain(true);
-
-    if (!selectedChainId || chainsLoading) {
-      return;
-    }
-
-    const chain = getChainById(selectedChainId);
-
-    if (isMounted) {
-      setSelectedChain(chain);
-      setLoadingChain(false);
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedChainId, chainsLoading, getChainById]);
+  useSelectStateManager();
 
   const handleChainToggle = () => {
     setShowChainSelect((prev) => {
@@ -68,16 +36,6 @@ const ChainAndTokenSelect: React.FC = () => {
       return !prev;
     });
   };
-
-  const chainAvatarSrc = useMemo(() => {
-    if (loadingChain || chainsLoading) return "";
-    return selectedChain?.logoURI || DEFAULT_CHAIN_LOGO;
-  }, [loadingChain, chainsLoading, selectedChain]);
-
-  const chainName = useMemo(() => {
-    if (loadingChain || chainsLoading) return "";
-    return selectedChain?.name || DEFAULT_NET;
-  }, [loadingChain, selectedChain, chainsLoading]);
 
   const showResetIcon = useMemo(() => {
     if (
@@ -140,43 +98,8 @@ const ChainAndTokenSelect: React.FC = () => {
           </Flex>
 
           <Flex justify="between">
-            <Flex
-              justify={"center"}
-              align={"center"}
-              gap={"1"}
-              style={{ cursor: "pointer" }}
-              onClick={handleChainToggle}
-            >
-              <Avatar radius="full" fallback="" src={chainAvatarSrc} />
-              <Text
-                size="2"
-                weight={"medium"}
-                style={{ color: theme.color.blue1 }}
-              >
-                {chainName}
-              </Text>
-            </Flex>
-
-            <Flex
-              justify={"center"}
-              align={"center"}
-              gap={"1"}
-              style={{ cursor: "pointer" }}
-              onClick={handleTokenToggle}
-            >
-              <Avatar
-                radius="full"
-                fallback=""
-                src={selectedToken?.logoURI || ""}
-              />
-              <Text
-                size="3"
-                weight={"bold"}
-                style={{ color: theme.color.blue1 }}
-              >
-                {selectedToken?.symbol}
-              </Text>
-            </Flex>
+            <ChainDisplay onClick={handleChainToggle} />
+            <TokenDisplay onClick={handleTokenToggle} />
           </Flex>
         </Flex>
       </Box>
