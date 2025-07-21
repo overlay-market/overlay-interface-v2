@@ -4,11 +4,13 @@ import { AppState } from "../state";
 import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import { ExtendedChain, TokenAmount } from "@lifi/sdk";
+import {  TokenAmount } from "@lifi/sdk";
 import { serializeWithBigInt } from "../../utils/serializeWithBigInt";
 import { SelectState } from "../../types/selectChainAndTokenTypes";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import { DEFAULT_CHAINID } from "../../constants/chains";
+import { useSelectedChain } from "../../hooks/lifi/useSelectedChain";
+import { useAccount } from "wagmi";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
@@ -146,14 +148,21 @@ export const useIsNewTxnHash = (): boolean => {
   return txnHash !== '' && txnHash !== previousTxnHash
 }
 
-export const useSelectStateManager = (selectedChain: ExtendedChain | undefined) => {
+export const useSelectStateManager = () => {
   const dispatch = useAppDispatch();
   const { selectedChainId, selectedToken, chainState, tokenState } = useAppSelector((state) => state.trade);
   const { ovlBalance, isLoading } = useOvlTokenBalance();
+  const { selectedChain, loadingChain } = useSelectedChain();
+  const { address: account } = useAccount();
 
   // Effect to manage chain state
   useEffect(() => {
-    if (!ovlBalance || isLoading) return;
+    if (account === undefined) {
+    dispatch(setChainState({ chainState: SelectState.EMPTY }));
+    return;
+  }
+
+    if (!ovlBalance || isLoading || loadingChain) return;
 
     if (selectedChainId === DEFAULT_CHAINID && ovlBalance > 0) {
       dispatch(setChainState({ chainState: SelectState.DEFAULT }));
@@ -164,19 +173,23 @@ export const useSelectStateManager = (selectedChain: ExtendedChain | undefined) 
     if (selectedChainId !== DEFAULT_CHAINID && selectedChain !== undefined && selectedChain.id === selectedChainId) {
       dispatch(setChainState({ chainState: SelectState.SELECTED }));
     }
-  }, [selectedChainId, chainState, dispatch, ovlBalance, selectedChain, isLoading]);
+  }, [selectedChainId, chainState, dispatch, ovlBalance, selectedChain, isLoading, loadingChain, account]);
 
   // Effect to manage token state
   useEffect(() => {
+    if (account === undefined) {
+    dispatch(setTokenState({ tokenState: SelectState.EMPTY }));
+    return;
+  }
     if (chainState === SelectState.DEFAULT) {
       dispatch(setTokenState({ tokenState: SelectState.DEFAULT }));
       return;
     }
-    if (selectedToken.chainId !== selectedChainId ) {
+    if (selectedToken.chainId !== selectedChainId) {
       dispatch(setTokenState({ tokenState: SelectState.EMPTY }));
     }
     if (selectedToken.chainId === selectedChainId && chainState === SelectState.SELECTED) {
       dispatch(setTokenState({ tokenState: SelectState.SELECTED }));
     }
-  }, [selectedToken, tokenState, dispatch, selectedChainId, chainState]);
+  }, [selectedToken, tokenState, dispatch, selectedChainId, chainState, account]);
 };
