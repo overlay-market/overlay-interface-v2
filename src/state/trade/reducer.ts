@@ -8,13 +8,16 @@ import {
   selectChain,
   updateTxnHash,
   resetTradeState,
-  selectToken
+  selectToken,
+  setChainState,
+  setTokenState
 } from "./actions";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { getFromLocalStorage } from "../../utils/getFromLocalStorage";
 import { TokenAmount } from "@lifi/sdk";
 import { deserializeWithBigInt } from "../../utils/serializeWithBigInt";
 import { DEFAULT_TOKEN } from "../../constants/applications";
+import { SelectState } from "../../types/selectChainAndTokenTypes";
 
 export interface TradeState {
   readonly typedValue: string;
@@ -25,6 +28,8 @@ export interface TradeState {
   readonly selectedToken: TokenAmount;
   readonly txnHash: string;
   readonly previousTxnHash: string;
+  readonly chainState: SelectState;
+  readonly tokenState: SelectState;
 }
 
 export const initialState: TradeState = {
@@ -40,6 +45,8 @@ export const initialState: TradeState = {
   ),
   txnHash: '',
   previousTxnHash: '',
+  chainState: SelectState.LOADING,
+  tokenState: SelectState.LOADING,
 };
 
 export default createReducer<TradeState>(initialState, (builder) =>
@@ -61,6 +68,12 @@ export default createReducer<TradeState>(initialState, (builder) =>
     })
     .addCase(selectToken, (state, action) => {
       state.selectedToken = action.payload.selectedToken;
+    })
+    .addCase(setChainState, (state, action) => {
+      state.chainState = action.payload.chainState;
+    })
+    .addCase(setTokenState, (state, action) => {
+      state.tokenState = action.payload.tokenState;
     })
     .addCase(updateTxnHash, (state, action) => {
       state.previousTxnHash = state.txnHash;

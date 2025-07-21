@@ -1,11 +1,14 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setSlippage, typeInput, updateTxnHash } from "./actions";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import { TokenAmount } from "@lifi/sdk";
+import { ExtendedChain, TokenAmount } from "@lifi/sdk";
 import { serializeWithBigInt } from "../../utils/serializeWithBigInt";
+import { SelectState } from "../../types/selectChainAndTokenTypes";
+import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
+import { DEFAULT_CHAINID } from "../../constants/chains";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
@@ -23,6 +26,8 @@ export const useTradeActionHandlers = (): {
   handleTxnHashUpdate: (txnHash: string, txnBlockNumber: number) => void;
   handleChainSelect: (selectedChainId: number) => void;
   handleTokenSelect: (selectedToken: TokenAmount) => void;
+  handleChainStateChange: (chainState: SelectState) => void;
+  handleTokenStateChange: (tokenState: SelectState) => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -82,6 +87,20 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   );
 
+  const handleChainStateChange = useCallback(
+    (chainState: SelectState) => {
+      dispatch(setChainState({ chainState }));
+    },
+    [dispatch]
+  );
+
+  const handleTokenStateChange = useCallback(
+    (tokenState: SelectState) => {
+      dispatch(setTokenState({ tokenState }));
+    },
+    [dispatch]
+  );
+
   const handleTxnHashUpdate =  useCallback(
     async (txnHash: string, txnBlockNumber: number) => {
       const checkSubgraphBlock = async () => {
@@ -114,6 +133,8 @@ export const useTradeActionHandlers = (): {
     handleChainSelect,
     handleTokenSelect,
     handleTxnHashUpdate,
+    handleChainStateChange,
+    handleTokenStateChange,
     handleTradeStateReset,
   }
 };
@@ -124,3 +145,46 @@ export const useIsNewTxnHash = (): boolean => {
   
   return txnHash !== '' && txnHash !== previousTxnHash
 }
+
+export const useChainState = (): SelectState => {
+  return useAppSelector((state) => state.trade.chainState);
+};
+
+export const useTokenState = (): SelectState => {
+  return useAppSelector((state) => state.trade.tokenState);
+};
+
+export const useSelectStateManager = (selectedChain: ExtendedChain | undefined) => {
+  const dispatch = useAppDispatch();
+  const { selectedChainId, selectedToken, chainState, tokenState } = useAppSelector((state) => state.trade);
+  const { ovlBalance, isLoading } = useOvlTokenBalance();
+
+  // Effect to manage chain state
+  useEffect(() => {
+    if (!ovlBalance || isLoading) return;
+
+    if (selectedChainId === DEFAULT_CHAINID && ovlBalance > 0) {
+      dispatch(setChainState({ chainState: SelectState.DEFAULT }));
+    }
+    if (selectedChainId === DEFAULT_CHAINID && ovlBalance === 0) {
+      dispatch(setChainState({ chainState: SelectState.EMPTY }));
+    }
+    if (selectedChainId !== DEFAULT_CHAINID && selectedChain !== undefined && selectedChain.id === selectedChainId) {
+      dispatch(setChainState({ chainState: SelectState.SELECTED }));
+    }
+  }, [selectedChainId, chainState, dispatch, ovlBalance, selectedChain, isLoading]);
+
+  // Effect to manage token state
+  useEffect(() => {
+    if (chainState === SelectState.DEFAULT) {
+      dispatch(setTokenState({ tokenState: SelectState.DEFAULT }));
+      return;
+    }
+    if (selectedToken.chainId !== selectedChainId ) {
+      dispatch(setTokenState({ tokenState: SelectState.EMPTY }));
+    }
+    if (selectedToken.chainId === selectedChainId && chainState === SelectState.SELECTED) {
+      dispatch(setTokenState({ tokenState: SelectState.SELECTED }));
+    }
+  }, [selectedToken, tokenState, dispatch, selectedChainId, chainState]);
+};

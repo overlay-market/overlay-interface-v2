@@ -1,5 +1,6 @@
 import { TokenAmount } from "@lifi/sdk";
 import OVLToken from "../assets/images/token-logos/OVL-token.webp";
+import { DEFAULT_CHAINID } from "./chains";
 
 export enum MARKET_CHART_URL {
   SEPOLIA = "https://api.overlay.market/sepolia-charts/v1/charts",
@@ -31,6 +32,7 @@ export const DEFAULT_TOKEN = {
   amount: 0n,
   blockNumber: 0n,
   address: "",
+  chainId: DEFAULT_CHAINID,
   decimals: 18,
   symbol: DEFAULT_TOKEN_SYMBOL,
   logoURI: DEFAULT_TOKEN_LOGO,
