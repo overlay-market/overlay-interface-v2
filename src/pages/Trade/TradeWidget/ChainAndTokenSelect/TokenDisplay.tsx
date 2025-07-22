@@ -37,9 +37,13 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({ onClick }) => {
       )}
       {tokenState === SelectState.EMPTY && (
         <>
-          <Avatar radius="full" fallback="" />
+          <Avatar
+            radius="full"
+            fallback=""
+            style={{ background: theme.color.grey3, opacity: 0.3 }}
+          />
           <Text size="2" weight={"medium"} style={{ color: theme.color.grey3 }}>
-            Select token...
+            Select token
           </Text>
         </>
       )}
