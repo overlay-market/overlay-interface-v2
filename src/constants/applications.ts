@@ -38,3 +38,5 @@ export const DEFAULT_TOKEN = {
   logoURI: DEFAULT_TOKEN_LOGO,
   name: "Overlay",
 } as TokenAmount;
+
+export const OVL_USD_PRICE = 1.01;
