@@ -18,6 +18,8 @@ import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
 import { useArcxAnalytics } from "@0xarc-io/analytics";
+import { SelectState } from "../../../types/selectChainAndTokenTypes";
+import { useTradeWithLiFi } from "../../../hooks/lifi/useTradeWithLiFi";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -34,7 +36,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
-  const { typedValue, selectedLeverage, isLong } = useTradeState();
+  const { typedValue, selectedLeverage, isLong, chainState, tokenState } =
+    useTradeState();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const [{ showConfirm, attemptingTransaction }, setTradeConfig] = useState<{
@@ -45,7 +48,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     attemptingTransaction: false,
   });
   const [isApprovalPending, setIsApprovalPending] = useState<boolean>(false);
+  const { handleTradeWithLifi } = useTradeWithLiFi();
   const arcxAnalytics = useArcxAnalytics();
+
+  const isDefaultState =
+    chainState === SelectState.DEFAULT && tokenState === SelectState.DEFAULT;
+  const isSelectedState =
+    chainState === SelectState.SELECTED && tokenState === SelectState.SELECTED;
+
   const title: string | undefined = useMemo(() => {
     if (!tradeState) return undefined;
     return tradeState.tradeState;
@@ -226,7 +236,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
   }, [attemptingTransaction]);
 
-  return (
+  const renderDefaultState = () => (
     <>
       {loading && <GradientLoaderButton title={"Trade"} />}
 
@@ -274,13 +284,48 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             handleTrade={handleTrade}
           />
         )}
+    </>
+  );
 
-      {!address && (
+  const renderSelectedState = () => (
+    <>
+      {loading && <GradientLoaderButton title={"Processing..."} />}
+
+      {address && !loading && (
         <GradientOutlineButton
-          title={"Connect Wallet"}
+          title={"Trade with LiFi"}
           width={"100%"}
-          handleClick={openModal}
+          size={"16px"}
+          isDisabled={false}
+          handleClick={handleTradeWithLifi}
         />
+      )}
+    </>
+  );
+
+  return (
+    <>
+      {isDefaultState && renderDefaultState()}
+      {isSelectedState && renderSelectedState()}
+      {!isDefaultState && !isSelectedState && (
+        <>
+          {loading && <GradientLoaderButton title={"Trade"} />}
+
+          {!loading && address ? (
+            <GradientOutlineButton
+              title={"Select Chain and Token"}
+              width={"100%"}
+              isDisabled={true}
+              size={"14px"}
+            />
+          ) : (
+            <GradientOutlineButton
+              title={"Connect Wallet"}
+              width={"100%"}
+              handleClick={openModal}
+            />
+          )}
+        </>
       )}
     </>
   );
