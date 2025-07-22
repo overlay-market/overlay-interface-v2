@@ -7,29 +7,22 @@ import {
   useTradeState,
 } from "../../../state/trade/hooks";
 import { useSearchParams } from "react-router-dom";
-import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import { toWei } from "overlay-sdk";
 import { WidgetDrawer } from "@lifi/widget";
 import ExchangeLiFiWidget from "./ExchangeLiFiWidget";
+import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFees";
 
 const CollateralInputComponent: React.FC = () => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { address } = useAccount();
-  const { chainId } = useMultichainContext();
-  const sdk = useSDK();
-  const { typedValue, selectedLeverage } = useTradeState();
+  const { typedValue } = useTradeState();
   const { handleAmountInput } = useTradeActionHandlers();
+  const { maxInputIncludingFees, isLoading, error } = useMaxInputIncludingFees({
+    marketId,
+  });
 
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
-  const [maxInputIncludingFees, setMaxInputIncludingFees] = useState<number>(0);
-
-  const sdkRef = useRef(sdk);
-  useEffect(() => {
-    sdkRef.current = sdk;
-  }, [sdk]);
 
   const drawerRef = useRef<WidgetDrawer>(null);
 
@@ -37,45 +30,23 @@ const CollateralInputComponent: React.FC = () => {
     drawerRef.current?.toggleDrawer();
   };
 
-  useEffect(() => {
-    const fetchMaxInputIncludingFees = async () => {
-      if (marketId && address) {
-        try {
-          const maxInputIncludingFees =
-            await sdkRef.current.trade.getMaxInputIncludingFees(
-              marketId,
-              address,
-              toWei(selectedLeverage),
-              6
-            );
-          maxInputIncludingFees &&
-            setMaxInputIncludingFees(maxInputIncludingFees);
-        } catch (error) {
-          console.error("Error fetching maxInputIncludingFees:", error);
-        }
-      }
-      if (!address) {
-        setMaxInputIncludingFees(0);
-      }
-    };
-
-    fetchMaxInputIncludingFees();
-  }, [marketId, address, selectedLeverage, chainId]);
-
   const handleUserInput = useCallback(
     (input: string) => {
-      if (Number(input) !== maxInputIncludingFees) {
+      const inputValue = Number(input);
+      if (inputValue !== maxInputIncludingFees) {
         setIsMaxSelected(false);
       }
       handleAmountInput(input);
     },
-    [handleAmountInput, setIsMaxSelected, maxInputIncludingFees]
+    [handleAmountInput, maxInputIncludingFees]
   );
 
-  const handleMaxInput = () => {
-    setIsMaxSelected(true);
-    return handleUserInput(Number(maxInputIncludingFees).toFixed(6));
-  };
+  const handleMaxInput = useCallback(() => {
+    if (maxInputIncludingFees > 0) {
+      setIsMaxSelected(true);
+      handleUserInput(maxInputIncludingFees.toFixed(6));
+    }
+  }, [maxInputIncludingFees, handleUserInput]);
 
   // Update amount input when max selected and leverage is changed (thus maxInputIncludingFees changes)
   useEffect(() => {
@@ -97,15 +68,21 @@ const CollateralInputComponent: React.FC = () => {
           </Text>
           <Text
             size="1"
-            onClick={handleMaxInput}
+            onClick={maxInputIncludingFees > 0 ? handleMaxInput : undefined}
             style={{
               textDecoration: "underline",
-              cursor: "pointer",
+              cursor: maxInputIncludingFees > 0 ? "pointer" : "not-allowed",
               color: isMaxSelected ? theme.color.white : theme.color.grey3,
+              opacity: isLoading ? 0.6 : 1,
             }}
           >
-            Max: {maxInputIncludingFees} OVL
+            {isLoading ? "Loading..." : `Max: ${maxInputIncludingFees} OVL`}
           </Text>
+          {error && (
+            <Text size="1" style={{ color: theme.color.red1 }}>
+              Error loading max amount
+            </Text>
+          )}
         </Flex>
 
         {address && (
