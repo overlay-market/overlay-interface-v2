@@ -47,29 +47,12 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
                   id={market.marketId}
                   priceWithCurrency={formatPriceWithCurrency(
                     market.price ?? 0,
-                    market.priceCurrency,
-                    3
+                    market.priceCurrency
                   )}
                   title={decodeURIComponent(market.marketId)}
                 />
               </SwiperSlide>
             ))}
-          {marketsData.length < 11 &&
-            marketsData
-              .filter((market) => !EXCLUDEDMARKETS.includes(market.marketId))
-              .map((market, index) => (
-                <SwiperSlide key={index} style={{ width: "auto" }}>
-                  <MarketCards
-                    id={market.marketId}
-                    priceWithCurrency={formatPriceWithCurrency(
-                      market.price ?? 0,
-                      market.priceCurrency,
-                      3
-                    )}
-                    title={decodeURIComponent(market.marketId)}
-                  />
-                </SwiperSlide>
-              ))}
         </Swiper>
       )}
     </MarketsCarouselContainer>

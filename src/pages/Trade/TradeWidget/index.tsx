@@ -10,19 +10,20 @@ import PositionSelectComponent from "./PositionSelectComponent";
 import CollateralInputComponent from "./CollateralInputComponent";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Address } from "viem";
 import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
+import theme from "../../../theme";
 
 const TradeWidget: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
   const { address } = useAccount();
   const sdk = useSDK();
@@ -36,7 +37,7 @@ const TradeWidget: React.FC = () => {
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
     undefined
   );
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
   const debouncedTypedValue = useDebounce(typedValue, 500);
   const [leverageInputValue, setLeverageInputValue] = useState<string | null>(
@@ -45,12 +46,31 @@ const TradeWidget: React.FC = () => {
   const debouncedSelectedLeverage = useDebounce(leverageInputValue, 500);
   const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
 
+  const sdkRef = useRef(sdk);
   useEffect(() => {
-    let isCancelled = false; // Flag to track if the effect should be cancelled
+    sdkRef.current = sdk;
+  }, [sdk]);
+
+  useEffect(() => {
+    setDisplayedLeverage(selectedLeverage);
+  }, [selectedLeverage]);
+
+  useEffect(() => {
+    if (debouncedSelectedLeverage !== null) {
+      handleLeverageSelect(debouncedSelectedLeverage);
+    }
+  }, [debouncedSelectedLeverage]);
+
+  useEffect(() => {
+    let isCancelled = false;
     setLoading(false);
 
     const fetchTradeState = async () => {
-      if (!debouncedTypedValue || debouncedTypedValue === "") {
+      if (
+        !debouncedTypedValue ||
+        debouncedTypedValue === "" ||
+        Number(debouncedTypedValue) === 0
+      ) {
         setTradeState(undefined);
         return;
       }
@@ -59,7 +79,7 @@ const TradeWidget: React.FC = () => {
         setLoading(true);
 
         try {
-          const tradeState = await sdk.trade.getTradeState(
+          const tradeState = await sdkRef.current.trade.getTradeState(
             marketId,
             toWei(debouncedTypedValue),
             toWei(selectedLeverage),
@@ -83,7 +103,6 @@ const TradeWidget: React.FC = () => {
 
     fetchTradeState();
 
-    // Cleanup function to cancel the fetch if conditions change
     return () => {
       isCancelled = true;
     };
@@ -99,34 +118,31 @@ const TradeWidget: React.FC = () => {
   ]);
 
   useEffect(() => {
+    if (!market?.id) return;
+
     const fetchCapLeverage = async () => {
-      if (market) {
-        try {
-          const capLeverage = await sdk.market.getCapLeverage(
-            market.id as Address
+      try {
+        const capLeverage = await sdkRef.current.market.getCapLeverage(
+          market.id as Address
+        );
+        const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
+        parsedCapLeverage &&
+          setCapleverage((prev) =>
+            prev === parsedCapLeverage ? prev : parsedCapLeverage
           );
-          const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
-          parsedCapLeverage && setCapleverage(parsedCapLeverage);
-        } catch (error) {
-          console.error("Error fetching capLeverage:", error);
-        }
+      } catch (error) {
+        console.error("Error fetching capLeverage:", error);
       }
     };
 
     fetchCapLeverage();
-  }, [market]);
+  }, [market?.id]);
 
   const handleLeverageInput = (newValue: number[]) => {
     const stringValue = newValue[0].toString();
     setLeverageInputValue(stringValue);
     setDisplayedLeverage(stringValue);
   };
-
-  useEffect(() => {
-    if (debouncedSelectedLeverage !== null) {
-      handleLeverageSelect(debouncedSelectedLeverage);
-    }
-  }, [debouncedSelectedLeverage]);
 
   return (
     <TradeWidgetContainer
@@ -152,20 +168,32 @@ const TradeWidget: React.FC = () => {
       />
 
       <CollateralInputComponent />
+      <TradeButtonComponent loading={loading} tradeState={tradeState} />
+      <button
+        onClick={() => setDetailsOpen((o) => !o)}
+        style={{
+          background: "none",
+          border: "none",
+          padding: 0,
+          // marginTop: "12px",
+          marginBottom: "8px",
+          fontSize: "16px",
+          fontWeight: 500,
+          color: theme.color.grey3,
+          cursor: "pointer",
+          textAlign: "right",
+        }}
+      >
+        {detailsOpen ? "Hide Info ▲" : "More Info ▼"}
+      </button>
 
-      {isMobile ? (
-        <>
-          <TradeButtonComponent loading={loading} tradeState={tradeState} />
+      {/* Conditionally render details */}
+      {detailsOpen && (
+        <div>
           <MainTradeDetails tradeState={tradeState} />
-        </>
-      ) : (
-        <>
-          <MainTradeDetails tradeState={tradeState} />
-          <TradeButtonComponent loading={loading} tradeState={tradeState} />
-        </>
+          <AdditionalTradeDetails tradeState={tradeState} />
+        </div>
       )}
-
-      <AdditionalTradeDetails tradeState={tradeState} />
     </TradeWidgetContainer>
   );
 };

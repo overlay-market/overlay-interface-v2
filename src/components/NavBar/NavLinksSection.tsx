@@ -17,13 +17,12 @@ import {
 //   PowercardIcon,
 //   PowercardActiveIcon,
 // } from "../../assets/icons/navBar-icons/powercard";
-// import {
-//   StakeIcon,
-//   StakeActiveIcon,
-// } from "../../assets/icons/navBar-icons/stake";
-import { DEFAULT_MARKET_ID, NAVBAR_MODE } from "../../constants/applications";
+import {
+  StakeIcon,
+  StakeActiveIcon,
+} from "../../assets/icons/navBar-icons/stake";
+import { DEFAULT_MARKET, NAVBAR_MODE } from "../../constants/applications";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
 import {
   TrophyActiveIcon,
   TrophyIcon,
@@ -36,6 +35,7 @@ import {
   MarketsActiveIcon,
   MarketsIcon,
 } from "../../assets/icons/navBar-icons/markets";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export interface NavLinkAsset {
   to: string;
@@ -54,7 +54,8 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
 }) => {
   const { currentMarket } = useCurrentMarketState();
 
-  const activeMarketId = currentMarket?.marketId ?? DEFAULT_MARKET_ID;
+  const activeMarket = currentMarket?.marketName ?? DEFAULT_MARKET;
+  const encodedMarket = encodeURIComponent(activeMarket);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const NAV_LINKS: Array<NavLinkAsset> = [
@@ -66,7 +67,7 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       showOnMobile: true,
     },
     {
-      to: `/trade/${activeMarketId}`,
+      to: `/trade?market=${encodedMarket}`,
       label: "Trade",
       icon: TradeIcon,
       activeIcon: TradeActiveIcon,
@@ -99,6 +100,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       label: "Airdrops",
       icon: AirdropsIcon,
       activeIcon: AirdropsActiveIcon,
+      showOnMobile: true,
+    },
+    {
+      to: "/faucet",
+      label: "Faucet",
+      icon: StakeIcon,
+      activeIcon: StakeActiveIcon,
       showOnMobile: true,
     },
     // {

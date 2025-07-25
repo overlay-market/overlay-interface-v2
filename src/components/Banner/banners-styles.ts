@@ -54,7 +54,11 @@ export const TitleText = styled(Text)`
   font-size: clamp(18px, 4vw, 24px);
   font-weight: 600;
   color: ${theme.color.grey1};
-  -webkit-text-stroke: 0.5px rgba(0, 0, 0, 0.5);
+  text-shadow: 
+    -0.5px -0.5px 0 rgba(0, 0, 0, 0.2), 
+    0.5px -0.5px 0 rgba(0, 0, 0, 0.2), 
+    -0.5px  0.5px 0 rgba(0, 0, 0, 0.2), 
+    0.5px  0.5px 0 rgba(0, 0, 0, 0.2);
 `;
 
 export const SubtitleText = styled(Text)`
@@ -66,7 +70,12 @@ export const SubtitleText = styled(Text)`
 export const CardsValue = styled.h2`
   margin: 0;
   font-size: clamp(0.8rem, 3vw, 18px);
-  color: ${theme.color.green2};
+  color: ${theme.color.grey1};
+  text-shadow: 
+    -0.5px -0.5px 0 rgba(0, 0, 0, 0.5), 
+    0.5px -0.5px 0 rgba(0, 0, 0, 0.5), 
+    -0.5px  0.5px 0 rgba(0, 0, 0, 0.5), 
+    0.5px  0.5px 0 rgba(0, 0, 0, 0.5);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

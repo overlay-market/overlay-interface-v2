@@ -14,4 +14,5 @@ export const CHAIN_SUBGRAPH_URL: Record<number, string> = {
   [SUPPORTED_CHAINID.ARBITRUM_GÖRLI]: 'https://api.thegraph.com/subgraphs/name/bigboydiamonds/overlay-v1-subgraph-arb-goerli',
   [SUPPORTED_CHAINID.IMOLA]: 'https://subgraph.overlay.market/query/subgraphs/name/overlay/v1-subgraph',
   [SUPPORTED_CHAINID.BARTIO]: 'https://api.goldsky.com/api/public/project_clyiptt06ifuv01ul9xiwfj28/subgraphs/overlay-bartio/prod/gn',
+  [SUPPORTED_CHAINID.BSC_TESTNET]: 'https://api.goldsky.com/api/public/project_clyiptt06ifuv01ul9xiwfj28/subgraphs/overlay-bnb-testnet/latest/gn',
 }

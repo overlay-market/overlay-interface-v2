@@ -6,8 +6,18 @@ import  theme  from "../../../theme";
 import styled from "styled-components";
 
 export const MarketInfo = styled(Flex)`
+  width: 100%;
+  height: 49px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
   border-bottom: 1px solid ${theme.color.darkBlue};
   cursor: pointer;
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    padding: 12px 8px 12px 16px;
+  }
 
   &:hover {
     background: ${theme.color.grey7};

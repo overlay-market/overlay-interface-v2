@@ -133,7 +133,7 @@ const SuggestedCards: React.FC = () => {
   const similarMarketsSectionWidth = useMemo(() => {
     if (similarMarkets) {
       if (similarMarkets && similarMarkets.length === 1) {
-        return "217px";
+        return "176px";
       } else if (isTablet || similarMarkets.length === 2) {
         return "364px";
       } else if (isMobile) {
@@ -155,7 +155,9 @@ const SuggestedCards: React.FC = () => {
             overflowX={"hidden"}
           >
             <Text weight={"bold"} size={"5"}>
-              Similar To This Market
+              {similarMarkets.length === 1
+                ? "Related"
+                : "Similar To This Market"}
             </Text>
             <Box>
               <Swiper
@@ -177,8 +179,7 @@ const SuggestedCards: React.FC = () => {
                       id={market.marketId}
                       priceWithCurrency={formatPriceWithCurrency(
                         market.parsedMid ?? 0,
-                        market.priceCurrency,
-                        3
+                        market.priceCurrency
                       )}
                       title={market.marketName}
                       description={extractFirstAbstract(market.descriptionText)}
@@ -217,8 +218,7 @@ const SuggestedCards: React.FC = () => {
                       id={market.marketId}
                       priceWithCurrency={formatPriceWithCurrency(
                         market.parsedMid ?? 0,
-                        market.priceCurrency,
-                        3
+                        market.priceCurrency
                       )}
                       title={market.marketName}
                       description={extractFirstAbstract(market.descriptionText)}

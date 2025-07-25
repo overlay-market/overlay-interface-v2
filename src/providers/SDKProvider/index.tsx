@@ -17,8 +17,10 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         [SUPPORTED_CHAINID.BARTIO]: import.meta.env.VITE_BARTIO_RPC,
         [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: import.meta.env
           .VITE_ARBITRUM_SEPOLIA_RPC,
+        [SUPPORTED_CHAINID.BSC_TESTNET]: import.meta.env.VITE_BSC_TESTNET_RPC,
       },
       web3Provider: walletClient as any,
+      useShiva: true,
     });
   }, [chainId, walletClient]);
 

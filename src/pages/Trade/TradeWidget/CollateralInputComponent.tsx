@@ -1,19 +1,20 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import NumericalInput from "../../../components/NumericalInput";
 import {
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { toWei } from "overlay-sdk";
 
 const CollateralInputComponent: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { address } = useAccount();
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
@@ -23,18 +24,24 @@ const CollateralInputComponent: React.FC = () => {
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
   const [maxInputIncludingFees, setMaxInputIncludingFees] = useState<number>(0);
 
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
   useEffect(() => {
     const fetchMaxInputIncludingFees = async () => {
       if (marketId && address) {
         try {
           const maxInputIncludingFees =
-            await sdk.trade.getMaxInputIncludingFees(
+            await sdkRef.current.trade.getMaxInputIncludingFees(
               marketId,
               address,
-              toWei(selectedLeverage)
+              toWei(selectedLeverage),
+              6
             );
           maxInputIncludingFees &&
-            setMaxInputIncludingFees(Number(maxInputIncludingFees.toFixed(6)));
+            setMaxInputIncludingFees(maxInputIncludingFees);
         } catch (error) {
           console.error("Error fetching maxInputIncludingFees:", error);
         }

@@ -1,8 +1,8 @@
 import { Text } from "@radix-ui/themes";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   LineSeparator,
   PositionsTableContainer,
@@ -16,7 +16,6 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import usePrevious from "../../../hooks/usePrevious";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -27,7 +26,8 @@ const POSITIONS_COLUMNS = [
 ];
 
 const PositionsTable: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
@@ -44,11 +44,10 @@ const PositionsTable: React.FC = () => {
 
   const isTablet = useMediaQuery("(max-width: 1279px)");
 
-  const previousMarketId = usePrevious(marketId);
-
-  const isNewMarketId = useMemo(() => {
-    return marketId !== previousMarketId;
-  }, [marketId, previousMarketId]);
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
 
   useEffect(() => {
     const fetchOpenPositions = async () => {
@@ -58,15 +57,17 @@ const PositionsTable: React.FC = () => {
       }
 
       if (marketId && account) {
+        const refreshData = isNewTxnHash;
         setLoading(true);
         try {
-          const positions = await sdk.openPositions.transformOpenPositions(
-            currentPage,
-            itemsPerPage,
-            marketId,
-            account as Address,
-            isNewTxnHash || isNewMarketId
-          );
+          const positions =
+            await sdkRef.current.openPositions.transformOpenPositions(
+              currentPage,
+              itemsPerPage,
+              marketId,
+              account as Address,
+              refreshData
+            );
 
           positions && setPositions(positions.data);
           positions && setPositionsTotalNumber(positions.total);
@@ -83,17 +84,7 @@ const PositionsTable: React.FC = () => {
     };
 
     fetchOpenPositions();
-  }, [
-    chainId,
-    marketId,
-    account,
-    isNewTxnHash,
-    isNewMarketId,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    setCurrentPage,
-  ]);
+  }, [chainId, marketId, account, isNewTxnHash, currentPage, itemsPerPage]);
 
   useEffect(() => {
     setCurrentPage(1);

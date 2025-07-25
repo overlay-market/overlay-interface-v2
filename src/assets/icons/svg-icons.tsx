@@ -55,7 +55,7 @@ export const ClockIcon: FC = () => (
   </svg>
 );
 
-export const CopyIcon: FC = () => (
+export const CopyGradientIcon: FC = () => (
   <svg
     width="15"
     height="15"
@@ -67,59 +67,20 @@ export const CopyIcon: FC = () => (
       fillRule="evenodd"
       clipRule="evenodd"
       d="M1 9.50006C1 10.3285 1.67157 11.0001 2.5 11.0001H4L4 10.0001H2.5C2.22386 10.0001 2 9.7762 2 9.50006L2 2.50006C2 2.22392 2.22386 2.00006 2.5 2.00006L9.5 2.00006C9.77614 2.00006 10 2.22392 10 2.50006V4.00002H5.5C4.67158 4.00002 4 4.67159 4 5.50002V12.5C4 13.3284 4.67158 14 5.5 14H12.5C13.3284 14 14 13.3284 14 12.5V5.50002C14 4.67159 13.3284 4.00002 12.5 4.00002H11V2.50006C11 1.67163 10.3284 1.00006 9.5 1.00006H2.5C1.67157 1.00006 1 1.67163 1 2.50006V9.50006ZM5 5.50002C5 5.22388 5.22386 5.00002 5.5 5.00002H12.5C12.7761 5.00002 13 5.22388 13 5.50002V12.5C13 12.7762 12.7761 13 12.5 13H5.5C5.22386 13 5 12.7762 5 12.5V5.50002Z"
-      fill="currentColor"
+      fill="url(#paint0_linear_212_3620)"
     />
-  </svg>
-);
-
-export const GradientCopyIcon: FC = () => (
-  <svg
-    width="15"
-    height="15"
-    viewBox="0 0 15 15"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <g clipPath="url(#clip0_2557_6908)">
-      <path
-        d="M12.5 5H6.25C5.55964 5 5 5.55964 5 6.25V12.5C5 13.1904 5.55964 13.75 6.25 13.75H12.5C13.1904 13.75 13.75 13.1904 13.75 12.5V6.25C13.75 5.55964 13.1904 5 12.5 5Z"
-        stroke="url(#paint0_linear_2557_6908)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M2.5 10C1.8125 10 1.25 9.4375 1.25 8.75V2.5C1.25 1.8125 1.8125 1.25 2.5 1.25H8.75C9.4375 1.25 10 1.8125 10 2.5"
-        stroke="url(#paint1_linear_2557_6908)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
     <defs>
       <linearGradient
-        id="paint0_linear_2557_6908"
-        x1="5"
-        y1="9.375"
-        x2="13.75"
-        y2="9.375"
+        id="paint0_linear_212_3620"
+        x1="2.04688"
+        y1="8.00005"
+        x2="13.95"
+        y2="8.00005"
         gradientUnits="userSpaceOnUse"
       >
         <stop stopColor="#FFC955" />
         <stop offset="1" stopColor="#FF7CD5" />
       </linearGradient>
-      <linearGradient
-        id="paint1_linear_2557_6908"
-        x1="1.25"
-        y1="5.625"
-        x2="10"
-        y2="5.625"
-        gradientUnits="userSpaceOnUse"
-      >
-        <stop stopColor="#FFC955" />
-        <stop offset="1" stopColor="#FF7CD5" />
-      </linearGradient>
-      <clipPath id="clip0_2557_6908">
-        <rect width="15" height="15" fill="white" />
-      </clipPath>
     </defs>
   </svg>
 );

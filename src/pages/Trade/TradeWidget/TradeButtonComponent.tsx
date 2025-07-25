@@ -10,7 +10,7 @@ import {
   useTradeState,
 } from "../../../state/trade/hooks";
 import { useCallback, useMemo, useState } from "react";
-import { toWei, TradeStateData } from "overlay-sdk";
+import { toWei, TradeState, TradeStateData } from "overlay-sdk";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
@@ -44,15 +44,19 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     showConfirm: false,
     attemptingTransaction: false,
   });
+  const [isApprovalPending, setIsApprovalPending] = useState<boolean>(false);
   const arcxAnalytics = useArcxAnalytics();
-
   const title: string | undefined = useMemo(() => {
     if (!tradeState) return undefined;
     return tradeState.tradeState;
   }, [tradeState]);
 
   const isDisabledTradeButton =
-    typedValue && !loading && (title === "Trade" || title === "Approve OVL")
+    typedValue &&
+    !loading &&
+    (title === TradeState.Trade ||
+      title === TradeState.NeedsApproval ||
+      title === TradeState.TradeHighPriceImpact)
       ? false
       : true;
 
@@ -119,6 +123,21 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     }
   };
 
+  const waitForTradeStateUpdate = async (
+    timeoutMs: number = 20000,
+    intervalMs: number = 2000
+  ): Promise<boolean> => {
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeoutMs) {
+      if (tradeState?.tradeState !== TradeState.NeedsApproval) {
+        return true;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+    return false;
+  };
+
   const handleApprove = async () => {
     if (!typedValue) {
       return;
@@ -128,46 +147,48 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       attemptingTransaction: true,
     });
 
-    sdk.ovl
-      .approve({
-        to: market?.id as Address,
+    try {
+      const result = await sdk.shiva.approveShiva({
+        account: address,
         amount: maxUint256,
-      })
-      .then((result) => {
-        addPopup(
-          {
-            txn: {
-              hash: result.hash,
-              success: result.receipt?.status === "success",
-              message: "",
-              type: TransactionType.APPROVAL,
-            },
-          },
-          result.hash
-        );
-        handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
-      })
-      .catch((error: Error) => {
-        const { errorCode, errorMessage } = handleError(error);
-
-        addPopup(
-          {
-            txn: {
-              hash: currentTimeForId,
-              success: false,
-              message: errorMessage,
-              type: errorCode,
-            },
-          },
-          currentTimeForId
-        );
-      })
-      .finally(() => {
-        setTradeConfig({
-          showConfirm,
-          attemptingTransaction: false,
-        });
       });
+
+      addPopup(
+        {
+          txn: {
+            hash: result.hash,
+            success: result.receipt?.status === "success",
+            message: "",
+            type: TransactionType.APPROVAL,
+          },
+        },
+        result.hash
+      );
+
+      handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
+
+      const isUpdated = await waitForTradeStateUpdate();
+      setIsApprovalPending(isUpdated);
+    } catch (error) {
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+    } finally {
+      setTradeConfig({
+        showConfirm,
+        attemptingTransaction: false,
+      });
+    }
   };
 
   const handleError = (error: Error) => {
@@ -209,25 +230,29 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     <>
       {loading && <GradientLoaderButton title={"Trade"} />}
 
-      {address && !loading && tradeState?.tradeState !== "Approve OVL" && (
-        <GradientOutlineButton
-          title={title ?? "Trade"}
-          width={"100%"}
-          size={isDisabledTradeButton ? "14px" : "16px"}
-          isDisabled={isDisabledTradeButton}
-          handleClick={() => {
-            setTradeConfig({
-              showConfirm: true,
-              attemptingTransaction: false,
-            });
-          }}
-        />
-      )}
+      {address &&
+        !loading &&
+        tradeState?.tradeState !== TradeState.NeedsApproval &&
+        !isApprovalPending && (
+          <GradientOutlineButton
+            title={title ?? "Trade"}
+            width={"100%"}
+            size={isDisabledTradeButton ? "14px" : "16px"}
+            isDisabled={isDisabledTradeButton}
+            handleClick={() => {
+              setTradeConfig({
+                showConfirm: true,
+                attemptingTransaction: false,
+              });
+            }}
+          />
+        )}
 
       {address &&
         !loading &&
         tradeState &&
-        tradeState.tradeState === "Approve OVL" &&
+        (tradeState.tradeState === TradeState.NeedsApproval ||
+          isApprovalPending) &&
         (attemptingTransaction ? (
           <GradientLoaderButton title={"Pending confirmation..."} />
         ) : (
@@ -238,15 +263,17 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           />
         ))}
 
-      {tradeState && tradeState.tradeState === "Trade" && (
-        <ConfirmTxnModal
-          open={showConfirm}
-          tradeState={tradeState}
-          attemptingTransaction={attemptingTransaction}
-          handleDismiss={handleDismiss}
-          handleTrade={handleTrade}
-        />
-      )}
+      {tradeState &&
+        (tradeState.tradeState === TradeState.Trade ||
+          tradeState.tradeState === TradeState.TradeHighPriceImpact) && (
+          <ConfirmTxnModal
+            open={showConfirm}
+            tradeState={tradeState}
+            attemptingTransaction={attemptingTransaction}
+            handleDismiss={handleDismiss}
+            handleTrade={handleTrade}
+          />
+        )}
 
       {!address && (
         <GradientOutlineButton
