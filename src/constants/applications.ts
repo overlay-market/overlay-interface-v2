@@ -1,3 +1,7 @@
+import { TokenAmount } from "@lifi/sdk";
+import OVLToken from "../assets/images/token-logos/OVL-token.webp";
+import { DEFAULT_CHAINID } from "./chains";
+
 export enum MARKET_CHART_URL {
   SEPOLIA = "https://api.overlay.market/sepolia-charts/v1/charts",
   IMOLA = "https://api.overlay.market/imola-charts/v1/charts",
@@ -21,3 +25,18 @@ export const LEADERBOARD_POINTS_API = 'https://api.overlay.market/points-bsc/poi
 export const REFERRAL_API_BASE_URL = "https://api.overlay.market/points-bsc";
 
 export const FAUCET_API = 'https://api.overlay.market/faucet/'
+
+export const DEFAULT_TOKEN_SYMBOL = "OVL";
+export const DEFAULT_TOKEN_LOGO = OVLToken;
+export const DEFAULT_TOKEN = {
+  amount: 0n,
+  blockNumber: 0n,
+  address: "",
+  chainId: DEFAULT_CHAINID,
+  decimals: 18,
+  symbol: DEFAULT_TOKEN_SYMBOL,
+  logoURI: DEFAULT_TOKEN_LOGO,
+  name: "Overlay",
+} as TokenAmount;
+
+export const OVL_USD_PRICE = 1.01;
