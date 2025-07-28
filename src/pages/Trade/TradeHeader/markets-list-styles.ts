@@ -60,7 +60,7 @@ export const DropdownContainer = styled(Box)`
   height: 520px;
   padding: 0 8px;
   position: absolute;
-  top: ${theme.headerSize.height}
+  top: ${theme.headerSize.height};
   left: 0;
   z-index: 10;
   background-color: ${theme.color.background};
@@ -79,7 +79,8 @@ export const DropdownContainer = styled(Box)`
   @media (min-width: ${theme.breakpoints.xxl}) {
     width: calc(272px + 16px);
     height: 645px;
-    left: 0;
+    left: calc(${theme.app.xxlPadding} - 16px);
+    border-left: 1px solid ${theme.color.darkBlue};
   }
 `;
 
