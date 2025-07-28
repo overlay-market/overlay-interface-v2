@@ -20,7 +20,7 @@ import {
   ShareOnXbutton,
 } from "./airdrops-claim-styles";
 import theme from "../../../theme";
-import LogoImg from "../../../assets/images/overlay-logo-only-no-background.png";
+import LogoImg from "../../../assets/images/overlay-logo-only-no-background.webp";
 import {
   GradientLink,
   StyledLink,
@@ -41,14 +41,14 @@ import {
 import { AirdropsAmounts } from "../types";
 import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
 import { GraphQLClient } from "graphql-request";
+import useAccount from "../../../hooks/useAccount";
 
 type AirdropClaimProps = {
   airdropsAmounts: AirdropsAmounts | null;
 };
 
 const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
-  // const { address: account } = useAccount();
-  const account = "0x55176a12ba096f60810fd74b90d1b1138b595ede";
+  const { address: account } = useAccount();
 
   const [streamData, setStreamData] = useState<StreamData | null>(null);
   const [airdropIdForErrorClaimAlias, setAirdropIdForErrorClaimAlias] =
