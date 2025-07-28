@@ -1,5 +1,5 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useAddPopup } from "../../state/application/hooks";
 import {
   GradientOutlineButton,
@@ -28,6 +28,7 @@ import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
 import { BridgeContainer, GradientBorderBox } from "./bridge-styles";
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
+import useDebounce from "../../hooks/useDebounce";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -43,6 +44,7 @@ const Bridge: React.FC = () => {
 
   const [amount, setAmount] = useState("");
   const [destination, setDestination] = useState("");
+  const debouncedAmount = useDebounce(amount, 500);
 
   const { data: allowance } = useReadContract({
     address: OVL_TOKEN_ADDRESS,
@@ -54,6 +56,14 @@ const Bridge: React.FC = () => {
 
   const { writeContractAsync } = useWriteContract();
   const waitForTransactionReceipt = useWaitForTransactionReceipt;
+
+  const title: string = useMemo(() => {
+    const amount = parseFloat(debouncedAmount);
+    if (isNaN(amount)) return "Bridge";
+    if (ovlBalance && amount > ovlBalance)
+      return "Amount Exceeds Available Balance";
+    return "Bridge";
+  }, [debouncedAmount, ovlBalance]);
 
   const handleBridge = async () => {
     if (!address) {
@@ -223,9 +233,9 @@ const Bridge: React.FC = () => {
 
             {address ? (
               <GradientSolidButton
-                title="Bridge"
+                title={title}
                 handleClick={handleBridge}
-                isDisabled={!amount || !destination}
+                isDisabled={!amount || !destination || title !== "Bridge"}
               />
             ) : (
               <GradientOutlineButton
