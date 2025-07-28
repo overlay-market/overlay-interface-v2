@@ -1,19 +1,33 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Box, Flex, Text } from "@radix-ui/themes";
 import React, { useEffect, useState } from "react";
 import { useAddPopup } from "../../state/application/hooks";
-import { GradientOutlineButton, GradientSolidButton } from "../../components/Button";
+import {
+  GradientOutlineButton,
+  GradientSolidButton,
+} from "../../components/Button";
 import NumericalInput from "../../components/NumericalInput";
 import useAccount from "../../hooks/useAccount";
 import { useModalHelper } from "../../components/ConnectWalletModal/utils";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import {
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+} from "wagmi";
 import { erc20Abi, maxUint256, parseUnits } from "viem";
 import bs58 from "bs58";
 import { TransactionType } from "../../constants/transaction";
-import { BRIDGE_ABI, BRIDGE_CONTRACT_ADDRESS, OVL_TOKEN_ADDRESS, SOLANA_DEVNET_EID } from "../../constants/bridge";
+import {
+  BRIDGE_ABI,
+  BRIDGE_CONTRACT_ADDRESS,
+  OVL_TOKEN_ADDRESS,
+  SOLANA_DEVNET_EID,
+} from "../../constants/bridge";
 import { StyledInput } from "../Leaderboard/ReferralSection/referral-modal-styles";
-import { readContract } from '@wagmi/core'
+import { readContract } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
+import { BridgeContainer, GradientBorderBox } from "./bridge-styles";
+import theme from "../../theme";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -72,7 +86,14 @@ const Bridge: React.FC = () => {
           args: [BRIDGE_CONTRACT_ADDRESS, maxUint256],
         });
         addPopup(
-          { txn: { hash: approveHash, success: true, message: "", type: TransactionType.APPROVAL } },
+          {
+            txn: {
+              hash: approveHash,
+              success: true,
+              message: "",
+              type: TransactionType.APPROVAL,
+            },
+          },
           approveHash
         );
         await waitForTransactionReceipt({ hash: approveHash });
@@ -103,17 +124,30 @@ const Bridge: React.FC = () => {
         value: msgFee.nativeFee,
       });
       addPopup(
-        { txn: { hash, success: true, message: "", type: TransactionType.BRIDGE_OVL } },
+        {
+          txn: {
+            hash,
+            success: true,
+            message: "",
+            type: TransactionType.BRIDGE_OVL,
+          },
+        },
         hash
       );
     } catch (error: unknown) {
       let message = "Bridge failed";
       let type = "ERROR";
       if (error && typeof error === "object") {
-        if ("message" in error && typeof (error as { message?: unknown }).message === "string") {
+        if (
+          "message" in error &&
+          typeof (error as { message?: unknown }).message === "string"
+        ) {
           message = (error as { message: string }).message;
         }
-        if ("code" in error && typeof (error as { code?: unknown }).code === "string") {
+        if (
+          "code" in error &&
+          typeof (error as { code?: unknown }).code === "string"
+        ) {
           type = (error as { code: string }).code;
         }
       }
@@ -132,32 +166,85 @@ const Bridge: React.FC = () => {
   };
 
   return (
-    <Flex
-      width="100vw"
-      height="80vh"
-      justify="center"
-      align="center"
-      direction="column"
-      px="16px"
-      gap="12px"
-    >
-      <Text size="5" weight="medium">
-        Bridge OVL to Solana Devnet
-      </Text>
-      <Text size="2">Balance: {balance} OVL</Text>
-      <NumericalInput value={amount} handleUserInput={setAmount} placeholder="Amount" />
-      <StyledInput
-        type="text"
-        value={destination}
-        onChange={(e) => setDestination(e.target.value.trim())}
-        placeholder="Solana Address"
-      />
-      {address ? (
-        <GradientSolidButton title="Bridge" handleClick={handleBridge} />
-      ) : (
-        <GradientOutlineButton title="Connect Wallet" handleClick={openModal} />
-      )}
-    </Flex>
+    <BridgeContainer>
+      <Flex
+        direction={"column"}
+        width={{ initial: "343px", sm: "424px", lg: "459px" }}
+        mt={{ sm: "120px", lg: "100px" }}
+        mb={"100px"}
+        gap={{ initial: "32px", sm: "28px" }}
+      >
+        <Text
+          style={{ fontWeight: "600", textAlign: "center" }}
+          size={{ initial: "6", sm: "7" }}
+        >
+          Bridge OVL to Solana Devnet
+        </Text>
+        <Text
+          style={{
+            fontWeight: "600",
+            textAlign: "center",
+            color: theme.color.blue1,
+          }}
+          size={{ initial: "4", sm: "5" }}
+        >
+          Balance: {balance} OVL
+        </Text>
+
+        <GradientBorderBox>
+          <Flex
+            direction={"column"}
+            width={"100%"}
+            gap={"16px"}
+            p={{ sm: "32px" }}
+          >
+            <Box
+              width={"100%"}
+              p={"8px"}
+              style={{ borderRadius: "8px", background: theme.color.grey4 }}
+            >
+              <Flex direction={"column"} gap="22px">
+                <Flex justify="between">
+                  <Text size="1" style={{ color: theme.color.grey3 }}>
+                    Amount
+                  </Text>
+                </Flex>
+                <Flex justify="between">
+                  <NumericalInput value={amount} handleUserInput={setAmount} />
+                  <Text
+                    size="3"
+                    weight={"bold"}
+                    style={{ color: theme.color.blue1 }}
+                  >
+                    OVL
+                  </Text>
+                </Flex>
+              </Flex>
+            </Box>
+
+            <StyledInput
+              type="text"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value.trim())}
+              placeholder="Solana Address"
+            />
+
+            {address ? (
+              <GradientSolidButton
+                title="Bridge"
+                handleClick={handleBridge}
+                isDisabled={!amount || !destination}
+              />
+            ) : (
+              <GradientOutlineButton
+                title="Connect Wallet"
+                handleClick={openModal}
+              />
+            )}
+          </Flex>
+        </GradientBorderBox>
+      </Flex>
+    </BridgeContainer>
   );
 };
 
