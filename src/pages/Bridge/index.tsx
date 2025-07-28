@@ -1,5 +1,5 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useAddPopup } from "../../state/application/hooks";
 import {
   GradientOutlineButton,
@@ -8,7 +8,6 @@ import {
 import NumericalInput from "../../components/NumericalInput";
 import useAccount from "../../hooks/useAccount";
 import { useModalHelper } from "../../components/ConnectWalletModal/utils";
-import useSDK from "../../providers/SDKProvider/useSDK";
 import {
   useReadContract,
   useWriteContract,
@@ -28,6 +27,7 @@ import { readContract } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
 import { BridgeContainer, GradientBorderBox } from "./bridge-styles";
 import theme from "../../theme";
+import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -38,12 +38,11 @@ const toBytes32 = (addr: string): `0x${string}` => {
 const Bridge: React.FC = () => {
   const { address } = useAccount();
   const { openModal } = useModalHelper();
-  const sdk = useSDK();
   const addPopup = useAddPopup();
+  const { ovlBalance } = useOvlTokenBalance();
 
   const [amount, setAmount] = useState("");
   const [destination, setDestination] = useState("");
-  const [balance, setBalance] = useState<string>("0");
 
   const { data: allowance } = useReadContract({
     address: OVL_TOKEN_ADDRESS,
@@ -55,20 +54,6 @@ const Bridge: React.FC = () => {
 
   const { writeContractAsync } = useWriteContract();
   const waitForTransactionReceipt = useWaitForTransactionReceipt;
-
-  useEffect(() => {
-    const fetchBalance = async () => {
-      if (address) {
-        try {
-          const bal = await sdk.ovl.balance(address, 8);
-          bal && setBalance(bal.toString());
-        } catch (e) {
-          console.error("Error fetching balance", e);
-        }
-      }
-    };
-    fetchBalance();
-  }, [address, sdk]);
 
   const handleBridge = async () => {
     if (!address) {
@@ -188,7 +173,14 @@ const Bridge: React.FC = () => {
           }}
           size={{ initial: "4", sm: "5" }}
         >
-          Balance: {balance} OVL
+          Balance:{" "}
+          <span style={{ fontFamily: "Roboto Mono", paddingLeft: "14px" }}>
+            {ovlBalance?.toLocaleString("en-US", {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 4,
+            })}
+          </span>{" "}
+          OVL
         </Text>
 
         <GradientBorderBox>
