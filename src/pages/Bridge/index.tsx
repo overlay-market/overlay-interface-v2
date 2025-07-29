@@ -8,11 +8,7 @@ import {
 import NumericalInput from "../../components/NumericalInput";
 import useAccount from "../../hooks/useAccount";
 import { useModalHelper } from "../../components/ConnectWalletModal/utils";
-import {
-  useReadContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-} from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { erc20Abi, maxUint256, parseUnits } from "viem";
 import bs58 from "bs58";
 import { TransactionType } from "../../constants/transaction";
@@ -23,7 +19,7 @@ import {
   SOLANA_DEVNET_EID,
 } from "../../constants/bridge";
 import { StyledInput } from "../Leaderboard/ReferralSection/referral-modal-styles";
-import { readContract } from "wagmi/actions";
+import { readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
 import { BridgeContainer, GradientBorderBox } from "./bridge-styles";
 import theme from "../../theme";
@@ -40,7 +36,7 @@ const Bridge: React.FC = () => {
   const { address } = useAccount();
   const { openModal } = useModalHelper();
   const addPopup = useAddPopup();
-  const { ovlBalance } = useOvlTokenBalance();
+  const { ovlBalance, refetch } = useOvlTokenBalance();
 
   const [amount, setAmount] = useState("");
   const [destination, setDestination] = useState("");
@@ -55,7 +51,6 @@ const Bridge: React.FC = () => {
   });
 
   const { writeContractAsync } = useWriteContract();
-  const waitForTransactionReceipt = useWaitForTransactionReceipt;
 
   const title: string = useMemo(() => {
     const amount = parseFloat(debouncedAmount);
@@ -91,7 +86,10 @@ const Bridge: React.FC = () => {
           },
           approveHash
         );
-        await waitForTransactionReceipt({ hash: approveHash });
+        await waitForTransactionReceipt(wagmiConfig, {
+          hash: approveHash,
+          confirmations: 1,
+        });
       }
 
       const sendParam = {
@@ -118,6 +116,7 @@ const Bridge: React.FC = () => {
         args: [sendParam, msgFee, address],
         value: msgFee.nativeFee,
       });
+
       addPopup(
         {
           txn: {
@@ -129,6 +128,15 @@ const Bridge: React.FC = () => {
         },
         hash
       );
+
+      await waitForTransactionReceipt(wagmiConfig, {
+        hash,
+        confirmations: 1,
+      });
+      await refetch();
+
+      setAmount("");
+      setDestination("");
     } catch (error: unknown) {
       let message = "Bridge failed";
       let type = "ERROR";

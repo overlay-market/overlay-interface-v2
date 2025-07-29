@@ -41,5 +41,5 @@ export const useOvlTokenBalance = () => {
     }
   }, [isNewTxnHash, refetch]);
 
-  return { ovlBalance, isLoading, isError };
+  return { ovlBalance, isLoading, isError, refetch };
 };
