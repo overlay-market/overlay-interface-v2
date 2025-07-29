@@ -11,7 +11,10 @@ import theme from "../../../theme";
 import type { OpenPositionData } from "overlay-sdk";
 import ClosePositionsModal from "../../../components/ClosePositionsModal";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { usePositionRefresh } from "../../../state/portfolio/hooks";
+import {
+  useIsNewUnwindTxn,
+  usePositionRefresh,
+} from "../../../state/portfolio/hooks";
 import { triggerLoader } from "../UnwindsTable";
 
 const POSITIONS_COLUMNS = [
@@ -30,6 +33,7 @@ const OpenPositionsTable: React.FC = () => {
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
+  const isNewUnwindTxn = useIsNewUnwindTxn();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -42,7 +46,13 @@ const OpenPositionsTable: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const { loading, positions, positionsTotalNumber, refreshPositions } =
-    usePositionRefresh(sdk, account, isNewTxnHash, currentPage, itemsPerPage);
+    usePositionRefresh(
+      sdk,
+      account,
+      isNewTxnHash || isNewUnwindTxn,
+      currentPage,
+      itemsPerPage
+    );
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
