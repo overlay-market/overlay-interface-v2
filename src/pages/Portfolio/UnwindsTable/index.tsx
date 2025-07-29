@@ -9,7 +9,10 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import UnwindPosition from "./UnwindPosition";
 import type { UnwindPositionData } from "overlay-sdk";
-import { useUnwindPositionRefresh } from "../../../state/portfolio/hooks";
+import {
+  useIsNewUnwindTxn,
+  useUnwindPositionRefresh,
+} from "../../../state/portfolio/hooks";
 
 const UNWIND_POSITIONS_COLUMNS = [
   "Market",
@@ -28,6 +31,7 @@ const UnwindsTable: React.FC = () => {
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
+  const isNewUnwindTxn = useIsNewUnwindTxn();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -40,7 +44,7 @@ const UnwindsTable: React.FC = () => {
     useUnwindPositionRefresh(
       sdk,
       account as Address | undefined,
-      isNewTxnHash,
+      isNewTxnHash || isNewUnwindTxn,
       currentPage,
       itemsPerPage
     );

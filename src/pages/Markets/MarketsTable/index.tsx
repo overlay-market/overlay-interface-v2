@@ -381,11 +381,7 @@ export default function MarketsTable({
                   <Table.Cell>
                     {formatPriceWithCurrency(
                       market.price ?? 0,
-                      market.priceCurrency,
-                      Number(market.price) > 10000 &&
-                        Number(market.price) < 1000000
-                        ? 5
-                        : 4
+                      market.priceCurrency
                     )}
                   </Table.Cell>
                   {!isMobile && (

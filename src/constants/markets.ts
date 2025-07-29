@@ -45,6 +45,8 @@ import SolUsd from "../assets/images/markets-full-logos/sol-usd.jpg";
 import TheWeekend from "../assets/images/markets-full-logos/the-weekend.jpg";
 import BillieEilish from "../assets/images/markets-full-logos/billie-eilish.jpg";
 import StrategicReverseIndex from '../assets/images/markets-full-logos/strategic-reserve-index.webp';
+import BtcUsdLogo from '../assets/images/markets-full-logos/BTC-USD.webp';
+import EthUsdLogo from '../assets/images/markets-full-logos/ETH-USD.webp';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -94,6 +96,8 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "The%20Weeknd%20Index": TheWeekend,
   "Billie%20Eilish%20Index": BillieEilish,
   "Strategic%20Reserve%20Index": StrategicReverseIndex,
+  "ETH%20%2F%20USD": EthUsdLogo,
+  "BTC%20%2F%20USD": BtcUsdLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -104,6 +108,8 @@ export const MARKETSORDER = [
   "amouranth%20vs%20peachJars",
   "binance%20alpha%20index",
   "Counter-Strike%202%20Skins",
+  "ETH%20%2F%20USD",
+  "BTC%20%2F%20USD",
   "The%20Weeknd%20Index",
   "Strategic%20Reserve%20Index",
   "Monalita%20vs%20Elvasnaps",
@@ -197,6 +203,8 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",
     "SUPER%20%2F%20ETH",
+    "ETH%20%2F%20USD",
+    "BTC%20%2F%20USD",
   ],
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",

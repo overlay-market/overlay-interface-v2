@@ -7,6 +7,7 @@ export interface PrevWeekDetails {
 }
 
 export interface SessionDetails {
+  sessionId: string
   sessionStart: string
   sessionEnd: string
   sessionLastUpdated: string
@@ -31,6 +32,10 @@ export interface LeaderboardPointsData {
 }
 
 export interface UserReferralData {
+  sessionId: string;
+  sessionStart: string;
+  sessionEnd: string;
+  sessionLastUpdated: string;
   walletAddress: Address;
   sessionTotalPoints: number;
   previousRunPoints: number;
@@ -44,4 +49,5 @@ export interface UserReferralData {
     walletAddress: Address;
     referralCodeUsed: string;
   } | null;
+  rank: number;
 }

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
 import { setCurrentMarket } from "./actions";
 import { ExpandedMarketData } from "overlay-sdk";
+import { shallowEqual } from "../../utils/equalityUtils";
 
 export function useCurrentMarketState(): AppState['currentMarket'] {
   return useAppSelector((state) => state.currentMarket);
@@ -12,9 +13,10 @@ export const useCurrentMarketActionHandlers = (): {
   handleCurrentMarketSet: (currentMarket: ExpandedMarketData) => void;
 } => {
   const dispatch = useAppDispatch();
+  const { currentMarket: prevMarket } = useCurrentMarketState();
 
   const handleCurrentMarketSet = useCallback(
-    (currentMarket: ExpandedMarketData) => {
+    (currentMarket: ExpandedMarketData) => { 
       const currentMarketParsed = {
         ...currentMarket,
         ask: currentMarket.ask.toString(),
@@ -37,7 +39,9 @@ export const useCurrentMarketActionHandlers = (): {
         parsedOiShort: currentMarket.parsedOiShort?.toString(),
       }
 
-      dispatch(setCurrentMarket({ currentMarket: currentMarketParsed }))
+      if (shallowEqual(prevMarket, currentMarketParsed)) return;
+
+      dispatch(setCurrentMarket({ currentMarket: currentMarketParsed }));
     },
     [dispatch]
   )
