@@ -142,10 +142,15 @@ const Bridge: React.FC = () => {
       let type = "ERROR";
       if (error && typeof error === "object") {
         if (
+          "shortMessage" in error &&
+          typeof (error as { shortMessage?: unknown }).shortMessage === "string"
+        ) {
+          message = (error as { shortMessage: string }).shortMessage;
+        } else if (
           "message" in error &&
           typeof (error as { message?: unknown }).message === "string"
         ) {
-          message = (error as { message: string }).message;
+          message = (error as { message: string }).message.split("\n")[0];
         }
         if (
           "code" in error &&
@@ -154,6 +159,10 @@ const Bridge: React.FC = () => {
           type = (error as { code: string }).code;
         }
       }
+      if (message.includes("Non-base58 character")) {
+        message = "Invalid Solana address";
+      }
+      console.error(error);
       addPopup(
         {
           txn: {
