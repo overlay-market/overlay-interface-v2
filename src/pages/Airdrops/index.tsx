@@ -9,6 +9,7 @@ import {
 } from "../../constants/airdrops";
 import EligibilityChecker from "./EligibilityChecker";
 import AirdropsClaim from "./AirdropsClaim";
+import useAccount from "../../hooks/useAccount";
 
 export enum EligibilityStatus {
   Eligible = "eligible",
@@ -18,8 +19,7 @@ export enum EligibilityStatus {
 }
 
 const Airdrops: React.FC = () => {
-  // const { address: account } = useAccount();
-  const account = "0xee5ce06accce11bc77c5a93723c8032d9108f22d";
+  const { address: account } = useAccount();
 
   const [address, setAddress] = useState<string>("");
   const [responseData, setResponseData] = useState<ResponseDataType | null>(

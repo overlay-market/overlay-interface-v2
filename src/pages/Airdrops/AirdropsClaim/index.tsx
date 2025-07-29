@@ -34,10 +34,7 @@ import {
   SABLIER_SUBGRAPH_URL,
   SABLIER_VESTING_URL,
 } from "../../../constants/airdrops";
-import {
-  GradientOutlineButton,
-  GradientSolidButton,
-} from "../../../components/Button";
+import { GradientOutlineButton } from "../../../components/Button";
 import { AirdropsAmounts } from "../types";
 import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
 import { GraphQLClient } from "graphql-request";
@@ -86,9 +83,9 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
     }
   }, [airdropsAmounts]);
 
-  const handleStake = () => {
-    console.log("Stake");
-  };
+  // const handleStake = () => {
+  //   console.log("Stake");
+  // };
 
   const handleClaim = (airdropId: string) => {
     setAirdropIdForErrorClaimAlias(null);
@@ -215,13 +212,13 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                       <span style={{ fontFamily: "Inter" }}>OVL</span>
                     </Text>
                     <Flex gap={"4px"}>
-                      <GradientSolidButton
+                      {/* <GradientSolidButton
                         title={"Stake"}
                         width={"73px"}
                         height={"32px"}
                         size={"12px"}
                         handleClick={handleStake}
-                      />
+                      /> */}
                       <GradientOutlineButton
                         title={"Claim"}
                         width={"73px"}
