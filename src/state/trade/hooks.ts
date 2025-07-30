@@ -5,7 +5,7 @@ import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selec
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import {  TokenAmount } from "@lifi/sdk";
-import { serializeWithBigInt } from "../../utils/serializeWithBigInt";
+import { deserializeWithBigInt, serializeWithBigInt } from "../../utils/serializeWithBigInt";
 import { SelectState } from "../../types/selectChainAndTokenTypes";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import { DEFAULT_CHAINID } from "../../constants/chains";
@@ -16,6 +16,20 @@ export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
 export function useTradeState(): AppState['trade'] {
   return useAppSelector((state) => state.trade);
+}
+
+export function useChainAndTokenState(): {
+  selectedChainId: number;
+  selectedToken: TokenAmount;
+  chainState: SelectState;
+  tokenState: SelectState;
+} {
+  return useAppSelector((state) => ({
+    selectedChainId: state.trade.selectedChainId,
+    selectedToken: deserializeWithBigInt(state.trade.selectedToken),
+    chainState: state.trade.chainState,
+    tokenState: state.trade.tokenState,
+  }));
 }
 
 const slippageRegex: RegExp = /^(?:\d{1,2}(?:\.\d{0,2})?|\.\d{1,2}|100(?:\.0{1,2})?)?$/;
@@ -82,12 +96,13 @@ export const useTradeActionHandlers = (): {
   );
 
   const handleTokenSelect = useCallback(
-    (selectedToken: TokenAmount) => {
-      dispatch(selectToken({ selectedToken }));
-      localStorage.setItem('lifiSelectedToken', serializeWithBigInt(selectedToken));
-    },
-    [dispatch]
-  );
+  (selectedToken: TokenAmount) => {
+    const serializedToken = serializeWithBigInt(selectedToken);
+    dispatch(selectToken({ selectedToken: serializedToken }));
+    localStorage.setItem('lifiSelectedToken', serializedToken);
+  },
+  [dispatch]
+);
 
   const handleChainStateChange = useCallback(
     (chainState: SelectState) => {
@@ -150,7 +165,7 @@ export const useIsNewTxnHash = (): boolean => {
 
 export const useSelectStateManager = () => {
   const dispatch = useAppDispatch();
-  const { selectedChainId, selectedToken, chainState, tokenState } = useAppSelector((state) => state.trade);
+  const {selectedChainId, chainState, tokenState, selectedToken} = useChainAndTokenState();
   const { ovlBalance, isLoading } = useOvlTokenBalance();
   const { selectedChain, loadingChain } = useSelectedChain();
   const { address: account } = useAccount();
@@ -170,7 +185,7 @@ export const useSelectStateManager = () => {
     if (selectedChainId === DEFAULT_CHAINID && ovlBalance === 0) {
       dispatch(setChainState({ chainState: SelectState.EMPTY }));
     }
-    if (selectedChainId !== DEFAULT_CHAINID && selectedChain !== undefined && selectedChain.id === selectedChainId) {
+    if (selectedChainId !== DEFAULT_CHAINID && selectedChain !== null && selectedChain.id === selectedChainId) {
       dispatch(setChainState({ chainState: SelectState.SELECTED }));
     }
   }, [selectedChainId, chainState, dispatch, ovlBalance, selectedChain, isLoading, loadingChain, account]);

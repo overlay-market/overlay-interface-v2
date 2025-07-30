@@ -14,8 +14,7 @@ import {
 } from "./actions";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { getFromLocalStorage } from "../../utils/getFromLocalStorage";
-import { TokenAmount } from "@lifi/sdk";
-import { deserializeWithBigInt } from "../../utils/serializeWithBigInt";
+import { deserializeWithBigInt, serializeWithBigInt } from "../../utils/serializeWithBigInt";
 import { DEFAULT_TOKEN } from "../../constants/applications";
 import { SelectState } from "../../types/selectChainAndTokenTypes";
 
@@ -25,7 +24,7 @@ export interface TradeState {
   readonly isLong: boolean;
   readonly slippageValue: DefaultTxnSettings | string;
   readonly selectedChainId: number;
-  readonly selectedToken: TokenAmount;
+  readonly selectedToken: string; 
   readonly txnHash: string;
   readonly previousTxnHash: string;
   readonly chainState: SelectState;
@@ -38,11 +37,11 @@ export const initialState: TradeState = {
   isLong: true,
   slippageValue: "1",
   selectedChainId: getFromLocalStorage('lifiSelectedChainId', DEFAULT_CHAINID as number),
-  selectedToken: getFromLocalStorage(
+  selectedToken: serializeWithBigInt(getFromLocalStorage(
     'lifiSelectedToken',
     DEFAULT_TOKEN,
     deserializeWithBigInt
-  ),
+  )),
   txnHash: '',
   previousTxnHash: '',
   chainState: SelectState.LOADING,

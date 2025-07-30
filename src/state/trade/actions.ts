@@ -1,4 +1,3 @@
-import { TokenAmount } from '@lifi/sdk';
 import { createAction } from '@reduxjs/toolkit';
 import { SelectState } from '../../types/selectChainAndTokenTypes';
 
@@ -12,7 +11,7 @@ export const selectPositionSide = createAction<{ isLong: boolean }>('trade/selec
 export const setSlippage = createAction<{ slippageValue: DefaultTxnSettings | string }>('trade/setSlippage');
 export const updateTxnHash = createAction<{ txnHash: string }>('trade/updateTxnHash');
 export const selectChain = createAction<{ selectedChainId: number }>('trade/selectChain');
-export const selectToken = createAction<{ selectedToken: TokenAmount }>('trade/selectToken');
+export const selectToken = createAction<{ selectedToken: string }>('trade/selectToken');
 export const setChainState = createAction<{
   chainState: SelectState;
 }>('trade/setChainState');
