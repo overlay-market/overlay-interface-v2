@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useTradeState } from '../../state/trade/hooks';
+import { useChainAndTokenState } from '../../state/trade/hooks';
 import useTokensByChain from './useTokensByChain';
 import useAccount from '../useAccount';
 import { getTokenBalances, TokenAmount } from '@lifi/sdk';
@@ -8,7 +8,7 @@ import { formatUnits } from 'viem';
 const defaultRefetchInterval = 32_000
 
 const useTokenBalances = () => {
-  const { selectedChainId } = useTradeState();
+  const { selectedChainId } = useChainAndTokenState();
   const {address} = useAccount();
 
   const { tokens, chain, isLoading } = useTokensByChain();

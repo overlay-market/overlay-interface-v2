@@ -1,12 +1,12 @@
 import { useAccount } from "wagmi";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../providers/SDKProvider/useSDK";
-import { useTradeState } from "../state/trade/hooks";
+import { useChainAndTokenState, useTradeState } from "../state/trade/hooks";
 import { useEffect, useRef, useState } from "react";
 import { SelectState } from "../types/selectChainAndTokenTypes";
 import { toWei } from "overlay-sdk";
 import { useSelectedTokenBalance } from "./lifi/useSelectedTokenBalance";
-import { calculateOvlAmountFromToken } from "../utils/calculateOvlAmountFromToken";
+import { calculateOvlAmountFromToken } from "../utils/tokenOvlConversion";
 import { OVL_USD_PRICE } from "../constants/applications";
 
 interface UseMaxInputIncludingFeesParams {
@@ -19,8 +19,9 @@ export const useMaxInputIncludingFees = ({
   const { address } = useAccount();
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
-  const { selectedLeverage, chainState, tokenState } =
+  const { selectedLeverage } =
       useTradeState();
+  const { chainState, tokenState } = useChainAndTokenState();    
   const { data: selectedToken } = useSelectedTokenBalance();
 
   const [maxInputIncludingFees, setMaxInputIncludingFees] = useState<number>(0);

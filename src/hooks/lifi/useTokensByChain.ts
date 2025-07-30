@@ -2,10 +2,10 @@ import { ChainType, getTokens, TokensResponse } from '@lifi/sdk';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import useChains from './useChains';
-import { useTradeState } from '../../state/trade/hooks';
+import { useChainAndTokenState } from '../../state/trade/hooks';
 
 const useTokensByChain = () => {
-  const { selectedChainId } = useTradeState();
+  const { selectedChainId } = useChainAndTokenState();
 
   const { data, isLoading } = useQuery<TokensResponse>({
     queryKey: ['tokensByChain', selectedChainId],

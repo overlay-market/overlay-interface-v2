@@ -1,6 +1,6 @@
 import { Avatar, Flex, Skeleton, Text } from "@radix-ui/themes";
 import theme from "../../../../theme";
-import { useTradeState } from "../../../../state/trade/hooks";
+import { useChainAndTokenState } from "../../../../state/trade/hooks";
 import { useSelectedChain } from "../../../../hooks/lifi/useSelectedChain";
 import { SelectState } from "../../../../types/selectChainAndTokenTypes";
 import { DEFAULT_CHAIN_LOGO, DEFAULT_NET } from "../../../../constants/chains";
@@ -12,7 +12,7 @@ interface ChainDisplayProps {
 }
 
 const ChainDisplay: React.FC<ChainDisplayProps> = ({ onClick }) => {
-  const { chainState } = useTradeState();
+  const { chainState } = useChainAndTokenState();
   const { selectedChain, loadingChain } = useSelectedChain();
   const { address: account } = useAccount();
 

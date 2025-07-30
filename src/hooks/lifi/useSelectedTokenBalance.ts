@@ -1,5 +1,5 @@
 import { useAccount } from "wagmi";
-import { useTradeState } from "../../state/trade/hooks";
+import { useChainAndTokenState } from "../../state/trade/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { getTokenBalance } from "@lifi/sdk";
 import { SelectState } from "../../types/selectChainAndTokenTypes";
@@ -7,7 +7,7 @@ import { serializeWithBigInt } from "../../utils/serializeWithBigInt";
 
 export const useSelectedTokenBalance = () => {
   const { address } = useAccount();
-  const { selectedToken, chainState, tokenState } = useTradeState();
+  const { selectedToken, chainState, tokenState } = useChainAndTokenState();
 
   return useQuery({
     queryKey: ["tokenBalance", address, serializeWithBigInt(selectedToken)],

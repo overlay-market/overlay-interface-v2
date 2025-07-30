@@ -1,6 +1,6 @@
 import { Avatar, Flex, Skeleton, Text } from "@radix-ui/themes";
 import theme from "../../../../theme";
-import { useTradeState } from "../../../../state/trade/hooks";
+import { useChainAndTokenState } from "../../../../state/trade/hooks";
 import { SelectState } from "../../../../types/selectChainAndTokenTypes";
 import { DEFAULT_TOKEN } from "../../../../constants/applications";
 import { useAccount } from "wagmi";
@@ -10,7 +10,7 @@ interface TokenDisplayProps {
 }
 
 const TokenDisplay: React.FC<TokenDisplayProps> = ({ onClick }) => {
-  const { tokenState, selectedToken } = useTradeState();
+  const { tokenState, selectedToken } = useChainAndTokenState();
   const { address: account } = useAccount();
 
   return (

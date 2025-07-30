@@ -3,9 +3,9 @@ import theme from "../../../../theme";
 import { useMemo, useState } from "react";
 import ChainSelect from "./ChainSelect";
 import {
+  useChainAndTokenState,
   useSelectStateManager,
   useTradeActionHandlers,
-  useTradeState,
 } from "../../../../state/trade/hooks";
 import { DEFAULT_CHAINID } from "../../../../constants/chains";
 import TokenSelect from "./TokenSelect";
@@ -18,7 +18,7 @@ import TokenDisplay from "./TokenDisplay";
 const ChainAndTokenSelect: React.FC = () => {
   const [showChainSelect, setShowChainSelect] = useState(false);
   const [showTokenSelect, setShowTokenSelect] = useState(false);
-  const { chainState, tokenState } = useTradeState();
+  const { chainState, tokenState } = useChainAndTokenState();
   const { handleChainSelect } = useTradeActionHandlers();
 
   useSelectStateManager();
