@@ -1,5 +1,5 @@
 import { Chain, defineChain } from "viem";
-import { arbitrumSepolia, berachainTestnetbArtio, bscTestnet } from "viem/chains";
+import { arbitrumSepolia, berachainTestnetbArtio, bscTestnet, bsc } from "viem/chains";
 import ArbitrumSepoliaLogo from "../assets/images/arbitrum-testnet-logo.webp";
 import ImolaLogo from "../assets/images/imola-logo.webp";
 import BartioLogo from "../assets/images/bartio-logo.webp";
@@ -15,14 +15,16 @@ export enum SUPPORTED_CHAINID {
   IMOLA = 30732,
   BARTIO = 80084,
   BSC_TESTNET = 97,
+  BSC_MAINNET = 56.
 }
 
-export const DEFAULT_NET = SUPPORTED_CHAINID[97];
-export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.BSC_TESTNET;
+export const DEFAULT_NET = SUPPORTED_CHAINID[56];
+export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.BSC_MAINNET;
 
 export const WORKING_CHAINS = [
   // SUPPORTED_CHAINID[SUPPORTED_CHAINID.ARBITRUM_SEPOLIA],
   SUPPORTED_CHAINID[SUPPORTED_CHAINID.BSC_TESTNET],
+  SUPPORTED_CHAINID[SUPPORTED_CHAINID.BSC_MAINNET]
   // SUPPORTED_CHAINID[SUPPORTED_CHAINID.BARTIO],
 ];
 
@@ -52,6 +54,7 @@ export const VIEM_CHAINS: { [key: number]: Chain } = {
   [SUPPORTED_CHAINID.BARTIO]: berachainTestnetbArtio,
   [SUPPORTED_CHAINID.IMOLA]: imola,
   [SUPPORTED_CHAINID.BSC_TESTNET]: bscTestnet,
+  [SUPPORTED_CHAINID.BSC_MAINNET] : bsc,
 };
 
 export const NETWORK_ICONS: {
@@ -61,6 +64,7 @@ export const NETWORK_ICONS: {
   [SUPPORTED_CHAINID.IMOLA]: ImolaLogo,
   [SUPPORTED_CHAINID.BARTIO]: BartioLogo,
   [SUPPORTED_CHAINID.BSC_TESTNET]: BscTestnetLogo,
+  [SUPPORTED_CHAINID.BSC_MAINNET] : BscTestnetLogo,
 };
 
 export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
@@ -68,10 +72,12 @@ export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
   [SUPPORTED_CHAINID.IMOLA]: "Movement",
   // [SUPPORTED_CHAINID.BARTIO]: "Berachain bArtio",
   [SUPPORTED_CHAINID.BSC_TESTNET]: "BSC Testnet",
+  [SUPPORTED_CHAINID.BSC_MAINNET]: "BSC"
 };
 
 export const CHAIN_LIST_ORDER: { [x: number]: number } = {
   // [0]: SUPPORTED_CHAINID.BARTIO,
+  [0] : SUPPORTED_CHAINID.BSC_MAINNET,
   [1]: SUPPORTED_CHAINID.BSC_TESTNET,
   // [2]: SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
 };

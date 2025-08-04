@@ -23,7 +23,7 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         <Box flexGrow="7" flexShrink="1" flexBasis="0%">
           {(() => {
             const market = marketsData.find(
-              (m) => m.marketId === "Hikaru%20Nakamura"
+              (m) => m.marketId === "Counter-Strike%202%20Skins"
             );
             return (
               <PromotedBanner
@@ -42,7 +42,7 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         <Box flexGrow="3" flexShrink="1" flexBasis="0%">
           {(() => {
             const market = marketsData.find(
-              (m) => m.marketId === "ETH%20Dominance"
+              (m) => m.marketId === "Counter-Strike%202%20Skins"
             );
             return (
               <PromotedBanner
