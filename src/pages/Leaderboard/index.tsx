@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Text } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import { LineSeparator } from "./leaderboard-styles";
 import UserPointsSection from "./UserPointsSection";
@@ -17,7 +17,6 @@ import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
 import { useGetEnsName } from "../../utils/viemEnsUtils";
 import { GradientText } from "./user-points-section-styles";
-import ReferralSection from "./ReferralSection";
 import ReferralModal from "./ReferralSection/ReferralModal";
 import { useSearchParams } from "react-router-dom";
 import { fetchPointsData } from "./utils/fetchPointsData";
@@ -33,9 +32,7 @@ const Leaderboard: React.FC = () => {
   const referralCodeFromURL = searchParams.get("referrer");
   const getEnsName = useGetEnsName();
 
-  const [sessionId, setSessionId] = useState<
-    string | undefined
-  >(undefined);
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const [pointsData, setPointsData] = useState<
     LeaderboardPointsData | undefined
   >(undefined);
@@ -135,8 +132,11 @@ const Leaderboard: React.FC = () => {
       );
 
       if (data) {
-        if (data.sessionDetails && new Date(data.sessionDetails.sessionEnd) < new Date()) {
-          setSessionId(data.sessionDetails.sessionId)
+        if (
+          data.sessionDetails &&
+          new Date(data.sessionDetails.sessionEnd) < new Date()
+        ) {
+          setSessionId(data.sessionDetails.sessionId);
         }
       }
       setPointsData(data);
@@ -205,8 +205,11 @@ const Leaderboard: React.FC = () => {
       setPointsData(data);
       setLoadedNumberOfRows((prev) => prev + ROWS_PER_LOAD);
 
-      if (data.sessionDetails && new Date(data.sessionDetails.sessionEnd) < new Date()) {
-        setSessionId(data.sessionDetails.sessionId)
+      if (
+        data.sessionDetails &&
+        new Date(data.sessionDetails.sessionEnd) < new Date()
+      ) {
+        setSessionId(data.sessionDetails.sessionId);
       }
     }
 
@@ -344,21 +347,6 @@ const Leaderboard: React.FC = () => {
             }
           />
         </Flex>
-
-        {hasJoinedReferralCampaign !== undefined ? (
-          <ReferralSection
-            hasJoinedReferralCampaign={hasJoinedReferralCampaign}
-            userData={userReferralData}
-            setOpenReferralModal={setOpenReferralModal}
-            triggerRefetch={setTriggerRefetchReferralData}
-          />
-        ) : (
-          <Skeleton
-            width={{ initial: "100%", sm: "360px" }}
-            height="50px"
-            style={{ borderRadius: "32px" }}
-          />
-        )}
 
         <LeaderboardTable
           ranks={ranks}
