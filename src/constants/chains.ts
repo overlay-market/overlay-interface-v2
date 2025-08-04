@@ -1,5 +1,5 @@
 import { Chain, defineChain } from "viem";
-import { arbitrumSepolia, berachainTestnetbArtio, bscTestnet, bsc } from "viem/chains";
+import { arbitrumSepolia, berachainTestnetbArtio, bsc } from "viem/chains";
 import ArbitrumSepoliaLogo from "../assets/images/arbitrum-testnet-logo.webp";
 import ImolaLogo from "../assets/images/imola-logo.webp";
 import BartioLogo from "../assets/images/bartio-logo.webp";
