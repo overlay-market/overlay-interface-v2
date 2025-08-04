@@ -18,7 +18,7 @@ export enum SUPPORTED_CHAINID {
 }
 
 export const DEFAULT_NET = SUPPORTED_CHAINID[97];
-export const DEFAULT_CHAINID: number | Chain = SUPPORTED_CHAINID.BSC_TESTNET;
+export const DEFAULT_CHAINID: number = SUPPORTED_CHAINID.BSC_TESTNET;
 export const DEFAULT_CHAIN_LOGO = BscTestnetLogo;
 
 export const WORKING_CHAINS = [
