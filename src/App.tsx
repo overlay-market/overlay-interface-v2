@@ -15,6 +15,8 @@ import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
+import Airdrops from "./pages/Airdrops";
+import useScrollbarWidth from "./hooks/useScrollbarWidth";
 import Faucet from "./pages/Faucet";
 
 const App = () => {
@@ -22,6 +24,8 @@ const App = () => {
   useSyncChainQuery(chainIdRef);
 
   const { chainId: contextChainID } = useMultichainContext();
+
+  useScrollbarWidth();
 
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
@@ -40,6 +44,7 @@ const App = () => {
                 <Route path="/trade" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/airdrops" element={<Airdrops />} />
                 <Route path="/faucet" element={<Faucet />} />
                 <Route path="*" element={<Navigate to="/markets" />} />
               </Routes>
