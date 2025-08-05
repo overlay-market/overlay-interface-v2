@@ -6,6 +6,7 @@ import useAccount from "../../../hooks/useAccount";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
+  useChainAndTokenState,
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
@@ -19,7 +20,12 @@ import { TransactionType } from "../../../constants/transaction";
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
 import { useArcxAnalytics } from "@0xarc-io/analytics";
 import { SelectState } from "../../../types/selectChainAndTokenTypes";
-import { useTradeWithLiFi } from "../../../hooks/lifi/useTradeWithLiFi";
+import { useLiFiTrade } from "../../../hooks/lifi/useLiFiTrade";
+import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFees";
+import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
+import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
+
+const TRADE_WITH_LIFI = "Trade with LiFi";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -36,8 +42,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
-  const { typedValue, selectedLeverage, isLong, chainState, tokenState } =
-    useTradeState();
+  const { typedValue, selectedLeverage, isLong } = useTradeState();
+  const { chainState, tokenState } = useChainAndTokenState();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const [{ showConfirm, attemptingTransaction }, setTradeConfig] = useState<{
@@ -48,27 +54,91 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     attemptingTransaction: false,
   });
   const [isApprovalPending, setIsApprovalPending] = useState<boolean>(false);
-  const { handleTradeWithLifi } = useTradeWithLiFi();
   const arcxAnalytics = useArcxAnalytics();
+  const { maxInputIncludingFees } = useMaxInputIncludingFees({
+    marketId: market?.marketId,
+  });
+
+  const { data: riskParamsData } = useRiskParamsQuery({
+    marketId: market?.id,
+  });
+
+  const minCollateral = useMemo(() => {
+    if (riskParamsData && riskParamsData.markets.length > 0) {
+      const formatted = formatFixedPoint18(
+        riskParamsData.markets[0].minCollateral
+      );
+      const numeric = Number(formatted);
+      return isNaN(numeric) ? 0 : numeric;
+    } else {
+      return 0;
+    }
+  }, [riskParamsData]);
 
   const isDefaultState =
     chainState === SelectState.DEFAULT && tokenState === SelectState.DEFAULT;
   const isSelectedState =
     chainState === SelectState.SELECTED && tokenState === SelectState.SELECTED;
 
-  const title: string | undefined = useMemo(() => {
-    if (!tradeState) return undefined;
-    return tradeState.tradeState;
-  }, [tradeState]);
+  const tradeButtonConfig = useMemo(() => {
+    const title: string = !tradeState ? "Trade" : tradeState.tradeState;
 
-  const isDisabledTradeButton =
-    typedValue &&
-    !loading &&
-    (title === TradeState.Trade ||
-      title === TradeState.NeedsApproval ||
-      title === TradeState.TradeHighPriceImpact)
-      ? false
-      : true;
+    const isDisabledTradeButton =
+      typedValue &&
+      !loading &&
+      tradeState &&
+      [
+        TradeState.Trade,
+        TradeState.NeedsApproval,
+        TradeState.TradeHighPriceImpact,
+      ].includes(tradeState.tradeState)
+        ? false
+        : true;
+
+    return {
+      title,
+      isDisabledTradeButton,
+    };
+  }, [tradeState, loading, typedValue]);
+
+  const liFiTradeButtonConfig = useMemo(() => {
+    const amountExceedsMaxInput = Number(typedValue) > maxInputIncludingFees;
+    const amountBelowMinCollateral =
+      typedValue && Number(typedValue) < minCollateral;
+
+    const title: string = amountExceedsMaxInput
+      ? "Amount Exceeds Max Input"
+      : amountBelowMinCollateral
+      ? "Amount Below Min Collateral"
+      : tradeState &&
+        [
+          TradeState.ExceedsCircuitBreakerOICap,
+          TradeState.ExceedsOICap,
+          TradeState.PositionUnderwater,
+          TradeState.TradeHighPriceImpact,
+        ].includes(tradeState.tradeState)
+      ? tradeState.tradeState
+      : TRADE_WITH_LIFI;
+
+    const isDisabledTradeButton =
+      !typedValue ||
+      loading ||
+      amountExceedsMaxInput ||
+      amountBelowMinCollateral ||
+      [
+        TradeState.ExceedsCircuitBreakerOICap,
+        TradeState.ExceedsOICap,
+        TradeState.PositionUnderwater,
+        TradeState.TradeHighPriceImpact,
+      ].includes(title as TradeState)
+        ? true
+        : false;
+
+    return {
+      title,
+      isDisabledTradeButton,
+    };
+  }, [tradeState, loading, typedValue, maxInputIncludingFees, minCollateral]);
 
   const handleTrade = async () => {
     if (market && tradeState) {
@@ -236,6 +306,27 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
   }, [attemptingTransaction]);
 
+  const { executeLiFiTrade, tradeStage, resetTradeWithLiFi } = useLiFiTrade();
+
+  const handleCrossChainTrade = async () => {
+    if (!address || !market || !tradeState) {
+      console.error("Missing required parameters for cross-chain trade");
+      return;
+    }
+
+    await executeLiFiTrade({
+      priceLimit: toWei(tradeState.priceInfo.minPrice as string),
+    });
+
+    setTradeConfig({
+      showConfirm: false,
+      attemptingTransaction,
+    });
+
+    resetTradeWithLiFi();
+    handleTradeStateReset();
+  };
+
   const renderDefaultState = () => (
     <>
       {loading && <GradientLoaderButton title={"Trade"} />}
@@ -245,10 +336,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         tradeState?.tradeState !== TradeState.NeedsApproval &&
         !isApprovalPending && (
           <GradientOutlineButton
-            title={title ?? "Trade"}
+            title={tradeButtonConfig.title}
             width={"100%"}
-            size={isDisabledTradeButton ? "14px" : "16px"}
-            isDisabled={isDisabledTradeButton}
+            size={tradeButtonConfig.isDisabledTradeButton ? "14px" : "16px"}
+            isDisabled={tradeButtonConfig.isDisabledTradeButton}
             handleClick={() => {
               setTradeConfig({
                 showConfirm: true,
@@ -289,15 +380,31 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const renderSelectedState = () => (
     <>
-      {loading && <GradientLoaderButton title={"Processing..."} />}
+      {loading && <GradientLoaderButton title={TRADE_WITH_LIFI} />}
 
       {address && !loading && (
         <GradientOutlineButton
-          title={"Trade with LiFi"}
+          title={liFiTradeButtonConfig.title}
           width={"100%"}
           size={"16px"}
-          isDisabled={false}
-          handleClick={handleTradeWithLifi}
+          isDisabled={liFiTradeButtonConfig.isDisabledTradeButton}
+          handleClick={() => {
+            setTradeConfig({
+              showConfirm: true,
+              attemptingTransaction: false,
+            });
+          }}
+        />
+      )}
+
+      {tradeState && (
+        <ConfirmTxnModal
+          open={showConfirm}
+          tradeState={tradeState}
+          tradeStage={tradeStage}
+          attemptingTransaction={attemptingTransaction}
+          handleDismiss={handleDismiss}
+          handleTrade={handleCrossChainTrade}
         />
       )}
     </>
@@ -311,20 +418,21 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         <>
           {loading && <GradientLoaderButton title={"Trade"} />}
 
-          {!loading && address ? (
-            <GradientOutlineButton
-              title={"Select Chain and Token"}
-              width={"100%"}
-              isDisabled={true}
-              size={"14px"}
-            />
-          ) : (
-            <GradientOutlineButton
-              title={"Connect Wallet"}
-              width={"100%"}
-              handleClick={openModal}
-            />
-          )}
+          {!loading &&
+            (address ? (
+              <GradientOutlineButton
+                title={"Select Chain and Token"}
+                width={"100%"}
+                isDisabled={true}
+                size={"14px"}
+              />
+            ) : (
+              <GradientOutlineButton
+                title={"Connect Wallet"}
+                width={"100%"}
+                handleClick={openModal}
+              />
+            ))}
         </>
       )}
     </>
