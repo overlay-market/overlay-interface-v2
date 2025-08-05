@@ -1,21 +1,17 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import NumericalInput from "../../../components/NumericalInput";
 import {
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
 import { useSearchParams } from "react-router-dom";
-import useAccount from "../../../hooks/useAccount";
-import { WidgetDrawer } from "@lifi/widget";
-import ExchangeLiFiWidget from "./ExchangeLiFiWidget";
 import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFees";
 
 const CollateralInputComponent: React.FC = () => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
-  const { address } = useAccount();
   const { typedValue } = useTradeState();
   const { handleAmountInput } = useTradeActionHandlers();
   const { maxInputIncludingFees, isLoading, error } = useMaxInputIncludingFees({
@@ -23,12 +19,6 @@ const CollateralInputComponent: React.FC = () => {
   });
 
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
-
-  const drawerRef = useRef<WidgetDrawer>(null);
-
-  const toggleWidget = () => {
-    drawerRef.current?.toggleDrawer();
-  };
 
   const handleUserInput = useCallback(
     (input: string) => {
@@ -85,22 +75,6 @@ const CollateralInputComponent: React.FC = () => {
           )}
         </Flex>
 
-        {address && (
-          <Flex justify={"end"} mb={"-16px"}>
-            <Text
-              size={"1"}
-              my={"-16px"}
-              style={{
-                cursor: "pointer",
-                color: theme.color.blue2,
-              }}
-              onClick={toggleWidget}
-            >
-              Exchange on LI.FI
-            </Text>
-          </Flex>
-        )}
-
         <Flex justify="between">
           <NumericalInput
             value={typedValue}
@@ -111,8 +85,6 @@ const CollateralInputComponent: React.FC = () => {
           </Text>
         </Flex>
       </Flex>
-
-      <ExchangeLiFiWidget ref={drawerRef} />
     </Box>
   );
 };
