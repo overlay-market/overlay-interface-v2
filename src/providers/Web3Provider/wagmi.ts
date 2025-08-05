@@ -1,16 +1,21 @@
 import { http, createConfig } from 'wagmi'
 import { bscTestnet } from 'wagmi/chains'
 import { getDefaultConfig } from 'connectkit'
+import { mainnetChains } from './chains';
 
 const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string
+
+const chains = [...mainnetChains, bscTestnet] as const;
+
+const transports = Object.fromEntries(
+  chains.map((chain) => [chain.id, http()])
+);
 
 export const wagmiConfig = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [bscTestnet],
-    transports: {
-      [bscTestnet.id]: http(),
-    },
+    chains,
+    transports,
 
     // Required API Keys
     walletConnectProjectId: projectId,

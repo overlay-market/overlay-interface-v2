@@ -1,14 +1,35 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectLeverage, selectPositionSide, setSlippage, typeInput, updateTxnHash } from "./actions";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
+import {  TokenAmount } from "@lifi/sdk";
+import { deserializeWithBigInt, serializeWithBigInt } from "../../utils/serializeWithBigInt";
+import { SelectState } from "../../types/selectChainAndTokenTypes";
+import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
+import { DEFAULT_CHAINID } from "../../constants/chains";
+import { useSelectedChain } from "../../hooks/lifi/useSelectedChain";
+import { useAccount } from "wagmi";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
 export function useTradeState(): AppState['trade'] {
   return useAppSelector((state) => state.trade);
+}
+
+export function useChainAndTokenState(): {
+  selectedChainId: number;
+  selectedToken: TokenAmount;
+  chainState: SelectState;
+  tokenState: SelectState;
+} {
+  return useAppSelector((state) => ({
+    selectedChainId: state.trade.selectedChainId,
+    selectedToken: deserializeWithBigInt(state.trade.selectedToken),
+    chainState: state.trade.chainState,
+    tokenState: state.trade.tokenState,
+  }));
 }
 
 const slippageRegex: RegExp = /^(?:\d{1,2}(?:\.\d{0,2})?|\.\d{1,2}|100(?:\.0{1,2})?)?$/;
@@ -19,6 +40,10 @@ export const useTradeActionHandlers = (): {
   handlePositionSideSelect: (isLong: boolean) => void;
   handleSlippageSet: (slippageValue: DefaultTxnSettings | string) => void;
   handleTxnHashUpdate: (txnHash: string, txnBlockNumber: number) => void;
+  handleChainSelect: (selectedChainId: number) => void;
+  handleTokenSelect: (selectedToken: TokenAmount) => void;
+  handleChainStateChange: (chainState: SelectState) => void;
+  handleTokenStateChange: (tokenState: SelectState) => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -62,6 +87,37 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   )
 
+  const handleChainSelect = useCallback(
+    (selectedChainId: number) => {
+      dispatch(selectChain({ selectedChainId }));
+      localStorage.setItem('lifiSelectedChainId', selectedChainId.toString());
+    },
+    [dispatch]
+  );
+
+  const handleTokenSelect = useCallback(
+  (selectedToken: TokenAmount) => {
+    const serializedToken = serializeWithBigInt(selectedToken);
+    dispatch(selectToken({ selectedToken: serializedToken }));
+    localStorage.setItem('lifiSelectedToken', serializedToken);
+  },
+  [dispatch]
+);
+
+  const handleChainStateChange = useCallback(
+    (chainState: SelectState) => {
+      dispatch(setChainState({ chainState }));
+    },
+    [dispatch]
+  );
+
+  const handleTokenStateChange = useCallback(
+    (tokenState: SelectState) => {
+      dispatch(setTokenState({ tokenState }));
+    },
+    [dispatch]
+  );
+
   const handleTxnHashUpdate =  useCallback(
     async (txnHash: string, txnBlockNumber: number) => {
       const checkSubgraphBlock = async () => {
@@ -91,7 +147,11 @@ export const useTradeActionHandlers = (): {
     handleLeverageSelect,
     handlePositionSideSelect,
     handleSlippageSet,
+    handleChainSelect,
+    handleTokenSelect,
     handleTxnHashUpdate,
+    handleChainStateChange,
+    handleTokenStateChange,
     handleTradeStateReset,
   }
 };
@@ -102,3 +162,49 @@ export const useIsNewTxnHash = (): boolean => {
   
   return txnHash !== '' && txnHash !== previousTxnHash
 }
+
+export const useSelectStateManager = () => {
+  const dispatch = useAppDispatch();
+  const {selectedChainId, chainState, tokenState, selectedToken} = useChainAndTokenState();
+  const { ovlBalance, isLoading } = useOvlTokenBalance();
+  const { selectedChain, loadingChain } = useSelectedChain();
+  const { address: account } = useAccount();
+
+  // Effect to manage chain state
+  useEffect(() => {
+    if (account === undefined) {
+    dispatch(setChainState({ chainState: SelectState.EMPTY }));
+    return;
+  }
+
+    if (!ovlBalance || isLoading || loadingChain) return;
+
+    if (selectedChainId === DEFAULT_CHAINID && ovlBalance > 0) {
+      dispatch(setChainState({ chainState: SelectState.DEFAULT }));
+    }
+    if (selectedChainId === DEFAULT_CHAINID && ovlBalance === 0) {
+      dispatch(setChainState({ chainState: SelectState.EMPTY }));
+    }
+    if (selectedChainId !== DEFAULT_CHAINID && selectedChain !== null && selectedChain.id === selectedChainId) {
+      dispatch(setChainState({ chainState: SelectState.SELECTED }));
+    }
+  }, [selectedChainId, chainState, dispatch, ovlBalance, selectedChain, isLoading, loadingChain, account]);
+
+  // Effect to manage token state
+  useEffect(() => {
+    if (account === undefined) {
+    dispatch(setTokenState({ tokenState: SelectState.EMPTY }));
+    return;
+  }
+    if (chainState === SelectState.DEFAULT) {
+      dispatch(setTokenState({ tokenState: SelectState.DEFAULT }));
+      return;
+    }
+    if (selectedToken.chainId !== selectedChainId) {
+      dispatch(setTokenState({ tokenState: SelectState.EMPTY }));
+    }
+    if (selectedToken.chainId === selectedChainId && chainState === SelectState.SELECTED) {
+      dispatch(setTokenState({ tokenState: SelectState.SELECTED }));
+    }
+  }, [selectedToken, tokenState, dispatch, selectedChainId, chainState, account]);
+};
