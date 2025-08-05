@@ -12,10 +12,12 @@ import {
 } from "../../../components/Button";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 import { formatNumberForDisplay } from "../../../utils/formatNumberForDisplay";
+import { TradeStage } from "../../../hooks/lifi/useLiFiTrade";
 
 type ConfirnTxnModalProps = {
   open: boolean;
   tradeState: TradeStateData;
+  tradeStage?: TradeStage;
   attemptingTransaction: boolean;
   handleDismiss: () => void;
   handleTrade: () => void;
@@ -24,12 +26,15 @@ type ConfirnTxnModalProps = {
 const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
   open,
   tradeState,
+  tradeStage,
   attemptingTransaction,
   handleDismiss,
   handleTrade,
 }) => {
   const { currentMarket: market } = useCurrentMarketState();
   const { slippageValue, isLong, selectedLeverage } = useTradeState();
+
+  const tradeWithLiFi = tradeStage !== undefined;
 
   const price: string = useMemo(() => {
     if (!market) return "-";
@@ -66,6 +71,55 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
   const expectedOi: string = useMemo(() => {
     return limitDigitsInDecimals(tradeState.expectedOi);
   }, [tradeState]);
+
+  const renderConfirmTradeDefault = () => (
+    <>
+      {attemptingTransaction ? (
+        <GradientLoaderButton
+          height={"46px"}
+          title={"Pending confirmation..."}
+        />
+      ) : (
+        <GradientSolidButton
+          title={"Confirm Trade"}
+          width={"100%"}
+          height={"46px"}
+          handleClick={handleTrade}
+        />
+      )}
+    </>
+  );
+
+  const renderConfirmTradeWithLiFi = () => (
+    <>
+      {tradeStage && tradeStage.stage === "idle" && (
+        <GradientSolidButton
+          title={"Confirm Trade with LiFi"}
+          width={"100%"}
+          height={"46px"}
+          handleClick={handleTrade}
+        />
+      )}
+
+      {tradeStage && tradeStage.stage !== "idle" && (
+        <>
+          <GradientLoaderButton height={"46px"} title={tradeStage.stage} />
+          <Flex my={"24px"}>
+            <Text
+              style={{
+                color: theme.color.grey2,
+                fontSize: "14px",
+                fontWeight: "600",
+              }}
+            >
+              {tradeStage.message ||
+                "Please wait for the transaction to be processed."}
+            </Text>
+          </Flex>
+        </>
+      )}
+    </>
+  );
 
   return (
     <Modal
@@ -128,19 +182,8 @@ const ConfirmTxnModal: React.FC<ConfirnTxnModalProps> = ({
         </Text>
       </Flex>
 
-      {attemptingTransaction ? (
-        <GradientLoaderButton
-          height={"46px"}
-          title={"Pending confirmation..."}
-        />
-      ) : (
-        <GradientSolidButton
-          title={"Confirm Trade"}
-          width={"100%"}
-          height={"46px"}
-          handleClick={handleTrade}
-        />
-      )}
+      {!tradeWithLiFi && renderConfirmTradeDefault()}
+      {tradeWithLiFi && renderConfirmTradeWithLiFi()}
     </Modal>
   );
 };
