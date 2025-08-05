@@ -1,6 +1,6 @@
 import { TokenAmount } from "@lifi/sdk";
 import { formatUnits, parseUnits } from "viem";
-import { OVL_DECIMALS } from "../constants/applications";
+import { OVL_DECIMALS } from "../../constants/applications";
 
 const USD_DECIMALS = 6;
 
@@ -24,6 +24,7 @@ export const calculateTokenAmountFromOvlAmount = (
   ovlPriceUsd: number,
 ): bigint => {  
 
+  console.log(userInput,Number(userInput) <= 0, parseFloat(token.priceUSD) <= 0, ovlPriceUsd <= 0);
    if (!userInput || Number(userInput) <= 0 || parseFloat(token.priceUSD) <= 0 || ovlPriceUsd <= 0) {
     return 0n;
   }

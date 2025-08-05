@@ -2,15 +2,16 @@ import { useAccount } from "wagmi";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../providers/SDKProvider/useSDK";
 import { useChainAndTokenState, useTradeState } from "../state/trade/hooks";
-import { useEffect, useRef, useState } from "react";
 import { SelectState } from "../types/selectChainAndTokenTypes";
 import { toWei } from "overlay-sdk";
 import { useSelectedTokenBalance } from "./lifi/useSelectedTokenBalance";
-import { calculateOvlAmountFromToken } from "../utils/tokenOvlConversion";
+import { calculateOvlAmountFromToken } from "../utils/lifi/tokenOvlConversion";
 import { OVL_USD_PRICE } from "../constants/applications";
+import { useQuery } from "@tanstack/react-query";
+import { serializeWithBigInt } from "../utils/serializeWithBigInt";
 
 interface UseMaxInputIncludingFeesParams {
-  marketId: string | null;
+  marketId: string | null | undefined;
 }
 
 export const useMaxInputIncludingFees = ({
@@ -19,81 +20,60 @@ export const useMaxInputIncludingFees = ({
   const { address } = useAccount();
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
-  const { selectedLeverage } =
-      useTradeState();
-  const { chainState, tokenState } = useChainAndTokenState();    
+  const { selectedLeverage } = useTradeState();
+  const { chainState, tokenState } = useChainAndTokenState();
   const { data: selectedToken } = useSelectedTokenBalance();
 
-  const [maxInputIncludingFees, setMaxInputIncludingFees] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const sdkRef = useRef(sdk);
-  
-  useEffect(() => {
-    sdkRef.current = sdk;
-  }, [sdk]);
+  const isDefaultState = chainState === SelectState.DEFAULT && tokenState === SelectState.DEFAULT;
+  const isSelectedState = chainState === SelectState.SELECTED && tokenState === SelectState.SELECTED;
 
-  useEffect(() => {
-    const fetchMaxInput = async () => {
-      setError(null);
-      
-      if (!address || !marketId) {
-        setMaxInputIncludingFees(0);
-        return;
+  const enabled = Boolean(
+    address &&
+    marketId &&
+    (isDefaultState || (isSelectedState && selectedToken))
+  );
+
+  const query = useQuery({
+    queryKey: [
+      'maxInputIncludingFees',
+      marketId,
+      address,
+      selectedLeverage,
+      chainId,
+      serializeWithBigInt(selectedToken), 
+      chainState,
+      tokenState,
+    ],
+    queryFn: async () => {
+      if (!address || !marketId) return 0;
+
+      if (isDefaultState) {
+        return await sdk.trade.getMaxInputIncludingFees(
+          marketId,
+          address,
+          toWei(selectedLeverage),
+          6
+        );
       }
 
-      const isDefaultState = chainState === SelectState.DEFAULT && tokenState === SelectState.DEFAULT;
-      const isSelectedState = chainState === SelectState.SELECTED && tokenState === SelectState.SELECTED;
-      
-      if (!isDefaultState && !isSelectedState) {
-        setMaxInputIncludingFees(0);
-        return;
+      if (isSelectedState && selectedToken) {
+        const ovlAmount = calculateOvlAmountFromToken(selectedToken, OVL_USD_PRICE);
+        return await sdk.trade.getMaxInputIncludingFeesFromBalance(
+          marketId,
+          ovlAmount,
+          toWei(selectedLeverage),
+          6
+        );
       }
 
-      setIsLoading(true);
+      return 0;
+    },
+    enabled,
+  });
 
-      try {
-        let maxInput: number;
-
-        if (isDefaultState) {
-          maxInput = await sdkRef.current.trade.getMaxInputIncludingFees(
-            marketId,
-            address,
-            toWei(selectedLeverage),
-            6
-          );
-        } else if (isSelectedState && selectedToken) {
-          const ovlAmount = calculateOvlAmountFromToken(selectedToken, OVL_USD_PRICE);
-          maxInput = await sdkRef.current.trade.getMaxInputIncludingFeesFromBalance(
-            marketId,
-            ovlAmount,
-            toWei(selectedLeverage),
-            6
-          );
-        } else {
-          setIsLoading(false);
-          return;
-        }
-
-        if (maxInput) {
-          setMaxInputIncludingFees(maxInput);
-        }
-      } catch (error) {
-        console.error("Error fetching maxInputIncludingFees:", error);
-        setError(error instanceof Error ? error.message : 'Unknown error occurred');
-        setMaxInputIncludingFees(0);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMaxInput();
-  }, [marketId, address, selectedLeverage, chainId, selectedToken, chainState, tokenState]);
-
-  return { 
-    maxInputIncludingFees, 
-    isLoading, 
-    error  
+  return {
+    maxInputIncludingFees: query.data ?? 0,
+    isLoading: query.isLoading,
+    error: query.error?.message ?? null,
   };
 };
