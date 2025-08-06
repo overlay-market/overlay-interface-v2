@@ -48,6 +48,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData }) => {
                     market.priceCurrency
                   )}
                   title={decodeURIComponent(market.marketId)}
+                  comingSoon={index === 0}
                 />
               </SwiperSlide>
             ))}

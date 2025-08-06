@@ -3,6 +3,8 @@ import {
   CustomCard,
   CardsValue,
   CardsTitle,
+  ComingSoonBanner,
+  ComingSoonOverlay,
 } from "./market-cards-styles";
 import { Skeleton } from "@radix-ui/themes";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
@@ -12,9 +14,15 @@ interface MarketCardsProps {
   priceWithCurrency: string;
   title: string;
   id: string;
+  comingSoon?: boolean;
 }
 
-const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
+const MarketCards = ({
+  priceWithCurrency,
+  title,
+  id,
+  comingSoon = false,
+}: MarketCardsProps) => {
   const redirectToTradePage = useRedirectToTradePage();
   return (
     <Skeleton loading={false}>
@@ -23,11 +31,17 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
           backgroundImage: `url(${getMarketLogo(id)})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          cursor: "pointer",
+          cursor: comingSoon ? "default" : "pointer",
           width: 200,
         }}
-        onClick={() => redirectToTradePage(id)}
+        onClick={() => !comingSoon && redirectToTradePage(id)}
       >
+        {comingSoon && (
+          <>
+            <ComingSoonOverlay />
+            <ComingSoonBanner>COMING SOON</ComingSoonBanner>
+          </>
+        )}
         <CardContent direction="column" align="center">
           <CardsValue>{priceWithCurrency}</CardsValue>
           <CardsTitle>{title}</CardsTitle>

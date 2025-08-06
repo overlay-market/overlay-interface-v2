@@ -36,6 +36,31 @@ export const CardContent = styled(Flex)`
   text-align: end;
 `;
 
+export const ComingSoonBanner = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-35deg);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 60px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 150%;
+  text-align: center;
+  z-index: 2;
+`;
+
+export const ComingSoonOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(128, 128, 128, 0.6);
+  z-index: 1;
+`;
+
 export const CardsValue = styled.h2`
   margin: 0;
   font-size: clamp(0.8rem, 3vw, 1.2rem);
