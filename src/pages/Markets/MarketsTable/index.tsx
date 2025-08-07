@@ -5,6 +5,7 @@ import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { TransformedMarketData } from "overlay-sdk";
 import ProgressBar from "../../../components/ProgressBar";
+import { GradientOutlineButton } from "../../../components/Button";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
@@ -475,22 +476,37 @@ export default function MarketsTable({
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <Flex align="center" gap="2">
-                          <Text size="2" style={{ color: theme.color.red2 }}>
-                            {Math.round(
-                              Number(market.shortPercentageOfTotalOi)
-                            )}
-                            %
+                        {isComingSoon ? (
+                          <Text
+                            size="4"
+                            style={{
+                              background: "linear-gradient(90deg, #A8A6A6 0%, #ff7cd5 100%)",
+                              backgroundClip: "text",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Coming Soon
                           </Text>
-                          <ProgressBar
-                            max={100}
-                            value={Number(market.shortPercentageOfTotalOi)}
-                          />
-                          <Text size="2" style={{ color: theme.color.green2 }}>
-                            {Math.round(Number(market.longPercentageOfTotalOi))}
-                            %
-                          </Text>
-                        </Flex>
+                        ) : (
+                          <Flex align="center" gap="2">
+                            <Text size="2" style={{ color: theme.color.red2 }}>
+                              {Math.round(
+                                Number(market.shortPercentageOfTotalOi)
+                              )}
+                              %
+                            </Text>
+                            <ProgressBar
+                              max={100}
+                              value={Number(market.shortPercentageOfTotalOi)}
+                            />
+                            <Text size="2" style={{ color: theme.color.green2 }}>
+                              {Math.round(Number(market.longPercentageOfTotalOi))}
+                              %
+                            </Text>
+                          </Flex>
+                        )}
                       </Table.Cell>
                       <Table.Cell style={{ textAlign: "center" }}>
                         <img
