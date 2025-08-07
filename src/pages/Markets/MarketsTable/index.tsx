@@ -345,6 +345,8 @@ export default function MarketsTable({
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
+              
+              const isComingSoon = !defaultMarketIds.has(market.marketId);
 
               const lineColor =
                 market7d &&
@@ -362,19 +364,46 @@ export default function MarketsTable({
                   key={index}
                   style={{
                     borderBottom: `1px solid ${theme.color.darkBlue}`,
-                    cursor: "pointer",
+                    cursor: isComingSoon ? "default" : "pointer",
+                    opacity: isComingSoon ? 0.8 : 1,
                   }}
-                  onClick={() => redirectToTradePage(market.marketId)}
+                  onClick={() => !isComingSoon && redirectToTradePage(market.marketId)}
                 >
                   <Table.Cell
                     style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                   >
                     <Flex style={{ alignItems: "center" }}>
-                      <MarketsLogos
-                        src={getMarketLogo(market.marketId)}
-                        alt={decodeURIComponent(market.marketId)}
-                        className="rounded-full"
-                      />
+                      <div style={{ position: "relative", display: "inline-block" }}>
+                        <MarketsLogos
+                          src={getMarketLogo(market.marketId)}
+                          alt={decodeURIComponent(market.marketId)}
+                          className="rounded-full"
+                          style={{
+                            filter: isComingSoon ? "grayscale(100%) brightness(0.6)" : "none",
+                          }}
+                        />
+                        {isComingSoon && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              fontSize: "8px",
+                              fontWeight: "bold",
+                              textAlign: "center",
+                              borderRadius: "50%",
+                            }}
+                          >
+                            SOON
+                          </div>
+                        )}
+                      </div>
                       <span style={{ alignSelf: "center", marginLeft: 20 }}>
                         {isMobile &&
                         decodeURIComponent(market.marketId).length > 28
