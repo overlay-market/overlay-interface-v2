@@ -35,16 +35,11 @@ const Markets: React.FC = () => {
           chainId: 97,
           rpcUrls: {
             97: import.meta.env.VITE_BSC_TESTNET_RPC,
-            56: import.meta.env.VITE_BSC_MAINNET_RPC,
-            31337: import.meta.env.VITE_BARTIO_RPC,
-            421614: import.meta.env.VITE_ARBITRUM_SEPOLIA_RPC,
           },
           useShiva: true,
         });
         const bscTestnetMarkets = await sdkForBscTestnet.markets.transformMarketsData();
         setOtherChainMarketsData(bscTestnetMarkets);
-        // For demonstration, log the BSC_TESTNET markets
-        // console.log("Markets from BSC_TESTNET:", bscTestnetMarkets);
       } catch (error) {
         console.error("Error fetching markets:", error);
       }
@@ -61,8 +56,7 @@ const Markets: React.FC = () => {
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
       <FirstSection marketsData={marketsData} />
       <Carousel marketsData={marketsData} otherChainMarketsData={otherChainMarketsData} />
-      <MarketsTable marketsData={marketsData} />
-      {/* You can use otherChainMarketsData as needed in your UI */}
+      <MarketsTable marketsData={marketsData} otherChainMarketsData={otherChainMarketsData} />
     </Flex>
   );
 };

@@ -17,6 +17,7 @@ import { getMarketLogo } from "../../../utils/getMarketLogo";
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
+  otherChainMarketsData?: TransformedMarketData[];
 }
 
 type SortableKeys =
@@ -27,8 +28,15 @@ type SortableKeys =
 
 export default function MarketsTable({
   marketsData,
+  otherChainMarketsData = [],
 }: MarketsTableProps): JSX.Element {
-  const marketIds = marketsData.map((market) => market.marketId);
+  const defaultMarketIds = new Set(marketsData.map((m) => m.marketId));
+  const uniqueOtherChainMarkets = otherChainMarketsData.filter(
+    (market) => !defaultMarketIds.has(market.marketId)
+  );
+  const allMarketsData = [...marketsData, ...uniqueOtherChainMarkets];
+
+  const marketIds = allMarketsData.map((market) => market.marketId);
   const markets7d = useMarkets7d(marketIds);
   const redirectToTradePage = useRedirectToTradePage();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -41,7 +49,7 @@ export default function MarketsTable({
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const sortedData = React.useMemo(() => {
-    const sortableItems = [...marketsData];
+    const sortableItems = [...allMarketsData];
     if (sortConfig?.key) {
       sortableItems.sort((a, b) => {
         let aValue = 0,
@@ -84,7 +92,7 @@ export default function MarketsTable({
       });
     }
     return sortableItems;
-  }, [marketsData, markets7d, sortConfig]);
+  }, [allMarketsData, markets7d, sortConfig]);
 
   const requestSort = (key: SortableKeys) => {
     let direction: "ascending" | "descending";
