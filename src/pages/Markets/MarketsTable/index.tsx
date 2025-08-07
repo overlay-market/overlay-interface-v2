@@ -408,7 +408,7 @@ export default function MarketsTable({
                       <span style={{ 
                         alignSelf: "center", 
                         marginLeft: 20,
-                        color: isComingSoon ? "white" : "inherit"
+                        color: isComingSoon ? "#8B8B8B" : "inherit"
                       }}>
                         {isMobile &&
                         decodeURIComponent(market.marketId).length > 28
@@ -420,7 +420,7 @@ export default function MarketsTable({
                       </span>
                     </Flex>
                   </Table.Cell>
-                  <Table.Cell style={{ color: isComingSoon ? "white" : "inherit" }}>
+                  <Table.Cell style={{ color: isComingSoon ? "#8B8B8B" : "inherit" }}>
                     {formatPriceWithCurrency(
                       market.price ?? 0,
                       market.priceCurrency
@@ -430,7 +430,7 @@ export default function MarketsTable({
                     <>
                       <Table.Cell
                         style={{
-                          color: isComingSoon ? "white" :
+                          color: isComingSoon ? "#8B8B8B" :
                             (market7d?.oneHourChange ?? 0) >= 0
                               ? theme.color.green2
                               : theme.color.red2,
@@ -442,7 +442,7 @@ export default function MarketsTable({
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color: isComingSoon ? "white" :
+                          color: isComingSoon ? "#8B8B8B" :
                             (market7d?.twentyFourHourChange ?? 0) >= 0
                               ? theme.color.green2
                               : theme.color.red2,
@@ -454,7 +454,7 @@ export default function MarketsTable({
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color: isComingSoon ? "white" :
+                          color: isComingSoon ? "#8B8B8B" :
                             (market7d?.sevenDayChange ?? 0) >= 0
                               ? theme.color.green2
                               : theme.color.red2,
@@ -464,10 +464,10 @@ export default function MarketsTable({
                           {market7d?.sevenDayChange?.toFixed(2)}%
                         </Skeleton>
                       </Table.Cell>
-                      <Table.Cell style={{ color: isComingSoon ? "white" : theme.color.green2 }}>
+                      <Table.Cell style={{ color: isComingSoon ? "#8B8B8B" : theme.color.green2 }}>
                         <span
                           style={{
-                            color: isComingSoon ? "white" :
+                            color: isComingSoon ? "#8B8B8B" :
                               market.funding && Number(market.funding) < 0
                                 ? theme.color.red2
                                 : theme.color.green2,
@@ -542,7 +542,7 @@ export default function MarketsTable({
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke={isComingSoon ? "white" : lineColor}
+                          stroke={isComingSoon ? "#8B8B8B" : lineColor}
                           strokeWidth={2}
                           dot={false}
                         />
