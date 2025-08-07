@@ -87,13 +87,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: <TrophyActiveIcon />,
       showOnMobile: true,
     },
-    {
-      to: "/faucet",
-      label: "Faucet",
-      icon: <StakeIcon />,
-      activeIcon: <StakeActiveIcon />,
-      showOnMobile: true,
-    },
+    // {
+    //   to: "/faucet",
+    //   label: "Faucet",
+    //   icon: <StakeIcon />,
+    //   activeIcon: <StakeActiveIcon />,
+    //   showOnMobile: true,
+    // },
     {
       to: "/bridge",
       label: "Bridge",
