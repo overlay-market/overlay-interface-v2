@@ -70,6 +70,7 @@ const Carousel: React.FC<CarouselProps> = ({ marketsData, otherChainMarketsData 
                       market.priceCurrency
                     )}
                     title={decodeURIComponent(market.marketId)}
+                    isComingSoon={true}
                   />
                 </SwiperSlide>
               ))}
