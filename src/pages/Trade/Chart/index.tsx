@@ -307,7 +307,6 @@ const Chart: React.FC = () => {
                   if (price >= 1000) {
                     return `${(price / 1000).toFixed(3)}K`;
                   }
-
                   if (price >= 1 && price < 10) {
                     return price.toFixed(fractionDigitsAmount);
                   }
@@ -322,7 +321,6 @@ const Chart: React.FC = () => {
                 },
               };
             }
-
             return null; // The default formatter will be used.
           },
         },
