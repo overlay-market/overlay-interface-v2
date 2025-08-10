@@ -281,17 +281,12 @@ const Chart: React.FC = () => {
             if (symbolInfo === null) {
               return null;
             }
-            const marketFormattingPrice = [
-              "BTC / USD",
-              "ETH / USD",
-              "Magnus Carlsen",
-              "Hikaru Nakamura",
-            ];
+            const marketFormattingPrice = ["BTC / USD", "ETH / USD"];
             const marketName = market?.marketName || "";
             if (marketFormattingPrice.some((name) => marketName === name)) {
               return {
-                format: (price) => {
-                  return Math.round(price).toLocaleString("en-US");
+                format: (price: number) => {
+                  return Math.round(price).toString();
                 },
               };
             }
@@ -307,6 +302,7 @@ const Chart: React.FC = () => {
                   if (price >= 1000) {
                     return `${(price / 1000).toFixed(3)}K`;
                   }
+
                   if (price >= 1 && price < 10) {
                     return price.toFixed(fractionDigitsAmount);
                   }
