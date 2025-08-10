@@ -1,8 +1,7 @@
 import { Address, createPublicClient, GetEnsNameReturnType, http, PublicClient, GetEnsAvatarReturnType } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from 'viem/ens'
-import useSDK from "../providers/SDKProvider/useSDK";
-import { SUPPORTED_CHAINID } from "../constants/chains";
+
 
 type GetEnsNameFunction = (address: Address) => Promise<GetEnsNameReturnType>;
 type GetEnsAvatarFunction = (name: string) => Promise<GetEnsAvatarReturnType>;
@@ -21,8 +20,7 @@ const publicClient: PublicClient = createPublicClient({
 });
 
 const useGetClient = (): PublicClient => {
-  const sdk = useSDK();
-  return sdk.core.chainId as number === SUPPORTED_CHAINID.MAINNET ? sdk.core.rpcProvider : publicClient;
+  return publicClient;
 };
 
 const ensNameCache = new Map<Address, string | null>();
