@@ -1,6 +1,6 @@
-export const SOLANA_DEVNET_EID = 40168; // LayerZero endpoint id for Solana devnet
-export const BRIDGE_CONTRACT_ADDRESS = "0x9e642cC2516A661a1d43e36b96117a13bf3903a9";
-export const OVL_TOKEN_ADDRESS = "0xb880E767739A82Eb716780BDfdbC1eD7b23BDB38";
+export const SOLANA_DEVNET_EID = 30168; // LayerZero endpoint id for Solana mainnet
+export const BRIDGE_CONTRACT_ADDRESS = "0x551D0BCd03aA13609a6982Cf8554f9ACa04C9464"; // BSC mainnet OvlOFTAdapter
+export const OVL_TOKEN_ADDRESS = "0x1F34c87ded863Fe3A3Cd76FAc8adA9608137C8c3";
 
 export const BRIDGE_ABI = [
         {
