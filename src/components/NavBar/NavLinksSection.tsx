@@ -17,10 +17,10 @@ import {
 //   PowercardIcon,
 //   PowercardActiveIcon,
 // } from "../../assets/icons/navBar-icons/powercard";
-import {
-  StakeIcon,
-  StakeActiveIcon,
-} from "../../assets/icons/navBar-icons/stake";
+// import {
+//   StakeIcon,
+//   StakeActiveIcon,
+// } from "../../assets/icons/navBar-icons/stake";
 import { DEFAULT_MARKET, NAVBAR_MODE } from "../../constants/applications";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
 import {
@@ -94,13 +94,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
     //   activeIcon: <StakeActiveIcon />,
     //   showOnMobile: true,
     // },
-    {
-      to: "/bridge",
-      label: "Bridge",
-      icon: <StakeIcon />,
-      activeIcon: <StakeActiveIcon />,
-      showOnMobile: true,
-    },
+    // {
+    //   to: "/bridge",
+    //   label: "Bridge",
+    //   icon: <StakeIcon />,
+    //   activeIcon: <StakeActiveIcon />,
+    //   showOnMobile: true,
+    // },
     // {
     //   to: "/stake",
     //   label: "Stake",
