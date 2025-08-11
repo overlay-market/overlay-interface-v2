@@ -1,7 +1,7 @@
 import { Box, Button, Flex, Text } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 
-const TGE_DATE = new Date("2025-08-14T00:00:00Z"); // Replace with actual TGE date
+const TGE_DATE = new Date("2025-08-14T00:00:00Z");
 
 const PreTGEBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -76,20 +76,17 @@ const PreTGEBanner: React.FC = () => {
         <Flex align="center" gap="4">
           <Flex align="center">
             <img
-              src="/src/assets/images/overlay-logo-only-no-background.webp"
+              src="/src/assets/images/overlay-full-logo.png"
               alt="Overlay"
               style={{ height: "40px" }}
             />
-            <Text size="6" style={{ color: "white", marginLeft: "1rem" }}>
-              OVERLAY
-            </Text>
           </Flex>
           <Text size="6" style={{ color: "white" }}>
-            X
+            x
           </Text>
           <Flex align="center">
             <img
-              src="/src/assets/images/bnc-mainnet-logo.png"
+              src="/src/assets/images/bsc-mainnet-logo.png"
               alt="Binance Alpha"
               style={{ height: "60px" }}
             />
@@ -124,12 +121,7 @@ const PreTGEBanner: React.FC = () => {
             alignItems: "center",
             gap: "0.5rem",
           }}
-          onClick={() =>
-            window.open(
-              "https://www.binance.com/en/feed/post/1234567",
-              "_blank"
-            )
-          }
+          onClick={() => window.open("https://x.com/overlayprotocol", "_blank")}
         >
           LEARN MORE
         </Button>
