@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Text } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
+import { ArrowRightIcon } from "../../assets/icons/ArrowRight";
 
 const TGE_DATE = new Date("2025-08-14T00:00:00Z");
 
@@ -83,7 +84,7 @@ const PreTGEBanner: React.FC = () => {
               src="/src/assets/images/overlay-full-logo.png"
               alt="Overlay"
               style={{
-                height: "40px",
+                height: "60px",
                 maxWidth: "100%",
                 objectFit: "contain",
               }}
@@ -135,7 +136,7 @@ const PreTGEBanner: React.FC = () => {
           }}
           onClick={() => window.open("https://x.com/overlayprotocol", "_blank")}
         >
-          LEARN MORE
+          LEARN MORE <ArrowRightIcon />
         </Button>
       </Flex>
     </Box>
