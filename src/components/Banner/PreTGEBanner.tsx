@@ -81,7 +81,7 @@ const PreTGEBanner: React.FC = () => {
         >
           <Flex align="center">
             <img
-              src="/src/assets/images/overlay-logo-only-no-background.webp"
+              src="/src/assets/images/overlay-full-logo.png"
               alt="Overlay"
               style={{
                 height: "60px",
@@ -91,11 +91,11 @@ const PreTGEBanner: React.FC = () => {
             />
           </Flex>
           <Text size="6" style={{ color: "white" }}>
-            X
+            x
           </Text>
           <Flex align="center">
             <img
-              src="/src/assets/images/bnc-mainnet-logo.png"
+              src="/src/assets/images/bsc-mainnet-logo.png"
               alt="Binance Alpha"
               style={{
                 height: "60px",
@@ -134,12 +134,7 @@ const PreTGEBanner: React.FC = () => {
             alignItems: "center",
             gap: "0.5rem",
           }}
-          onClick={() =>
-            window.open(
-              "https://www.binance.com/en/feed/post/1234567",
-              "_blank"
-            )
-          }
+          onClick={() => window.open("https://x.com/overlayprotocol", "_blank")}
         >
           LEARN MORE <ArrowRightIcon />
         </Button>
