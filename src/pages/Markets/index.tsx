@@ -2,17 +2,20 @@ import { Flex } from "@radix-ui/themes";
 import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
+import PreTGEBanner from "../../components/Banner/PreTGEBanner";
 import MarketsTable from "./MarketsTable";
 import { TransformedMarketData } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
-import { OverlaySDK } from "overlay-sdk"; 
+import { OverlaySDK } from "overlay-sdk";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
-  const [otherChainMarketsData, setOtherChainMarketsData] = useState<TransformedMarketData[]>([]); // new state
+  const [otherChainMarketsData, setOtherChainMarketsData] = useState<
+    TransformedMarketData[]
+  >([]); // new state
   const [totalSupplyChange, setTotalSupplyChange] = useState<
     string | undefined
   >();
@@ -38,7 +41,8 @@ const Markets: React.FC = () => {
           },
           useShiva: true,
         });
-        const bscTestnetMarkets = await sdkForBscTestnet.markets.transformMarketsData();
+        const bscTestnetMarkets =
+          await sdkForBscTestnet.markets.transformMarketsData();
         setOtherChainMarketsData(bscTestnetMarkets);
       } catch (error) {
         console.error("Error fetching markets:", error);
@@ -54,9 +58,16 @@ const Markets: React.FC = () => {
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
+      <PreTGEBanner />
       <FirstSection marketsData={marketsData} />
-      <Carousel marketsData={marketsData} otherChainMarketsData={otherChainMarketsData} />
-      <MarketsTable marketsData={marketsData} otherChainMarketsData={otherChainMarketsData} />
+      <Carousel
+        marketsData={marketsData}
+        otherChainMarketsData={otherChainMarketsData}
+      />
+      <MarketsTable
+        marketsData={marketsData}
+        otherChainMarketsData={otherChainMarketsData}
+      />
     </Flex>
   );
 };
