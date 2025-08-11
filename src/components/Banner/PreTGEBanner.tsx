@@ -72,13 +72,21 @@ const PreTGEBanner: React.FC = () => {
       >
         ✕
       </Button>
-      <Flex direction="column" align="center" gap="6">
-        <Flex align="center" gap="4">
+      <Flex direction="column" align="center" gap="4">
+        <Flex
+          direction={{ initial: "column", sm: "row" }}
+          align="center"
+          gap={{ initial: "2", sm: "4" }}
+        >
           <Flex align="center">
             <img
               src="/src/assets/images/overlay-full-logo.png"
               alt="Overlay"
-              style={{ height: "40px" }}
+              style={{
+                height: "40px",
+                maxWidth: "100%",
+                objectFit: "contain",
+              }}
             />
           </Flex>
           <Text size="6" style={{ color: "white" }}>
@@ -88,7 +96,11 @@ const PreTGEBanner: React.FC = () => {
             <img
               src="/src/assets/images/bsc-mainnet-logo.png"
               alt="Binance Alpha"
-              style={{ height: "60px" }}
+              style={{
+                height: "60px",
+                maxWidth: "100%",
+                objectFit: "contain",
+              }}
             />
           </Flex>
         </Flex>
