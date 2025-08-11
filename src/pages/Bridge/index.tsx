@@ -21,7 +21,11 @@ import {
 import { StyledInput } from "../Leaderboard/ReferralSection/referral-modal-styles";
 import { readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
-import { BridgeContainer, GradientBorderBox } from "./bridge-styles";
+import {
+  BridgeContainer,
+  GradientBorderBox,
+  SourceChainSelectButton,
+} from "./bridge-styles";
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import useDebounce from "../../hooks/useDebounce";
@@ -38,6 +42,7 @@ const Bridge: React.FC = () => {
   const addPopup = useAddPopup();
   const { ovlBalance, refetch } = useOvlTokenBalance();
 
+  const [sourceChain, setSourceChain] = useState<"BSC" | "SOLANA">("BSC");
   const [amount, setAmount] = useState("");
   const [destination, setDestination] = useState("");
   const debouncedAmount = useDebounce(amount, 500);
@@ -54,11 +59,13 @@ const Bridge: React.FC = () => {
 
   const title: string = useMemo(() => {
     const amount = parseFloat(debouncedAmount);
-    if (isNaN(amount)) return "Bridge";
+    const defaultTitle =
+      sourceChain === "BSC" ? "Bridge to Solana" : "Bridge to BSC";
+    if (isNaN(amount)) return defaultTitle;
     if (ovlBalance && amount > ovlBalance)
       return "Amount Exceeds Available Balance";
-    return "Bridge";
-  }, [debouncedAmount, ovlBalance]);
+    return defaultTitle;
+  }, [debouncedAmount, ovlBalance, sourceChain]);
 
   const handleBridge = async () => {
     if (!address) {
@@ -190,17 +197,19 @@ const Bridge: React.FC = () => {
           style={{ fontWeight: "600", textAlign: "center" }}
           size={{ initial: "6", sm: "7" }}
         >
-          Bridge OVL to Solana Devnet
+          OVL Bridge
         </Text>
+
         <Text
           style={{
             fontWeight: "600",
             textAlign: "center",
-            color: theme.color.blue1,
           }}
           size={{ initial: "4", sm: "5" }}
         >
-          Balance:{" "}
+          <span style={{ color: theme.color.grey3, fontWeight: "400" }}>
+            Balance:
+          </span>{" "}
           <span style={{ fontFamily: "Roboto Mono", paddingLeft: "14px" }}>
             {ovlBalance?.toLocaleString("en-US", {
               minimumFractionDigits: 0,
@@ -214,9 +223,61 @@ const Bridge: React.FC = () => {
           <Flex
             direction={"column"}
             width={"100%"}
-            gap={"16px"}
+            gap={"20px"}
             p={{ sm: "32px" }}
           >
+            <Text
+              size="1"
+              style={{ color: theme.color.grey3, textAlign: "center" }}
+            >
+              Select Source Chain
+            </Text>
+            <Flex gap="12px" justify="center" mt={"-10px"}>
+              <SourceChainSelectButton
+                active={sourceChain === "BSC" ? "true" : "false"}
+                onClick={() => setSourceChain("BSC")}
+              >
+                <Flex
+                  direction={"column"}
+                  justify={"center"}
+                  align={"center"}
+                  height="100%"
+                >
+                  <Text
+                    size={"3"}
+                    weight={"bold"}
+                    style={{
+                      color: sourceChain === "BSC" ? theme.color.blue2 : "",
+                    }}
+                  >
+                    BSC
+                  </Text>
+                </Flex>
+              </SourceChainSelectButton>
+
+              <SourceChainSelectButton
+                active={sourceChain === "SOLANA" ? "true" : "false"}
+                onClick={() => setSourceChain("SOLANA")}
+              >
+                <Flex
+                  direction={"column"}
+                  justify={"center"}
+                  align={"center"}
+                  height="100%"
+                >
+                  <Text
+                    size={"3"}
+                    weight={"bold"}
+                    style={{
+                      color: sourceChain === "SOLANA" ? theme.color.blue2 : "",
+                    }}
+                  >
+                    SOLANA
+                  </Text>
+                </Flex>
+              </SourceChainSelectButton>
+            </Flex>
+
             <Box
               width={"100%"}
               p={"8px"}
@@ -245,7 +306,9 @@ const Bridge: React.FC = () => {
               type="text"
               value={destination}
               onChange={(e) => setDestination(e.target.value.trim())}
-              placeholder="Solana Address"
+              placeholder={
+                sourceChain === "BSC" ? "Solana Address" : "BSC Address"
+              }
             />
 
             {address ? (
