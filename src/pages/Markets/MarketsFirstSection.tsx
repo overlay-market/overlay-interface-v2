@@ -42,7 +42,7 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         <Box flexGrow="3" flexShrink="1" flexBasis="0%">
           {(() => {
             const market = marketsData.find(
-              (m) => m.marketId === "Counter-Strike%202%20Skins"
+              (m) => m.marketId === "BNB%20%2F%20USD"
             );
             return (
               <PromotedBanner
