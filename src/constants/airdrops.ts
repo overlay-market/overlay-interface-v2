@@ -1,6 +1,6 @@
 export enum ClaimId {
   TUNA = 'TUNA',
-  OG_PCD = 'OG + PCD',
+  OG_PCD = 'OG_PCD',
   FJORD_BUYERS = 'FJORD_BUYERS',
 }
 
