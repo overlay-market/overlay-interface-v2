@@ -1,6 +1,9 @@
 import { Box, Button, Flex, Text } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import { ArrowRightIcon } from "../../assets/icons/ArrowRight";
+import bnc_pre_TGE from "../../assets/images/bnc_pre_TGE.png";
+import overlayFullLogo from "../../assets/images/overlay-full-logo.png";
+import bscMainnetLogo from "../../assets/images/bsc-mainnet-logo.png";
 
 const TGE_DATE = new Date("2025-08-14T07:30:00Z");
 
@@ -40,7 +43,7 @@ const PreTGEBanner: React.FC = () => {
       ml={{ sm: "16px", xs: "0" }}
       width={{ sm: "calc(100% - 16px)", xs: "100%" }}
       style={{
-        background: 'url("/src/assets/images/bnc_pre_TGE.png")',
+        background: `url(${bnc_pre_TGE})`,
         backgroundSize: "cover",
         padding: "2rem",
         marginTop: "1rem",
@@ -81,7 +84,7 @@ const PreTGEBanner: React.FC = () => {
         >
           <Flex align="center">
             <img
-              src="/src/assets/images/overlay-full-logo.png"
+              src={overlayFullLogo}
               alt="Overlay"
               style={{
                 height: "60px",
@@ -95,7 +98,7 @@ const PreTGEBanner: React.FC = () => {
           </Text>
           <Flex align="center">
             <img
-              src="/src/assets/images/bsc-mainnet-logo.png"
+              src={bscMainnetLogo}
               alt="Binance Alpha"
               style={{
                 height: "60px",
