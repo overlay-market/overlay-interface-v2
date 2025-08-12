@@ -47,6 +47,7 @@ import BillieEilish from "../assets/images/markets-full-logos/billie-eilish.jpg"
 import StrategicReverseIndex from '../assets/images/markets-full-logos/strategic-reserve-index.webp';
 import BtcUsdLogo from '../assets/images/markets-full-logos/BTC-USD.webp';
 import EthUsdLogo from '../assets/images/markets-full-logos/ETH-USD.webp';
+import CoinVsHood from '../assets/images/markets-full-logos/coin-vs-hood.png';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -98,6 +99,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Strategic%20Reserve%20Index": StrategicReverseIndex,
   "ETH%20%2F%20USD": EthUsdLogo,
   "BTC%20%2F%20USD": BtcUsdLogo,
+  "Coin%20Vs%20Hood": CoinVsHood,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {

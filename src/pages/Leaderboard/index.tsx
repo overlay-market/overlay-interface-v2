@@ -1,4 +1,4 @@
-import { Flex, Skeleton, Text } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import {
   LeaderboardContainer,
@@ -21,7 +21,6 @@ import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
 import { useGetEnsName } from "../../utils/viemEnsUtils";
 import { GradientText } from "./user-points-section-styles";
-import ReferralSection from "./ReferralSection";
 import ReferralModal from "./ReferralSection/ReferralModal";
 import { useSearchParams } from "react-router-dom";
 import { fetchPointsData } from "./utils/fetchPointsData";
@@ -352,21 +351,6 @@ const Leaderboard: React.FC = () => {
             }
           />
         </Flex>
-
-        {hasJoinedReferralCampaign !== undefined ? (
-          <ReferralSection
-            hasJoinedReferralCampaign={hasJoinedReferralCampaign}
-            userData={userReferralData}
-            setOpenReferralModal={setOpenReferralModal}
-            triggerRefetch={setTriggerRefetchReferralData}
-          />
-        ) : (
-          <Skeleton
-            width={{ initial: "100%", sm: "360px" }}
-            height="50px"
-            style={{ borderRadius: "32px" }}
-          />
-        )}
 
         <LeaderboardTable
           ranks={ranks}
