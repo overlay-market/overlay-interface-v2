@@ -47,6 +47,7 @@ type AirdropClaimProps = {
 const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
   const { address: account } = useAccount();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [streamData, setStreamData] = useState<StreamData | null>(null);
   const [airdropIdForErrorClaimAlias, setAirdropIdForErrorClaimAlias] =
     useState<string | null>(null);
@@ -89,15 +90,8 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
 
   const handleClaim = (airdropId: string) => {
     setAirdropIdForErrorClaimAlias(null);
-
-    const alias =
-      streamData &&
-      streamData.find(
-        (item) =>
-          item.sender.toLowerCase() ===
-          MERKLE_DISTIBUTOR_ADDRESSES[airdropId].toLowerCase()
-      )?.alias;
-
+    const alias = MERKLE_DISTIBUTOR_ADDRESSES[airdropId];
+    
     if (alias) {
       const url = `${SABLIER_VESTING_URL}${alias}`;
       window.open(url, "_blank");
@@ -107,7 +101,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
   };
 
   const handleShareOnX = () => {
-    const shareText = `I just got my $OVL airdrop from @overlaymarket! ${totalAmount} $OVL 🐻🔥 \n\nCheck yours and start trading today at app.overlay.market/airdrops`;
+    const shareText = `I just got my $OVL airdrop from @overlaymarket! ${totalAmount} $OVL 🚀🔥 \n\nCheck yours and start trading today at app.overlay.market/airdrops`;
 
     const XshareUrl = `https://x.com/intent/post?text=${encodeURIComponent(
       shareText
