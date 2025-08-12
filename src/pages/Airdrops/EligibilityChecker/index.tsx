@@ -17,6 +17,7 @@ import {
 } from "../../../components/Button";
 import { EligibilityStatus } from "..";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { LINKS } from "../../../constants/links";
 
 type EligibilityCheckerProps = {
   eligibilityStatus: EligibilityStatus;
@@ -152,11 +153,15 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
             <InfoContainer>
               <Text size={"1"} style={{ lineHeight: "14.5px" }}>
                 <span style={{ fontWeight: "600" }}>
-                  Wondering what to do with your shiny new $OVL?
+                  Not eligible this round? Stay updated on X for future opportunities.
                 </span>{" "}
               </Text>
 
-              <StyledLink to="/markets" style={{ textDecoration: "none" }}>
+              <StyledLink 
+                to={LINKS.X}
+                target="_blank" 
+                style={{ textDecoration: "none" }}
+              >
                 <GradientRightArrowIcon />
               </StyledLink>
             </InfoContainer>
