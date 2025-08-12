@@ -2,7 +2,7 @@ import { Box, Button, Flex, Text } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
 import { ArrowRightIcon } from "../../assets/icons/ArrowRight";
 
-const TGE_DATE = new Date("2025-08-14T00:00:00Z");
+const TGE_DATE = new Date("2025-08-14T07:30:00Z");
 
 const PreTGEBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
