@@ -233,7 +233,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                     style={{ lineHeight: "14.5px" }}
                     weight={"medium"}
                   >
-                    Note: 25% vested at TGE and 75% vested upon CEX listing of
+                    Note: [REDACTED] vested at TGE and [REDACTED] linear unlock
                     OVL
                   </Text>
                   {airdropIdForErrorClaimAlias === airdropId && (
