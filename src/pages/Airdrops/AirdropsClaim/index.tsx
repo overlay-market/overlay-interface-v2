@@ -1,5 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   AirdropBox,
   AirdropsClaimContainer,
@@ -13,7 +13,6 @@ import {
   GradientBorderBox,
   GradientText,
   HandImg,
-  InfoBox,
   LineSeparator,
   MainBgImg,
   MobileShadowBox,
@@ -21,57 +20,22 @@ import {
 } from "./airdrops-claim-styles";
 import theme from "../../../theme";
 import LogoImg from "../../../assets/images/overlay-logo-only-no-background.webp";
-import {
-  GradientLink,
-  StyledLink,
-} from "../EligibilityChecker/eligibility-checker-styles";
 import Xlogo from "../../../assets/images/airdrops/socials-x.webp";
-import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
 import {
-  AIRDROP_LEARN_MORE_LINK,
   AIRDROPS,
   MERKLE_DISTIBUTOR_ADDRESSES,
-  SABLIER_SUBGRAPH_URL,
   SABLIER_VESTING_URL,
 } from "../../../constants/airdrops";
 import { GradientOutlineButton } from "../../../components/Button";
 import { AirdropsAmounts } from "../types";
-import { MyQueryResponse, queryDocument, StreamData } from "./subgraphTypes";
-import { GraphQLClient } from "graphql-request";
-import useAccount from "../../../hooks/useAccount";
 
 type AirdropClaimProps = {
   airdropsAmounts: AirdropsAmounts | null;
 };
 
 const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
-  const { address: account } = useAccount();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [streamData, setStreamData] = useState<StreamData | null>(null);
   const [airdropIdForErrorClaimAlias, setAirdropIdForErrorClaimAlias] =
     useState<string | null>(null);
-
-  const client = new GraphQLClient(SABLIER_SUBGRAPH_URL);
-
-  useEffect(() => {
-    const fetchStreams = async (recipient: string) => {
-      try {
-        const variables = { recipient };
-        const response = await client.request<MyQueryResponse>(
-          queryDocument,
-          variables
-        );
-
-        setStreamData(response.streams);
-      } catch (error) {
-        console.log(error);
-        setStreamData(null);
-      }
-    };
-
-    account && fetchStreams(account.toLowerCase());
-  }, [account]);
 
   const totalAmount = useMemo(() => {
     if (airdropsAmounts) {
@@ -91,7 +55,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
   const handleClaim = (airdropId: string) => {
     setAirdropIdForErrorClaimAlias(null);
     const alias = MERKLE_DISTIBUTOR_ADDRESSES[airdropId];
-    
+
     if (alias) {
       const url = `${SABLIER_VESTING_URL}${alias}`;
       window.open(url, "_blank");
