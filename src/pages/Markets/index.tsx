@@ -2,13 +2,13 @@ import { Flex } from "@radix-ui/themes";
 import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
+import PreTGEBanner from "../../components/Banner/PreTGEBanner";
 import MarketsTable from "./MarketsTable";
 import { TransformedMarketData } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
-import { MarketsContainer } from "./markets-styles";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
@@ -41,15 +41,13 @@ const Markets: React.FC = () => {
   }, [chainId]);
 
   return (
-    <MarketsContainer direction="column">
+    <Flex direction="column" width={"100%"} overflowX={"hidden"}>
       <MarketsHeader ovlSupplyChange={totalSupplyChange} />
-
-      <Flex direction="column">
-        <FirstSection marketsData={marketsData} />
-        <Carousel marketsData={marketsData} />
-        <MarketsTable marketsData={marketsData} />
-      </Flex>
-    </MarketsContainer>
+      <PreTGEBanner />
+      <FirstSection marketsData={marketsData} />
+      <Carousel marketsData={marketsData} />
+      <MarketsTable marketsData={marketsData} />
+    </Flex>
   );
 };
 
