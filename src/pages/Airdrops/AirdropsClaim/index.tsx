@@ -250,7 +250,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                 </AirdropBox>
               ))}
 
-            <InfoBox>
+            {/* <InfoBox>
               <Text size={"1"} style={{ lineHeight: "14.5px" }} weight={"bold"}>
                 Airdrop 2 campaign is now live.
               </Text>
@@ -263,7 +263,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                 <GradientLink> Don’t miss out</GradientLink>
                 <GradientOpenInNewIcon />
               </StyledLink>
-            </InfoBox>
+            </InfoBox> */}
           </MobileShadowBox>
         </AirdropsClaimContent>
       </AirdropsClaimContainer>

@@ -4,14 +4,12 @@ import {
   BummerContainer,
   DisabledButton,
   GradientBorderBox,
-  GradientLink,
   InfoContainer,
   LineSeparator,
   StyledInput,
   StyledLink,
 } from "./eligibility-checker-styles";
-import { AIRDROP_LEARN_MORE_LINK } from "../../../constants/airdrops";
-import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
+import { GradientRightArrowIcon } from "../../../assets/icons/svg-icons";
 import theme from "../../../theme";
 import {
   GradientLoaderButton,
@@ -153,20 +151,13 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
             eligibilityStatus === "eligibleNoRewards") && (
             <InfoContainer>
               <Text size={"1"} style={{ lineHeight: "14.5px" }}>
-                <span style={{ fontWeight: "700" }}>Didn’t make the cut?</span>{" "}
-                <br />
-                <span style={{ fontWeight: "200" }}>
-                  Airdrop 2 campaign is now live.
-                </span>
+                <span style={{ fontWeight: "600" }}>
+                  Wondering what to do with your shiny new $OVL?
+                </span>{" "}
               </Text>
 
-              <StyledLink
-                to={AIRDROP_LEARN_MORE_LINK}
-                target="_blank"
-                style={{ textDecoration: "none" }}
-              >
-                <GradientLink> Don’t miss out</GradientLink>
-                <GradientOpenInNewIcon />
+              <StyledLink to="/markets" style={{ textDecoration: "none" }}>
+                <GradientRightArrowIcon />
               </StyledLink>
             </InfoContainer>
           )}
