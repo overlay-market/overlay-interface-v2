@@ -5,10 +5,11 @@ export enum ClaimId {
   OVL_TO_OV = 'OVL_TO_OV',
   TUNA_CAMPAIGN = 'TUNA_CAMPAIGN',
   OG = 'OG',
+  FJORD_BUYERS = 'FJORD_BUYERS',
 }
 
 export const AIRDROP_CHECKER_API = 'https://api.overlay.market/airdrop-checker/'
-export const SABLIER_VESTING_URL = 'https://app.sablier.com/vesting/stream/'
+export const SABLIER_VESTING_URL = 'https://app.sablier.com/airdrops/campaign/'
 export const SABLIER_SUBGRAPH_URL =  `https://api.studio.thegraph.com/query/57079/sablier-v2-arbitrum/version/latest`
 export const AIRDROP_LEARN_MORE_LINK = `https://mirror.xyz/0x7999C7f0b9f2259434b7aD130bBe36723a49E14e/Q5OmkZ7eXCZ8AgrDy37IaLfTQouVR9R1U3mmiRDDdz8`
 
@@ -21,6 +22,7 @@ export const MERKLE_DISTIBUTOR_ADDRESSES: ClaimMap = {
   [ClaimId.RETRO]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
   [ClaimId.TUNA_CAMPAIGN]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
   [ClaimId.OG]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
+  [ClaimId.FJORD_BUYERS]: '0x5200660d504e84754ef55bfb46fdec3b932e916a-56',
 }
 
 export enum AirdropStatus {
@@ -38,10 +40,14 @@ export type AirdropMap = {
 }
 
 export const AIRDROPS: AirdropMap = {
-  [ClaimId.OVL_TO_OV]: {
-    title: 'TUNA Campaign',
+  [ClaimId.FJORD_BUYERS]: {
+    title: 'Fjord Buyers',
     status: AirdropStatus.ACTIVATED,
   },
+  // [ClaimId.OVL_TO_OV]: {
+  //   title: 'TUNA Campaign',
+  //   status: AirdropStatus.ACTIVATED,
+  // },
   // [ClaimId.RETRO]: {
   //   title: 'Airdrop',
   //   status: AirdropStatus.ACTIVATED,
@@ -54,8 +60,8 @@ export const AIRDROPS: AirdropMap = {
   //   title: 'OG',
   //   status: AirdropStatus.ACTIVATED,
   // },
-  [ClaimId.BEACON_HOLDERS]: {
-    title: 'beacon holders',
-    status: AirdropStatus.ACTIVATED,
-  },
+  // [ClaimId.BEACON_HOLDERS]: {
+  //   title: 'beacon holders',
+  //   status: AirdropStatus.ACTIVATED,
+  // },
 }
