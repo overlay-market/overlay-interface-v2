@@ -1,10 +1,6 @@
 export enum ClaimId {
-  BEACON_HOLDERS = 'BEACON_HOLDERS',
-  OVERLAY = 'OVERLAY',
-  RETRO = 'retro',
-  OVL_TO_OV = 'OVL_TO_OV',
-  TUNA_CAMPAIGN = 'TUNA_CAMPAIGN',
-  OG = 'OG',
+  TUNA = 'TUNA',
+  OG_PCD = 'OG + PCD',
   FJORD_BUYERS = 'FJORD_BUYERS',
 }
 
@@ -16,12 +12,8 @@ export const AIRDROP_LEARN_MORE_LINK = `https://mirror.xyz/0x7999C7f0b9f2259434b
 export type ClaimMap = {[claimId: string]: string}
 
 export const MERKLE_DISTIBUTOR_ADDRESSES: ClaimMap = {
-  [ClaimId.BEACON_HOLDERS]: '0xe00a6444686988C809bEa59bC8a18EA298a6A0a1',
-  [ClaimId.OVERLAY]: '0x36D6136b9e0372Fe9dE42BD21311890bFb523246',
-  [ClaimId.OVL_TO_OV]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
-  [ClaimId.RETRO]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
-  [ClaimId.TUNA_CAMPAIGN]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
-  [ClaimId.OG]: '0x5991a31ab4095cb5470a5bd532e02568393b06d5',
+  [ClaimId.TUNA]: '0x63d139e7c969e584485c08d995723dee72026895-56',
+  [ClaimId.OG_PCD]: '0x80d03e83883cab55256ce51da74925e6693e19ea-56',
   [ClaimId.FJORD_BUYERS]: '0x5200660d504e84754ef55bfb46fdec3b932e916a-56',
 }
 
@@ -44,24 +36,12 @@ export const AIRDROPS: AirdropMap = {
     title: 'Fjord Buyers',
     status: AirdropStatus.ACTIVATED,
   },
-  // [ClaimId.OVL_TO_OV]: {
-  //   title: 'TUNA Campaign',
-  //   status: AirdropStatus.ACTIVATED,
-  // },
-  // [ClaimId.RETRO]: {
-  //   title: 'Airdrop',
-  //   status: AirdropStatus.ACTIVATED,
-  // },
-  // [ClaimId.TUNA_CAMPAIGN]: {
-  //   title: 'TUNA Campaign',
-  //   status: AirdropStatus.ACTIVATED,
-  // },
-  // [ClaimId.OG]: {
-  //   title: 'OG',
-  //   status: AirdropStatus.ACTIVATED,
-  // },
-  // [ClaimId.BEACON_HOLDERS]: {
-  //   title: 'beacon holders',
-  //   status: AirdropStatus.ACTIVATED,
-  // },
+  [ClaimId.TUNA]: {
+    title: 'TUNA',
+    status: AirdropStatus.ACTIVATED,
+  },
+  [ClaimId.OG_PCD]: {
+    title: 'OG + PCD',
+    status: AirdropStatus.ACTIVATED,
+  },
 }
