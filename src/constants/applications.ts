@@ -17,7 +17,6 @@ export enum NAVBAR_MODE {
   DEFAULT = "default",
 }
 
-export const LEADERBOARD_POINTS_API = 'https://api.overlay.market/points-bsc/points/leaderboard'
-export const REFERRAL_API_BASE_URL = "https://api.overlay.market/points-bsc";
+export const PERMANENT_LEADERBOARD_API = 'https://api.overlay.market/points-bsc/points/leaderboard'
 
 export const FAUCET_API = 'https://api.overlay.market/faucet/'
