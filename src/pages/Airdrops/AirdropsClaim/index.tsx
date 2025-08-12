@@ -13,6 +13,7 @@ import {
   GradientBorderBox,
   GradientText,
   HandImg,
+  InfoBox,
   LineSeparator,
   MainBgImg,
   MobileShadowBox,
@@ -28,6 +29,8 @@ import {
 } from "../../../constants/airdrops";
 import { GradientOutlineButton } from "../../../components/Button";
 import { AirdropsAmounts } from "../types";
+import { GradientLink, StyledLink } from "../EligibilityChecker/eligibility-checker-styles";
+import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
 
 type AirdropClaimProps = {
   airdropsAmounts: AirdropsAmounts | null;
@@ -186,14 +189,6 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                       />
                     </Flex>
                   </Flex>
-                  <Text
-                    size={"1"}
-                    style={{ lineHeight: "14.5px" }}
-                    weight={"medium"}
-                  >
-                    Note: [REDACTED] vested at TGE and [REDACTED] linear unlock
-                    OVL
-                  </Text>
                   {airdropIdForErrorClaimAlias === airdropId && (
                     <Text
                       size={"1"}
@@ -208,20 +203,20 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                 </AirdropBox>
               ))}
 
-            {/* <InfoBox>
+            <InfoBox>
               <Text size={"1"} style={{ lineHeight: "14.5px" }} weight={"bold"}>
-                Airdrop 2 campaign is now live.
+                Wondering what to do with your shiny new $OVL?
               </Text>
 
               <StyledLink
-                to={AIRDROP_LEARN_MORE_LINK}
+                to={"/markets"}
                 target="_blank"
                 style={{ textDecoration: "none" }}
               >
-                <GradientLink> Don’t miss out</GradientLink>
+                <GradientLink> Trade </GradientLink>
                 <GradientOpenInNewIcon />
               </StyledLink>
-            </InfoBox> */}
+            </InfoBox>
           </MobileShadowBox>
         </AirdropsClaimContent>
       </AirdropsClaimContainer>
