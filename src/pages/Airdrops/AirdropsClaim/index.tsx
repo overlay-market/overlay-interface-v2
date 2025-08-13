@@ -180,13 +180,15 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                         size={"12px"}
                         handleClick={handleStake}
                       /> */}
-                      <GradientOutlineButton
-                        title={"Claim"}
-                        width={"73px"}
-                        height={"32px"}
-                        size={"12px"}
-                        handleClick={() => handleClaim(airdropId)}
-                      />
+                      {MERKLE_DISTIBUTOR_ADDRESSES[airdropId] && (
+                        <GradientOutlineButton
+                          title={"Claim"}
+                          width={"73px"}
+                          height={"32px"}
+                          size={"12px"}
+                          handleClick={() => handleClaim(airdropId)}
+                        />
+                      )}
                     </Flex>
                   </Flex>
                   {airdropIdForErrorClaimAlias === airdropId && (
@@ -198,6 +200,17 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                       }}
                     >
                       An error occurred. Please contact the team.
+                    </Text>
+                  )}
+                  {!MERKLE_DISTIBUTOR_ADDRESSES[airdropId] && (
+                    <Text
+                      size={"1"}
+                      weight={"medium"}
+                      style={{
+                        color: theme.color.white,
+                      }}
+                    >
+                      Available after [redacted]
                     </Text>
                   )}
                 </AirdropBox>
@@ -213,7 +226,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                 target="_blank"
                 style={{ textDecoration: "none" }}
               >
-                <GradientLink> Trade </GradientLink>
+                <GradientLink> Trade and Earn </GradientLink>
                 <GradientOpenInNewIcon />
               </StyledLink>
             </InfoBox>
