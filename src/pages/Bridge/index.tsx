@@ -18,10 +18,13 @@ import {
   OVL_TOKEN_ADDRESS,
   SOLANA_DEVNET_EID,
 } from "../../constants/bridge";
-import { StyledInput } from "../Leaderboard/ReferralSection/referral-modal-styles";
 import { readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
-import { BridgeContainer, GradientBorderBox } from "./bridge-styles";
+import {
+  BridgeContainer,
+  GradientBorderBox,
+  StyledInput,
+} from "./bridge-styles";
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import useDebounce from "../../hooks/useDebounce";
@@ -244,7 +247,9 @@ const Bridge: React.FC = () => {
             <StyledInput
               type="text"
               value={destination}
-              onChange={(e) => setDestination(e.target.value.trim())}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setDestination(e.target.value.trim())
+              }
               placeholder="Solana Address"
             />
 
