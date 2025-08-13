@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import theme from "../../theme";
+import theme from "../../../theme";
 
 export const Table = styled.table`
   width: calc(100% - 16px);
@@ -19,36 +19,6 @@ export const StyledHeader = styled.th<{textalign: string}>`
   }
 `;
 
-export const CurrentUserRankingRow = styled.tr`
-  position: relative;
-  z-index: 10;
-  height: 44px;
-  @media (min-width: ${theme.breakpoints.sm}) {
-    height: 52px;
-  } 
-`;
-
-export const BgRow = styled.tr`
-  position: relative;
-  
-  &::before {
-    content: "";
-    position: absolute;
-    top: -44px;
-    left: -8px; 
-    height: 44px;    
-    width: calc(100% + 16px);
-    background: ${theme.color.grey9}; 
-    z-index: 0; 
-    border-radius: 32px;
-
-    @media (min-width: ${theme.breakpoints.sm}) {
-      height: 52px;
-      top: -52px;
-    } 
-  }
-`
-
 export const StyledRow = styled.tr`
   border-bottom: 1px solid ${theme.color.darkBlue};
 `;
@@ -63,4 +33,19 @@ export const StyledCell = styled.td<{textalign: string, weight?: string}>`
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 16px 12px;
   }
+`;
+
+export const MarketLogo = styled.img`
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 0.5px solid rgba(236, 236, 236, 0.15);
+  display: inline-block; 
+  vertical-align: middle;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    width: 40px;
+    height: 40px;
+  } 
 `;

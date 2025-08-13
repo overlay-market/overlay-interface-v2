@@ -1,4 +1,4 @@
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { Address, createPublicClient, http, PublicClient } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
@@ -40,7 +40,7 @@ export const useENSAvatar = (name: string | undefined | null) => {
   });
 };
 
-export const useResolveENSProfiles = (users: ExtendedUserData[] | undefined) => {
+export const useResolveENSProfiles = (users: ExtendedUserData[] | undefined): UseQueryResult<ExtendedUserData, unknown>[] => {
   return useQueries({
     queries: (users || []).map(user => ({
       queryKey: ['ensProfile', user.walletAddress],
