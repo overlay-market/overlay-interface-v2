@@ -8,7 +8,7 @@ export const usePermanentLeaderboard = (
   numberOfRows: number,
   walletAddress: Address | undefined,
 ) => {
-  const endpoint = `/all-time/leaderboard/${numberOfRows}${
+  const endpoint = `all-time/leaderboard/${numberOfRows}${
     walletAddress ? `/${walletAddress}` : ""
   }`;
 
