@@ -226,7 +226,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                 target="_blank"
                 style={{ textDecoration: "none" }}
               >
-                <GradientLink> Trade </GradientLink>
+                <GradientLink> Trade and Earn </GradientLink>
                 <GradientOpenInNewIcon />
               </StyledLink>
             </InfoBox>
