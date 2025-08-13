@@ -2,6 +2,7 @@ export enum ClaimId {
   TUNA = 'TUNA',
   OG_PCD = 'OG_PCD',
   FJORD_BUYERS = 'FJORD_BUYERS',
+  TORCH = 'TORCH',
 }
 
 export const AIRDROP_CHECKER_API = 'https://api.overlay.market/airdrop-checker/'
@@ -15,6 +16,7 @@ export const MERKLE_DISTIBUTOR_ADDRESSES: ClaimMap = {
   [ClaimId.TUNA]: '0x63d139e7c969e584485c08d995723dee72026895-56',
   [ClaimId.OG_PCD]: '0x80d03e83883cab55256ce51da74925e6693e19ea-56',
   [ClaimId.FJORD_BUYERS]: '0x5200660d504e84754ef55bfb46fdec3b932e916a-56',
+  [ClaimId.TORCH]: '',
 }
 
 export enum AirdropStatus {
@@ -42,6 +44,10 @@ export const AIRDROPS: AirdropMap = {
   },
   [ClaimId.OG_PCD]: {
     title: 'OG + PCD',
+    status: AirdropStatus.ACTIVATED,
+  },
+  [ClaimId.TORCH]: {
+    title: 'TORCH',
     status: AirdropStatus.ACTIVATED,
   },
 }
