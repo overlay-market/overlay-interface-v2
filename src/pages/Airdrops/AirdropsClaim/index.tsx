@@ -29,7 +29,10 @@ import {
 } from "../../../constants/airdrops";
 import { GradientOutlineButton } from "../../../components/Button";
 import { AirdropsAmounts } from "../types";
-import { GradientLink, StyledLink } from "../EligibilityChecker/eligibility-checker-styles";
+import {
+  GradientLink,
+  StyledLink,
+} from "../EligibilityChecker/eligibility-checker-styles";
 import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
 
 type AirdropClaimProps = {
@@ -68,7 +71,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
   };
 
   const handleShareOnX = () => {
-    const shareText = `I just got my $OVL airdrop from @overlaymarket! ${totalAmount} $OVL 🚀🔥 \n\nCheck yours and start trading today at app.overlay.market/airdrops`;
+    const shareText = `I just got my $OVL airdrop from @OverlayProtocol! ${totalAmount} $OVL 🚀🔥 \n\nCheck yours and start trading today at app.overlay.market/airdrops`;
 
     const XshareUrl = `https://x.com/intent/post?text=${encodeURIComponent(
       shareText
