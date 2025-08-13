@@ -44,7 +44,7 @@ const CurrentUserRow = ({
                 {formattedUserdata?.username ?? shortenAddress(account)}
               </Text>
             </Flex>
-            {isMobile && <UserFullInfo currentUserData={formattedUserdata} />}
+            {isMobile && <UserFullInfo currentUser={formattedUserdata} />}
           </Flex>
         </StyledCell>
 
