@@ -1,7 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -12,14 +12,12 @@ import {
   useCurrentMarketActionHandlers,
   useCurrentMarketState,
 } from "../../state/currentMarket/hooks";
-import { useMarketsActionHandlers } from "../../state/markets/hooks";
 import PositionsTable from "./PositionsTable";
 import InfoMarketSection from "./InfoMarketSection";
-import { ExpandedMarketData } from "overlay-sdk";
 import { StyledFlex, TradeContainer } from "./trade-styles";
 import SuggestedCards from "./SuggestedCards";
 import { DEFAULT_MARKET } from "../../constants/applications";
-import { deepEqual } from "../../utils/equalityUtils";
+import useActiveMarkets from "../../hooks/useActiveMarkets";
 
 const Trade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,11 +30,7 @@ const Trade: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
-  const { handleMarketsUpdate } = useMarketsActionHandlers();
-
-  const [markets, setMarkets] = useState<ExpandedMarketData[] | undefined>(
-    undefined
-  );
+  const { data: markets } = useActiveMarkets();
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -48,28 +42,6 @@ const Trade: React.FC = () => {
       setSearchParams({ market: DEFAULT_MARKET }, { replace: true });
     }
   }, [marketParam]);
-
-  useEffect(() => {
-    let isFetching = false;
-
-    const fetchActiveMarkets = async () => {
-      if (!sdkRef.current.markets.getActiveMarkets || isFetching) return;
-      isFetching = true;
-      try {
-        const activeMarkets = await sdkRef.current.markets.getActiveMarkets();
-        activeMarkets &&
-          setMarkets((prev) =>
-            deepEqual(prev, activeMarkets) ? prev : activeMarkets
-          );
-      } catch (error) {
-        console.error("Error fetching markets:", error);
-      } finally {
-        isFetching = false;
-      }
-    };
-
-    fetchActiveMarkets();
-  }, [chainId]);
 
   useEffect(() => {
     if (!markets || !marketParam) return;
@@ -93,12 +65,6 @@ const Trade: React.FC = () => {
       }
     }
   }, [marketParam, markets]);
-
-  useEffect(() => {
-    if (markets) {
-      handleMarketsUpdate(markets);
-    }
-  }, [markets]);
 
   useEffect(() => {
     handleTradeStateReset();

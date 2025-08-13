@@ -1,14 +1,18 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Flex } from "@radix-ui/themes";
 import StyledNavLink from "./StyledNavLink";
 import {
-  PortfolioIcon,
-  PortfolioActiveIcon,
-} from "../../assets/icons/navBar-icons/portfolio";
+  BackpackIcon,
+  BackpackActiveIcon,
+} from "../../assets/icons/navBar-icons/backpack";
 import {
   TradeIcon,
   TradeActiveIcon,
 } from "../../assets/icons/navBar-icons/trade";
+import {
+  AirdropsActiveIcon,
+  AirdropsIcon,
+} from "../../assets/icons/navBar-icons/airdrops";
 // import {
 //   RocketIcon,
 //   RocketActiveIcon,
@@ -17,31 +21,23 @@ import {
 //   PowercardIcon,
 //   PowercardActiveIcon,
 // } from "../../assets/icons/navBar-icons/powercard";
-import {
-  StakeIcon,
-  StakeActiveIcon,
-} from "../../assets/icons/navBar-icons/stake";
+// import {
+//   StakeIcon,
+//   StakeActiveIcon,
+// } from "../../assets/icons/navBar-icons/stake";
 import { DEFAULT_MARKET, NAVBAR_MODE } from "../../constants/applications";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
 import {
   TrophyActiveIcon,
   TrophyIcon,
 } from "../../assets/icons/navBar-icons/trophy";
-import {
-  AirdropsActiveIcon,
-  AirdropsIcon,
-} from "../../assets/icons/navBar-icons/airdrops";
-import {
-  MarketsActiveIcon,
-  MarketsIcon,
-} from "../../assets/icons/navBar-icons/markets";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 
 export interface NavLinkAsset {
   to: string;
   label: string;
-  icon: React.ComponentType<{ size?: number }>;
-  activeIcon: React.ComponentType<{ size?: number }>;
+  icon: ReactNode;
+  activeIcon: ReactNode;
   showOnMobile: boolean;
 }
 
@@ -62,37 +58,37 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
     {
       to: "/markets",
       label: "Markets",
-      icon: MarketsIcon,
-      activeIcon: MarketsActiveIcon,
+      icon: <BackpackIcon />,
+      activeIcon: <BackpackActiveIcon />,
       showOnMobile: true,
     },
     {
       to: `/trade?market=${encodedMarket}`,
       label: "Trade",
-      icon: TradeIcon,
-      activeIcon: TradeActiveIcon,
+      icon: <TradeIcon />,
+      activeIcon: <TradeActiveIcon />,
       showOnMobile: true,
     },
     {
       to: "/portfolio",
       label: "Portfolio",
-      icon: PortfolioIcon,
-      activeIcon: PortfolioActiveIcon,
+      icon: <BackpackIcon />,
+      activeIcon: <BackpackActiveIcon />,
       showOnMobile: true,
     },
     // {
     //   to: "/powercards",
     //   label: "PowerCards",
-    //   icon: PowercardIcon,
-    //   activeIcon: PowercardActiveIcon,
+    //   icon: <PowercardIcon />,
+    //   activeIcon: <PowercardActiveIcon />,
     //   showOnMobile: !isMobile,
     // },
     {
       to: "/leaderboard",
       label:
         isMobile && mode === NAVBAR_MODE.DEFAULT ? "Leaders" : "Leaderboard",
-      icon: TrophyIcon,
-      activeIcon: TrophyActiveIcon,
+      icon: <TrophyIcon />,
+      activeIcon: <TrophyActiveIcon />,
       showOnMobile: true,
     },
     {
@@ -102,18 +98,25 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: AirdropsActiveIcon,
       showOnMobile: true,
     },
-    {
-      to: "/faucet",
-      label: "Faucet",
-      icon: StakeIcon,
-      activeIcon: StakeActiveIcon,
-      showOnMobile: true,
-    },
+    // {
+    //   to: "/faucet",
+    //   label: "Faucet",
+    //   icon: <StakeIcon />,
+    //   activeIcon: <StakeActiveIcon />,
+    //   showOnMobile: true,
+    // },
+    // {
+    //   to: "/bridge",
+    //   label: "Bridge",
+    //   icon: <StakeIcon />,
+    //   activeIcon: <StakeActiveIcon />,
+    //   showOnMobile: true,
+    // },
     // {
     //   to: "/stake",
     //   label: "Stake",
-    //   icon: StakeIcon,
-    //   activeIcon: StakeActiveIcon,
+    //   icon: <StakeIcon />,
+    //   activeIcon: <StakeActiveIcon />,
     //   showOnMobile: true,
     // },
   ];

@@ -4,12 +4,12 @@ import theme from "../../theme";
 import Loader from "../../components/Loader";
 import moment from "moment";
 
-type PointsUpdateSectionProps = {
-  pointsUpdatedAt?: string;
+type LeaderboardUpdateSectionProps = {
+  leaderboardUpdatedAt?: string;
 };
 
-const PointsUpdateSection: React.FC<PointsUpdateSectionProps> = ({
-  pointsUpdatedAt,
+const LeaderboardUpdateSection: React.FC<LeaderboardUpdateSectionProps> = ({
+  leaderboardUpdatedAt,
 }) => {
   return (
     <Flex
@@ -36,8 +36,8 @@ const PointsUpdateSection: React.FC<PointsUpdateSectionProps> = ({
           Updated At
         </Text>
         <Text size={"3"} style={{ fontWeight: "600" }}>
-          {pointsUpdatedAt ? (
-            `${moment.utc(pointsUpdatedAt).format("DD MMM HH:mm")} UTC`
+          {leaderboardUpdatedAt ? (
+            `${moment.utc(leaderboardUpdatedAt).format("DD MMM HH:mm")} UTC`
           ) : (
             <Loader />
           )}
@@ -47,4 +47,4 @@ const PointsUpdateSection: React.FC<PointsUpdateSectionProps> = ({
   );
 };
 
-export default PointsUpdateSection;
+export default LeaderboardUpdateSection;

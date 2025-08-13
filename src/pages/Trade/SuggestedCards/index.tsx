@@ -8,7 +8,6 @@ import "swiper/css/pagination";
 import "swiper/css/mousewheel";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import TradeMarketCard from "../../../components/MarketCards/TradeMarketCard";
-import { useMarketsState } from "../../../state/markets/hooks";
 import {
   CategoryName,
   MARKET_CATEGORIES,
@@ -19,11 +18,12 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { MarketDataParsed } from "../../../types/marketTypes";
 import { SuggestedCardsContainer } from "./suggested-cards-styles";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
+import useActiveMarkets from "../../../hooks/useActiveMarkets";
 
 const SuggestedCards: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
   const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1279px)");
-  const { markets } = useMarketsState();
+  const { data: markets } = useActiveMarkets();
   const { currentMarket } = useCurrentMarketState();
 
   const marketsData = markets && [...markets];

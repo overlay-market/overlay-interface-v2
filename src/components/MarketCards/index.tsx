@@ -12,9 +12,15 @@ interface MarketCardsProps {
   priceWithCurrency: string;
   title: string;
   id: string;
+  isComingSoon?: boolean;
 }
 
-const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
+const MarketCards = ({
+  priceWithCurrency,
+  title,
+  id,
+  isComingSoon = false,
+}: MarketCardsProps) => {
   const redirectToTradePage = useRedirectToTradePage();
   return (
     <Skeleton loading={false}>
@@ -23,14 +29,42 @@ const MarketCards = ({ priceWithCurrency, title, id }: MarketCardsProps) => {
           backgroundImage: `url(${getMarketLogo(id)})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          cursor: "pointer",
+          cursor: isComingSoon ? "default" : "pointer",
           width: 200,
+          position: "relative",
+          filter: isComingSoon ? "grayscale(100%) brightness(0.6)" : "none",
         }}
-        onClick={() => redirectToTradePage(id)}
+        onClick={() => !isComingSoon && redirectToTradePage(id)}
       >
-        <CardContent direction="column" align="center">
-          <CardsValue>{priceWithCurrency}</CardsValue>
-          <CardsTitle>{title}</CardsTitle>
+        {isComingSoon && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+              fontSize: "14px",
+              fontWeight: "bold",
+              textAlign: "center",
+              zIndex: 2,
+            }}
+          >
+            COMING SOON
+          </div>
+        )}
+        <CardContent direction="column" align="center" style={{ zIndex: isComingSoon ? 3 : 1, position: "relative" }}>
+          <CardsValue style={{ opacity: 1 }}>
+            {priceWithCurrency}
+          </CardsValue>
+          <CardsTitle style={{ opacity: isComingSoon ? 0.7 : 1 }}>
+            {title}
+          </CardsTitle>
         </CardContent>
       </CustomCard>
     </Skeleton>
