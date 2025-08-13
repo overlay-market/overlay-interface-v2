@@ -37,8 +37,8 @@ const CurrentUserRow = ({
           textalign="left"
           style={{ paddingLeft: isMobile ? "12px" : "20px" }}
         >
-          <Flex justify="between">
-            <Flex align="baseline" gap="8px">
+          <Flex justify="between" gap={"18px"}>
+            <Flex align="center" gap="8px">
               <Text>{isMobile ? `Your rank` : `Your current rank`}</Text>
               <Text style={{ color: theme.color.grey8 }} size="1">
                 {formattedUserdata?.username ?? shortenAddress(account)}

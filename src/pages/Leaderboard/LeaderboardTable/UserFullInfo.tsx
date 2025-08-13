@@ -23,11 +23,13 @@ const UserFullInfo: React.FC<UserFullInfoProps> = ({ currentUser }) => {
               border: "none",
               outline: "none",
               padding: 0,
-              fontSize: "14px",
+              fontSize: "12px",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 500,
               color: theme.color.grey8,
               cursor: "pointer",
               textAlign: "right",
+              whiteSpace: "nowrap",
             }}
           >
             {detailsOpen
