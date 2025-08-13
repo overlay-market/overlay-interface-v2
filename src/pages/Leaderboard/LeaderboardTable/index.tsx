@@ -8,6 +8,8 @@ import ColumnSelector from "./ColumnSelector";
 import CurrentUserRow from "./CurrentUserRow";
 import LeaderboardRows from "./LeaderboardRows";
 import MostTradedMarketLogo from "./MostTradedMarketLogo";
+import * as Tooltip from "@radix-ui/react-tooltip";
+import theme from "../../../theme";
 
 type LeaderboardTableProps = {
   ranks?: ExtendedUserData[];
@@ -65,7 +67,26 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
           {!isMobile ? (
             columnOptions.map((col) => (
               <StyledHeader key={col.value} textalign="right">
-                {col.label}
+                {col.value === "positions" ? (
+                  <Tooltip.Provider delayDuration={100}>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger asChild>
+                        <span>{col.label}</span>
+                      </Tooltip.Trigger>
+                      <Tooltip.Content
+                        style={{
+                          color: theme.color.green1,
+                          padding: "4px 8px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        Total number of closed positions
+                      </Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                ) : (
+                  col.label
+                )}
               </StyledHeader>
             ))
           ) : (
