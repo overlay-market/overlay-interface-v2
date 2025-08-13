@@ -17,6 +17,7 @@ import { getMarketLogo } from "../../../utils/getMarketLogo";
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
+  otherChainMarketsData?: TransformedMarketData[];
 }
 
 type SortableKeys =
@@ -27,8 +28,15 @@ type SortableKeys =
 
 export default function MarketsTable({
   marketsData,
+  otherChainMarketsData = [],
 }: MarketsTableProps): JSX.Element {
-  const marketIds = marketsData.map((market) => market.marketId);
+  const defaultMarketIds = new Set(marketsData.map((m) => m.marketId));
+  const uniqueOtherChainMarkets = otherChainMarketsData.filter(
+    (market) => !defaultMarketIds.has(market.marketId)
+  );
+  const allMarketsData = [...marketsData, ...uniqueOtherChainMarkets];
+
+  const marketIds = allMarketsData.map((market) => market.marketId);
   const markets7d = useMarkets7d(marketIds);
   const redirectToTradePage = useRedirectToTradePage();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -41,7 +49,7 @@ export default function MarketsTable({
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const sortedData = React.useMemo(() => {
-    const sortableItems = [...marketsData];
+    const sortableItems = [...allMarketsData];
     if (sortConfig?.key) {
       sortableItems.sort((a, b) => {
         let aValue = 0,
@@ -84,7 +92,7 @@ export default function MarketsTable({
       });
     }
     return sortableItems;
-  }, [marketsData, markets7d, sortConfig]);
+  }, [allMarketsData, markets7d, sortConfig]);
 
   const requestSort = (key: SortableKeys) => {
     let direction: "ascending" | "descending";
@@ -338,6 +346,8 @@ export default function MarketsTable({
                 (m) => m.marketId === market.marketId
               );
 
+              const isComingSoon = !defaultMarketIds.has(market.marketId);
+
               const lineColor =
                 market7d &&
                 market7d.sevenDaysChartData &&
@@ -354,20 +364,62 @@ export default function MarketsTable({
                   key={index}
                   style={{
                     borderBottom: `1px solid ${theme.color.darkBlue}`,
-                    cursor: "pointer",
+                    cursor: isComingSoon ? "default" : "pointer",
+                    opacity: isComingSoon ? 0.8 : 1,
                   }}
-                  onClick={() => redirectToTradePage(market.marketId)}
+                  onClick={() =>
+                    !isComingSoon && redirectToTradePage(market.marketId)
+                  }
                 >
                   <Table.Cell
                     style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                   >
                     <Flex style={{ alignItems: "center" }}>
-                      <MarketsLogos
-                        src={getMarketLogo(market.marketId)}
-                        alt={decodeURIComponent(market.marketId)}
-                        className="rounded-full"
-                      />
-                      <span style={{ alignSelf: "center", marginLeft: 20 }}>
+                      <div
+                        style={{
+                          position: "relative",
+                          display: "inline-block",
+                        }}
+                      >
+                        <MarketsLogos
+                          src={getMarketLogo(market.marketId)}
+                          alt={decodeURIComponent(market.marketId)}
+                          className="rounded-full"
+                          style={{
+                            filter: isComingSoon
+                              ? "grayscale(100%) brightness(0.6)"
+                              : "none",
+                          }}
+                        />
+                        {isComingSoon && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              fontSize: "8px",
+                              fontWeight: "bold",
+                              textAlign: "center",
+                              borderRadius: "50%",
+                            }}
+                          >
+                            SOON
+                          </div>
+                        )}
+                      </div>
+                      <span
+                        style={{
+                          alignSelf: "center",
+                          marginLeft: 20,
+                          color: isComingSoon ? "#8B8B8B" : "inherit",
+                        }}
+                      >
                         {isMobile &&
                         decodeURIComponent(market.marketId).length > 28
                           ? `${decodeURIComponent(market.marketId).slice(
@@ -378,7 +430,9 @@ export default function MarketsTable({
                       </span>
                     </Flex>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell
+                    style={{ color: isComingSoon ? "#8B8B8B" : "inherit" }}
+                  >
                     {formatPriceWithCurrency(
                       market.price ?? 0,
                       market.priceCurrency
@@ -388,10 +442,11 @@ export default function MarketsTable({
                     <>
                       <Table.Cell
                         style={{
-                          color:
-                            (market7d?.oneHourChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
+                          color: isComingSoon
+                            ? "#8B8B8B"
+                            : (market7d?.oneHourChange ?? 0) >= 0
+                            ? theme.color.green2
+                            : theme.color.red2,
                         }}
                       >
                         <Skeleton loading={!market7d}>
@@ -400,10 +455,11 @@ export default function MarketsTable({
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color:
-                            (market7d?.twentyFourHourChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
+                          color: isComingSoon
+                            ? "#8B8B8B"
+                            : (market7d?.twentyFourHourChange ?? 0) >= 0
+                            ? theme.color.green2
+                            : theme.color.red2,
                         }}
                       >
                         <Skeleton loading={!market7d}>
@@ -412,23 +468,29 @@ export default function MarketsTable({
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color:
-                            (market7d?.sevenDayChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
+                          color: isComingSoon
+                            ? "#8B8B8B"
+                            : (market7d?.sevenDayChange ?? 0) >= 0
+                            ? theme.color.green2
+                            : theme.color.red2,
                         }}
                       >
                         <Skeleton loading={!market7d}>
                           {market7d?.sevenDayChange?.toFixed(2)}%
                         </Skeleton>
                       </Table.Cell>
-                      <Table.Cell style={{ color: theme.color.green2 }}>
+                      <Table.Cell
+                        style={{
+                          color: isComingSoon ? "#8B8B8B" : theme.color.green2,
+                        }}
+                      >
                         <span
                           style={{
-                            color:
-                              market.funding && Number(market.funding) < 0
-                                ? theme.color.red2
-                                : theme.color.green2,
+                            color: isComingSoon
+                              ? "#8B8B8B"
+                              : market.funding && Number(market.funding) < 0
+                              ? theme.color.red2
+                              : theme.color.green2,
                           }}
                         >
                           {market.funding && Number(market.funding) < 0
@@ -438,22 +500,43 @@ export default function MarketsTable({
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <Flex align="center" gap="2">
-                          <Text size="2" style={{ color: theme.color.red2 }}>
-                            {Math.round(
-                              Number(market.shortPercentageOfTotalOi)
-                            )}
-                            %
+                        {isComingSoon ? (
+                          <Text
+                            size="4"
+                            style={{
+                              background:
+                                "linear-gradient(90deg, #A8A6A6 0%, #ff7cd5 100%)",
+                              backgroundClip: "text",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Coming Soon
                           </Text>
-                          <ProgressBar
-                            max={100}
-                            value={Number(market.shortPercentageOfTotalOi)}
-                          />
-                          <Text size="2" style={{ color: theme.color.green2 }}>
-                            {Math.round(Number(market.longPercentageOfTotalOi))}
-                            %
-                          </Text>
-                        </Flex>
+                        ) : (
+                          <Flex align="center" gap="2">
+                            <Text size="2" style={{ color: theme.color.red2 }}>
+                              {Math.round(
+                                Number(market.shortPercentageOfTotalOi)
+                              )}
+                              %
+                            </Text>
+                            <ProgressBar
+                              max={100}
+                              value={Number(market.shortPercentageOfTotalOi)}
+                            />
+                            <Text
+                              size="2"
+                              style={{ color: theme.color.green2 }}
+                            >
+                              {Math.round(
+                                Number(market.longPercentageOfTotalOi)
+                              )}
+                              %
+                            </Text>
+                          </Flex>
+                        )}
                       </Table.Cell>
                       <Table.Cell style={{ textAlign: "center" }}>
                         <img
@@ -485,7 +568,7 @@ export default function MarketsTable({
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke={lineColor}
+                          stroke={isComingSoon ? "#8B8B8B" : lineColor}
                           strokeWidth={2}
                           dot={false}
                         />

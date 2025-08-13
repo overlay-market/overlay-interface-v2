@@ -3,11 +3,7 @@ import MenuHamburger from "./MenuHamburger";
 import { Box, DropdownMenu, Flex, Text } from "@radix-ui/themes";
 import useAccount from "../../hooks/useAccount";
 import useDisconnect from "../../hooks/useDisconnect";
-import {
-  CHAIN_LIST,
-  NETWORK_ICONS,
-  SUPPORTED_CHAINID,
-} from "../../constants/chains";
+import { CHAIN_LIST, NETWORK_ICONS } from "../../constants/chains";
 import theme from "../../theme";
 import {
   ChainLogo,
@@ -23,12 +19,7 @@ import { NAVBAR_MODE } from "../../constants/applications";
 import { useModalHelper } from "../ConnectWalletModal/utils";
 
 const networkLabel = (chainId: number) => {
-  const isTestnet = [
-    SUPPORTED_CHAINID.ARBITRUM_SEPOLIA,
-    SUPPORTED_CHAINID.BARTIO,
-    SUPPORTED_CHAINID.IMOLA,
-    SUPPORTED_CHAINID.BSC_TESTNET,
-  ].includes(chainId);
+  const isTestnet = false;
 
   return (
     <>
