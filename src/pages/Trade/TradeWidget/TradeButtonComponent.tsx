@@ -148,22 +148,25 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
 
     try {
-      const result = await sdk.shiva.approveShiva({
-        account: address,
-        amount: maxUint256,
-      });
+      const useShiva = sdk.core.usingShiva();
+      const result = useShiva
+        ? await sdk.shiva.approveShiva({
+            account: address,
+            amount: maxUint256,
+          })
+        : await sdk.ovl.approve({
+            to: market?.id as Address,
+            amount: maxUint256,
+          });
 
-      addPopup(
-        {
-          txn: {
-            hash: result.hash,
-            success: result.receipt?.status === "success",
-            message: "",
-            type: TransactionType.APPROVAL,
-          },
+      addPopup({
+        txn: {
+          hash: result.hash,
+          success: result.receipt?.status === "success",
+          message: "",
+          type: TransactionType.APPROVAL,
         },
-        result.hash
-      );
+      });
 
       handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
 
