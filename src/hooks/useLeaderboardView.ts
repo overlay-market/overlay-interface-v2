@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import useActiveMarkets from "./useActiveMarkets";
 import { ColumnKey, DisplayUserData, ExtendedUserData } from "../pages/Leaderboard/types";
-import { formatDecimalToPercentage } from "../utils/formatDecimal";
 import { formatPriceWithCurrency } from "../utils/formatPriceWithCurrency";
 
 export interface ColumnDef {
@@ -58,7 +57,7 @@ export const useLeaderboardView = ({
     );
     const formattedWinRate =
       Number(currentUser.winRate) > 0
-        ? `${formatDecimalToPercentage(currentUser.winRate)}%`
+        ?  `${Math.round(Number(currentUser.winRate) * 100)}%`
         : "N/A";
     
     const tranformedTotalProfitOVL = Number(currentUser.totalProfitOVL) / 1e18;
@@ -101,7 +100,7 @@ export const useLeaderboardView = ({
 
     const formattedWinRate =
       Number(rank.winRate) > 0
-        ? `${formatDecimalToPercentage(rank.winRate)}%`
+        ?  `${Math.round(Number(rank.winRate) * 100)}%`
         : "N/A";
     
     const tranformedTotalProfitOVL = Number(rank.totalProfitOVL) / 1e18;
