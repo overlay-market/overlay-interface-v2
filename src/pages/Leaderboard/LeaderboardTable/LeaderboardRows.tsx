@@ -79,7 +79,10 @@ const LeaderboardRows = ({
             <StyledCell textalign="right">{rank.totalProfitUSD}</StyledCell>
             <StyledCell textalign="right">{rank.totalPositions}</StyledCell>
             <StyledCell textalign="right">
-              <MostTradedMarketLogo rank={rank} />
+              <MostTradedMarketLogo
+                marketId={rank.marketId}
+                marketName={rank.marketName}
+              />
             </StyledCell>
             <StyledCell textalign="right">{rank.winRate}</StyledCell>
             <StyledCell textalign="right">{rank.totalVolumeOVL}</StyledCell>

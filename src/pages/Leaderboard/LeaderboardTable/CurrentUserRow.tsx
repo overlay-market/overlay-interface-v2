@@ -60,7 +60,10 @@ const CurrentUserRow = ({
               {formattedUserdata?.totalPositions ?? <Loader />}
             </StyledCell>
             <StyledCell textalign="right">
-              <MostTradedMarketLogo rank={formattedUserdata} />
+              <MostTradedMarketLogo
+                marketId={formattedUserdata?.marketId}
+                marketName={formattedUserdata?.marketName}
+              />
             </StyledCell>
             <StyledCell textalign="right">
               {formattedUserdata?.winRate ?? <Loader />}

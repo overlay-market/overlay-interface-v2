@@ -1,31 +1,30 @@
 import { getMarketLogo } from "../../../utils/getMarketLogo";
-import { ExtendedUserData } from "../types";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { MarketLogo } from "./leaderboard-table-styles";
 import theme from "../../../theme";
-import useActiveMarkets from "../../../hooks/useActiveMarkets";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 
 interface MostTradedMarketCellProps {
-  rank: ExtendedUserData;
+  marketId?: string;
+  marketName?: string;
 }
 
-const MostTradedMarketLogo = ({ rank }: MostTradedMarketCellProps) => {
+const MostTradedMarketLogo = ({
+  marketId,
+  marketName,
+}: MostTradedMarketCellProps) => {
   const redirectToTradePage = useRedirectToTradePage();
-  const { data: markets } = useActiveMarkets();
-  const market = markets?.find((m) => m.id === rank.mostTradedMarket.marketId);
-  if (!rank) return null;
+
+  if (!marketId || !marketName) return null;
 
   return (
     <Tooltip.Provider delayDuration={200}>
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <MarketLogo
-            src={getMarketLogo(market?.marketId || "")}
+            src={getMarketLogo(marketId)}
             alt="logo"
-            onClick={() =>
-              market?.marketId && redirectToTradePage(market.marketId)
-            }
+            onClick={() => redirectToTradePage(marketId)}
           />
         </Tooltip.Trigger>
         <Tooltip.Content
@@ -36,7 +35,7 @@ const MostTradedMarketLogo = ({ rank }: MostTradedMarketCellProps) => {
             fontSize: "14px",
           }}
         >
-          {market?.marketName}
+          {marketName}
         </Tooltip.Content>
       </Tooltip.Root>
     </Tooltip.Provider>

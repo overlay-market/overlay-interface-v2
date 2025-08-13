@@ -1,6 +1,6 @@
 import { StyledHeader, Table } from "./leaderboard-table-styles";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { ExtendedUserData } from "../types";
+import { DisplayUserData, ExtendedUserData } from "../types";
 import Loader from "../../../components/Loader";
 import { useResolveENSProfiles } from "../../../hooks/useENSProfile";
 import { useLeaderboardView } from "../../../hooks/useLeaderboardView";
@@ -32,7 +32,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     formattedRanks,
   } = useLeaderboardView({ ranks, currentUser: currentUserData });
 
-  const getColumnValue = (data: ExtendedUserData) => {
+  const getColumnValue = (data: DisplayUserData) => {
     switch (selectedColumn) {
       case "profitOVL":
         return data.totalProfitOVL ?? <Loader />;
@@ -47,7 +47,12 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
       case "fees":
         return data.totalFeesOVL ?? <Loader />;
       case "mostTradedMarket":
-        return <MostTradedMarketLogo rank={data} />;
+        return (
+          <MostTradedMarketLogo
+            marketId={data.marketId}
+            marketName={data.marketName}
+          />
+        );
       default:
         return data.totalProfitOVL ?? <Loader />;
     }
