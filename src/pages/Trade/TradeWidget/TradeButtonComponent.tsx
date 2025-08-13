@@ -157,7 +157,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         : await sdk.ovl.approve({
             to: market?.id as Address,
             amount: maxUint256,
-          })
+          }
 
       addPopup(
         {
