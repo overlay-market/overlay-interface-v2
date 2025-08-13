@@ -18,7 +18,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   ranks,
   currentUserData,
 }) => {
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const isMobile = useMediaQuery("(max-width: 1150px)");
   const ensProfiles = useResolveENSProfiles(ranks);
 
   const {
@@ -27,7 +27,8 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     selectedLabel,
     columnOptions,
     formattedUserdata,
-  } = useLeaderboardView({ ranks, currentUserData });
+    formattedRanks,
+  } = useLeaderboardView({ ranks, currentUser: currentUserData });
 
   const getColumnValue = (data: ExtendedUserData) => {
     switch (selectedColumn) {
@@ -87,7 +88,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
 
       <tbody>
         <LeaderboardRows
-          ranks={ranks}
+          ranks={formattedRanks}
           ensProfiles={ensProfiles}
           isMobile={isMobile}
           getColumnValue={getColumnValue}

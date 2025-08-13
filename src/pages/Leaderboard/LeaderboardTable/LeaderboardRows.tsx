@@ -4,7 +4,7 @@ import { shortenAddress } from "../../../utils/web3";
 import { StyledCell, StyledRow } from "./leaderboard-table-styles";
 import Avatar from "boring-avatars";
 import { getRandomColors, getRandomName } from "../../../utils/boringAvatars";
-import { ExtendedUserData } from "../types";
+import { DisplayUserData, ExtendedUserData } from "../types";
 import MostTradedMarketLogo from "./MostTradedMarketLogo";
 
 interface ENSProfile {
@@ -15,7 +15,7 @@ interface ENSProfile {
 }
 
 interface LeaderboardRowsProps {
-  ranks: ExtendedUserData[] | undefined;
+  ranks: DisplayUserData[] | undefined;
   ensProfiles: ENSProfile[];
   isMobile: boolean;
   getColumnValue: (user: ExtendedUserData) => React.ReactNode;
