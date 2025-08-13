@@ -2,7 +2,7 @@ import { Flex, Text } from "@radix-ui/themes";
 import useAccount from "../../hooks/useAccount";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import theme from "../../theme";
-import { GradientText } from "./user-points-section-styles";
+import { GradientText } from "./top-section-styles";
 import { useModalHelper } from "../../components/ConnectWalletModal/utils";
 
 const TopSection: React.FC = () => {
