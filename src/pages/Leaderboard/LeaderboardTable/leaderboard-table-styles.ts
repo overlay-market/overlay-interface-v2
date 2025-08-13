@@ -43,6 +43,7 @@ export const MarketLogo = styled.img`
   border: 0.5px solid rgba(236, 236, 236, 0.15);
   display: inline-block; 
   vertical-align: middle;
+  cursor: pointer;
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 40px;
