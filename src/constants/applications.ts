@@ -2,6 +2,7 @@ import { TokenAmount } from "@lifi/sdk";
 import OVLToken from "../assets/images/token-logos/OVL-token.webp";
 import { DEFAULT_CHAINID, SUPPORTED_CHAINID } from "./chains";
 import { Address } from "viem";
+import { OVL_ADDRESS } from "overlay-sdk";
 
 export enum MARKET_CHART_URL {
   BSC_TESTNET = "https://api.overlay.market/bsc-testnet-charts/v1/charts",
@@ -26,15 +27,8 @@ export const FAUCET_API = 'https://api.overlay.market/faucet/'
 
 export type AddressMap = { [chainId: number]: Address };
 
-export const OVL_ADDRESS: AddressMap = {
-  [SUPPORTED_CHAINID.ARBITRUM_SEPOLIA]: "0x3E27fAe625f25291bFda517f74bf41DC40721dA2",
-  [SUPPORTED_CHAINID.IMOLA]: "0xCde46284D32148c4D470fA33BA788710b3d21E89",
-  [SUPPORTED_CHAINID.BARTIO]: "0x97576e088f0d05EF68cac2EEc63d017FE90952a0",
-  [SUPPORTED_CHAINID.BSC_TESTNET]: "0xb880E767739A82Eb716780BDfdbC1eD7b23BDB38",
-};
-
 export const SHIVA_ADDRESS: AddressMap = {
-  [SUPPORTED_CHAINID.BSC_TESTNET]: "0x6385C8b971e822CB02Ced25FCe9aA9604Bed213c",
+  [SUPPORTED_CHAINID.BSC_MAINNET]: "0xeB497c228F130BD91E7F13f81c312243961d894A",
 };
 
 export const DEFAULT_TOKEN_SYMBOL = "OVL";
@@ -50,5 +44,4 @@ export const DEFAULT_TOKEN = {
   name: "Overlay",
 } as TokenAmount;
 
-export const OVL_USD_PRICE = 1.01;
 export const OVL_DECIMALS = 18;
