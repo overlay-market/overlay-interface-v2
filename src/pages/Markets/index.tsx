@@ -35,7 +35,6 @@ const Markets: React.FC = () => {
         });
         sdk.ovl.price().then((price) => {
           price && setCurrentPrice(price);
-          console.log("Current price:", price);
         });
         // Fetch from BSC_TESTNET only (chainId 97)
         const sdkForBscTestnet = new OverlaySDK({
