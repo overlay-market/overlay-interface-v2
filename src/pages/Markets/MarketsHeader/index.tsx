@@ -6,11 +6,12 @@ import {
   SupplyChangeText,
 } from "./market-header-styles";
 
-
 const MarketsHeader = ({
   ovlSupplyChange,
+  ovlCurrentPrice,
 }: {
   ovlSupplyChange: string | undefined;
+  ovlCurrentPrice: number | undefined;
 }) => {
   const tokenTicker = "OVL";
 
@@ -41,7 +42,7 @@ const MarketsHeader = ({
           ml={"5"}
         >
           <StyledText>{tokenTicker} PRICE</StyledText>
-          <Text>$~~</Text>
+          <Text>${ovlCurrentPrice}</Text>
         </StyledFlex>
 
         <StyledFlex

@@ -19,6 +19,7 @@ const Markets: React.FC = () => {
   const [totalSupplyChange, setTotalSupplyChange] = useState<
     string | undefined
   >();
+  const [currentPrice, setCurrentPrice] = useState<number | undefined>();
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
 
@@ -32,7 +33,9 @@ const Markets: React.FC = () => {
           supplyChange &&
             setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%"));
         });
-
+        sdk.ovl.price().then((price) => {
+          price && setCurrentPrice(price);
+        });
         // Fetch from BSC_TESTNET only (chainId 97)
         const sdkForBscTestnet = new OverlaySDK({
           chainId: 97,
@@ -57,7 +60,10 @@ const Markets: React.FC = () => {
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
-      <MarketsHeader ovlSupplyChange={totalSupplyChange} />
+      <MarketsHeader
+        ovlSupplyChange={totalSupplyChange}
+        ovlCurrentPrice={currentPrice}
+      />
       <PreTGEBanner />
       <FirstSection marketsData={marketsData} />
       <Carousel
