@@ -84,8 +84,8 @@ export const useLiFiTrade = () => {
         fromToken: selectedToken.address,
         fromAddress: account,
         fromAmount: tokenAmount.toString(),
-        toChain: DEFAULT_CHAINID, 
-        toToken: OVL_ADDRESS[DEFAULT_CHAINID], 
+        toChain: DEFAULT_CHAINID as number, 
+        toToken: OVL_ADDRESS[DEFAULT_CHAINID as number], 
         slippage: 0.03,
       }).catch((err) => {
         console.error("❌ Failed to get estimate quote:", err);
@@ -145,13 +145,13 @@ export const useLiFiTrade = () => {
         fromToken: selectedToken.address,
         fromAddress: account,
         fromAmount: tokenAmount.toString(),
-        toChain: DEFAULT_CHAINID,
-        toToken: OVL_ADDRESS[DEFAULT_CHAINID], 
+        toChain: DEFAULT_CHAINID as number,
+        toToken: OVL_ADDRESS[DEFAULT_CHAINID as number], 
         slippage: 0.03,
         contractCalls: [
           {
             fromAmount: estimatedOvlAmount.toString(), 
-            fromTokenAddress: OVL_ADDRESS[DEFAULT_CHAINID],
+            fromTokenAddress: OVL_ADDRESS[DEFAULT_CHAINID as number],
             toContractAddress: currentMarket.id as Address,
             toContractCallData: encodedShivaBuildCallData,
             toContractGasLimit: gasWithBuffer.toString() || '500000',
@@ -190,7 +190,7 @@ export const useLiFiTrade = () => {
           address: DEFAULT_TOKEN.address as Address,
           chainId: DEFAULT_TOKEN.chainId as number,
         },
-        spenderAddress: SHIVA_ADDRESS[DEFAULT_CHAINID] as Address,
+        spenderAddress: SHIVA_ADDRESS[DEFAULT_CHAINID as number] as Address,
         tokenAmountSelected: BigInt(estimatedOvlAmount),
       });      
 

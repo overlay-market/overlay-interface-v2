@@ -9,7 +9,7 @@ const EIP712_DOMAIN = {
   name: 'Shiva',
   version: '1',
   chainId: DEFAULT_CHAINID as number,
-  verifyingContract: SHIVA_ADDRESS[DEFAULT_CHAINID] as Address 
+  verifyingContract: SHIVA_ADDRESS[DEFAULT_CHAINID as number] as Address 
 };
 
 const EIP712_TYPES = {
