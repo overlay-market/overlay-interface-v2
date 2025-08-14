@@ -1,7 +1,6 @@
 import { Flex, Box, ChevronDownIcon } from "@radix-ui/themes";
 import useOutsideClick from "../../../hooks/useOutsideClick";
 import React, { useState, Fragment, useMemo } from "react";
-import { useMarketsState } from "../../../state/markets/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import MarketItem from "./MarketItem";
 import {
@@ -20,10 +19,11 @@ import {
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
 import SearchBar from "../../../components/SearchBar";
+import useActiveMarkets from "../../../hooks/useActiveMarkets";
 
 const MarketsList: React.FC = () => {
-  const { markets } = useMarketsState();
   const { currentMarket } = useCurrentMarketState();
+  const { data: markets } = useActiveMarkets();
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");

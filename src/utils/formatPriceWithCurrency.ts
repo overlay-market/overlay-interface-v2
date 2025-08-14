@@ -25,9 +25,12 @@ export const formatPriceWithCurrency = (
   }
 
   const numericPrice = Number(price.toString().replaceAll(",", ""));
-  const formattedPrice = formatNumberWithCommas(numericPrice);
+  const isNegative = numericPrice < 0;
+  const absPrice = Math.abs(numericPrice);
 
-  return priceCurrency === "BERA"
-    ? `${formattedPrice} BERA`
+  const formattedPrice = formatNumberWithCommas(absPrice);
+
+  return isNegative
+    ? `-${priceCurrency}${formattedPrice}`
     : `${priceCurrency}${formattedPrice}`;
 };
