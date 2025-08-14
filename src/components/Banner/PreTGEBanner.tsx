@@ -5,7 +5,7 @@ import bnc_pre_TGE from "../../assets/images/bnc_pre_TGE.png";
 import overlayFullLogo from "../../assets/images/overlay-full-logo.png";
 import bscMainnetLogo from "../../assets/images/bsc-mainnet-logo.png";
 
-const TGE_DATE = new Date("2025-08-14T07:30:00Z");
+const TGE_DATE = new Date("2025-08-14T08:30:00Z");
 
 const PreTGEBanner: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
