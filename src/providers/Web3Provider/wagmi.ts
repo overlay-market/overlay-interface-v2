@@ -8,16 +8,19 @@ const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string
 const chains = [...mainnetChains, bsc] as const;
 
 const transports = Object.fromEntries(
-  chains.map((chain) => [chain.id, http()])
+  chains.map((chain) => [
+    chain.id,
+    chain.id === bsc.id
+      ? http(import.meta.env.VITE_BSC_MAINNET_RPC) // custom for BSC
+      : http()
+  ])
 );
 
 export const wagmiConfig = createConfig(
   getDefaultConfig({
     // Your dApps chains
     chains: [bsc],
-    transports: {
-      [bsc.id]: http(import.meta.env.VITE_BSC_MAINNET_RPC),
-    },
+    transports,
 
     // Required API Keys
     walletConnectProjectId: projectId,
