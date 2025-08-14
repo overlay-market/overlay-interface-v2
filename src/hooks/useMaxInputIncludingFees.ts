@@ -6,9 +6,9 @@ import { SelectState } from "../types/selectChainAndTokenTypes";
 import { toWei } from "overlay-sdk";
 import { useSelectedTokenBalance } from "./lifi/useSelectedTokenBalance";
 import { calculateOvlAmountFromToken } from "../utils/lifi/tokenOvlConversion";
-import { OVL_USD_PRICE } from "../constants/applications";
 import { useQuery } from "@tanstack/react-query";
 import { serializeWithBigInt } from "../utils/serializeWithBigInt";
+import { useOvlPrice } from "./useOvlPrice";
 
 interface UseMaxInputIncludingFeesParams {
   marketId: string | null | undefined;
@@ -23,6 +23,7 @@ export const useMaxInputIncludingFees = ({
   const { selectedLeverage } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
   const { data: selectedToken } = useSelectedTokenBalance();
+   const { data: ovlPrice } = useOvlPrice();
 
   const isDefaultState = chainState === SelectState.DEFAULT && tokenState === SelectState.DEFAULT;
   const isSelectedState = chainState === SelectState.SELECTED && tokenState === SelectState.SELECTED;
@@ -56,8 +57,10 @@ export const useMaxInputIncludingFees = ({
         );
       }
 
+      if (!ovlPrice) return 0;
+
       if (isSelectedState && selectedToken) {
-        const ovlAmount = calculateOvlAmountFromToken(selectedToken, OVL_USD_PRICE);
+        const ovlAmount = calculateOvlAmountFromToken(selectedToken, ovlPrice);
         return await sdk.trade.getMaxInputIncludingFeesFromBalance(
           marketId,
           ovlAmount,

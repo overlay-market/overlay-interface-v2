@@ -4,7 +4,7 @@ import { useAccount,  usePublicClient,  useWalletClient } from 'wagmi';
 import { OVL_ADDRESS, toWei } from 'overlay-sdk';
 import { useChainAndTokenState, useTradeState } from '../../state/trade/hooks';
 import { calculateTokenAmountFromOvlAmount } from '../../utils/lifi/tokenOvlConversion';
-import { DEFAULT_TOKEN, OVL_USD_PRICE, SHIVA_ADDRESS } from '../../constants/applications';
+import { DEFAULT_TOKEN,  SHIVA_ADDRESS } from '../../constants/applications';
 import { convertQuoteToRoute, executeRoute, ExecutionOptions, getContractCallsQuote, getQuote } from '@lifi/sdk';
 import { BuildOnBehalfOfParams, useShivaBuild } from './useShivaBuild';
 import { useCurrentMarketState } from '../../state/currentMarket/hooks';
@@ -13,6 +13,7 @@ import { DEFAULT_CHAINID } from '../../constants/chains';
 import { useTokenApprovalWithLiFi } from './useTokenApprovalWithLiFi';
 import { useSafeChainSwitch } from './useSafeChainSwitch';
 import { useAddPopup } from '../../state/application/hooks';
+import { useOvlPrice } from '../useOvlPrice';
 
 interface TradeParams {
   priceLimit: bigint;
@@ -44,7 +45,7 @@ export interface TradeStage {
 export const useLiFiTrade = () => {
   const [tradeStage, setTradeStage] = useState<TradeStage>({ stage: 'idle' });
   const [quote, setQuote] = useState<any>(null);
-  
+  const { data: ovlPrice } = useOvlPrice();
   const { address: account } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
@@ -67,7 +68,7 @@ export const useLiFiTrade = () => {
       throw new Error('Wallet not connected');
     }
 
-    if (!currentMarket) {
+    if (!currentMarket || !ovlPrice) {
       console.warn('Missing required data for Trade with LiFi action');
       return;
     }  
@@ -77,7 +78,7 @@ export const useLiFiTrade = () => {
 
       setTradeStage({ stage: 'quote', message: 'Getting cross-chain quote estimation' });     
 
-      const tokenAmount = calculateTokenAmountFromOvlAmount(typedValue, selectedToken, OVL_USD_PRICE);     
+      const tokenAmount = calculateTokenAmountFromOvlAmount(typedValue, selectedToken, ovlPrice);     
                 
       const estimateQuote = await getQuote({
         fromChain: selectedChainId,
@@ -199,7 +200,7 @@ export const useLiFiTrade = () => {
 
       const shownTxHashes = new Set<string>();
       
-    const executedRoute = await executeRoute(route, {
+    await executeRoute(route, {
       // Update hook to track progress and set transaction hash
       updateRouteHook: (updatedRoute) => {
         console.log("🔄 Route updated:", {
