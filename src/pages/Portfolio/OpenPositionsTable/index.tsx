@@ -40,6 +40,10 @@ const OpenPositionsTable: React.FC = () => {
   const [selectedPositions, setSelectedPositions] = useState<Set<string>>(
     new Set()
   );
+
+  const getPositionKey = (position: OpenPositionData) => {
+    return `${position.positionId}-${position.marketAddress}`;
+  };
   const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
 
@@ -57,7 +61,7 @@ const OpenPositionsTable: React.FC = () => {
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
       setSelectedPositions(
-        new Set(positions?.map((p) => p.positionId.toString()) || [])
+        new Set(positions?.map((p) => getPositionKey(p)) || [])
       );
     } else {
       setSelectedPositions(new Set());
@@ -70,11 +74,11 @@ const OpenPositionsTable: React.FC = () => {
   ) => {
     setSelectedPositions((prev) => {
       const newSet = new Set(prev);
-      const positionId = position.positionId.toString();
+      const positionKey = getPositionKey(position);
       if (checked) {
-        newSet.add(positionId);
+        newSet.add(positionKey);
       } else {
-        newSet.delete(positionId);
+        newSet.delete(positionKey);
       }
       return newSet;
     });
@@ -166,9 +170,7 @@ const OpenPositionsTable: React.FC = () => {
                 onCheckboxChange={(checked) =>
                   handlePositionSelect(position, checked)
                 }
-                isChecked={selectedPositions.has(
-                  position.positionId.toString()
-                )}
+                isChecked={selectedPositions.has(getPositionKey(position))}
               />
             ))
           )
@@ -190,7 +192,7 @@ const OpenPositionsTable: React.FC = () => {
         selectedCount={selectedPositions.size}
         selectedPositions={
           positions?.filter((pos) =>
-            selectedPositions.has(pos.positionId.toString())
+            selectedPositions.has(getPositionKey(pos))
           ) || []
         }
         onConfirm={handleClosePositions}

@@ -5,16 +5,15 @@ import {
   StyledText,
   SupplyChangeText,
 } from "./market-header-styles";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import { SUPPORTED_CHAINID } from "../../../constants/chains";
 
 const MarketsHeader = ({
   ovlSupplyChange,
+  ovlCurrentPrice,
 }: {
   ovlSupplyChange: string | undefined;
+  ovlCurrentPrice: number | undefined;
 }) => {
-  const { chainId } = useMultichainContext();
-  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OVL" : "OVL";
+  const tokenTicker = "OVL";
 
   const getSupplyChangeColor = (change: string | undefined) => {
     if (!change) return "default";
@@ -43,7 +42,7 @@ const MarketsHeader = ({
           ml={"5"}
         >
           <StyledText>{tokenTicker} PRICE</StyledText>
-          <Text>$~~</Text>
+          <Text>${ovlCurrentPrice}</Text>
         </StyledFlex>
 
         <StyledFlex

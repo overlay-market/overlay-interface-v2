@@ -15,9 +15,10 @@ import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
-import Faucet from "./pages/Faucet";
 import Bridge from "./pages/Bridge";
 import { SolanaProvider } from "./providers/SolanaProvider";
+import Airdrops from "./pages/Airdrops";
+// import Faucet from "./pages/Faucet";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -43,7 +44,8 @@ const App = () => {
                   <Route path="/trade" element={<Trade />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
-                  <Route path="/faucet" element={<Faucet />} />
+                  <Route path="/airdrops" element={<Airdrops />} />
+                  {/* <Route path="/faucet" element={<Faucet />} /> */}
                   <Route path="/bridge" element={<Bridge />} />
                   <Route path="*" element={<Navigate to="/markets" />} />
                 </Routes>

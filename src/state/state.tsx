@@ -4,7 +4,6 @@ import { setupListeners } from "@reduxjs/toolkit/query";
 import { updateVersion } from "./global/actions";
 import trade from "./trade/reducer";
 import currentMarket from "./currentMarket/reducer";
-import markets from "./markets/reducer";
 import application from "./application/reducer";
 
 const PERSISTED_KEYS: string[] = ["user", "transactions"];
@@ -14,7 +13,6 @@ const store = configureStore({
     application,
     trade,
     currentMarket,
-    markets,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ thunk: true }).concat(

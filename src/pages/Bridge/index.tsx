@@ -18,7 +18,6 @@ import {
   OVL_TOKEN_ADDRESS,
   SOLANA_DEVNET_EID,
 } from "../../constants/bridge";
-import { StyledInput } from "../Leaderboard/ReferralSection/referral-modal-styles";
 import { readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
 import {
@@ -28,6 +27,7 @@ import {
   GradientBorderBox,
   LabelText,
   SwapDirectionButton,
+  StyledInput,
 } from "./bridge-styles";
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";

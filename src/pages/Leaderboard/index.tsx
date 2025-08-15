@@ -1,220 +1,60 @@
-import { Flex, Skeleton, Text } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import { LineSeparator } from "./leaderboard-styles";
-import UserPointsSection from "./UserPointsSection";
-import LeaderboardTable from "./LeaderboardTable";
-import PointsUpdateSection from "./PointsUpdateSection";
 import useAccount from "../../hooks/useAccount";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ExtendedUserData,
-  LeaderboardPointsData,
-  UserData,
-  UserReferralData,
-} from "./types";
-import { Address } from "viem";
+import { ExtendedUserData, UserData } from "./types";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
-import { useGetEnsName } from "../../utils/viemEnsUtils";
-import { GradientText } from "./user-points-section-styles";
-import ReferralSection from "./ReferralSection";
-import ReferralModal from "./ReferralSection/ReferralModal";
-import { useSearchParams } from "react-router-dom";
-import { fetchPointsData } from "./utils/fetchPointsData";
-import { fetchUserReferralData } from "./utils/fetchUserReferralData";
+import { usePermanentLeaderboard } from "../../hooks/usePermanentLeaderboard";
+import { useENSName } from "../../hooks/useENSProfile";
+import LeaderboardUpdateSection from "./LeaderboardUpdateSection";
+import TopSection from "./TopSection";
+import LeaderboardTable from "./LeaderboardTable";
 
 const INITIAL_NUMBER_OF_ROWS = 15;
 const ROWS_PER_LOAD = 20;
-const comingSoon = false;
 
 const Leaderboard: React.FC = () => {
-  const { address: account, status } = useAccount();
-  const [searchParams] = useSearchParams();
-  const referralCodeFromURL = searchParams.get("referrer");
-  const getEnsName = useGetEnsName();
+  const { address: account } = useAccount();
+  const { data: ensName } = useENSName(account);
 
-  const [sessionId, setSessionId] = useState<
-    string | undefined
-  >(undefined);
-  const [pointsData, setPointsData] = useState<
-    LeaderboardPointsData | undefined
-  >(undefined);
-  const [currentUserData, setCurrentUserData] = useState<
-    ExtendedUserData | undefined
-  >(undefined);
-  const [userReferralData, setUserReferralData] = useState<
-    UserReferralData | undefined
-  >(undefined);
-  const [fetchingPointsData, setFetchingPointsData] = useState(false);
-  const [fetchingReferralsData, setFetchingReferralsData] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [loadedNumberOfRows, setLoadedNumberOfRows] = useState(
     INITIAL_NUMBER_OF_ROWS
   );
-  const [openReferralModal, setOpenReferralModal] = useState(false);
-  const [triggerRefetchReferralData, setTriggerRefetchReferralData] =
-    useState(false);
-
   const observerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const fetchReferralData = async () => {
-      if (!account) return;
-
-      const data = await fetchUserReferralData(
-        account,
-        setFetchingReferralsData,
-        sessionId
-      );
-      setUserReferralData(data);
-    };
-
-    fetchReferralData();
-  }, [account, sessionId]);
-
-  useEffect(() => {
-    const fetchReferralData = async () => {
-      if (!account || !triggerRefetchReferralData) return;
-
-      const data = await fetchUserReferralData(
-        account,
-        setFetchingReferralsData,
-        sessionId
-      );
-      setUserReferralData(data);
-      setTriggerRefetchReferralData(false);
-    };
-
-    fetchReferralData();
-  }, [triggerRefetchReferralData, account, sessionId]);
-
-  const userBonusInfo = useMemo(() => {
-    if (!userReferralData) return;
-
-    return {
-      affiliateBonus: userReferralData.previousRunAffiliateBonus,
-      referralBonus: userReferralData.previousRunReferralBonus,
-      walletBoostBonus: userReferralData.previousRunWalletBoostBonus,
-    };
-  }, [account, triggerRefetchReferralData, userReferralData]);
-
-  const hasJoinedReferralCampaign: boolean | undefined = useMemo(() => {
-    if (status === "connecting" || fetchingReferralsData) {
-      return undefined;
-    }
-
-    if (!account || !userReferralData) {
-      return false;
-    }
-
-    return (
-      userReferralData.referredByAffiliate !== null ||
-      userReferralData.myReferralCode !== null
-    );
-  }, [
-    account,
-    userReferralData,
-    triggerRefetchReferralData,
-    status,
-    fetchingReferralsData,
-  ]);
-
-  useEffect(() => {
-    if (referralCodeFromURL && !hasJoinedReferralCampaign) {
-      setOpenReferralModal(true);
-    }
-  }, [account, referralCodeFromURL, hasJoinedReferralCampaign]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await fetchPointsData(
-        INITIAL_NUMBER_OF_ROWS,
-        undefined,
-        setFetchingPointsData
-      );
-
-      if (data) {
-        if (data.sessionDetails && new Date(data.sessionDetails.sessionEnd) < new Date()) {
-          setSessionId(data.sessionDetails.sessionId)
-        }
-      }
-      setPointsData(data);
-    };
-
-    fetchData();
-  }, []);
+  const { data, isLoading, isError, error } = usePermanentLeaderboard(
+    loadedNumberOfRows,
+    account
+  );
 
   const ranks = useMemo<UserData[] | undefined>(() => {
-    if (pointsData) {
-      return pointsData.leaderboardTable;
-    }
-  }, [pointsData]);
+    return data?.leaderboard;
+  }, [data]);
 
-  useEffect(() => {
-    let isCancelled = false;
+  const leaderboardLastUpdated = useMemo<string | undefined>(() => {
+    return data?.lastUpdated;
+  }, [data]);
 
-    const resolveUsername = async (user: UserData) => {
-      try {
-        const username = await getEnsName(user._id as Address);
-        if (!isCancelled && username) {
-          setCurrentUserData({
-            ...user,
-            username,
-          });
-        }
-      } catch (err) {
-        console.error("Failed to resolve ENS:", err);
-      }
+  const currentUserData = useMemo<ExtendedUserData | undefined>(() => {
+    if (!data?.userRank || !account) return undefined;
+
+    return {
+      ...data.userRank,
+      username: ensName || undefined,
     };
+  }, [data, account, ensName]);
 
-    if (account && userReferralData) {
-      const userDataFromReferral: UserData = {
-        _id: userReferralData.walletAddress,
-        totalPoints: userReferralData.sessionTotalPoints,
-        previousRunPoints: userReferralData.previousRunPoints,
-        rank: userReferralData.rank,
-      };
+  // Infinite scroll logic
+  const hasMore = useMemo(() => {
+    if (!data) return true;
+    return data.leaderboard.length < data.totalUsers;
+  }, [data]);
 
-      setCurrentUserData({
-        ...userDataFromReferral,
-        username: undefined,
-      });
-
-      resolveUsername(userDataFromReferral);
-    } else {
-      setCurrentUserData(undefined);
-    }
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [account, userReferralData]);
-
-  const loadMoreData = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-
-    const data = await fetchPointsData(
-      loadedNumberOfRows + ROWS_PER_LOAD,
-      undefined,
-      setFetchingPointsData
-    );
-
-    if (data) {
-      setPointsData(data);
-      setLoadedNumberOfRows((prev) => prev + ROWS_PER_LOAD);
-
-      if (data.sessionDetails && new Date(data.sessionDetails.sessionEnd) < new Date()) {
-        setSessionId(data.sessionDetails.sessionId)
-      }
-    }
-
-    if (data && data.leaderboardTable.length >= data.totalUsers) {
-      setHasMore(false);
-    }
-
-    setLoading(false);
+  const loadMoreData = () => {
+    if (isLoading || !hasMore) return;
+    setLoadedNumberOfRows((prev) => prev + ROWS_PER_LOAD);
   };
 
   const observer = useRef<IntersectionObserver>();
@@ -250,6 +90,12 @@ const Leaderboard: React.FC = () => {
     };
   }, [hasMore, loadedNumberOfRows]);
 
+  useEffect(() => {
+    if (isError) {
+      console.error("Error loading leaderboard data:", error);
+    }
+  }, [isError, error]);
+
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
       <Flex
@@ -264,68 +110,12 @@ const Leaderboard: React.FC = () => {
       </Flex>
       <LineSeparator />
 
-      {comingSoon && (
-        <Flex
-          position="fixed"
-          top="55px"
-          bottom="20"
-          left="20"
-          width="95%"
-          height={{ initial: "85%", sm: "100%" }}
-          style={{
-            zIndex: "1000",
-          }}
-          justify="center"
-          align="center"
-        >
-          <Flex
-            style={{
-              background: "black",
-              padding: "24px",
-              borderRadius: "8px",
-              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-            }}
-            maxWidth="80%"
-            direction="column"
-            align="center"
-            gap="16px"
-          >
-            <GradientText
-              size={{ initial: "5", sm: "6" }}
-              style={{
-                fontWeight: "700",
-                cursor: "pointer",
-              }}
-            >
-              T🔥O🔥R🔥C🔥H
-            </GradientText>
-            <Text size="2" style={{ textAlign: "center" }}>
-              Campaign has begun! Points will update on May 27.
-            </Text>
-
-            <a
-              href="https://overlayprotocol.medium.com/t-o-r-c-h-b0213aa3ae85"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                color: theme.color.grey3,
-                fontWeight: "600",
-                textDecoration: "underline",
-              }}
-            >
-              Learn more
-            </a>
-          </Flex>
-        </Flex>
-      )}
-
       <Flex
         direction={"column"}
         gap={{ initial: "24px", sm: "28px", md: "32px" }}
         pt={"16px"}
         pl={{ initial: "4px", sm: "16px", md: "12px" }}
         pr={{ initial: "4px", sm: "0px" }}
-        style={comingSoon ? { filter: "blur(5px)" } : {}}
       >
         <Flex
           direction={{ initial: "column", sm: "row" }}
@@ -333,41 +123,15 @@ const Leaderboard: React.FC = () => {
           align={"center"}
           gap={"12px"}
         >
-          <UserPointsSection
-            userPoints={userReferralData?.sessionTotalPoints}
-            isLoading={fetchingPointsData || status === "connecting"}
-          />
-          <PointsUpdateSection
-            pointsUpdatedAt={
-              userReferralData?.sessionLastUpdated ||
-              pointsData?.sessionDetails?.sessionLastUpdated
-            }
+          <TopSection />
+          <LeaderboardUpdateSection
+            leaderboardUpdatedAt={leaderboardLastUpdated}
           />
         </Flex>
 
-        {hasJoinedReferralCampaign !== undefined ? (
-          <ReferralSection
-            hasJoinedReferralCampaign={hasJoinedReferralCampaign}
-            userData={userReferralData}
-            setOpenReferralModal={setOpenReferralModal}
-            triggerRefetch={setTriggerRefetchReferralData}
-          />
-        ) : (
-          <Skeleton
-            width={{ initial: "100%", sm: "360px" }}
-            height="50px"
-            style={{ borderRadius: "32px" }}
-          />
-        )}
+        <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
 
-        <LeaderboardTable
-          ranks={ranks}
-          currentUserData={currentUserData}
-          userBonusInfo={userBonusInfo}
-          hasJoinedReferralCampaign={Boolean(hasJoinedReferralCampaign)}
-        />
-
-        {loading && (
+        {isLoading && (
           <Flex
             justify={"center"}
             width={"100%"}
@@ -379,16 +143,6 @@ const Leaderboard: React.FC = () => {
         )}
         <Flex ref={observerRef} width={"10px"} height={"10px"} />
       </Flex>
-
-      {openReferralModal && (
-        <ReferralModal
-          referralCodeFromURL={referralCodeFromURL}
-          isEligibleForAffiliate={userReferralData?.isEligibleForAffiliate}
-          open={openReferralModal}
-          triggerRefetch={setTriggerRefetchReferralData}
-          handleDismiss={() => setOpenReferralModal(false)}
-        />
-      )}
     </Flex>
   );
 };
