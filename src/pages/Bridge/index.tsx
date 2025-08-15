@@ -23,12 +23,24 @@ import { readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
 import {
   BridgeContainer,
+  ChainBox,
+  ChainText,
   GradientBorderBox,
-  SourceChainSelectButton,
+  LabelText,
+  SwapDirectionButton,
 } from "./bridge-styles";
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import useDebounce from "../../hooks/useDebounce";
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  SystemProgram,
+} from "@solana/web3.js";
+import { useSolanaWallet } from "../../hooks/useSolanaWallet";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { GradientBothSidesArrowIcon } from "../../assets/icons/svg-icons";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -41,8 +53,12 @@ const Bridge: React.FC = () => {
   const { openModal } = useModalHelper();
   const addPopup = useAddPopup();
   const { ovlBalance, refetch } = useOvlTokenBalance();
-
+  const solanaWallet = useSolanaWallet();
   const [sourceChain, setSourceChain] = useState<"BSC" | "SOLANA">("BSC");
+  const [destinationChain, setDestinationChain] = useState<"BSC" | "SOLANA">(
+    "SOLANA"
+  );
+  const [rotated, setRotated] = useState(false);
   const [amount, setAmount] = useState("");
   const [destination, setDestination] = useState("");
   const debouncedAmount = useDebounce(amount, 500);
@@ -57,94 +73,131 @@ const Bridge: React.FC = () => {
 
   const { writeContractAsync } = useWriteContract();
 
+  const defaultTitle = "Bridge";
+
   const title: string = useMemo(() => {
     const amount = parseFloat(debouncedAmount);
-    const defaultTitle =
-      sourceChain === "BSC" ? "Bridge to Solana" : "Bridge to BSC";
+
     if (isNaN(amount)) return defaultTitle;
     if (ovlBalance && amount > ovlBalance)
       return "Amount Exceeds Available Balance";
     return defaultTitle;
-  }, [debouncedAmount, ovlBalance, sourceChain]);
+  }, [debouncedAmount, ovlBalance, defaultTitle]);
 
-  const handleBridge = async () => {
-    if (!address) {
-      openModal();
-      return;
-    }
-    if (!amount || !destination) return;
-    try {
-      const amountWei = parseUnits(amount, 18);
-      if ((allowance ?? 0n) < amountWei) {
-        const approveHash = await writeContractAsync({
-          address: OVL_TOKEN_ADDRESS,
-          abi: erc20Abi,
-          functionName: "approve",
-          args: [BRIDGE_CONTRACT_ADDRESS, maxUint256],
-        });
-        addPopup(
-          {
-            txn: {
-              hash: approveHash,
-              success: true,
-              message: "",
-              type: TransactionType.APPROVAL,
-            },
-          },
-          approveHash
-        );
-        await waitForTransactionReceipt(wagmiConfig, {
-          hash: approveHash,
-          confirmations: 1,
-        });
-      }
+  const handleBridgeBSCToSolana = async () => {
+    if (!address) return;
 
-      const sendParam = {
-        dstEid: SOLANA_DEVNET_EID,
-        to: toBytes32(destination),
-        amountLD: amountWei,
-        minAmountLD: amountWei,
-        extraOptions: "0x",
-        composeMsg: "0x",
-        oftCmd: "0x",
-      } as const;
-
-      const msgFee = await readContract(wagmiConfig, {
-        address: BRIDGE_CONTRACT_ADDRESS,
-        abi: BRIDGE_ABI,
-        functionName: "quoteSend",
-        args: [sendParam, false],
+    const amountWei = parseUnits(amount, 18);
+    if ((allowance ?? 0n) < amountWei) {
+      const approveHash = await writeContractAsync({
+        address: OVL_TOKEN_ADDRESS,
+        abi: erc20Abi,
+        functionName: "approve",
+        args: [BRIDGE_CONTRACT_ADDRESS, maxUint256],
       });
-
-      const hash = await writeContractAsync({
-        address: BRIDGE_CONTRACT_ADDRESS,
-        abi: BRIDGE_ABI,
-        functionName: "send",
-        args: [sendParam, msgFee, address],
-        value: msgFee.nativeFee,
-      });
-
       addPopup(
         {
           txn: {
-            hash,
+            hash: approveHash,
             success: true,
             message: "",
-            type: TransactionType.BRIDGE_OVL,
+            type: TransactionType.APPROVAL,
           },
         },
-        hash
+        approveHash
       );
-
       await waitForTransactionReceipt(wagmiConfig, {
-        hash,
+        hash: approveHash,
         confirmations: 1,
       });
-      await refetch();
+    }
 
+    const sendParam = {
+      dstEid: SOLANA_DEVNET_EID,
+      to: toBytes32(destination),
+      amountLD: amountWei,
+      minAmountLD: amountWei,
+      extraOptions: "0x",
+      composeMsg: "0x",
+      oftCmd: "0x",
+    } as const;
+
+    const msgFee = await readContract(wagmiConfig, {
+      address: BRIDGE_CONTRACT_ADDRESS,
+      abi: BRIDGE_ABI,
+      functionName: "quoteSend",
+      args: [sendParam, false],
+    });
+
+    const hash = await writeContractAsync({
+      address: BRIDGE_CONTRACT_ADDRESS,
+      abi: BRIDGE_ABI,
+      functionName: "send",
+      args: [sendParam, msgFee, address],
+      value: msgFee.nativeFee,
+    });
+
+    addPopup(
+      {
+        txn: {
+          hash,
+          success: true,
+          message: "",
+          type: TransactionType.BRIDGE_OVL,
+        },
+      },
+      hash
+    );
+
+    await waitForTransactionReceipt(wagmiConfig, {
+      hash,
+      confirmations: 1,
+    });
+  };
+
+  const handleBridgeSolanaToBSC = async () => {
+    if (!solanaWallet.publicKey) {
+      await solanaWallet.connect();
+      return;
+    }
+
+    const connection = new Connection("https://api.devnet.solana.com");
+    console.log({ solanaWallet, connection });
+    const tx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: solanaWallet.publicKey,
+        toPubkey: new PublicKey(destination),
+        lamports: 0, // replace with token transfer/burn instruction
+      })
+    );
+
+    const sig = await solanaWallet.sendTransaction(tx, connection);
+    await connection.confirmTransaction(sig, "confirmed");
+
+    // Here you would call your relayer API to trigger mint on BSC
+    await fetch("/api/bridge/solana-to-bsc", {
+      method: "POST",
+      body: JSON.stringify({ tx: sig, amount }),
+    });
+  };
+
+  const handleBridge = async () => {
+    if (!amount || !destination) return;
+    try {
+      if (sourceChain === "BSC") {
+        if (!address) {
+          openModal();
+          return;
+        }
+        await handleBridgeBSCToSolana();
+      } else {
+        await handleBridgeSolanaToBSC();
+      }
+
+      await refetch();
       setAmount("");
       setDestination("");
-    } catch (error: unknown) {
+    } catch (error) {
       let message = "Bridge failed";
       let type = "ERROR";
       if (error && typeof error === "object") {
@@ -182,6 +235,12 @@ const Bridge: React.FC = () => {
         Date.now().toString()
       );
     }
+  };
+
+  const handleSwapChains = () => {
+    setSourceChain(destinationChain);
+    setDestinationChain(sourceChain);
+    setRotated((prev) => !prev);
   };
 
   return (
@@ -226,56 +285,34 @@ const Bridge: React.FC = () => {
             gap={"20px"}
             p={{ sm: "32px" }}
           >
-            <Text
-              size="1"
-              style={{ color: theme.color.grey3, textAlign: "center" }}
-            >
-              Select Source Chain
-            </Text>
-            <Flex gap="12px" justify="center" mt={"-10px"}>
-              <SourceChainSelectButton
-                active={sourceChain === "BSC" ? "true" : "false"}
-                onClick={() => setSourceChain("BSC")}
-              >
-                <Flex
-                  direction={"column"}
-                  justify={"center"}
-                  align={"center"}
-                  height="100%"
-                >
-                  <Text
-                    size={"3"}
-                    weight={"bold"}
-                    style={{
-                      color: sourceChain === "BSC" ? theme.color.blue2 : "",
-                    }}
-                  >
-                    BSC
-                  </Text>
+            <Flex gap="8px" justify="center" align="center">
+              <ChainBox>
+                <Flex direction={"column"}>
+                  <LabelText>From</LabelText>
+                  <Flex justify="center">
+                    <ChainText>{sourceChain}</ChainText>
+                  </Flex>
                 </Flex>
-              </SourceChainSelectButton>
+              </ChainBox>
 
-              <SourceChainSelectButton
-                active={sourceChain === "SOLANA" ? "true" : "false"}
-                onClick={() => setSourceChain("SOLANA")}
+              <SwapDirectionButton
+                onClick={handleSwapChains}
+                style={{
+                  transform: rotated ? "rotateY(180deg)" : "rotateY(0deg)",
+                  transition: "transform 0.3s ease-in-out",
+                }}
               >
-                <Flex
-                  direction={"column"}
-                  justify={"center"}
-                  align={"center"}
-                  height="100%"
-                >
-                  <Text
-                    size={"3"}
-                    weight={"bold"}
-                    style={{
-                      color: sourceChain === "SOLANA" ? theme.color.blue2 : "",
-                    }}
-                  >
-                    SOLANA
-                  </Text>
+                <GradientBothSidesArrowIcon />
+              </SwapDirectionButton>
+
+              <ChainBox>
+                <Flex direction={"column"}>
+                  <LabelText>To</LabelText>
+                  <Flex justify="center">
+                    <ChainText>{destinationChain}</ChainText>
+                  </Flex>
                 </Flex>
-              </SourceChainSelectButton>
+              </ChainBox>
             </Flex>
 
             <Box
@@ -315,13 +352,23 @@ const Bridge: React.FC = () => {
               <GradientSolidButton
                 title={title}
                 handleClick={handleBridge}
-                isDisabled={!amount || !destination || title !== "Bridge"}
+                isDisabled={!amount || !destination || title !== defaultTitle}
               />
             ) : (
               <GradientOutlineButton
                 title="Connect Wallet"
                 handleClick={openModal}
               />
+            )}
+
+            {solanaWallet.connected ? (
+              <GradientSolidButton
+                title={title}
+                handleClick={handleBridge}
+                isDisabled={!amount || !destination || title !== defaultTitle}
+              />
+            ) : (
+              <WalletMultiButton />
             )}
           </Flex>
         </GradientBorderBox>
