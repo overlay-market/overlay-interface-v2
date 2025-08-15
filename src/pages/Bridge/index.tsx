@@ -348,28 +348,31 @@ const Bridge: React.FC = () => {
               }
             />
 
-            {address ? (
-              <GradientSolidButton
-                title={title}
-                handleClick={handleBridge}
-                isDisabled={!amount || !destination || title !== defaultTitle}
-              />
-            ) : (
-              <GradientOutlineButton
-                title="Connect Wallet"
-                handleClick={openModal}
-              />
-            )}
-
-            {solanaWallet.connected ? (
-              <GradientSolidButton
-                title={title}
-                handleClick={handleBridge}
-                isDisabled={!amount || !destination || title !== defaultTitle}
-              />
-            ) : (
-              <WalletMultiButton />
-            )}
+            {sourceChain === "BSC" ? (
+                address ? (
+                  <GradientSolidButton
+                    title={title}
+                    handleClick={handleBridge}
+                    isDisabled={!amount || !destination || title !== defaultTitle}
+                  />
+                ) : (
+                  <GradientOutlineButton
+                    title="Connect Wallet"
+                    handleClick={openModal}
+                  />
+                )
+              ) : (
+                solanaWallet.connected ? (
+                  <GradientSolidButton
+                    title={title}
+                    handleClick={handleBridge}
+                    isDisabled={!amount || !destination || title !== defaultTitle}
+                  />
+                ) : (
+                  <WalletMultiButton />
+                )
+              )
+            }
           </Flex>
         </GradientBorderBox>
       </Flex>
