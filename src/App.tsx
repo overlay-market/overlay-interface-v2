@@ -17,6 +17,7 @@ import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
 import Faucet from "./pages/Faucet";
 import Bridge from "./pages/Bridge";
+import { SolanaProvider } from "./providers/SolanaProvider";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -27,27 +28,29 @@ const App = () => {
   return (
     <MultichainContextProvider initialChainId={contextChainID as number}>
       <SDKProvider>
-        <Theme>
-          <AppContainer>
-            <Trackers.WalletConnectionTracker />
-            <ScrollToTop />
-            <Popups />
-            <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
-              <NavBar />
-              <Wallet />
-              <Routes>
-                <Route path="/" element={<Navigate to="/markets" />} />
-                <Route path="/markets" element={<Markets />} />
-                <Route path="/trade" element={<Trade />} />
-                <Route path="/portfolio" element={<Portfolio />} />
-                <Route path="/leaderboard" element={<Leaderboard />} />
-                <Route path="/faucet" element={<Faucet />} />
-                <Route path="/bridge" element={<Bridge />} />
-                <Route path="*" element={<Navigate to="/markets" />} />
-              </Routes>
-            </Flex>
-          </AppContainer>
-        </Theme>
+        <SolanaProvider>
+          <Theme>
+            <AppContainer>
+              <Trackers.WalletConnectionTracker />
+              <ScrollToTop />
+              <Popups />
+              <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
+                <NavBar />
+                <Wallet />
+                <Routes>
+                  <Route path="/" element={<Navigate to="/markets" />} />
+                  <Route path="/markets" element={<Markets />} />
+                  <Route path="/trade" element={<Trade />} />
+                  <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/leaderboard" element={<Leaderboard />} />
+                  <Route path="/faucet" element={<Faucet />} />
+                  <Route path="/bridge" element={<Bridge />} />
+                  <Route path="*" element={<Navigate to="/markets" />} />
+                </Routes>
+              </Flex>
+            </AppContainer>
+          </Theme>
+        </SolanaProvider>
       </SDKProvider>
     </MultichainContextProvider>
   );
