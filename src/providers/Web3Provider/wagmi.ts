@@ -19,7 +19,7 @@ const transports = Object.fromEntries(
 export const wagmiConfig = createConfig(
   getDefaultConfig({
     // Your dApps chains
-    chains: [bsc],
+    chains,
     transports,
 
     // Required API Keys
