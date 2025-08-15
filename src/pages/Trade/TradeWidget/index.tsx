@@ -20,6 +20,8 @@ import Slider from "../../../components/Slider";
 import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
+import ChainAndTokenSelect from "./ChainAndTokenSelect";
+import { Flex } from "@radix-ui/themes";
 
 const TradeWidget: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -167,6 +169,7 @@ const TradeWidget: React.FC = () => {
         handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
       />
 
+      <ChainAndTokenSelect />
       <CollateralInputComponent />
       <TradeButtonComponent loading={loading} tradeState={tradeState} />
       <button
@@ -175,13 +178,13 @@ const TradeWidget: React.FC = () => {
           background: "none",
           border: "none",
           padding: 0,
-          // marginTop: "12px",
           marginBottom: "8px",
           fontSize: "16px",
           fontWeight: 500,
           color: theme.color.grey3,
           cursor: "pointer",
           textAlign: "right",
+          outline: "none",
         }}
       >
         {detailsOpen ? "Hide Info ▲" : "More Info ▼"}
@@ -189,10 +192,19 @@ const TradeWidget: React.FC = () => {
 
       {/* Conditionally render details */}
       {detailsOpen && (
-        <div>
+        <Flex
+          style={{
+            background: theme.color.background,
+            zIndex: 100,
+            border: "8px solid transparent",
+            boxShadow: `rgb(0 0 0 / 40%) 0px 0px 12px 0px`,
+            marginTop: "-14px",
+          }}
+          direction={"column"}
+        >
           <MainTradeDetails tradeState={tradeState} />
           <AdditionalTradeDetails tradeState={tradeState} />
-        </div>
+        </Flex>
       )}
     </TradeWidgetContainer>
   );
