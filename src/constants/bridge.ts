@@ -1,6 +1,18 @@
-export const SOLANA_DEVNET_EID = 30168; // LayerZero endpoint id for Solana mainnet
+export const SOLANA_MAINNET_EID = 30168; // LayerZero endpoint id for Solana Mainnet
+export const BSC_MAINNET_EID = 30102; // LayerZero endpoint id for BSC mainnet
 export const BRIDGE_CONTRACT_ADDRESS = "0x551D0BCd03aA13609a6982Cf8554f9ACa04C9464"; // BSC mainnet OvlOFTAdapter
 export const OVL_TOKEN_ADDRESS = "0x1F34c87ded863Fe3A3Cd76FAc8adA9608137C8c3";
+
+// Solana mainnet deployment addresses
+export const SOLANA_OFT_PROGRAM_ID = "HLzTG3sKDx1a8E4gWNn7x6fdxBG99pnN7ssxYm3APA8o"; // LayerZero OFT program
+export const SOLANA_OVL_MINT = "DXoC7CCQquzYaut2wtMELDGBTqNLAk5VsMawxa5CS2nA"; // OVL token mint
+export const SOLANA_MINT_AUTHORITY = "FPbEsKkuWNVjR33J7eyJsKCYNtp2dU6ktTE9XziULM6Z"; // Mint authority
+export const SOLANA_ESCROW = "8q4t9AwGzKYkdVSQ2U8KayyJnarsoJ8D8WHsGfhenS3a"; // Escrow account
+export const SOLANA_OFT_STORE = "Gz1ACtKBXxkee46gEteEowLDjcUEtC5TAZV9GSodJMag"; // OFT store account
+
+// Standard Solana program addresses
+export const SOLANA_TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+export const SOLANA_ASSOCIATED_TOKEN_PROGRAM_ID = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 
 export const BRIDGE_ABI = [
         {
