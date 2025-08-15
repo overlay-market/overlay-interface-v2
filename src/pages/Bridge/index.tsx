@@ -16,7 +16,7 @@ import {
   BRIDGE_ABI,
   BRIDGE_CONTRACT_ADDRESS,
   OVL_TOKEN_ADDRESS,
-  SOLANA_DEVNET_EID,
+  SOLANA_MAINNET_EID,
 } from "../../constants/bridge";
 import { readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
@@ -113,7 +113,7 @@ const Bridge: React.FC = () => {
     }
 
     const sendParam = {
-      dstEid: SOLANA_DEVNET_EID,
+      dstEid: SOLANA_MAINNET_EID,
       to: toBytes32(destination),
       amountLD: amountWei,
       minAmountLD: amountWei,
