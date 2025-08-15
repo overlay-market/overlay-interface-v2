@@ -2,17 +2,12 @@ import { useMemo, useState } from "react";
 import useActiveMarkets from "./useActiveMarkets";
 import { ColumnKey, DisplayUserData, ExtendedUserData } from "../pages/Leaderboard/types";
 import { formatPriceWithCurrency } from "../utils/formatPriceWithCurrency";
-
-export interface ColumnDef {
-  value: ColumnKey;
-  label: string;
-}
+import { leaderboardColumns } from "../pages/Leaderboard/LeaderboardTable/leaderboardConfig";
 
 type Return = {
   selectedColumn: ColumnKey;
   setSelectedColumn: (k: ColumnKey) => void;
   selectedLabel: string;
-  columnOptions: { value: ColumnKey; label: string }[];
   formattedUserdata?: DisplayUserData;
   formattedRanks?: DisplayUserData[];
 };
@@ -33,21 +28,11 @@ export const useLeaderboardView = ({
 }: Params): Return => {
   const { data: markets } = useActiveMarkets();
 
-  const [selectedColumn, setSelectedColumn] = useState<ColumnKey>("profitOVL");
-
-  const columnOptions: ColumnDef[] = [
-    { value: "profitOVL", label: "Profit OVL" },
-    { value: "profitUSD", label: "Profit USD" },
-    { value: "positions", label: "Number of Positions" },
-    { value: "mostTradedMarket", label: "Most Traded Market" },
-    { value: "winRate", label: "Win Rate" },
-    { value: "volume", label: "Volume OVL" },
-    { value: "fees", label: "Fees OVL" },
-  ];
+  const [selectedColumn, setSelectedColumn] = useState<ColumnKey>(leaderboardColumns[leaderboardColumns.length - 1].value);
 
   const selectedLabel = useMemo(
-    () => columnOptions.find(opt => opt.value === selectedColumn)?.label ?? "",
-    [selectedColumn]
+    () => leaderboardColumns.find(opt => opt.value === selectedColumn)?.label ?? leaderboardColumns[leaderboardColumns.length - 1].label,
+    [selectedColumn, leaderboardColumns]
   );
 
   const formattedUserdata: DisplayUserData | undefined = useMemo(() => {
@@ -133,5 +118,5 @@ export const useLeaderboardView = ({
   });
 }, [ranks, markets]);
 
-  return { selectedColumn, setSelectedColumn, selectedLabel, columnOptions, formattedUserdata, formattedRanks };
+  return { selectedColumn, setSelectedColumn, selectedLabel,  formattedUserdata, formattedRanks };
 };

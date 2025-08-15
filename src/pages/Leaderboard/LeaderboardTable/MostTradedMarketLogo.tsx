@@ -4,15 +4,15 @@ import { MarketLogo } from "./leaderboard-table-styles";
 import theme from "../../../theme";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 
-interface MostTradedMarketCellProps {
+interface MostTradedMarketLogoProps {
   marketId?: string;
   marketName?: string;
 }
 
-const MostTradedMarketLogo = ({
+const MostTradedMarketLogo: React.FC<MostTradedMarketLogoProps> = ({
   marketId,
   marketName,
-}: MostTradedMarketCellProps) => {
+}) => {
   const redirectToTradePage = useRedirectToTradePage();
 
   if (!marketId || !marketName) return null;
