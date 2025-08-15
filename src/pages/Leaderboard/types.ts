@@ -51,6 +51,12 @@ export type DisplayUserData = ExtendedUserData & {
   marketName?: string;
 };
 
+export interface ColumnDef {
+  value: ColumnKey;
+  label: string;
+  render: (data: DisplayUserData) => React.ReactNode;
+}
+
 export interface MarketInfo {
   id: string;
   marketId: string;
