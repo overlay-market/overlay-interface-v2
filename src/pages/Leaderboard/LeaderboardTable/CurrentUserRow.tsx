@@ -7,10 +7,10 @@ import {
 } from "./current-user-row-styles";
 import theme from "../../../theme";
 import { shortenAddress } from "../../../utils/web3";
-import { DisplayUserData, ExtendedUserData } from "../types";
+import { DisplayUserData, ExtendedUserData, Ranking } from "../types";
 import useAccount from "../../../hooks/useAccount";
 import UserDetails from "./UserDetails";
-import { leaderboardColumns } from "./leaderboardConfig";
+import { leaderboardColumns, RANKING_BY } from "./leaderboardConfig";
 
 interface CurrentUserRowProps {
   formattedUserdata: DisplayUserData | undefined;
@@ -27,11 +27,16 @@ const CurrentUserRow = ({
 
   if (!account || !formattedUserdata) return null;
 
+  const displayRank =
+    RANKING_BY === Ranking.ByVolume
+      ? formattedUserdata?.rankByVolume
+      : formattedUserdata?.rank;
+
   return (
     <tbody>
       <CurrentUserRankingRow>
         <StyledCell textalign="center" width={isMobile ? "36px" : "60px"}>
-          {formattedUserdata?.rank ?? <Loader />}
+          {displayRank ?? <Loader />}
         </StyledCell>
         <StyledCell
           textalign="left"
