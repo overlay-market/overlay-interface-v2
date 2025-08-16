@@ -1,5 +1,7 @@
-import { ColumnDef } from "../types";
+import { ColumnDef, Ranking } from "../types";
 import MostTradedMarketLogo from "./MostTradedMarketLogo";
+
+export const RANKING_BY: Ranking = Ranking.ByProfit;
 
 export const leaderboardColumns: ColumnDef[] = [
   {

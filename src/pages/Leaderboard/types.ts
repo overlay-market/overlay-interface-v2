@@ -12,6 +12,7 @@ export interface UserData {
   mostTradedMarket: MostTradedMarket;
   profitablePositions: number;
   rank: number;
+  rankByVolume: number;
   lastUpdated: string; 
   totalFeesOVL: number | string;
   totalFeesUSD: number | string;
@@ -61,4 +62,9 @@ export interface MarketInfo {
   id: string;
   marketId: string;
   marketName: string;
+}
+
+export enum Ranking {
+  ByProfit = "profit",
+  ByVolume = "volume",
 }
