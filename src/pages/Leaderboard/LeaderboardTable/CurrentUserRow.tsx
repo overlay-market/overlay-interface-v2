@@ -7,10 +7,10 @@ import {
 } from "./current-user-row-styles";
 import theme from "../../../theme";
 import { shortenAddress } from "../../../utils/web3";
-import UserFullInfo from "./UserFullInfo";
-import { DisplayUserData, ExtendedUserData } from "../types";
+import { DisplayUserData, ExtendedUserData, Ranking } from "../types";
 import useAccount from "../../../hooks/useAccount";
-import MostTradedMarketLogo from "./MostTradedMarketLogo";
+import UserDetails from "./UserDetails";
+import { leaderboardColumns, RANKING_BY } from "./leaderboardConfig";
 
 interface CurrentUserRowProps {
   formattedUserdata: DisplayUserData | undefined;
@@ -27,11 +27,16 @@ const CurrentUserRow = ({
 
   if (!account || !formattedUserdata) return null;
 
+  const displayRank =
+    RANKING_BY === Ranking.ByVolume
+      ? formattedUserdata?.rankByVolume
+      : formattedUserdata?.rank;
+
   return (
     <tbody>
       <CurrentUserRankingRow>
         <StyledCell textalign="center" width={isMobile ? "36px" : "60px"}>
-          {formattedUserdata?.rank ?? <Loader />}
+          {displayRank ?? <Loader />}
         </StyledCell>
         <StyledCell
           textalign="left"
@@ -44,36 +49,17 @@ const CurrentUserRow = ({
                 {formattedUserdata?.username ?? shortenAddress(account)}
               </Text>
             </Flex>
-            {isMobile && <UserFullInfo currentUser={formattedUserdata} />}
+            {isMobile && <UserDetails currentUser={formattedUserdata} />}
           </Flex>
         </StyledCell>
 
         {!isMobile ? (
           <>
-            <StyledCell textalign="right">
-              {formattedUserdata?.totalProfitOVL ?? <Loader />}
-            </StyledCell>
-            <StyledCell textalign="right">
-              {formattedUserdata?.totalProfitUSD ?? <Loader />}
-            </StyledCell>
-            <StyledCell textalign="right">
-              {formattedUserdata?.totalPositions ?? <Loader />}
-            </StyledCell>
-            <StyledCell textalign="right">
-              <MostTradedMarketLogo
-                marketId={formattedUserdata?.marketId}
-                marketName={formattedUserdata?.marketName}
-              />
-            </StyledCell>
-            <StyledCell textalign="right">
-              {formattedUserdata?.winRate ?? <Loader />}
-            </StyledCell>
-            <StyledCell textalign="right">
-              {formattedUserdata?.totalVolumeOVL ?? <Loader />}
-            </StyledCell>
-            <StyledCell textalign="right">
-              {formattedUserdata?.totalFeesOVL ?? <Loader />}
-            </StyledCell>
+            {leaderboardColumns.map((column) => (
+              <StyledCell key={column.value} textalign="right">
+                {column.render(formattedUserdata)}
+              </StyledCell>
+            ))}
           </>
         ) : (
           <StyledCell textalign="right">

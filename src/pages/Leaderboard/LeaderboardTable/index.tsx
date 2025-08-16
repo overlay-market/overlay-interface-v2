@@ -1,15 +1,14 @@
 import { StyledHeader, Table } from "./leaderboard-table-styles";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { DisplayUserData, ExtendedUserData } from "../types";
-import Loader from "../../../components/Loader";
+import { ExtendedUserData } from "../types";
 import { useResolveENSProfiles } from "../../../hooks/useENSProfile";
 import { useLeaderboardView } from "../../../hooks/useLeaderboardView";
 import ColumnSelector from "./ColumnSelector";
 import CurrentUserRow from "./CurrentUserRow";
 import LeaderboardRows from "./LeaderboardRows";
-import MostTradedMarketLogo from "./MostTradedMarketLogo";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import theme from "../../../theme";
+import { leaderboardColumns } from "./leaderboardConfig";
 
 type LeaderboardTableProps = {
   ranks?: ExtendedUserData[];
@@ -27,36 +26,13 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     selectedColumn,
     setSelectedColumn,
     selectedLabel,
-    columnOptions,
     formattedUserdata,
     formattedRanks,
   } = useLeaderboardView({ ranks, currentUser: currentUserData });
 
-  const getColumnValue = (data: DisplayUserData) => {
-    switch (selectedColumn) {
-      case "profitOVL":
-        return data.totalProfitOVL ?? <Loader />;
-      case "profitUSD":
-        return data.totalProfitUSD ?? <Loader />;
-      case "positions":
-        return data.totalPositions ?? <Loader />;
-      case "winRate":
-        return data.winRate ?? <Loader />;
-      case "volume":
-        return data.totalVolumeOVL ?? <Loader />;
-      case "fees":
-        return data.totalFeesOVL ?? <Loader />;
-      case "mostTradedMarket":
-        return (
-          <MostTradedMarketLogo
-            marketId={data.marketId}
-            marketName={data.marketName}
-          />
-        );
-      default:
-        return data.totalProfitOVL ?? <Loader />;
-    }
-  };
+  const selectedColumnDef = leaderboardColumns.find(
+    (col) => col.value === selectedColumn
+  );
 
   return (
     <Table>
@@ -70,7 +46,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
             Leaderboard Rankings
           </StyledHeader>
           {!isMobile ? (
-            columnOptions.map((col) => (
+            leaderboardColumns.map((col) => (
               <StyledHeader key={col.value} textalign="right">
                 {col.value === "positions" ? (
                   <Tooltip.Provider delayDuration={100}>
@@ -98,7 +74,6 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
             <StyledHeader textalign="right">
               <ColumnSelector
                 selectedLabel={selectedLabel}
-                columnOptions={columnOptions}
                 setSelectedColumn={setSelectedColumn}
               />
             </StyledHeader>
@@ -109,7 +84,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
       <CurrentUserRow
         formattedUserdata={formattedUserdata}
         isMobile={isMobile}
-        getColumnValue={getColumnValue}
+        getColumnValue={(data) => selectedColumnDef?.render(data)}
       />
 
       <tbody>
@@ -117,7 +92,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
           ranks={formattedRanks}
           ensProfiles={ensProfiles}
           isMobile={isMobile}
-          getColumnValue={getColumnValue}
+          getColumnValue={(data) => selectedColumnDef?.render(data)}
         />
       </tbody>
     </Table>

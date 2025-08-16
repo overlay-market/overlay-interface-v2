@@ -6,16 +6,15 @@ import {
   StyledDropdownItem,
 } from "./column-selector-styles";
 import { ColumnKey } from "../types";
+import { leaderboardColumns } from "./leaderboardConfig";
 
 interface ColumnSelectorProps {
   selectedLabel: string;
-  columnOptions: { value: ColumnKey; label: string }[];
   setSelectedColumn: (key: ColumnKey) => void;
 }
 
 const ColumnSelector = ({
   selectedLabel,
-  columnOptions,
   setSelectedColumn,
 }: ColumnSelectorProps) => {
   const [open, setOpen] = useState(false);
@@ -31,7 +30,7 @@ const ColumnSelector = ({
         </ColumnSelectButton>
       </DropdownMenu.Trigger>
       <StyledDropdownContent align="end">
-        {columnOptions.map((option) => (
+        {leaderboardColumns.map((option) => (
           <StyledDropdownItem
             key={option.value}
             onClick={() => setSelectedColumn(option.value)}

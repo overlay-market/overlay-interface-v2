@@ -4,8 +4,8 @@ import { shortenAddress } from "../../../utils/web3";
 import { StyledCell, StyledRow } from "./leaderboard-table-styles";
 import Avatar from "boring-avatars";
 import { getRandomColors, getRandomName } from "../../../utils/boringAvatars";
-import { DisplayUserData, ExtendedUserData } from "../types";
-import MostTradedMarketLogo from "./MostTradedMarketLogo";
+import { DisplayUserData, ExtendedUserData, Ranking } from "../types";
+import { leaderboardColumns, RANKING_BY } from "./leaderboardConfig";
 
 interface ENSProfile {
   data?: {
@@ -44,11 +44,13 @@ const LeaderboardRows = ({
     const username =
       userProfile?.username ?? shortenAddress(rank.walletAddress);
     const avatarUrl = userProfile?.avatar ?? null;
+    const displayRank =
+      RANKING_BY === Ranking.ByVolume ? rank.rankByVolume : rank.rank;
 
     return (
       <StyledRow key={rank.walletAddress}>
         <StyledCell textalign="center" width={isMobile ? "36px" : "60px"}>
-          {rank.rank}
+          {displayRank}
         </StyledCell>
         <StyledCell
           textalign="left"
@@ -75,18 +77,11 @@ const LeaderboardRows = ({
 
         {!isMobile ? (
           <>
-            <StyledCell textalign="right">{rank.totalProfitOVL}</StyledCell>
-            <StyledCell textalign="right">{rank.totalProfitUSD}</StyledCell>
-            <StyledCell textalign="right">{rank.totalPositions}</StyledCell>
-            <StyledCell textalign="right">
-              <MostTradedMarketLogo
-                marketId={rank.marketId}
-                marketName={rank.marketName}
-              />
-            </StyledCell>
-            <StyledCell textalign="right">{rank.winRate}</StyledCell>
-            <StyledCell textalign="right">{rank.totalVolumeOVL}</StyledCell>
-            <StyledCell textalign="right">{rank.totalFeesOVL}</StyledCell>
+            {leaderboardColumns.map((column) => (
+              <StyledCell key={column.value} textalign="right">
+                {column.render(rank)}
+              </StyledCell>
+            ))}
           </>
         ) : (
           <StyledCell textalign="right">{getColumnValue(rank)}</StyledCell>
