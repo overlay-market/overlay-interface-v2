@@ -14,6 +14,19 @@ export const SOLANA_OFT_STORE = "Gz1ACtKBXxkee46gEteEowLDjcUEtC5TAZV9GSodJMag"; 
 export const SOLANA_TOKEN_PROGRAM_ID = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 export const SOLANA_ASSOCIATED_TOKEN_PROGRAM_ID = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 
+// LayerZero OFT configuration
+export const OFT_DECIMALS = 18; // EVM token decimals
+export const SOLANA_TOKEN_DECIMALS = 9; // SPL token decimals
+
+// Connection endpoints - using alternative RPC providers
+export const SOLANA_MAINNET_RPC = "https://solana-mainnet.g.alchemy.com/v2/demo";
+export const SOLANA_MAINNET_RPC_FALLBACK = "https://mainnet.helius-rpc.com/?api-key=demo";
+export const SOLANA_DEVNET_RPC = "https://api.devnet.solana.com";
+
+// For development - use devnet which has fewer rate limits
+export const USE_DEVNET = false;
+export const CURRENT_SOLANA_RPC = USE_DEVNET ? SOLANA_DEVNET_RPC : SOLANA_MAINNET_RPC;
+
 export const BRIDGE_ABI = [
         {
             "type": "function",
