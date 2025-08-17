@@ -41,6 +41,7 @@ import {
 import { useSolanaWallet } from "../../hooks/useSolanaWallet";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { GradientBothSidesArrowIcon } from "../../assets/icons/svg-icons";
+import {OftQuote} from "./oft-quote";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -373,6 +374,7 @@ const Bridge: React.FC = () => {
                 )
               )
             }
+            <OftQuote destination={destination} />
           </Flex>
         </GradientBorderBox>
       </Flex>
