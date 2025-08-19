@@ -3,7 +3,7 @@ export enum ClaimId {
   OG_PCD = 'OG_PCD',
   FJORD_BUYERS = 'FJORD_BUYERS',
   TORCH = 'TORCH',
-  OG_CONVERSION = 'OG_CONVERSION',
+  OG_CONVERSION = 'DAO',
 }
 
 export const AIRDROP_CHECKER_API = 'https://api.overlay.market/airdrop-checker/'
