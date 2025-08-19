@@ -3,7 +3,7 @@ export enum ClaimId {
   OG_PCD = 'OG_PCD',
   FJORD_BUYERS = 'FJORD_BUYERS',
   TORCH = 'TORCH',
-  DAO = 'DAO',
+  OG_CONVERSION = 'OG_CONVERSION',
 }
 
 export const AIRDROP_CHECKER_API = 'https://api.overlay.market/airdrop-checker/'
@@ -18,7 +18,7 @@ export const MERKLE_DISTIBUTOR_ADDRESSES: ClaimMap = {
   [ClaimId.OG_PCD]: '0x80d03e83883cab55256ce51da74925e6693e19ea-56',
   [ClaimId.FJORD_BUYERS]: '0x5200660d504e84754ef55bfb46fdec3b932e916a-56',
   [ClaimId.TORCH]: '',
-  [ClaimId.DAO]: '',
+  [ClaimId.OG_CONVERSION]: '',
 }
 
 export enum AirdropStatus {
@@ -52,8 +52,8 @@ export const AIRDROPS: AirdropMap = {
     title: 'TORCH',
     status: AirdropStatus.ACTIVATED,
   },
-  [ClaimId.DAO]: {
-    title: 'DAO',
+  [ClaimId.OG_CONVERSION]: {
+    title: 'OG Conversion',
     status: AirdropStatus.ACTIVATED,
   },
 }
