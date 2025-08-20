@@ -37,11 +37,17 @@ export interface BuildOnBehalfOfParams {
   deadline: number; 
 }
 
+function randomUint256(): bigint {
+  const array = new Uint8Array(32);
+  crypto.getRandomValues(array);
+  return BigInt("0x" + Array.from(array, b => b.toString(16).padStart(2, "0")).join(""));
+}
+
 export const useShivaBuild = () => {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
 
-  const getCurrentNonce = useCallback(
+  const getFreeNonce = useCallback(
   async (owner: Address): Promise<bigint> => {
     if (!publicClient) throw new Error("publicClient is undefined");
 
@@ -51,12 +57,11 @@ export const useShivaBuild = () => {
       client: publicClient,
     });
 
-    let nonce = 0n;
-    while (await shivaContract.read.usedNonces([owner, nonce])) {
-      nonce++;
+    while (true) {
+      const nonce = randomUint256();
+      const used = await shivaContract.read.usedNonces([owner, nonce]);
+      if (!used) return nonce;
     }
-  
-    return nonce;
   },
   [publicClient]
 );
@@ -100,7 +105,7 @@ export const useShivaBuild = () => {
   const encodeShivaBuildCall = useCallback(async (
     params: BuildOnBehalfOfParams,
   ): Promise<Hex> => {
-    const nonce = await getCurrentNonce(params.owner);
+    const nonce = await getFreeNonce(params.owner);
   
     const signature = await generateSignature(params, nonce);
 
@@ -128,7 +133,7 @@ export const useShivaBuild = () => {
         }
       ],
     });
-  }, [getCurrentNonce, generateSignature]);
+  }, [getFreeNonce, generateSignature]);
 
   return { encodeShivaBuildCall };
 };
