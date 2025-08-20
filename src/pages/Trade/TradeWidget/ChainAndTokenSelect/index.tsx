@@ -14,12 +14,13 @@ import { SelectState } from "../../../../types/selectChainAndTokenTypes";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import ChainDisplay from "./ChainDisplay";
 import TokenDisplay from "./TokenDisplay";
+import { DEFAULT_TOKEN } from "../../../../constants/applications";
 
 const ChainAndTokenSelect: React.FC = () => {
   const [showChainSelect, setShowChainSelect] = useState(false);
   const [showTokenSelect, setShowTokenSelect] = useState(false);
   const { chainState, tokenState } = useChainAndTokenState();
-  const { handleChainSelect } = useTradeActionHandlers();
+  const { handleChainSelect, handleTokenSelect } = useTradeActionHandlers();
 
   useSelectStateManager();
 
@@ -51,6 +52,7 @@ const ChainAndTokenSelect: React.FC = () => {
     setShowChainSelect(false);
     setShowTokenSelect(false);
     handleChainSelect(DEFAULT_CHAINID as number);
+    handleTokenSelect(DEFAULT_TOKEN);
   };
 
   return (
@@ -83,10 +85,8 @@ const ChainAndTokenSelect: React.FC = () => {
                   </Tooltip.Trigger>
                   <Tooltip.Content
                     style={{
-                      backgroundColor: theme.color.background,
                       color: theme.color.green2,
-                      padding: "4px 8px",
-                      borderRadius: "4px",
+                      paddingRight: "26px",
                       fontSize: "14px",
                     }}
                   >
