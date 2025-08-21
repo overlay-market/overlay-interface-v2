@@ -2,7 +2,6 @@ import { Flex } from "@radix-ui/themes";
 import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
-import PreTGEBanner from "../../components/Banner/PreTGEBanner";
 import MarketsTable from "./MarketsTable";
 import { TransformedMarketData } from "overlay-sdk";
 import { useEffect, useState } from "react";
@@ -64,7 +63,6 @@ const Markets: React.FC = () => {
         ovlSupplyChange={totalSupplyChange}
         ovlCurrentPrice={currentPrice}
       />
-      <PreTGEBanner />
       <FirstSection marketsData={marketsData} />
       <Carousel
         marketsData={marketsData}

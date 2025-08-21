@@ -25,6 +25,7 @@ export const StyledDropdownContent = styled(DropdownMenu.Content)`
   outline: none;
   border-radius: 0px;
   box-shadow: ${theme.color.grey7} 0px 4px 6px 0px;
+  border: 1px solid ${theme.color.grey9};
 `;
 
 export const StyledDropdownItem = styled(DropdownMenu.Item)`
