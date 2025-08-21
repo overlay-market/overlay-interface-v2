@@ -20,12 +20,12 @@ import { TransactionType } from "../../../constants/transaction";
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
 import { useArcxAnalytics } from "@0xarc-io/analytics";
 import { SelectState } from "../../../types/selectChainAndTokenTypes";
-import { useLiFiTrade } from "../../../hooks/lifi/useLiFiTrade";
 import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFees";
 import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
 import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
+import { useLiFiBridge } from "../../../hooks/lifi/useLiFiBridge";
 
-const TRADE_WITH_LIFI = "Trade with LiFi";
+const TRADE_WITH_LIFI = "Bridge & Trade";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -44,6 +44,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     useTradeActionHandlers();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
+  const {
+    executeBridge,
+    bridgeStage,
+    resetBridge,
+    bridgedAmount,
+    bridgeQuote,
+    getBridgeQuote,
+  } = useLiFiBridge();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const [{ showConfirm, attemptingTransaction }, setTradeConfig] = useState<{
@@ -123,6 +131,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     const isDisabledTradeButton =
       !typedValue ||
       loading ||
+      bridgeStage.stage === "bridging" ||
+      bridgeStage.stage === "quote" ||
+      bridgeStage.stage === "approval" ||
       amountExceedsMaxInput ||
       amountBelowMinCollateral ||
       [
@@ -138,7 +149,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       title,
       isDisabledTradeButton,
     };
-  }, [tradeState, loading, typedValue, maxInputIncludingFees, minCollateral]);
+  }, [
+    tradeState,
+    loading,
+    typedValue,
+    maxInputIncludingFees,
+    minCollateral,
+    bridgeStage,
+  ]);
 
   const handleTrade = async () => {
     if (market && tradeState) {
@@ -309,25 +327,127 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
   }, [attemptingTransaction]);
 
-  const { executeLiFiTrade, tradeStage, resetTradeWithLiFi } = useLiFiTrade();
-
-  const handleCrossChainTrade = async () => {
-    if (!address || !market || !tradeState) {
+  const handleLiFiGetBridgeQuote = async () => {
+    if (!address || !market || !tradeState || !typedValue) {
       console.error("Missing required parameters for cross-chain trade");
       return;
     }
 
-    await executeLiFiTrade({
-      priceLimit: toWei(tradeState.priceInfo.minPrice as string),
-    });
+    const quote = await getBridgeQuote();
+
+    if (quote) {
+      setTradeConfig({
+        showConfirm: true,
+        attemptingTransaction: false,
+      });
+    }
+  };
+
+  const handleBridge = async () => {
+    if (!address || !market || !tradeState || !typedValue || !bridgeQuote) {
+      console.error("Missing required parameters for bridge");
+      return;
+    }
+
+    try {
+      await executeBridge();
+    } catch (error: unknown) {
+      const { errorCode, errorMessage } = handleError(error as Error);
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
+    }
+  };
+
+  const handleLiFiTrade = async () => {
+    if (!address || !market || !tradeState || !bridgedAmount) {
+      console.error("Missing required parameters for position opening");
+      return;
+    }
 
     setTradeConfig({
       showConfirm: false,
-      attemptingTransaction,
+      attemptingTransaction: true,
     });
 
-    resetTradeWithLiFi();
-    handleTradeStateReset();
+    const collateralAmount = BigInt(bridgedAmount);
+
+    console.log("🏗️ Building position with:", {
+      bridgedAmount: bridgedAmount,
+      bridgedAmountReadable: (Number(bridgedAmount) / 1e18).toFixed(6),
+      collateralAmount: collateralAmount.toString(),
+      collateralReadable: (Number(collateralAmount) / 1e18).toFixed(6),
+      leverage: selectedLeverage,
+      dataType: typeof bridgedAmount,
+      minCollateralRequired: minCollateral,
+    });
+
+    sdk.market
+      .build({
+        account: address,
+        marketAddress: market?.id as Address,
+        collateral: collateralAmount,
+        leverage: toWei(selectedLeverage),
+        isLong,
+        priceLimit: toWei(tradeState.priceInfo.minPrice as string),
+      })
+      .then((result) => {
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: result.receipt?.status === "success",
+              message: "",
+              type: TransactionType.BUILD_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+        handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
+        handleTradeStateReset();
+        arcxAnalytics?.transaction({
+          transactionHash: result.hash,
+          account: address,
+          chainId,
+          metadata: {
+            action: TransactionType.BUILD_OVL_POSITION,
+          },
+        });
+        resetBridge();
+      })
+      .catch((error: Error) => {
+        const { errorCode, errorMessage } = handleError(error);
+
+        addPopup(
+          {
+            txn: {
+              hash: currentTimeForId,
+              success: false,
+              message: errorMessage,
+              type: errorCode,
+            },
+          },
+          currentTimeForId
+        );
+      })
+      .finally(() => {
+        setTradeConfig({
+          showConfirm: false,
+          attemptingTransaction: false,
+        });
+      });
   };
 
   const renderDefaultState = () => (
@@ -385,18 +505,19 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     <>
       {loading && <GradientLoaderButton title={TRADE_WITH_LIFI} />}
 
-      {address && !loading && (
+      {address && !loading && bridgeStage.stage !== "quote" && (
         <GradientOutlineButton
           title={liFiTradeButtonConfig.title}
           width={"100%"}
           size={"16px"}
           isDisabled={liFiTradeButtonConfig.isDisabledTradeButton}
-          handleClick={() => {
-            setTradeConfig({
-              showConfirm: true,
-              attemptingTransaction: false,
-            });
-          }}
+          handleClick={handleLiFiGetBridgeQuote}
+        />
+      )}
+
+      {address && !loading && bridgeStage.stage === "quote" && (
+        <GradientLoaderButton
+          title={bridgeStage.message || "Getting bridge quote..."}
         />
       )}
 
@@ -404,10 +525,12 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         <ConfirmTxnModal
           open={showConfirm}
           tradeState={tradeState}
-          tradeStage={tradeStage}
+          bridgeStage={bridgeStage}
+          bridgeQuote={bridgeQuote}
           attemptingTransaction={attemptingTransaction}
           handleDismiss={handleDismiss}
-          handleTrade={handleCrossChainTrade}
+          handleBridge={handleBridge}
+          handleTrade={handleLiFiTrade}
         />
       )}
     </>
