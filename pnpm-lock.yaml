@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@0xarc-io/analytics':
-    specifier: ^2.2.3
-    version: 2.4.2(@types/react@18.3.23)(react@18.3.1)
   '@lifi/sdk':
     specifier: ^3.7.11
     version: 3.8.7(@solana/wallet-adapter-base@0.9.27)(@solana/web3.js@1.98.4)(@types/react@18.3.23)(react@18.3.1)(typescript@5.8.3)(viem@2.33.2)
@@ -156,22 +153,6 @@ packages:
       '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.8.3)
       graphql: 16.11.0
       typescript: 5.8.3
-    dev: false
-
-  /@0xarc-io/analytics@2.4.2(@types/react@18.3.23)(react@18.3.1):
-    resolution: {integrity: sha512-qXZkDWCj3BgNJxFT7Nh9yRCLzBhDxspBhCVJRKMrzQgcs3myM3zE2CPH3uoFvUOCXs1B5VsZgUGOpuH1qdwMPg==}
-    peerDependencies:
-      '@types/react': '>=16.14.34'
-      react: '>=16.14.0'
-    dependencies:
-      '@restless/sanitizers': 0.2.5
-      '@types/react': 18.3.23
-      react: 18.3.1
-      socket.io-client: 4.8.1
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
     dev: false
 
   /@adraffy/ens-normalize@1.11.0:
@@ -3971,10 +3952,6 @@ packages:
       - uploadthing
       - utf-8-validate
       - zod
-    dev: false
-
-  /@restless/sanitizers@0.2.5:
-    resolution: {integrity: sha512-utsOFwv5owNnbj8HijF7uML/AURgUl5YvY4S2gpxQsrp2D1EP/4rQU/HSyYdIQaL89BoZ/5NHveRJrcFyuHo/w==}
     dev: false
 
   /@rolldown/pluginutils@1.0.0-beta.27:
