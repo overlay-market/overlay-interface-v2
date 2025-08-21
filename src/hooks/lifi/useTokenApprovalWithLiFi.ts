@@ -3,11 +3,11 @@ import type {  Address } from 'viem';
 import { checkAndApproveToken } from '../../utils/lifi/checkAndApproveToken';
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 import { Token } from '../../types/selectChainAndTokenTypes';
-import { TradeStage } from './useLiFiTrade';
+import { BridgeStage } from './useLiFiBridge';
 import { TransactionType } from '../../constants/transaction';
 import { useAddPopup } from '../../state/application/hooks';
 
-export const useTokenApprovalWithLiFi = ({setTradeStage}: {setTradeStage: (stage: TradeStage) => void;}) => {
+export const useTokenApprovalWithLiFi = ({setTradeStage}: {setTradeStage: (stage: BridgeStage) => void;}) => {
   const publicClient = usePublicClient();
   const { data: walletClient } = useWalletClient();
   const { address: ownerAddress } = useAccount();
@@ -24,7 +24,7 @@ export const useTokenApprovalWithLiFi = ({setTradeStage}: {setTradeStage: (stage
       tokenAmountSelected: bigint;
     }): Promise<void> => {
       if (!walletClient || !publicClient || !ownerAddress) {
-        setTradeStage({ stage: 'error', message: 'Wallet not connected' });
+        setTradeStage({ stage: 'idle', message: 'Wallet not connected' });
         throw new Error('Wallet or client not connected');
       }
 
@@ -58,7 +58,7 @@ export const useTokenApprovalWithLiFi = ({setTradeStage}: {setTradeStage: (stage
       } catch (error: any) {
         console.error(error);
         setTradeStage({
-          stage: 'error',
+          stage: 'idle',
           message: 'Token approval failed',
         });
 
