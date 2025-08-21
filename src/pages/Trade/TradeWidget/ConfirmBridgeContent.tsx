@@ -70,70 +70,59 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
 
   return (
     <>
-      <Flex
-        direction={"column"}
-        justify={"between"}
-        align="center"
-        height="100%"
-        style={{ flex: 1 }}
-      >
-        <Flex direction={"column"}>
-          <Flex mt={"24px"} direction={"column"} width={"100%"}>
-            <DetailRow
-              detail={"From"}
-              value={`${selectedChain?.name} (${selectedToken?.symbol || ""})`}
-            />
-            <DetailRow detail={"To"} value={"BSC (OVL)"} />
-            <DetailRow
-              detail={"You Pay"}
-              value={`${userInputFormatted} ${selectedToken?.symbol || ""}`}
-            />
-            <DetailRow
-              detail={"You Receive"}
-              value={`${expectedOvlFormatted} OVL`}
-              valueColor={theme.color.green1}
-            />
-          </Flex>
+      <Flex mt={"24px"} direction={"column"} width={"100%"}>
+        <DetailRow
+          detail={"From"}
+          value={`${selectedChain?.name} (${selectedToken?.symbol || ""})`}
+        />
+        <DetailRow detail={"To"} value={"BSC (OVL)"} />
+        <DetailRow
+          detail={"You Pay"}
+          value={`${userInputFormatted} ${selectedToken?.symbol || ""}`}
+        />
+        <DetailRow
+          detail={"You Receive"}
+          value={`${expectedOvlFormatted} OVL`}
+          valueColor={theme.color.green1}
+        />
+      </Flex>
 
-          <Flex mt={"32px"} direction={"column"} width={"100%"}>
-            <DetailRow detail={"Exchange Rate"} value={exchangeRateFormatted} />
-            <DetailRow detail={"Bridge Fee"} value={bridgeFeeFormatted} />
-            <DetailRow detail={"Slippage Tolerance"} value={"1%"} />
-          </Flex>
-        </Flex>
-        <Flex direction={"column"}>
+      <Flex mt={"32px"} direction={"column"} width={"100%"}>
+        <DetailRow detail={"Exchange Rate"} value={exchangeRateFormatted} />
+        <DetailRow detail={"Bridge Fee"} value={bridgeFeeFormatted} />
+        <DetailRow detail={"Slippage Tolerance"} value={"1%"} />
+      </Flex>
+
+      <Flex my={"24px"}>
+        <Text style={{ color: theme.color.grey3, fontSize: "12px" }}>
+          {`You will receive approximately ${expectedOvlFormatted} OVL on BSC. The transaction will bridge from ${selectedChain?.name} and automatically switch you to BSC network.`}
+        </Text>
+      </Flex>
+
+      {attemptingBridge ? (
+        <>
+          <GradientLoaderButton height={"46px"} title={bridgeStage.stage} />
           <Flex my={"24px"}>
-            <Text style={{ color: theme.color.grey3, fontSize: "12px" }}>
-              {`You will receive approximately ${expectedOvlFormatted} OVL on BSC. The transaction will bridge from ${selectedChain?.name} and automatically switch you to BSC network.`}
+            <Text
+              style={{
+                color: theme.color.grey2,
+                fontSize: "14px",
+                fontWeight: "600",
+              }}
+            >
+              {bridgeStage.message ||
+                "Please wait for the transaction to be processed."}
             </Text>
           </Flex>
-
-          {attemptingBridge ? (
-            <>
-              <GradientLoaderButton height={"46px"} title={bridgeStage.stage} />
-              <Flex my={"24px"}>
-                <Text
-                  style={{
-                    color: theme.color.grey2,
-                    fontSize: "14px",
-                    fontWeight: "600",
-                  }}
-                >
-                  {bridgeStage.message ||
-                    "Please wait for the transaction to be processed."}
-                </Text>
-              </Flex>
-            </>
-          ) : (
-            <GradientSolidButton
-              title={"Confirm Bridge"}
-              width={"100%"}
-              height={"46px"}
-              handleClick={handleBridge}
-            />
-          )}
-        </Flex>
-      </Flex>
+        </>
+      ) : (
+        <GradientSolidButton
+          title={"Confirm Bridge"}
+          width={"100%"}
+          height={"46px"}
+          handleClick={handleBridge}
+        />
+      )}
     </>
   );
 };
