@@ -378,7 +378,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     }
 
     setTradeConfig({
-      showConfirm: false,
+      showConfirm,
       attemptingTransaction: true,
     });
 
