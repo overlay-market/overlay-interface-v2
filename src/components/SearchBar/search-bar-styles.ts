@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import theme from "../../../theme";
 import { Flex } from "@radix-ui/themes";
 import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import theme from "../../theme";
 
 export const SearchContainer = styled(Flex)`
   position: relative;
@@ -32,12 +32,12 @@ export const SearchIcon = styled(MagnifyingGlassIcon)`
   }
 `
 
-export const SearchInput = styled.input`
+export const SearchInput = styled.input<{ $bgcolor?: string }>`
   width: 100%;
   padding: 8px 28px;  
   border-radius: 6px;
-  border: 1px solid ${theme.color.grey4};  
-  background: ${theme.color.grey4}; 
+  border: 1px solid ${({ $bgcolor }) => $bgcolor || theme.color.grey4};  
+  background: ${({ $bgcolor }) => $bgcolor || theme.color.grey4}; 
   opacity: 0.7;
   color: #ddd; 
   font-size: 14px;
