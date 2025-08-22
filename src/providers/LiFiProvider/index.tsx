@@ -17,26 +17,25 @@ export const LiFiProvider = ({ children, sdkConfig }: LiFiProviderProps) => {
   useEffect(() => {
     if (!walletClient) return;
 
-    const client = createWalletClient({
-      account: walletClient.account,
-      chain: walletClient.chain,
-      transport: custom(walletClient.transport),
-    });
+    if (!isInitialized) {
+      const client = createWalletClient({
+        account: walletClient.account,
+        chain: walletClient.chain,
+        transport: custom(walletClient.transport),
+      });
 
-    createConfig({
-      integrator: "overlay",
-      providers: [
-        EVM({
-          getWalletClient: async () => client,
-        }),
-      ],
-      ...sdkConfig,
-    });
-
-    setIsInitialized(true);
-  }, [sdkConfig, walletClient]);
-
-  if (!isInitialized) return null;
+      createConfig({
+        integrator: "overlay",
+        providers: [
+          EVM({
+            getWalletClient: async () => client,
+          }),
+        ],
+        ...sdkConfig,
+      });
+      setIsInitialized(true);
+    }
+  }, [sdkConfig, walletClient, isInitialized]);
 
   return (
     <LiFiContext.Provider value={lifiConfig}>{children}</LiFiContext.Provider>
