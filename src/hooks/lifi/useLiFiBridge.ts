@@ -10,6 +10,7 @@ import { useTokenApprovalWithLiFi } from './useTokenApprovalWithLiFi';
 import { useSafeChainSwitch } from './useSafeChainSwitch';
 import { useAddPopup } from '../../state/application/hooks';
 import { OVL_DECIMALS } from '../../constants/applications';
+import { useSelectedChain } from './useSelectedChain';
 
 export interface BridgeStage {
   stage: 'idle' | 'quote' | 'approval' | 'bridging' | 'success';
@@ -32,6 +33,7 @@ export const useLiFiBridge = () => {
   const { data: walletClient } = useWalletClient();
   const { typedValue } = useTradeState();
   const { selectedChainId, selectedToken } = useChainAndTokenState();
+  const { selectedChain } = useSelectedChain();
   const { approveIfNeeded } = useTokenApprovalWithLiFi({ 
     setTradeStage: (stage) => setBridgeStage({
       stage: stage.stage as BridgeStage['stage'],
@@ -118,7 +120,7 @@ export const useLiFiBridge = () => {
       });
 
       // Switch to source chain for token approval
-      await safeSwitch(selectedChainId);
+      selectedChain && await safeSwitch(selectedChain);
 
       // Handle token approval if needed
       await approveIfNeeded({
@@ -147,7 +149,7 @@ export const useLiFiBridge = () => {
 
       await executeRoute(route, {
         switchChainHook: async (chainId: number) => {
-          const success = await safeSwitch(chainId);
+          const success = selectedChain && await safeSwitch(selectedChain);
           if (!success) {
             throw new Error(`Failed to switch to chain ${chainId}`);
           }
@@ -191,7 +193,7 @@ export const useLiFiBridge = () => {
 
       // Switch to BSC after bridge completion
       await safeSwitch(DEFAULT_CHAINID);
-
+     
       // Bridge completed successfully - use what Li.Fi actually delivers
       const actualOvlAmount = finalExpectedOvl;
       
@@ -317,6 +319,18 @@ export const useLiFiBridge = () => {
     } catch (error: unknown) {
       console.error('Quote error:', error);
       setBridgeStage({ stage: 'idle' });
+
+      const errorMessage = error instanceof Error ? error.message : '';
+      
+      addPopup({
+        txn: {
+          hash: Date.now().toString(),
+          success: false,
+          message: `Getting bridge quote failed. ${errorMessage}`,
+          type: "BRIDGE_ERROR",
+        },
+      }, Date.now().toString());
+
       throw error;
     }
   }, [account, selectedToken, selectedChainId, typedValue]);
