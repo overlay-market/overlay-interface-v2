@@ -166,14 +166,12 @@ export const useIsNewTxnHash = (): boolean => {
 
 export const useSelectStateManager = () => {
   const dispatch = useAppDispatch();
-  const {selectedChainId, chainState, tokenState, selectedToken} = useChainAndTokenState();
+  const {selectedChainId, chainState,  selectedToken} = useChainAndTokenState();
   const { ovlBalance, isLoading } = useOvlTokenBalance();
-  const { selectedChain, loadingChain } = useSelectedChain();
+  const { loadingChain } = useSelectedChain();
   const { address: account } = useAccount();
   const { handleTokenSelect } = useTradeActionHandlers();
   
-
-console.log({selectedChainId, DEFAULT_CHAINID, chainState, tokenState, selectedToken, ovlBalance, isLoading, loadingChain, account, selectedChain});
   // Effect to manage chain state
   useEffect(() => {
     if ( isLoading || loadingChain) return;
