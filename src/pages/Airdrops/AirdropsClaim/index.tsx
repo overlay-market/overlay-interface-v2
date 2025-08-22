@@ -132,15 +132,23 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualif
             <GradientBorderBox>
               {totalAmount && (
                 <>
-                  <Text
-                    size={{ initial: "3", sm: "4" }}
-                    weight={"bold"}
-                    style={{ color: "#10DCB1", lineHeight: "19px" }}
-                  >
-                    You earned
-                  </Text>
+                  {!disqualifiedTorch && (
+                    <Text
+                      size={{ initial: "3", sm: "4" }}
+                      weight={"bold"}
+                      style={{ color: "#10DCB1", lineHeight: "19px" }}
+                    >
+                      You earned
+                    </Text>
+                  )}
 
-                  <GradientText>
+                  <GradientText style={{ 
+                    color: disqualifiedTorch ? theme.color.grey10 : undefined,
+                    background: disqualifiedTorch ? "none" : undefined,
+                    backgroundClip: disqualifiedTorch ? "unset" : undefined,
+                    WebkitBackgroundClip: disqualifiedTorch ? "unset" : undefined,
+                    WebkitTextFillColor: disqualifiedTorch ? theme.color.grey10 : "transparent"
+                  }}>
                     {totalAmount}{" "}
                     <span style={{ fontFamily: "Inter" }}>OVL</span>
                   </GradientText>
