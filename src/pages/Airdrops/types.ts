@@ -1,6 +1,7 @@
 export type AirdropAmount = {
   airdropID: string
   amount: string | null
+  disqualified?: boolean
 }
 
 export type AddressResults = {

@@ -24,6 +24,7 @@ import LogoImg from "../../../assets/images/overlay-logo-only-no-background.webp
 import Xlogo from "../../../assets/images/airdrops/socials-x.webp";
 import {
   AIRDROPS,
+  ClaimId,
   MERKLE_DISTIBUTOR_ADDRESSES,
   SABLIER_VESTING_URL,
 } from "../../../constants/airdrops";
@@ -37,9 +38,10 @@ import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
 
 type AirdropClaimProps = {
   airdropsAmounts: AirdropsAmounts | null;
+  disqualifiedTorch: Boolean | null;
 };
 
-const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
+const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualifiedTorch }) => {
   const [airdropIdForErrorClaimAlias, setAirdropIdForErrorClaimAlias] =
     useState<string | null>(null);
 
@@ -48,7 +50,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
       const total = Object.values(airdropsAmounts)
         .map((value) => parseFloat(value))
         .reduce((sum, current) => sum + current, 0);
-      return total;
+      return total.toFixed(2);
     } else {
       return null;
     }
@@ -63,7 +65,13 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
     const alias = MERKLE_DISTIBUTOR_ADDRESSES[airdropId];
 
     if (alias) {
-      const url = `${SABLIER_VESTING_URL}${alias}`;
+      let url
+      if (alias.startsWith("0x")) {
+        url = `${SABLIER_VESTING_URL}${alias}`;
+      }
+      else {
+        url = alias
+      }
       window.open(url, "_blank");
     } else {
       setAirdropIdForErrorClaimAlias(airdropId);
@@ -140,7 +148,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
               )}
             </GradientBorderBox>
 
-            {totalAmount !== null && totalAmount > 0 && (
+            {totalAmount !== null && +totalAmount > 0 && (
               <ShareOnXbutton onClick={handleShareOnX}>
                 <Text>Share on</Text>
                 <img src={Xlogo} alt="Xlogo" width={"16px"} height={"16px"} />
@@ -163,6 +171,13 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                       weight={"medium"}
                     >
                       {AIRDROPS[airdropId].title}
+                      {
+                        airdropId === ClaimId.TORCH 
+                          ? disqualifiedTorch
+                            ? " - DISQUALIFIED"
+                            : " - QUALIFIED" 
+                          : ""
+                      }
                     </Text>
                     <Text
                       ml={{ initial: "0", sm: "auto" }}
@@ -185,8 +200,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                       /> */}
                       {MERKLE_DISTIBUTOR_ADDRESSES[airdropId] && (
                         <GradientOutlineButton
-                          title={"Claim"}
-                          width={"73px"}
+                          title={airdropId === ClaimId.TORCH ? `How to ${disqualifiedTorch ? "Appeal" : "Claim"}` : "Claim"}
                           height={"32px"}
                           size={"12px"}
                           handleClick={() => handleClaim(airdropId)}
@@ -205,7 +219,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                       An error occurred. Please contact the team.
                     </Text>
                   )}
-                  {!MERKLE_DISTIBUTOR_ADDRESSES[airdropId] && (
+                  {!MERKLE_DISTIBUTOR_ADDRESSES[airdropId] && !AIRDROPS[airdropId].subtitle && (
                     <Text
                       size={"1"}
                       weight={"medium"}
@@ -213,7 +227,18 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts }) => {
                         color: theme.color.white,
                       }}
                     >
-                      Available after [redacted]
+                      {AIRDROPS[airdropId].subtitle ?? "Available after [redacted]"}
+                    </Text>
+                  )}
+                  {AIRDROPS[airdropId].subtitle && (
+                    <Text
+                      size={"1"}
+                      weight={"medium"}
+                      style={{
+                        color: theme.color.white,
+                      }}
+                    >
+                      {AIRDROPS[airdropId].subtitle}
                     </Text>
                   )}
                 </AirdropBox>
