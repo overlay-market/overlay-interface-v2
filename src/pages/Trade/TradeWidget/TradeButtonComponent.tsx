@@ -18,7 +18,6 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
-import { useArcxAnalytics } from "@0xarc-io/analytics";
 import { SelectState } from "../../../types/selectChainAndTokenTypes";
 import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFees";
 import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
@@ -36,7 +35,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   loading,
   tradeState,
 }) => {
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
   const sdk = useSDK();
   const { openModal } = useModalHelper();
   const { currentMarket: market } = useCurrentMarketState();
@@ -62,7 +61,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     attemptingTransaction: false,
   });
   const [isApprovalPending, setIsApprovalPending] = useState<boolean>(false);
-  const arcxAnalytics = useArcxAnalytics();
   const { maxInputIncludingFees } = useMaxInputIncludingFees({
     marketId: market?.marketId,
   });
@@ -188,14 +186,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           );
           handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
           handleTradeStateReset();
-          arcxAnalytics?.transaction({
-            transactionHash: result.hash,
-            account: address,
-            chainId,
-            metadata: {
-              action: TransactionType.BUILD_OVL_POSITION,
-            },
-          });
         })
         .catch((error: Error) => {
           const { errorCode, errorMessage } = handleError(error);
@@ -417,14 +407,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
         handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
         handleTradeStateReset();
-        arcxAnalytics?.transaction({
-          transactionHash: result.hash,
-          account: address,
-          chainId,
-          metadata: {
-            action: TransactionType.BUILD_OVL_POSITION,
-          },
-        });
         resetBridge();
       })
       .catch((error: Error) => {

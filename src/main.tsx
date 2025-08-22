@@ -10,7 +10,6 @@ import theme from "./theme";
 import { Provider } from "react-redux";
 import store from "./state/state.tsx";
 import Web3Provider from "./providers/Web3Provider";
-import { ArcxAnalyticsProvider } from '@0xarc-io/analytics';
 
 const assets = import.meta.glob("/src/assets/**/*.{png,jpg,jpeg,webp,gif,mp4}", { eager: true });
 
@@ -34,21 +33,17 @@ function preloadAssets() {
 
 preloadAssets();
 
-const apiKey = "44242b32c3a5151254dc2bdc85fe66dbcc9f70da4c6d3abfca236acb30d9e6e8";
-
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
       <Web3Provider>
-        <ArcxAnalyticsProvider apiKey={apiKey}>
-          <BrowserRouter>
-            <ThemeProvider theme={theme}>
-              <DefaultRadixTheme>
-                <App />
-              </DefaultRadixTheme>
-            </ThemeProvider>
-          </BrowserRouter>
-        </ArcxAnalyticsProvider>
+        <BrowserRouter>
+          <ThemeProvider theme={theme}>
+            <DefaultRadixTheme>
+              <App />
+            </DefaultRadixTheme>
+          </ThemeProvider>
+        </BrowserRouter>
       </Web3Provider>
     </Provider>
   </React.StrictMode>
