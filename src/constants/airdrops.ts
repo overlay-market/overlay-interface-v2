@@ -17,7 +17,7 @@ export const MERKLE_DISTIBUTOR_ADDRESSES: ClaimMap = {
   [ClaimId.TUNA]: '0x63d139e7c969e584485c08d995723dee72026895-56',
   [ClaimId.OG_PCD]: '0x80d03e83883cab55256ce51da74925e6693e19ea-56',
   [ClaimId.FJORD_BUYERS]: '0x5200660d504e84754ef55bfb46fdec3b932e916a-56',
-  [ClaimId.TORCH]: '',
+  [ClaimId.TORCH]: 'https://docs.overlay.market/Token/TORCH%20Airdrop',
   [ClaimId.OG_CONVERSION]: '',
 }
 
@@ -29,6 +29,7 @@ export enum AirdropStatus {
 export type AirdropType = {
   title: string
   status: AirdropStatus
+  subtitle?: string
 }
 
 export type AirdropMap = {
@@ -51,6 +52,7 @@ export const AIRDROPS: AirdropMap = {
   [ClaimId.TORCH]: {
     title: 'TORCH',
     status: AirdropStatus.ACTIVATED,
+    subtitle: 'Follow instructions ->'
   },
   [ClaimId.OG_CONVERSION]: {
     title: 'OG Conversion',
