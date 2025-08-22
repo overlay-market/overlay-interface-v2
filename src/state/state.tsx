@@ -6,7 +6,16 @@ import trade from "./trade/reducer";
 import currentMarket from "./currentMarket/reducer";
 import application from "./application/reducer";
 
-const PERSISTED_KEYS: string[] = ["user", "transactions"];
+const PERSISTED_KEYS: string[] = ["application", "trade", "currentMarket"];
+
+function safeLoad(states: string[]) {
+  try {
+    return load({ states });
+  } catch (e) {
+    console.warn("[Redux-LocalStorage-Simple] load failed, using defaults", e);
+    return {}; // fall back to reducer defaults
+  }
+}
 
 const store = configureStore({
   reducer: {
@@ -18,11 +27,10 @@ const store = configureStore({
     getDefaultMiddleware({ thunk: true }).concat(
       save({ states: PERSISTED_KEYS, debounce: 1000 })
     ),
-  preloadedState: load({ states: PERSISTED_KEYS }),
+  preloadedState: safeLoad(PERSISTED_KEYS),
 });
 
 store.dispatch(updateVersion());
-
 setupListeners(store.dispatch);
 
 export default store;
