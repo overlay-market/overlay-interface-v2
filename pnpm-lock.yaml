@@ -9,8 +9,8 @@ dependencies:
     specifier: ^2.2.3
     version: 2.4.2(@types/react@18.3.23)(react@18.3.1)
   '@lifi/sdk':
-    specifier: ^3.7.11
-    version: 3.8.7(@solana/wallet-adapter-base@0.9.27)(@solana/web3.js@1.98.4)(@types/react@18.3.23)(react@18.3.1)(typescript@5.8.3)(viem@2.33.2)
+    specifier: ^3.10.1
+    version: 3.10.1(@solana/wallet-adapter-base@0.9.27)(@solana/web3.js@1.98.4)(@types/react@18.3.23)(react@18.3.1)(typescript@5.8.3)(viem@2.33.2)
   '@radix-ui/react-dialog':
     specifier: ^1.1.1
     version: 1.1.14(@types/react-dom@18.3.7)(@types/react@18.3.23)(react-dom@18.3.1)(react@18.3.1)
@@ -565,8 +565,8 @@ packages:
       - zod
     dev: false
 
-  /@bigmi/core@0.4.2(@types/react@18.3.23)(bs58@6.0.0)(react@18.3.1)(typescript@5.8.3):
-    resolution: {integrity: sha512-Lyw3hKXHb/GyBWDRuqr8XHX62kFEI6wmYQPKlKJ2d7/+ORLh7A2xxuyfjD0tJesPojpk2Q/PKv8ENn9kdqcETw==}
+  /@bigmi/core@0.4.4(@types/react@18.3.23)(bs58@6.0.0)(react@18.3.1)(typescript@5.8.3):
+    resolution: {integrity: sha512-FTRmvsCf/UU3y2rXRXD6aSmFGa2hqsCKb//ZCTUz9uUKAVqogBPLLeJziWfaT5pbhyvSZOU/+2Pcge8lVbQXjw==}
     peerDependencies:
       bs58: ^6.0.0
     dependencies:
@@ -582,6 +582,12 @@ packages:
       - react
       - typescript
       - use-sync-external-store
+    dev: false
+
+  /@bitcoinerlab/secp256k1@1.2.0:
+    resolution: {integrity: sha512-jeujZSzb3JOZfmJYI0ph1PVpCRV5oaexCgy+RvCXV8XlY+XFB/2n3WOcvBsKLsOw78KYgnQrQWb2HrKE4be88Q==}
+    dependencies:
+      '@noble/curves': 1.9.7
     dev: false
 
   /@coinbase/wallet-sdk@3.9.3:
@@ -1484,18 +1490,19 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  /@lifi/sdk@3.8.7(@solana/wallet-adapter-base@0.9.27)(@solana/web3.js@1.98.4)(@types/react@18.3.23)(react@18.3.1)(typescript@5.8.3)(viem@2.33.2):
-    resolution: {integrity: sha512-kiB1zVGjd/1nG0SLVbAcGXdr5SgWoOK4GbMKc01zUILEgQDC+VbP4/AMGaL0ewQnagrtyH1Qtdi5iTnedwrt8Q==}
+  /@lifi/sdk@3.10.1(@solana/wallet-adapter-base@0.9.27)(@solana/web3.js@1.98.4)(@types/react@18.3.23)(react@18.3.1)(typescript@5.8.3)(viem@2.33.2):
+    resolution: {integrity: sha512-YzG5Xj1ebTTmKgswk3QkaJ8qk2ofLRVzLfAGEnXtgADHvMSKyju0GzvJwcxWXeMw2WFYzODA0dHaWalLK7WBdQ==}
     peerDependencies:
       '@solana/wallet-adapter-base': ^0.9.0
       '@solana/web3.js': ^1.98.0
       viem: ^2.21.0
     dependencies:
-      '@bigmi/core': 0.4.2(@types/react@18.3.23)(bs58@6.0.0)(react@18.3.1)(typescript@5.8.3)
-      '@lifi/types': 17.26.0(typescript@5.8.3)
-      '@mysten/sui': 1.37.1(typescript@5.8.3)
-      '@mysten/wallet-standard': 0.16.9(typescript@5.8.3)
-      '@noble/curves': 1.9.6
+      '@bigmi/core': 0.4.4(@types/react@18.3.23)(bs58@6.0.0)(react@18.3.1)(typescript@5.8.3)
+      '@bitcoinerlab/secp256k1': 1.2.0
+      '@lifi/types': 17.32.0(typescript@5.8.3)
+      '@mysten/sui': 1.37.4(typescript@5.8.3)
+      '@mysten/wallet-standard': 0.16.12(typescript@5.8.3)
+      '@noble/curves': 1.9.7
       '@solana/wallet-adapter-base': 0.9.27(@solana/web3.js@1.98.4)
       '@solana/web3.js': 1.98.4(typescript@5.8.3)
       bech32: 2.0.0
@@ -1515,8 +1522,8 @@ packages:
       - zod
     dev: false
 
-  /@lifi/types@17.26.0(typescript@5.8.3):
-    resolution: {integrity: sha512-lfd+YNc5ApmNTGnn5V8a/3rNU8odBMdh7CTJNToPeuEnsXlAxEFKN6d1/ou7PH9MLvtrfBbypo+j3tzFT5XDgQ==}
+  /@lifi/types@17.32.0(typescript@5.8.3):
+    resolution: {integrity: sha512-5D/K0cTDP+eMcIEwDcoqWVDtHSekKMl3+FqeWGRUNDD0PCvjZ0TjS10iBMNpfm4IxnvcEj4FIkTsOIreAGxx8w==}
     dependencies:
       viem: 2.33.2(typescript@5.8.3)(zod@3.22.4)
     transitivePeerDependencies:
@@ -1798,14 +1805,14 @@ packages:
       '@scure/base': 1.2.6
     dev: false
 
-  /@mysten/sui@1.37.1(typescript@5.8.3):
-    resolution: {integrity: sha512-xkQEgO/XdGz9T5vJU0iEiw8ZnuDSHWjdYA+u783wY5dt0TknYDBBcThaufhz9j+tksCxKhR5OkktE+Wz3zdYtw==}
+  /@mysten/sui@1.37.4(typescript@5.8.3):
+    resolution: {integrity: sha512-3dKddNEF7XTfPnYIfVyHHTX+9fraQrKFxiBJ8nveISqo4skyClH/nDyS8Nkh7coknbWghuSSsD82liCOZX2uLw==}
     engines: {node: '>=18'}
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.11.0)
       '@mysten/bcs': 1.7.0
       '@mysten/utils': 0.1.1
-      '@noble/curves': 1.9.6
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
       '@scure/bip32': 1.7.0
@@ -1826,10 +1833,10 @@ packages:
       '@scure/base': 1.2.6
     dev: false
 
-  /@mysten/wallet-standard@0.16.9(typescript@5.8.3):
-    resolution: {integrity: sha512-1Wyps0Qnw+EMKUIHJfDGwhZBxTTYyhvx9UM8wsw+/Bscywe5+t9kLaUFblS81Xu0u8tTp1ZAmZDSkr/2y7NS9A==}
+  /@mysten/wallet-standard@0.16.12(typescript@5.8.3):
+    resolution: {integrity: sha512-zyWMGsXk8uZKa+rvkMWpi1Dfm6+Dorx8/9fCQw2SOkwM/hR4GjGL5TyypM8hxLej9KouUmbAS2Bij3kIITTVjw==}
     dependencies:
-      '@mysten/sui': 1.37.1(typescript@5.8.3)
+      '@mysten/sui': 1.37.4(typescript@5.8.3)
       '@wallet-standard/core': 1.1.1
     transitivePeerDependencies:
       - '@gql.tada/svelte-support'
@@ -1883,6 +1890,13 @@ packages:
 
   /@noble/curves@1.9.6:
     resolution: {integrity: sha512-GIKz/j99FRthB8icyJQA51E8Uk5hXmdyThjgQXRKiv9h0zeRlzSCLIzFw6K1LotZ3XuB7yzlf76qk7uBmTdFqA==}
+    engines: {node: ^14.21.3 || >=16}
+    dependencies:
+      '@noble/hashes': 1.8.0
+    dev: false
+
+  /@noble/curves@1.9.7:
+    resolution: {integrity: sha512-gbKGcRUYIjA3/zCCNaWDciTMFI0dCkvou3TL8Zmy5Nc7sJ47a0jtOeZoTaMxkuqRo9cRhjOdZJXegxYE5FN/xw==}
     engines: {node: ^14.21.3 || >=16}
     dependencies:
       '@noble/hashes': 1.8.0
