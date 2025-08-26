@@ -333,13 +333,37 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
-    const quote = await getBridgeQuote();
+    const { quote, error } = await getBridgeQuote();
 
     if (quote) {
       setTradeConfig({
         showConfirm: true,
         attemptingTransaction: false,
       });
+    } else if (error) {
+      const { errorCode, errorMessage } = handleError(error);
+
+      let message = errorMessage;
+      if (errorCode === 1006) {
+        message = (
+          <>
+            No available quotes for the requested transfer.
+            <br />
+            Please try again
+          </>
+        );
+      }
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: message,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
     }
   };
 
