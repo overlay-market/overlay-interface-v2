@@ -24,6 +24,10 @@ export interface BridgeQuoteInfo {
   fees: string;
 }
 
+type BridgeQuoteResult =
+  | { quote: BridgeQuoteInfo; error?: undefined }
+  | { quote?: undefined; error: Error };
+
 export const useLiFiBridge = () => {
   const [bridgeStage, setBridgeStage] = useState<BridgeStage>({ stage: 'idle' });
   const [bridgedAmount, setBridgedAmount] = useState<string>('0');
@@ -242,21 +246,22 @@ export const useLiFiBridge = () => {
     setBridgeQuote(null);
   }, []);
 
-  const getBridgeQuote = useCallback(async () => {
+  const getBridgeQuote = useCallback(async (): Promise<BridgeQuoteResult> => {
     if (!account || !selectedToken || !typedValue) {
-      throw new Error('Missing required data for quote');
+      return { error: new Error("Missing required data for quote") };
     }
 
     // If we're already on BSC with OVL, no quote needed
     if (selectedChainId === DEFAULT_CHAINID && selectedToken.address === OVL_ADDRESS[DEFAULT_CHAINID as number]) {
       const ovlAmount = parseUnits(typedValue, OVL_DECIMALS);
-      setBridgeQuote({
+      const quote: BridgeQuoteInfo = {
         expectedOvlAmount: ovlAmount.toString(),
-        requiredInputAmount: ovlAmount.toString(), 
-        exchangeRate: '1 OVL = 1 OVL',
-        fees: 'No fees - already on BSC'
-      });
-      return;
+        requiredInputAmount: ovlAmount.toString(),
+        exchangeRate: "1 OVL = 1 OVL",
+        fees: "No fees - already on BSC",
+      };
+      setBridgeQuote(quote);
+      return { quote };
     }
 
     try {
@@ -271,7 +276,7 @@ export const useLiFiBridge = () => {
         toAmountRaw: exactOvlAmount.toString()
       });
 
-      const quote = await getContractCallsQuote({
+      const quoteResponse = await getContractCallsQuote({
         fromChain: selectedChainId,
         fromToken: selectedToken.address,
         fromAddress: account,
@@ -282,12 +287,12 @@ export const useLiFiBridge = () => {
         slippage: 0.01,
       });
 
-      if (!quote) {
-        throw new Error("Failed to get bridge quote");
+      if (!quoteResponse) {
+        return { error: new Error("Failed to get bridge quote") };
       }
 
       // Contract calls quote has different structure
-      const finalRequiredInput = quote.action?.fromAmount || '0';
+      const finalRequiredInput = quoteResponse.action?.fromAmount || '0';
       const finalExpectedOvl = exactOvlAmount.toString(); // We requested exact amount
       const inputAmountReadable = Number(finalRequiredInput) / Math.pow(10, selectedToken.decimals);
       const expectedOvlReadable = Number(finalExpectedOvl) / 1e18;
@@ -313,11 +318,11 @@ export const useLiFiBridge = () => {
 
       setBridgeStage({ stage: 'idle' });
 
-      return newQuote;
+      return { quote: newQuote };
     } catch (error: unknown) {
       console.error('Quote error:', error);
       setBridgeStage({ stage: 'idle' });
-      throw error;
+      return { error: error as Error };
     }
   }, [account, selectedToken, selectedChainId, typedValue]);
 
