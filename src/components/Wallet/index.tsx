@@ -4,11 +4,8 @@ import { Box, Flex } from "@radix-ui/themes";
 import { GradientOutlineButton } from "../Button";
 import ChainSwitch from "./ChainSwitch";
 import ConnectWalletModal from "../ConnectWalletModal";
-import useAccount from "../../hooks/useAccount";
 
 const Wallet: React.FC = () => {
-  const { address } = useAccount();
-
   const navigate = useNavigate();
 
   const toggleWidget = () => {
@@ -34,15 +31,13 @@ const Wallet: React.FC = () => {
         justify="end"
         pr={{ initial: "15px", sm: "20px" }}
       >
-        {address && (
-          <GradientOutlineButton
-            title="Buy OVL"
-            width="84px"
-            height="29px"
-            size="12px"
-            handleClick={toggleWidget}
-          />
-        )}
+        <GradientOutlineButton
+          title="Buy OVL"
+          width="84px"
+          height="29px"
+          size="12px"
+          handleClick={toggleWidget}
+        />
 
         <ChainSwitch />
         <ConnectWalletModal />
