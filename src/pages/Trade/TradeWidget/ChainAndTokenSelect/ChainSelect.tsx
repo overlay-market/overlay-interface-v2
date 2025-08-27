@@ -42,7 +42,14 @@ const ChainSelect: React.FC<ChainSelectProps> = ({ onClose }) => {
         <StyledScrollArea>
           <Flex gap="12px" wrap={"wrap"} justify={"center"}>
             {isLoading ? (
-              <Loader />
+              <Flex
+                width={"100%"}
+                pt={"20px"}
+                justify={"center"}
+                align={"center"}
+              >
+                <Loader />
+              </Flex>
             ) : filteredChains && filteredChains.length > 0 ? (
               filteredChains.map((chain) => (
                 <Tooltip.Provider key={chain.id}>

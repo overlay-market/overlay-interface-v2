@@ -75,7 +75,14 @@ const TokenSelect: React.FC<TokenSelectProps> = ({ onClose }) => {
       <Flex direction="column" gap="8px">
         <StyledScrollArea>
           {isTokensLoading || isBalanceLoading ? (
-            <Loader />
+            <Flex
+              width={"100%"}
+              pt={"20px"}
+              justify={"center"}
+              align={"center"}
+            >
+              <Loader />
+            </Flex>
           ) : tokensWithFormattedBalance?.length ? (
             <Flex direction="column">
               {tokensWithFormattedBalance?.length >= 5 && (
