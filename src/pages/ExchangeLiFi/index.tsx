@@ -8,11 +8,16 @@ import { LiFiWidgetEventsHandler } from "./LiFiWidgetEventsHandler";
 import useChainSwitch from "../../hooks/useChainSwitch";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import useAccount from "../../hooks/useAccount";
+import { GradientOutlineButton } from "../../components/Button";
+import { useModalHelper } from "../../components/ConnectWalletModal/utils";
 
 const ExchangeLiFi: React.FC = () => {
+  const { address } = useAccount();
   const drawerRef = useRef<WidgetDrawer>(null);
   const switchChain = useChainSwitch();
   const { refetch } = useOvlTokenBalance();
+  const { openModal } = useModalHelper();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   useEffect(() => {
@@ -101,14 +106,24 @@ const ExchangeLiFi: React.FC = () => {
       align={"center"}
       mb={isMobile ? "100px" : "0px"}
     >
-      <Box style={{ height: isMobile ? "auto" : "80%" }}>
-        <LiFiWidget
-          ref={drawerRef}
-          integrator="overlay"
-          config={widgetConfig}
-        />
-        <LiFiWidgetEventsHandler onRouteFinished={handleChainSwitch} />
-      </Box>
+      {address ? (
+        <Box style={{ height: isMobile ? "auto" : "80%" }}>
+          <LiFiWidget
+            ref={drawerRef}
+            integrator="overlay"
+            config={widgetConfig}
+          />
+          <LiFiWidgetEventsHandler onRouteFinished={handleChainSwitch} />
+        </Box>
+      ) : (
+        <Flex width={"200px"}>
+          <GradientOutlineButton
+            title={"Connect Wallet"}
+            width={"100%"}
+            handleClick={openModal}
+          />
+        </Flex>
+      )}
     </Flex>
   );
 };
