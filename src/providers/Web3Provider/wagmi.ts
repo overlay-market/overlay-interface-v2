@@ -5,7 +5,7 @@ import { mainnetChains } from './chains';
 
 const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string
 
-const chains = [...mainnetChains, bsc] as const;
+const chains = [bsc,...mainnetChains] as const;
 
 const transports = Object.fromEntries(
   chains.map((chain) => [
