@@ -17,6 +17,7 @@ import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
 import { LiFiProvider } from "./providers/LiFiProvider";
 import Airdrops from "./pages/Airdrops";
+import ExchangeLiFi from "./pages/ExchangeLiFi";
 // import Faucet from "./pages/Faucet";
 // import Bridge from "./pages/Bridge";
 
@@ -45,6 +46,7 @@ const App = () => {
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
                   <Route path="/airdrops" element={<Airdrops />} />
+                  <Route path="/exchange/*" element={<ExchangeLiFi />} />
                   {/* <Route path="/faucet" element={<Faucet />} /> */}
                   {/* <Route path="/bridge" element={<Bridge />} /> */}
                   <Route path="*" element={<Navigate to="/markets" />} />

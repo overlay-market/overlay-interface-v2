@@ -6,6 +6,7 @@ import {
   AIRDROPS,
   AirdropStatus,
   AirdropType,
+  ClaimId,
 } from "../../constants/airdrops";
 import EligibilityChecker from "./EligibilityChecker";
 import AirdropsClaim from "./AirdropsClaim";
@@ -29,6 +30,7 @@ const Airdrops: React.FC = () => {
   const [eligibilityStatus, setEligibilityStatus] = useState(
     EligibilityStatus.Null
   );
+  const [disqualifiedTorch, setDisqualifiedTorch] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (account) {
@@ -119,7 +121,7 @@ const Airdrops: React.FC = () => {
             (item) => item.airdropID === airdropId
           )!;
 
-          if (airdropIdAmount["amount"]) {
+          if (airdropIdAmount && airdropIdAmount["amount"]) {
             airdropsAmounts[airdropId] = (
               Number(airdropIdAmount["amount"]) / 1e18
             )
@@ -131,6 +133,22 @@ const Airdrops: React.FC = () => {
     }
 
     return airdropsAmounts;
+  }, [addressResults, activeAirdropKeys]);
+
+  useEffect(() => {
+    if (addressResults) {
+      Object.keys(addressResults).forEach((address) => {
+        activeAirdropKeys.forEach((airdropId) => {
+          const airdropIdAmount = addressResults[address].find(
+            (item) => item.airdropID === airdropId
+          )!;
+
+          if (airdropIdAmount && airdropIdAmount["amount"] && airdropId === ClaimId.TORCH) {
+            setDisqualifiedTorch(airdropIdAmount.disqualified ?? null)
+          }
+        });
+      });
+    }
   }, [addressResults, activeAirdropKeys]);
 
   const airdropsAmounts = useMemo<AirdropsAmounts | null>(() => {
@@ -176,7 +194,7 @@ const Airdrops: React.FC = () => {
         />
       )}
       {eligibilityStatus === "eligible" && (
-        <AirdropsClaim airdropsAmounts={airdropsAmounts} />
+        <AirdropsClaim airdropsAmounts={airdropsAmounts} disqualifiedTorch={disqualifiedTorch} />
       )}
     </>
   );
