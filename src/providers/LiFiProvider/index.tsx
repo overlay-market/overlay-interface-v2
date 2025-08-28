@@ -1,7 +1,7 @@
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useRef, useState } from "react";
 import { createConfig, EVM, config as lifiConfig, SDKConfig } from "@lifi/sdk";
-import { useWalletClient } from "wagmi";
-import { createWalletClient, custom } from "viem";
+import { useConfig, useWalletClient } from "wagmi";
+import { WalletClient } from "viem";
 
 interface LiFiProviderProps {
   children: React.ReactNode;
@@ -12,30 +12,42 @@ export const LiFiContext = createContext<typeof lifiConfig | null>(null);
 
 export const LiFiProvider = ({ children, sdkConfig }: LiFiProviderProps) => {
   const [isInitialized, setIsInitialized] = useState(false);
-  const { data: walletClient } = useWalletClient();
+  const { data: walletClient, refetch: refetchWalletClient } =
+    useWalletClient();
+  const config = useConfig();
+
+  const walletClientRef: React.MutableRefObject<WalletClient | null> =
+    useRef(null);
 
   useEffect(() => {
-    if (!walletClient) return;
+    const updateWalletClient = async () => {
+      const { data: updatedWalletClient } = await refetchWalletClient();
+      walletClientRef.current = updatedWalletClient ?? null;
+    };
 
-    if (!isInitialized) {
-      const client = createWalletClient({
-        account: walletClient.account,
-        chain: walletClient.chain,
-        transport: custom(walletClient.transport),
-      });
+    updateWalletClient();
+  }, [walletClient, config.state.chainId]);
 
-      createConfig({
-        integrator: "overlay",
-        providers: [
-          EVM({
-            getWalletClient: async () => client,
-          }),
-        ],
-        ...sdkConfig,
-      });
-      setIsInitialized(true);
-    }
-  }, [sdkConfig, walletClient, isInitialized]);
+  useEffect(() => {
+    if (isInitialized) return;
+
+    createConfig({
+      integrator: "overlay",
+      providers: [
+        EVM({
+          getWalletClient: async () => {
+            const client = walletClientRef.current;
+            if (!client) throw new Error("No wallet client available");
+
+            return client;
+          },
+        }),
+      ],
+      ...sdkConfig,
+    });
+
+    setIsInitialized(true);
+  }, [sdkConfig, isInitialized]);
 
   return (
     <LiFiContext.Provider value={lifiConfig}>{children}</LiFiContext.Provider>
