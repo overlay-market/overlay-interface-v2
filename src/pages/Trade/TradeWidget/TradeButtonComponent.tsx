@@ -50,6 +50,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     resetBridge,
     bridgedAmount,
     bridgeQuote,
+    isBridging,
     getBridgeQuote,
   } = useLiFiBridge();
   const addPopup = useAddPopup();
@@ -529,7 +530,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     <>
       {loading && <GradientLoaderButton title={TRADE_WITH_LIFI} />}
 
-      {address && !loading && bridgeStage.stage !== "quote" && (
+      {address && !loading && !isBridging && (
         <GradientOutlineButton
           title={liFiTradeButtonConfig.title}
           width={"100%"}
@@ -539,7 +540,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         />
       )}
 
-      {address && !loading && bridgeStage.stage === "quote" && (
+      {address && !loading && isBridging && (
         <GradientLoaderButton
           title={bridgeStage.message || "Getting bridge quote..."}
         />

@@ -33,7 +33,7 @@ export const useLiFiBridge = () => {
   const [bridgedAmount, setBridgedAmount] = useState<string>('0');
   const [bridgeQuote, setBridgeQuote] = useState<BridgeQuoteInfo | null>(null);
   const { address: account } = useAccount();
-  const { data: walletClient } = useWalletClient();
+  const { data: walletClient, refetch: refetchWalletClient } = useWalletClient();
   const { typedValue } = useTradeState();
   const { selectedChainId, selectedToken } = useChainAndTokenState();
   const { approveIfNeeded } = useTokenApprovalWithLiFi({ 
@@ -150,12 +150,17 @@ export const useLiFiBridge = () => {
       const shownTxHashes = new Set<string>();
 
       await executeRoute(route, {
-        switchChainHook: async (chainId: number) => {
-          const success = await safeSwitch(chainId);
+        switchChainHook: async () => {
+          const success = await safeSwitch(route.fromChainId);
           if (!success) {
-            throw new Error(`Failed to switch to chain ${chainId}`);
+            throw new Error(`Failed to switch to chain ${route.fromChainId}`);
           }
-          return walletClient;
+
+          const { data: updatedWalletClient } = await refetchWalletClient();
+          if (!updatedWalletClient) {
+            throw new Error("No wallet client after chain switch");
+          }
+          return updatedWalletClient;
         },
         updateRouteHook: (updatedRoute) => {
           console.log("🌉 Bridge route updated:", {
