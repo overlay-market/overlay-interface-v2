@@ -10,7 +10,7 @@ import {
   useTradeActionHandlers,
   useTradeState,
 } from "../../../state/trade/hooks";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toWei, TradeState, TradeStateData } from "overlay-sdk";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { Address, maxUint256 } from "viem";
@@ -365,6 +365,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         },
         currentTimeForId
       );
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
     }
   };
 
@@ -474,6 +478,15 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         });
       });
   };
+
+  useEffect(() => {
+    if (bridgeStage.stage === "success" && !showConfirm) {
+      setTradeConfig({
+        showConfirm: true,
+        attemptingTransaction,
+      });
+    }
+  }, [bridgeStage, showConfirm]);
 
   const renderDefaultState = () => (
     <>
