@@ -486,7 +486,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         attemptingTransaction,
       });
     }
-  }, [bridgeStage, showConfirm]);
+  }, [bridgeStage]);
 
   const renderDefaultState = () => (
     <>
