@@ -10,6 +10,7 @@ import { useTokenApprovalWithLiFi } from './useTokenApprovalWithLiFi';
 import { useSafeChainSwitch } from './useSafeChainSwitch';
 import { useAddPopup } from '../../state/application/hooks';
 import { OVL_DECIMALS } from '../../constants/applications';
+import { BRIDGE_FEE, BRIDGE_SLIPPAGE } from '../../constants/bridge';
 
 export interface BridgeStage {
   stage: 'idle' | 'quote' | 'approval' | 'bridging' | 'success';
@@ -83,7 +84,7 @@ export const useLiFiBridge = () => {
         toToken: OVL_ADDRESS[DEFAULT_CHAINID as number],
         toAmount: exactOvlAmount.toString(),
         contractCalls: [], 
-        slippage: 0.01,
+        slippage: BRIDGE_SLIPPAGE,
       }).catch((err) => {
         console.error("❌ Failed to get bridge quote:", err);
         throw new Error(`Failed to get bridge quote: ${err.message || "Unknown error"}`);
@@ -289,7 +290,7 @@ export const useLiFiBridge = () => {
         toToken: OVL_ADDRESS[DEFAULT_CHAINID as number],
         toAmount: exactOvlAmount.toString(),
         contractCalls: [], // Empty array as shown in Li.Fi example
-        slippage: 0.01,
+        slippage: BRIDGE_SLIPPAGE,
       });
 
       if (!quoteResponse) {
@@ -316,7 +317,7 @@ export const useLiFiBridge = () => {
         expectedOvlAmount: finalExpectedOvl,
         requiredInputAmount: finalRequiredInput,
         exchangeRate: `1 OVL = ${exchangeRate} ${selectedToken.symbol}`,
-        fees: '~1% slippage',
+        fees: `${BRIDGE_FEE * 100}%`,
       };
 
       setBridgeQuote(newQuote);
