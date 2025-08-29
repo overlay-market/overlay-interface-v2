@@ -24,8 +24,7 @@ export const calculateTokenAmountFromOvlAmount = (
   ovlPriceUsd: number,
 ): bigint => {  
 
-  console.log(userInput,Number(userInput) <= 0, parseFloat(token.priceUSD) <= 0, ovlPriceUsd <= 0);
-   if (!userInput || Number(userInput) <= 0 || parseFloat(token.priceUSD) <= 0 || ovlPriceUsd <= 0) {
+  if (!userInput || Number(userInput) <= 0 || parseFloat(token.priceUSD) <= 0 || ovlPriceUsd <= 0) {
     return 0n;
   }
   
