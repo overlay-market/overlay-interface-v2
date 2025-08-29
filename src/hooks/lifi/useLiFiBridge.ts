@@ -119,7 +119,7 @@ export const useLiFiBridge = () => {
         expectedOvlAmount: finalExpectedOvl,
         requiredInputAmount: finalRequiredInput,
         exchangeRate: `1 OVL = ${exchangeRate} ${selectedToken.symbol}`,
-        fees: '~1% slippage'
+        fees: `${BRIDGE_FEE * 100}%`,
       });
 
       // Switch to source chain for token approval
