@@ -15,7 +15,8 @@ import {
   BridgeStage,
 } from "../../../hooks/lifi/useLiFiBridge";
 import { useSelectedChain } from "../../../hooks/lifi/useSelectedChain";
-import { BRIDGE_FEE, BRIDGE_SLIPPAGE } from "../../../constants/bridge";
+import { BRIDGE_SLIPPAGE } from "../../../constants/bridge";
+import { formatAdjustedBridgeAmount } from "../../../utils/lifi/calculateBridgeAmount";
 
 type ConfirmBridgeContentProps = {
   bridgeQuote?: BridgeQuoteInfo | null;
@@ -48,19 +49,13 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
   }, [bridgeQuote, typedValue, selectedToken]);
 
   const expectedOvlFormatted = useMemo(() => {
-    let baseOvl = 0;
-
     if (bridgeQuote?.expectedOvlAmount) {
-      baseOvl = Number(bridgeQuote.expectedOvlAmount) / 1e18;
+      // Use the amount from the actual bridge quote
+      return (Number(bridgeQuote.expectedOvlAmount) / 1e18).toFixed(4);
     } else {
-      baseOvl = parseFloat(typedValue) || 0;
+      // Use the utility function to calculate adjusted amount consistently
+      return formatAdjustedBridgeAmount(typedValue, selectedLeverage);
     }
-
-    const leverage = Number(selectedLeverage) || 1;
-    const calculatedBridgefee = baseOvl * leverage * BRIDGE_FEE;
-    const finalOvl = baseOvl + calculatedBridgefee;
-
-    return finalOvl.toFixed(4);
   }, [bridgeQuote, typedValue, selectedLeverage]);
 
   const exchangeRateFormatted = useMemo(() => {
