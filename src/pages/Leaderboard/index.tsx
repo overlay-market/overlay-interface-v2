@@ -18,7 +18,7 @@ const ROWS_PER_LOAD = 20;
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
   const { data: ensName } = useENSName(account);
-
+  const [allRanks, setAllRanks] = useState<UserData[]>([]);
   const [loadedNumberOfRows, setLoadedNumberOfRows] = useState(
     INITIAL_NUMBER_OF_ROWS
   );
@@ -29,9 +29,17 @@ const Leaderboard: React.FC = () => {
     account
   );
 
-  const ranks = useMemo<UserData[] | undefined>(() => {
-    return data?.leaderboard;
-  }, [data]);
+  useEffect(() => {
+    if (data?.leaderboard) {
+      setAllRanks((prev) => {
+        const existingRanks = new Set(prev.map((p) => p._id));
+        const newUsers = data.leaderboard.filter(
+          (u) => !existingRanks.has(u._id)
+        );
+        return [...prev, ...newUsers];
+      });
+    }
+  }, [data?.leaderboard]);
 
   const leaderboardLastUpdated = useMemo<string | undefined>(() => {
     return data?.lastUpdated;
@@ -68,7 +76,10 @@ const Leaderboard: React.FC = () => {
     observer.current = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (isFirstTrigger.current) {
+        if (
+          isFirstTrigger.current &&
+          loadedNumberOfRows === INITIAL_NUMBER_OF_ROWS
+        ) {
           isFirstTrigger.current = false;
           return;
         }
@@ -88,7 +99,7 @@ const Leaderboard: React.FC = () => {
     return () => {
       if (currentRef) observer.current?.unobserve(currentRef);
     };
-  }, [hasMore, loadedNumberOfRows]);
+  }, [hasMore, loadedNumberOfRows, isLoading]);
 
   useEffect(() => {
     if (isError) {
@@ -129,7 +140,7 @@ const Leaderboard: React.FC = () => {
           />
         </Flex>
 
-        <LeaderboardTable ranks={ranks} currentUserData={currentUserData} />
+        <LeaderboardTable ranks={allRanks} currentUserData={currentUserData} />
 
         {isLoading && (
           <Flex
