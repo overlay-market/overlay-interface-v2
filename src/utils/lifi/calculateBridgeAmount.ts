@@ -20,7 +20,7 @@ export const calculateAdjustedBridgeAmount = (
   const leverageNum = Number(leverage) || 1;
   
   // Calculate bridge fee: baseAmount * leverage * BRIDGE_FEE (0.5%)
-  const bridgeFeeAmount = baseOvlAmount * BigInt(Math.floor(leverageNum * 1000)) * BigInt(5) / BigInt(1000000);
+  const bridgeFeeAmount = baseOvlAmount * BigInt(Math.floor(leverageNum * 1000)) * BigInt(Math.floor(BRIDGE_FEE * 1000)) / BigInt(1000000);
   
   // Return adjusted amount: base + fees
   return baseOvlAmount + bridgeFeeAmount;

@@ -15,7 +15,7 @@ import {
   BridgeStage,
 } from "../../../hooks/lifi/useLiFiBridge";
 import { useSelectedChain } from "../../../hooks/lifi/useSelectedChain";
-import { BRIDGE_FEE, BRIDGE_SLIPPAGE } from "../../../constants/bridge";
+import { BRIDGE_SLIPPAGE } from "../../../constants/bridge";
 import { formatAdjustedBridgeAmount } from "../../../utils/lifi/calculateBridgeAmount";
 
 type ConfirmBridgeContentProps = {

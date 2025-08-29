@@ -4,12 +4,10 @@ import { useAccount, useWalletClient } from 'wagmi';
 import { OVL_ADDRESS } from 'overlay-sdk';
 import { useChainAndTokenState, useTradeState } from '../../state/trade/hooks';
 import { convertQuoteToRoute, executeRoute, ExecutionOptions, getContractCallsQuote } from '@lifi/sdk';
-import { parseUnits } from 'viem';
 import { DEFAULT_CHAINID } from '../../constants/chains';
 import { useTokenApprovalWithLiFi } from './useTokenApprovalWithLiFi';
 import { useSafeChainSwitch } from './useSafeChainSwitch';
 import { useAddPopup } from '../../state/application/hooks';
-import { OVL_DECIMALS } from '../../constants/applications';
 import { BRIDGE_FEE, BRIDGE_SLIPPAGE } from '../../constants/bridge';
 import { calculateAdjustedBridgeAmount } from '../../utils/lifi/calculateBridgeAmount';
 
