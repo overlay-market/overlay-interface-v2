@@ -11,6 +11,7 @@ import { useSafeChainSwitch } from './useSafeChainSwitch';
 import { useAddPopup } from '../../state/application/hooks';
 import { OVL_DECIMALS } from '../../constants/applications';
 import { BRIDGE_FEE, BRIDGE_SLIPPAGE } from '../../constants/bridge';
+import { calculateAdjustedBridgeAmount } from '../../utils/lifi/calculateBridgeAmount';
 
 export interface BridgeStage {
   stage: 'idle' | 'quote' | 'approval' | 'bridging' | 'success';
@@ -35,7 +36,7 @@ export const useLiFiBridge = () => {
   const [bridgeQuote, setBridgeQuote] = useState<BridgeQuoteInfo | null>(null);
   const { address: account } = useAccount();
   const { data: walletClient, refetch: refetchWalletClient } = useWalletClient();
-  const { typedValue } = useTradeState();
+  const { typedValue, selectedLeverage } = useTradeState();
   const { selectedChainId, selectedToken } = useChainAndTokenState();
   const { approveIfNeeded } = useTokenApprovalWithLiFi({ 
     setTradeStage: (stage) => setBridgeStage({
@@ -57,32 +58,33 @@ export const useLiFiBridge = () => {
 
     // If we're already on BSC with OVL, no bridging needed
     if (selectedChainId === DEFAULT_CHAINID && selectedToken.address === OVL_ADDRESS[DEFAULT_CHAINID as number]) {
-      const ovlAmount = parseUnits(typedValue, OVL_DECIMALS).toString();
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage).toString();
       setBridgeStage({ stage: 'success', message: 'Ready for position - already on BSC with OVL' });
-      setBridgedAmount(ovlAmount);
+      setBridgedAmount(adjustedOvlAmount);
       return;
     }
 
     try {
       setBridgeStage({ stage: 'quote', message: 'Getting bridge quote...' });
 
-      // Use exact OVL amount that user wants to receive with toAmount
-      const exactOvlAmount = parseUnits(typedValue, OVL_DECIMALS);
+      // Calculate adjusted OVL amount including fees so user receives what they typed
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage);
 
-      console.log("🎯 Using toAmount for exact OVL:", {
+      console.log("🎯 Using adjusted amount for bridge:", {
         userTypedValue: typedValue,
-        wantedOVL: (Number(exactOvlAmount) / 1e18).toFixed(6),
-        toAmountRaw: exactOvlAmount.toString()
+        userLeverage: selectedLeverage,
+        adjustedOVL: (Number(adjustedOvlAmount) / 1e18).toFixed(6),
+        toAmountRaw: adjustedOvlAmount.toString()
       });
 
-      // Get contract calls quote with exact toAmount
+      // Get contract calls quote with adjusted toAmount
       const quote = await getContractCallsQuote({
         fromChain: selectedChainId,
         fromToken: selectedToken.address,
         fromAddress: account,
         toChain: DEFAULT_CHAINID as number,
         toToken: OVL_ADDRESS[DEFAULT_CHAINID as number],
-        toAmount: exactOvlAmount.toString(),
+        toAmount: adjustedOvlAmount.toString(),
         contractCalls: [], 
         slippage: BRIDGE_SLIPPAGE,
       }).catch((err) => {
@@ -96,8 +98,8 @@ export const useLiFiBridge = () => {
 
       // Contract calls quote has different structure than regular quote
       const finalRequiredInput = quote.action?.fromAmount || '0';
-      const finalExpectedOvl = exactOvlAmount.toString(); // We requested exact amount
-      const guaranteedOvlAmount = quote.estimate?.toAmountMin || exactOvlAmount.toString(); 
+      const finalExpectedOvl = adjustedOvlAmount.toString(); // We requested adjusted amount
+      const guaranteedOvlAmount = quote.estimate?.toAmountMin || adjustedOvlAmount.toString(); 
       const approvalAddress = quote.estimate?.approvalAddress;
       
       // Calculate exchange rate and fees for display
@@ -105,13 +107,13 @@ export const useLiFiBridge = () => {
       const expectedOvlReadable = Number(finalExpectedOvl) / 1e18;
       const exchangeRate = (inputAmountReadable / expectedOvlReadable).toFixed(6);
       
-      console.log("🎯 Contract calls quote details (toAmount):", {
-        requestedOVL: (Number(exactOvlAmount) / 1e18).toFixed(6),
+      console.log("🎯 Contract calls quote details (adjusted amount):", {
+        requestedOVL: (Number(adjustedOvlAmount) / 1e18).toFixed(6),
         expectedOVL: expectedOvlReadable.toFixed(6),
         guaranteedOVL: (Number(guaranteedOvlAmount) / 1e18).toFixed(6),
         requiredInput: inputAmountReadable.toFixed(6),
         exchangeRate: `1 OVL = ${exchangeRate} ${selectedToken.symbol}`,
-        exactMatch: expectedOvlReadable === (Number(exactOvlAmount) / 1e18) ? "✅ Perfect match!" : "❌ Mismatch"
+        adjustedMatch: expectedOvlReadable === (Number(adjustedOvlAmount) / 1e18) ? "✅ Perfect match!" : "❌ Mismatch"
       });
       
       // Store quote info for potential modal display
@@ -262,6 +264,7 @@ export const useLiFiBridge = () => {
     selectedToken,
     selectedChainId,
     typedValue,
+    selectedLeverage,
     safeSwitch,
     approveIfNeeded,
     addPopup,
@@ -281,10 +284,10 @@ export const useLiFiBridge = () => {
 
     // If we're already on BSC with OVL, no quote needed
     if (selectedChainId === DEFAULT_CHAINID && selectedToken.address === OVL_ADDRESS[DEFAULT_CHAINID as number]) {
-      const ovlAmount = parseUnits(typedValue, OVL_DECIMALS);
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage);
       const quote: BridgeQuoteInfo = {
-        expectedOvlAmount: ovlAmount.toString(),
-        requiredInputAmount: ovlAmount.toString(),
+        expectedOvlAmount: adjustedOvlAmount.toString(),
+        requiredInputAmount: adjustedOvlAmount.toString(),
         exchangeRate: "1 OVL = 1 OVL",
         fees: "No fees - already on BSC",
       };
@@ -295,13 +298,14 @@ export const useLiFiBridge = () => {
     try {
       setBridgeStage({ stage: 'quote', message: 'Getting bridge quote...' });
 
-      // Use exact OVL amount with toAmount (same as executeBridge)
-      const exactOvlAmount = parseUnits(typedValue, OVL_DECIMALS);
+      // Use adjusted OVL amount with toAmount (same as executeBridge)
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage);
 
-      console.log("🎯 getBridgeQuote using toAmount:", {
+      console.log("🎯 getBridgeQuote using adjusted amount:", {
         userTypedValue: typedValue,
-        wantedOVL: (Number(exactOvlAmount) / 1e18).toFixed(6),
-        toAmountRaw: exactOvlAmount.toString()
+        userLeverage: selectedLeverage,
+        adjustedOVL: (Number(adjustedOvlAmount) / 1e18).toFixed(6),
+        toAmountRaw: adjustedOvlAmount.toString()
       });
 
       const quoteResponse = await getContractCallsQuote({
@@ -310,7 +314,7 @@ export const useLiFiBridge = () => {
         fromAddress: account,
         toChain: DEFAULT_CHAINID as number,
         toToken: OVL_ADDRESS[DEFAULT_CHAINID as number],
-        toAmount: exactOvlAmount.toString(),
+        toAmount: adjustedOvlAmount.toString(),
         contractCalls: [], // Empty array as shown in Li.Fi example
         slippage: BRIDGE_SLIPPAGE,
       });
@@ -321,7 +325,7 @@ export const useLiFiBridge = () => {
 
       // Contract calls quote has different structure
       const finalRequiredInput = quoteResponse.action?.fromAmount || '0';
-      const finalExpectedOvl = exactOvlAmount.toString(); // We requested exact amount
+      const finalExpectedOvl = adjustedOvlAmount.toString(); // We requested adjusted amount
       const inputAmountReadable = Number(finalRequiredInput) / Math.pow(10, selectedToken.decimals);
       const expectedOvlReadable = Number(finalExpectedOvl) / 1e18;
       const exchangeRate = (inputAmountReadable / expectedOvlReadable).toFixed(6);
@@ -329,10 +333,10 @@ export const useLiFiBridge = () => {
       console.log("🎯 Contract Calls Quote Response:", {
         requestedOVL: typedValue,
         quoteFromAmount: finalRequiredInput,
-        exactOvlAmount: finalExpectedOvl,
+        adjustedOvlAmount: finalExpectedOvl,
         inputReadable: inputAmountReadable.toFixed(6),
         ovlReadable: expectedOvlReadable.toFixed(6),
-        perfectMatch: expectedOvlReadable === parseFloat(typedValue) ? "✅ Perfect!" : "❌ Mismatch"
+        adjustedMatch: expectedOvlReadable === (Number(adjustedOvlAmount) / 1e18) ? "✅ Perfect!" : "❌ Mismatch"
       });
 
       const newQuote: BridgeQuoteInfo = {
@@ -352,7 +356,7 @@ export const useLiFiBridge = () => {
       setBridgeStage({ stage: 'idle' });
       return { error: error as Error };
     }
-  }, [account, selectedToken, selectedChainId, typedValue]);
+  }, [account, selectedToken, selectedChainId, typedValue, selectedLeverage]);
 
   return {
     bridgeStage,
