@@ -406,6 +406,60 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
+    // Check if approval is needed before building position
+    if (tradeState.tradeState === TradeState.NeedsApproval) {
+      console.log("🔒 Approval needed for Shiva contract after bridge");
+      
+      setTradeConfig({
+        showConfirm,
+        attemptingTransaction: true,
+      });
+
+      try {
+        // Use existing handleApprove logic
+        const useShiva = sdk.core.usingShiva();
+        const result = useShiva
+          ? await sdk.shiva.approveShiva({
+              account: address,
+              amount: maxUint256,
+            })
+          : await sdk.ovl.approve({
+              to: market?.id as Address,
+              amount: maxUint256,
+            });
+
+        addPopup({
+          txn: {
+            hash: result.hash,
+            success: result.receipt?.status === "success",
+            message: "",
+            type: TransactionType.APPROVAL,
+          },
+        });
+
+        handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
+        console.log("✅ Approval completed, proceeding with position building");
+      } catch (error) {
+        const { errorCode, errorMessage } = handleError(error as Error);
+        addPopup(
+          {
+            txn: {
+              hash: currentTimeForId,
+              success: false,
+              message: errorMessage,
+              type: errorCode,
+            },
+          },
+          currentTimeForId
+        );
+        setTradeConfig({
+          showConfirm: false,
+          attemptingTransaction: false,
+        });
+        return;
+      }
+    }
+
     setTradeConfig({
       showConfirm,
       attemptingTransaction: true,
