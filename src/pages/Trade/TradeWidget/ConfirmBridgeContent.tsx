@@ -15,6 +15,7 @@ import {
   BridgeStage,
 } from "../../../hooks/lifi/useLiFiBridge";
 import { useSelectedChain } from "../../../hooks/lifi/useSelectedChain";
+import { BRIDGE_FEE, BRIDGE_SLIPPAGE } from "../../../constants/bridge";
 
 type ConfirmBridgeContentProps = {
   bridgeQuote?: BridgeQuoteInfo | null;
@@ -27,7 +28,7 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
   bridgeStage,
   handleBridge,
 }) => {
-  const { typedValue } = useTradeState();
+  const { typedValue, selectedLeverage } = useTradeState();
   const { selectedToken } = useChainAndTokenState();
   const { selectedChain } = useSelectedChain();
 
@@ -47,12 +48,20 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
   }, [bridgeQuote, typedValue, selectedToken]);
 
   const expectedOvlFormatted = useMemo(() => {
+    let baseOvl = 0;
+
     if (bridgeQuote?.expectedOvlAmount) {
-      const ovlAmount = Number(bridgeQuote.expectedOvlAmount) / 1e18;
-      return ovlAmount.toFixed(4);
+      baseOvl = Number(bridgeQuote.expectedOvlAmount) / 1e18;
+    } else {
+      baseOvl = parseFloat(typedValue) || 0;
     }
-    return parseFloat(typedValue).toFixed(4);
-  }, [bridgeQuote, typedValue]);
+
+    const leverage = Number(selectedLeverage) || 1;
+    const calculatedBridgefee = baseOvl * leverage * BRIDGE_FEE;
+    const finalOvl = baseOvl + calculatedBridgefee;
+
+    return finalOvl.toFixed(4);
+  }, [bridgeQuote, typedValue, selectedLeverage]);
 
   const exchangeRateFormatted = useMemo(() => {
     if (bridgeQuote?.exchangeRate) {
@@ -67,6 +76,8 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
     }
     return "~1% slippage";
   }, [bridgeQuote]);
+
+  const slippageValue = BRIDGE_SLIPPAGE * 100;
 
   return (
     <>
@@ -90,7 +101,7 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
       <Flex mt={"32px"} direction={"column"} width={"100%"}>
         <DetailRow detail={"Exchange Rate"} value={exchangeRateFormatted} />
         <DetailRow detail={"Bridge Fee"} value={bridgeFeeFormatted} />
-        <DetailRow detail={"Slippage Tolerance"} value={"1%"} />
+        <DetailRow detail={"Slippage Tolerance"} value={`${slippageValue}%`} />
       </Flex>
 
       <Flex my={"24px"}>
