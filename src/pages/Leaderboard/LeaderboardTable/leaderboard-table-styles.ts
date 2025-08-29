@@ -5,6 +5,11 @@ export const Table = styled.table`
   width: calc(100% - 16px);
   border-collapse: collapse;
   margin: 0 8px;
+  margin-bottom: 60px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    margin-bottom: 0px;
+  }
 `;
 
 export const StyledHeader = styled.th<{textalign: string}>`
