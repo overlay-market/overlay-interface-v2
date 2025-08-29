@@ -22,14 +22,19 @@ export const useSafeChainSwitch = (options?: UseSafeChainSwitchOptions) => {
       options?.onSwitchStart?.(currentChainId, targetChainId);
       
       try {
-        await switchChainAsync({ chainId: targetChainId });
-        await new Promise((res) => setTimeout(res, 1500));
-
-        const updatedChainId = config.state.chainId;
+        const result = await switchChainAsync({ chainId: targetChainId });
         
-        if (updatedChainId !== targetChainId) {
-          throw new Error(`Switched chain does not match target chain (${targetChainId})`);
+        // Verify the switch was successful by checking the returned chain
+        if (result.id !== targetChainId) {
+          throw new Error(`Chain switch failed: expected ${targetChainId}, got ${result.id}`);
         }
+        
+        // Also verify against wagmi config state
+        const updatedChainId = config.state.chainId;
+        if (updatedChainId !== targetChainId) {
+          throw new Error(`Config state mismatch: expected ${targetChainId}, got ${updatedChainId}`);
+        }
+        
         return true;
       } catch (err) {
         console.error('❌ Failed to switch chains:', err);
