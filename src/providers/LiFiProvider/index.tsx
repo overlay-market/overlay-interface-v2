@@ -26,7 +26,7 @@ export const LiFiProvider = ({ children, sdkConfig }: LiFiProviderProps) => {
     };
 
     updateWalletClient();
-  }, [walletClient, config.state.chainId]);
+  }, [walletClient, config.state.chainId, refetchWalletClient]);
 
   useEffect(() => {
     if (isInitialized) return;

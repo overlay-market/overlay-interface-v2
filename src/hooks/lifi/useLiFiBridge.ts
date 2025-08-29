@@ -123,9 +123,26 @@ export const useLiFiBridge = () => {
       });
 
       // Switch to source chain for token approval
-      await safeSwitch(selectedChainId);
+      const switchSuccess = await safeSwitch(selectedChainId);
+      if (!switchSuccess) {
+        throw new Error(`Failed to switch to source chain ${selectedChainId}`);
+      }
+      
+      // Refetch wallet client to get updated chain context after switch
+      const { data: freshWalletClient } = await refetchWalletClient();
+      if (!freshWalletClient) {
+        throw new Error('Failed to get updated wallet client after chain switch');
+      }
+      
+      console.log("✅ Successfully switched to source chain for approval:", {
+        targetChainId: selectedChainId,
+        tokenChainId: selectedToken.chainId,
+        approvalAddress,
+        freshClientChainId: freshWalletClient.chain?.id,
+        chainMatches: freshWalletClient.chain?.id === selectedChainId,
+      });
 
-      // Handle token approval if needed
+      // Handle token approval with fresh wallet client
       await approveIfNeeded({
         token: {
           address: selectedToken.address as Address,
@@ -133,6 +150,7 @@ export const useLiFiBridge = () => {
         },
         spenderAddress: approvalAddress as Address,
         tokenAmountSelected: BigInt(finalRequiredInput),
+        freshWalletClient,
       });
 
       setBridgeStage({ stage: 'bridging', message: 'Bridging tokens to BSC...' });
@@ -151,16 +169,19 @@ export const useLiFiBridge = () => {
       const shownTxHashes = new Set<string>();
 
       await executeRoute(route, {
-        switchChainHook: async () => {
-          const success = await safeSwitch(route.fromChainId);
+        switchChainHook: async (chainId: number) => {
+          console.log("🔄 LiFi requesting chain switch to:", chainId);
+          const success = await safeSwitch(chainId);
           if (!success) {
-            throw new Error(`Failed to switch to chain ${route.fromChainId}`);
+            throw new Error(`Failed to switch to chain ${chainId}`);
           }
 
+          // Refetch wallet client to get updated chain context
           const { data: updatedWalletClient } = await refetchWalletClient();
           if (!updatedWalletClient) {
             throw new Error("No wallet client after chain switch");
           }
+          console.log("✅ Chain switch completed for LiFi execution");
           return updatedWalletClient;
         },
         updateRouteHook: (updatedRoute) => {
@@ -243,7 +264,8 @@ export const useLiFiBridge = () => {
     typedValue,
     safeSwitch,
     approveIfNeeded,
-    addPopup
+    addPopup,
+    refetchWalletClient
   ]);
 
   const resetBridge = useCallback(() => {
