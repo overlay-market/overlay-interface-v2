@@ -1,7 +1,7 @@
 import { StyledHeader, Table } from "./leaderboard-table-styles";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { ExtendedUserData } from "../types";
-import { useResolveENSProfiles } from "../../../hooks/useENSProfile";
+import { useResolveENSProfilesBatched } from "../../../hooks/useENSProfile";
 import { useLeaderboardView } from "../../../hooks/useLeaderboardView";
 import ColumnSelector from "./ColumnSelector";
 import CurrentUserRow from "./CurrentUserRow";
@@ -20,7 +20,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   currentUserData,
 }) => {
   const isMobile = useMediaQuery("(max-width: 1150px)");
-  const ensProfiles = useResolveENSProfiles(ranks);
+  const ensProfiles = useResolveENSProfilesBatched(ranks);
 
   const {
     selectedColumn,

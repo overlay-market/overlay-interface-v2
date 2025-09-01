@@ -8,15 +8,13 @@ import { DisplayUserData, ExtendedUserData, Ranking } from "../types";
 import { leaderboardColumns, RANKING_BY } from "./leaderboardConfig";
 
 interface ENSProfile {
-  data?: {
-    username?: string;
-    avatar?: string;
-  };
+  username?: string;
+  avatar?: string;
 }
 
 interface LeaderboardRowsProps {
   ranks: DisplayUserData[] | undefined;
-  ensProfiles: ENSProfile[];
+  ensProfiles: Record<string, ENSProfile>;
   isMobile: boolean;
   getColumnValue: (user: ExtendedUserData) => React.ReactNode;
 }
@@ -39,8 +37,8 @@ const LeaderboardRows = ({
     );
   }
 
-  return ranks.map((rank, index) => {
-    const userProfile = ensProfiles[index]?.data;
+  return ranks.map((rank) => {
+    const userProfile = ensProfiles[rank.walletAddress];
     const username =
       userProfile?.username ?? shortenAddress(rank.walletAddress);
     const avatarUrl = userProfile?.avatar ?? null;

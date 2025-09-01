@@ -1,8 +1,9 @@
-import { useQueries, useQuery, UseQueryResult } from "@tanstack/react-query";
-import { Address, createPublicClient, http, PublicClient } from "viem";
+import {  useQuery, useQueryClient } from "@tanstack/react-query";
+import { Address, createPublicClient, http,  PublicClient } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
 import { ExtendedUserData } from "../pages/Leaderboard/types";
+import { useEffect, useState } from "react";
 
 const mainnetClient: PublicClient = createPublicClient({
   chain: mainnet,
@@ -40,24 +41,57 @@ export const useENSAvatar = (name: string | undefined | null) => {
   });
 };
 
-export const useResolveENSProfiles = (users: ExtendedUserData[] | undefined): UseQueryResult<ExtendedUserData, unknown>[] => {
-  return useQueries({
-    queries: (users || []).map(user => ({
-      queryKey: ['ensProfile', user.walletAddress],
-      queryFn: async () => {
-        const name = await mainnetClient.getEnsName({ address: user.walletAddress as Address });
-        let avatar = null;
-        if (name) {
-          avatar = await mainnetClient.getEnsAvatar({ name: normalize(name) });
-        }
-        return {
-          ...user,
-          username: name,
-          avatar: avatar,
-        };
-      },
-      staleTime: Infinity,
-      enabled: !!user.walletAddress,
-    })),
+export type ENSResult = Record<string, { username?: string; avatar?: string }>;
+
+export const useResolveENSProfilesBatched = (users: ExtendedUserData[] | undefined) => {
+  const queryClient = useQueryClient();
+  const [ensProfiles, setEnsProfiles] = useState<ENSResult>({});
+
+  useEffect(() => {
+    if (!users || users.length === 0) return;
+
+    const unresolvedUsers = users.filter(
+      (u) =>
+        u.walletAddress &&
+        !queryClient.getQueryData(['ensProfile', u.walletAddress])
+    );
+
+    if (!unresolvedUsers.length) return;
+
+    const fetchBatch = async () => {
+      const newProfiles: ENSResult = {};
+
+      await Promise.all(
+        unresolvedUsers.map(async (user) => {
+          const username = await mainnetClient.getEnsName({
+            address: user.walletAddress as Address,
+          });
+          let avatar = null;
+          if (username) {
+            avatar = await mainnetClient.getEnsAvatar({ name: normalize(username) });
+          }
+
+          const profile = { username: username || undefined, avatar: avatar || undefined };
+
+          queryClient.setQueryData(['ensProfile', user.walletAddress], profile);
+
+          newProfiles[user.walletAddress] = profile;
+        })
+      );
+
+      setEnsProfiles((prev) => ({ ...prev, ...newProfiles }));
+    };
+
+    fetchBatch();
+  }, [users, queryClient]);
+
+  // Combine React Query cached profiles and local state
+  const combinedProfiles: ENSResult = {};
+  users?.forEach((user) => {
+    if (!user.walletAddress) return;
+    const cached = queryClient.getQueryData<ENSResult[number]>(['ensProfile', user.walletAddress]);
+    combinedProfiles[user.walletAddress] = cached || ensProfiles[user.walletAddress];
   });
+
+  return combinedProfiles;
 };
