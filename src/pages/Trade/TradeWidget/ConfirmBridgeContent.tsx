@@ -105,6 +105,19 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
         </Text>
       </Flex>
 
+      <Flex my={"24px"} direction={"column"}>
+        <Text style={{ color: theme.color.grey3, fontSize: "12px" }}>
+          {`⚠️ Important: Your ${
+            selectedToken?.symbol || ""
+          } will be converted to OVL tokens on BSC.`}
+        </Text>
+        <Text style={{ color: theme.color.grey3, fontSize: "12px" }}>
+          {`You will trade with OVL, not ${
+            selectedToken?.symbol || ""
+          }. These tokens have independent price movements.`}
+        </Text>
+      </Flex>
+
       {attemptingBridge ? (
         <>
           <GradientLoaderButton height={"46px"} title={bridgeStage.stage} />
