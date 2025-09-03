@@ -13,6 +13,7 @@ import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
 import { useArcxAnalytics } from "@0xarc-io/analytics";
 import useAccount from "../../../hooks/useAccount";
+import { usePublicClient } from "wagmi";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -37,8 +38,9 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
-  const arcxAnalytics = useArcxAnalytics()
+  const arcxAnalytics = useArcxAnalytics();
   const { address, chainId } = useAccount();
+  const publicClient = usePublicClient();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
 
@@ -52,61 +54,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     return title === "Unwind" && inputValue !== "" ? false : true;
   }, [inputValue, title]);
 
-  const handleUnwind = async () => {
-    if (position && unwindPercentage && inputValue && priceLimit) {
-      setAttemptingUnwind(true);
-
-      sdk.market
-        .unwind({
-          marketAddress: position.marketAddress as Address,
-          positionId: BigInt(position.positionId),
-          fraction: toWei(unwindPercentage),
-          priceLimit: priceLimit,
-        })
-        .then((result) => {
-          addPopup(
-            {
-              txn: {
-                hash: result.hash,
-                success: result.receipt?.status === "success",
-                message: "",
-                type: TransactionType.UNWIND_OVL_POSITION,
-              },
-            },
-            result.hash
-          );
-          handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
-          arcxAnalytics?.transaction({
-            transactionHash: result.hash,
-            account: address,
-            chainId,
-            metadata: {
-              action: TransactionType.UNWIND_OVL_POSITION,
-            },
-          })
-        })
-        .catch((error: Error) => {
-          const { errorCode, errorMessage } = handleError(error);
-
-          addPopup(
-            {
-              txn: {
-                hash: currentTimeForId,
-                success: false,
-                message: errorMessage,
-                type: errorCode,
-              },
-            },
-            currentTimeForId
-          );
-        })
-        .finally(() => {
-          setAttemptingUnwind(false);
-          handleDismiss();
-        });
-    }
-  };
-
   const handleError = (error: Error) => {
     const errorString = JSON.stringify(error);
     const errorObj = JSON.parse(errorString);
@@ -117,6 +64,124 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     const errorMessage =
       errorObj.cause?.shortMessage || errorObj.cause?.cause?.shortMessage;
     return { errorCode, errorMessage };
+  };
+
+  const handleUnwind = async () => {
+    if (!sdk || !publicClient || !address) {
+      console.error("Missing required dependencies for unwind operation");
+      return;
+    }
+
+    if (!position || !unwindPercentage || !inputValue || !priceLimit) {
+      console.error("Missing required parameters for unwind operation");
+      return;
+    }
+
+    setAttemptingUnwind(true);
+
+    try {
+      const result = await sdk.market.unwind({
+        marketAddress: position.marketAddress as Address,
+        positionId: BigInt(position.positionId),
+        fraction: toWei(unwindPercentage),
+        priceLimit,
+      });
+
+      let receipt = result.receipt;
+
+      if (!receipt) {
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(
+              () => reject(new Error("Transaction confirmation timeout")),
+              60_000
+            )
+          );
+
+          receipt = await Promise.race([
+            publicClient.waitForTransactionReceipt({ hash: result.hash }),
+            timeoutPromise,
+          ]);
+        } catch (timeoutError) {
+          console.warn("Transaction confirmation timeout:", timeoutError);
+
+          addPopup(
+            {
+              txn: {
+                hash: result.hash,
+                success: true,
+                message:
+                  "Transaction is taking longer than expected. It may still confirm.",
+                type: TransactionType.UNWIND_OVL_POSITION,
+              },
+            },
+            result.hash
+          );
+          return;
+        }
+      }
+
+      if (receipt) {
+        const isSuccess = receipt.status === "success";
+
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: isSuccess,
+              message: "",
+              type: TransactionType.UNWIND_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+
+        if (receipt.blockNumber) {
+          handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
+        }
+
+        arcxAnalytics?.transaction({
+          transactionHash: result.hash,
+          account: address,
+          chainId,
+          metadata: {
+            action: TransactionType.UNWIND_OVL_POSITION,
+          },
+        });
+      } else {
+        console.error("No receipt received after successful wait");
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: false,
+              message: "Transaction status unknown. Please check your wallet.",
+              type: TransactionType.UNWIND_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+      }
+    } catch (error) {
+      console.error("Unwind operation failed:", error);
+
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+    } finally {
+      setAttemptingUnwind(false);
+      handleDismiss();
+    }
   };
 
   return (
