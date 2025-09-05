@@ -93,32 +93,33 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       if (!receipt) {
         try {
           const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(
-              () => reject(new Error("Transaction confirmation timeout")),
-              60_000
-            )
+            setTimeout(() => reject(new Error("TRANSACTION_TIMEOUT")), 60_000)
           );
 
           receipt = await Promise.race([
             publicClient.waitForTransactionReceipt({ hash: result.hash }),
             timeoutPromise,
           ]);
-        } catch (timeoutError) {
-          console.warn("Transaction confirmation timeout:", timeoutError);
+        } catch (waitError: any) {
+          if (waitError.message === "TRANSACTION_TIMEOUT") {
+            console.warn("Transaction confirmation timeout:", waitError);
 
-          addPopup(
-            {
-              txn: {
-                hash: result.hash,
-                success: true,
-                message:
-                  "Transaction is taking longer than expected. It may still confirm.",
-                type: TransactionType.BUILD_OVL_POSITION,
+            addPopup(
+              {
+                txn: {
+                  hash: result.hash,
+                  success: null,
+                  message:
+                    "Transaction is taking longer than expected. It may still confirm.",
+                  type: TransactionType.BUILD_OVL_POSITION,
+                },
               },
-            },
-            result.hash
-          );
-          return;
+              result.hash
+            );
+            return;
+          } else {
+            throw waitError;
+          }
         }
       }
 
@@ -245,32 +246,33 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       if (!receipt) {
         try {
           const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(
-              () => reject(new Error("Transaction confirmation timeout")),
-              60_000
-            )
+            setTimeout(() => reject(new Error("TRANSACTION_TIMEOUT")), 60_000)
           );
 
           receipt = await Promise.race([
             publicClient.waitForTransactionReceipt({ hash: result.hash }),
             timeoutPromise,
           ]);
-        } catch (timeoutError) {
-          console.warn("Transaction confirmation timeout:", timeoutError);
+        } catch (waitError: any) {
+          if (waitError.message === "TRANSACTION_TIMEOUT") {
+            console.warn("Transaction confirmation timeout:", waitError);
 
-          addPopup(
-            {
-              txn: {
-                hash: result.hash,
-                success: true,
-                message:
-                  "Transaction is taking longer than expected. It may still confirm.",
-                type: TransactionType.APPROVAL,
+            addPopup(
+              {
+                txn: {
+                  hash: result.hash,
+                  success: null,
+                  message:
+                    "Transaction is taking longer than expected. It may still confirm.",
+                  type: TransactionType.APPROVAL,
+                },
               },
-            },
-            result.hash
-          );
-          return;
+              result.hash
+            );
+            return;
+          } else {
+            throw waitError;
+          }
         }
       }
 
