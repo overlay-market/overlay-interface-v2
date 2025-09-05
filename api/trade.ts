@@ -8,6 +8,8 @@ interface MarketMeta {
   image: string;
 }
 
+const TWITTER_HANDLE = '@OverlayProtocol';
+
 const RAW_BASE =
   'https://raw.githubusercontent.com/overlay-market/overlay-interface-v2/main/src/assets/images/markets-full-logos';
 
@@ -63,7 +65,25 @@ export default function handler(
   const market = typeof query.market === 'string' ? (query.market as string) : undefined;
   const { title, description, image } = getMarketMeta(market);
 
-  const headTags = `\n    <meta property="og:title" content="${title}" />\n    <meta property="og:image" content="${image}" />\n    <meta name="description" content="${description}" />\n    <meta property="og:description" content="${description}" />\n  `;
+  const host = req.headers.host || '';
+  const protocol = host.startsWith('localhost') ? 'http' : 'https';
+  const url = `${protocol}://${host}/trade${
+    market ? `?market=${encodeURIComponent(market)}` : ''
+  }`;
+
+  const headTags = `
+    <meta name="description" content="${description}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="${TWITTER_HANDLE}" />
+    <meta name="twitter:title" content="${title}" />
+    <meta name="twitter:description" content="${description}" />
+    <meta name="twitter:image" content="${image}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="${title}" />
+    <meta property="og:description" content="${description}" />
+    <meta property="og:url" content="${url}" />
+    <meta property="og:image" content="${image}" />
+  `;
 
   const template = readTemplate();
   const html = template.replace('</head>', `${headTags}</head>`);
