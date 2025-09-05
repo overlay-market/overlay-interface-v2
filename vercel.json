@@ -1,8 +1,5 @@
 {
   "rewrites": [
     { "source": "/trade", "destination": "/api/trade" }
-  ],
-  "botProtection": {
-    "allowlist": ["Twitterbot"]
-  }
+  ]
 }
