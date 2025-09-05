@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { getMarketMeta } from './getMarketMeta';
+import { getMarketMeta } from '../src/utils/getMarketMeta.ts';
 import type { IncomingMessage, ServerResponse } from 'http';
 
 function readTemplate() {

@@ -1,4 +1,4 @@
-import { DEFAULT_LOGO, MARKETS_FULL_LOGOS } from "../src/constants/markets";
+import { DEFAULT_LOGO, MARKETS_FULL_LOGOS } from "../constants/markets";
 
 export interface MarketMeta {
   title: string;
