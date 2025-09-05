@@ -18,6 +18,7 @@ import { StyledFlex, TradeContainer } from "./trade-styles";
 import SuggestedCards from "./SuggestedCards";
 import { DEFAULT_MARKET } from "../../constants/applications";
 import useActiveMarkets from "../../hooks/useActiveMarkets";
+import { DEFAULT_LOGO, MARKETS_FULL_LOGOS } from "../../constants/markets";
 
 const Trade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,6 +70,47 @@ const Trade: React.FC = () => {
   useEffect(() => {
     handleTradeStateReset();
   }, [marketParam, chainId, handleTradeStateReset]);
+
+  useEffect(() => {
+    const marketId = currentMarket?.marketId;
+    const marketName = currentMarket?.marketName;
+    const imageSrc =
+      (marketId && MARKETS_FULL_LOGOS[marketId]) || DEFAULT_LOGO;
+
+    const title = marketName
+      ? `${marketName} | Overlay Markets`
+      : "Overlay Markets";
+    const description = marketName
+      ? `Trade ${marketName} on Overlay Markets`
+      : "Trade markets on Overlay Markets";
+
+    document.title = title;
+
+    const upsert = (
+      attr: "name" | "property",
+      key: string,
+      value: string
+    ) => {
+      let element = document.head.querySelector(
+        `meta[${attr}="${key}"]`
+      ) as HTMLMetaElement | null;
+      if (!element) {
+        element = document.createElement("meta");
+        element.setAttribute(attr, key);
+        document.head.appendChild(element);
+      }
+      element.setAttribute("content", value);
+    };
+
+    upsert("property", "og:type", "website");
+    upsert("property", "og:title", title);
+    upsert("property", "og:description", description);
+    upsert("property", "og:image", imageSrc);
+    upsert("name", "twitter:card", "summary_large_image");
+    upsert("name", "twitter:title", title);
+    upsert("name", "twitter:description", description);
+    upsert("name", "twitter:image", imageSrc);
+  }, [currentMarket]);
 
   return (
     <TradeContainer direction="column" width={"100%"} mb="100px">
