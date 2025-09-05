@@ -5,7 +5,7 @@ export type PopupContent =
   | {
     txn: {
       hash: string
-      success: boolean
+      success: boolean | null
       message: string
       type: TransactionType | number | string
     }
