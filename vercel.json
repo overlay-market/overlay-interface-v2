@@ -1,10 +1,7 @@
 {
   "functions": {
     "api/trade.ts": {
-      "includeFiles": [
-        "src/constants/markets.ts",
-        "src/assets/images/markets-full-logos/**"
-      ]
+      "includeFiles": "src/constants/markets.ts src/assets/images/markets-full-logos/**"
     }
   },
   "rewrites": [
