@@ -33,7 +33,7 @@ export default {
       timezone: 'Etc/UTC',
       exchange: 'Overlay',
       minmov: 1,
-      pricescale: 100,
+      pricescale: 10000000,
       has_intraday: false,
       visible_plots_set: 'ohlc',
       has_weekly_and_monthly: false,

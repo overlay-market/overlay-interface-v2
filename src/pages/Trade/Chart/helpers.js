@@ -13,6 +13,10 @@ export const isBartio = (chainId) => {
   return chainId === Number(SUPPORTED_CHAINID.BARTIO)
 }
 
+export const isBscTestnet = (chainId) => {
+  return chainId === Number(SUPPORTED_CHAINID.BSC_TESTNET)
+}
+
 export const getMarketChartUrl = (value) => {
   const chainId = typeof value === 'number' ? value : JSON.parse(value.ticker).chainId
 
@@ -22,6 +26,10 @@ export const getMarketChartUrl = (value) => {
     return MARKET_CHART_URL.IMOLA
   } else if (isBartio(chainId)) {
     return MARKET_CHART_URL.BARTIO
+  } else if (isBscTestnet(chainId)) {
+    return MARKET_CHART_URL.BSC_TESTNET
+  } else if (chainId === Number(SUPPORTED_CHAINID.BSC_MAINNET)) {
+    return MARKET_CHART_URL.BSC_MAINNET
   } else {
     return MARKET_CHART_URL.DEFAULT
   }

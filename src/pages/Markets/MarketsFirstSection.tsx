@@ -19,30 +19,42 @@ export const FirstSection = ({ marketsData }: FirstSectionProps) => {
         xs: "row",
       }}
     >
-      <Skeleton loading={marketsData.length < 14 + 1}>
+      <Skeleton loading={!marketsData.length}>
         <Box flexGrow="7" flexShrink="1" flexBasis="0%">
-          <PromotedBanner
-            Name={decodeURIComponent(marketsData[14]?.marketId ?? "")}
-            Value={formatPriceWithCurrency(
-              marketsData[14]?.price ?? 0,
-              marketsData[14]?.priceCurrency,
-              3
-            )}
-            Id={marketsData[14]?.marketId ?? ""}
-          />
+          {(() => {
+            const market = marketsData.find(
+              (m) => m.marketId === "Counter-Strike%202%20Skins"
+            );
+            return (
+              <PromotedBanner
+                Name={decodeURIComponent(market?.marketId ?? "")}
+                Value={formatPriceWithCurrency(
+                  market?.price ?? 0,
+                  market?.priceCurrency ?? ""
+                )}
+                Id={market?.marketId ?? ""}
+              />
+            );
+          })()}
         </Box>
       </Skeleton>
-      <Skeleton loading={marketsData.length < 5 + 1}>
+      <Skeleton loading={!marketsData.length}>
         <Box flexGrow="3" flexShrink="1" flexBasis="0%">
-          <PromotedBanner
-            Name={decodeURIComponent(marketsData[5]?.marketId ?? "")}
-            Value={formatPriceWithCurrency(
-              marketsData[5]?.price ?? 0,
-              marketsData[5]?.priceCurrency,
-              3
-            )}
-            Id={marketsData[5]?.marketId ?? ""}
-          />
+          {(() => {
+            const market = marketsData.find(
+              (m) => m.marketId === "BNB%20%2F%20USD"
+            );
+            return (
+              <PromotedBanner
+                Name={decodeURIComponent(market?.marketId ?? "")}
+                Value={formatPriceWithCurrency(
+                  market?.price ?? 0,
+                  market?.priceCurrency ?? ""
+                )}
+                Id={market?.marketId ?? ""}
+              />
+            );
+          })()}
         </Box>
       </Skeleton>
       {/* <Box flexGrow="3" flexShrink="1" flexBasis="0%">

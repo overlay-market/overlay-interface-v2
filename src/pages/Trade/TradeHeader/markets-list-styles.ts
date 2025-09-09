@@ -25,14 +25,14 @@ export const MarketsListContainer = styled(Flex)`
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 334px;
-    padding-left: 16px;
+    padding-left: 8px;
     padding-right: 16px;
     border-right: 1px solid ${theme.color.darkBlue};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
     width: 260px;
-    padding-left: 10px;
+    padding-left: 8px;
     padding-right: 10px;
   }
 
@@ -56,39 +56,46 @@ export const CurrentMarketLogo = styled.img`
 `;
 
 export const DropdownContainer = styled(Box)`
-  width: 280px;
+  width: 100%;
   height: 520px;
+  padding: 0 8px;
   position: absolute;
   top: ${theme.headerSize.height}
   left: 0;
   z-index: 10;
   background-color: ${theme.color.background};
   border-top: 1px solid ${theme.color.darkBlue};
+  border-right: 1px solid ${theme.color.darkBlue};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 334px;
     height: 614px;
+    padding: 0;
   }
   @media (min-width: ${theme.breakpoints.lg}) {
     width: 260px;
     height: 562px;
   }
   @media (min-width: ${theme.breakpoints.xxl}) {
-    width: 272px;
+    width: calc(272px + 16px);
     height: 645px;
+    left: 0;
   }
 `;
 
 export const StyledScrollArea = styled.div`
   height: 520px;
   overflow-y: auto;
-
+  position: relative;
+  padding-right: 8px;
+  margin-right: -8px;
+ 
   &::-webkit-scrollbar {
     width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: ${theme.color.background};
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
@@ -100,6 +107,8 @@ export const StyledScrollArea = styled.div`
   }
   @media (min-width: ${theme.breakpoints.sm}) {
     height: 614px;
+    padding-right: 0px;
+    margin-right: 0px;
   }
   @media (min-width: ${theme.breakpoints.lg}) {
     height: 562px;
@@ -108,3 +117,9 @@ export const StyledScrollArea = styled.div`
     height: 645px;
   }
 `;
+
+export const SearchEmptyMessage = styled.div`
+  width: 100%;
+  color: #777;
+  padding-left: 16px;
+`

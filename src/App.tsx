@@ -9,13 +9,17 @@ import Wallet from "./components/Wallet";
 import { useRef } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
 import Popups from "./components/Popups";
-import { DEFAULT_MARKET_ID } from "./constants/applications";
 import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
 import Referrals from "./pages/Referrals";
 import Trackers from "./components/Trackers";
+import Leaderboard from "./pages/Leaderboard";
+import Airdrops from "./pages/Airdrops";
+import ExchangeLiFi from "./pages/ExchangeLiFi";
+// import Faucet from "./pages/Faucet";
+// import Bridge from "./pages/Bridge";
 
 const App = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
@@ -37,13 +41,15 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<Navigate to="/markets" />} />
                 <Route path="/markets" element={<Markets />} />
-                <Route
-                  path="/trade"
-                  element={<Navigate to={`/trade/${DEFAULT_MARKET_ID}`} />}
-                />
-                <Route path="/trade/:marketId" element={<Trade />} />
+                <Route path="/trade" element={<Trade />} />
                 <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/referrals" element={<Referrals />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/airdrops" element={<Airdrops />} />
+                <Route path="/exchange/*" element={<ExchangeLiFi />} />
+                {/* <Route path="/faucet" element={<Faucet />} /> */}
+                {/* <Route path="/bridge" element={<Bridge />} /> */}
+                <Route path="*" element={<Navigate to="/markets" />} />
               </Routes>
             </Flex>
           </AppContainer>

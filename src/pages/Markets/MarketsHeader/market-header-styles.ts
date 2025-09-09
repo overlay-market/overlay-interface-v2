@@ -1,13 +1,17 @@
 import styled from "styled-components";
 import theme from "../../../theme";
-import { Flex } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
+
+interface SupplyChangeTextProps {
+  $changeColor: "green" | "red" | "default";
+}
 
 export const MarketHeaderContainer = styled(Flex)`
   height: 50px;
   width: 100%;
   justify-content: space-between;
 
-  @media (max-width: ${theme.breakpoints.sm}) {
+  @media (max-width: 767px) {
     display: none;
   }
 
@@ -35,4 +39,17 @@ export const StyledFlex = styled(Flex)`
 export const StyledText = styled.div`
   font-size: 10px;
   font-weight: 300;
+`;
+
+export const SupplyChangeText = styled(Text)<SupplyChangeTextProps>`
+  color: ${({ $changeColor }) => {
+    switch ($changeColor) {
+      case "green":
+        return theme.color.green1;
+      case "red":
+        return theme.color.red1;
+      default:
+        return "inherit";
+    }
+  }};
 `;

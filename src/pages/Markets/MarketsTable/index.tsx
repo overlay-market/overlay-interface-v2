@@ -2,7 +2,7 @@ import { Box, Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../../theme";
 import * as Select from "@radix-ui/react-select";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { TransformedMarketData } from "overlay-sdk";
 import ProgressBar from "../../../components/ProgressBar";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
@@ -10,23 +10,102 @@ import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
-import { MARKETS_FULL_LOGOS } from "../../../constants/markets";
 import { MarketsLogos } from "./markets-table-styles";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import * as React from "react";
+import { getMarketLogo } from "../../../utils/getMarketLogo";
+
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
+  otherChainMarketsData?: TransformedMarketData[];
 }
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
+
+type SortableKeys =
+  | "funding"
+  | "oneHourChange"
+  | "twentyFourHourChange"
+  | "sevenDayChange";
 
 export default function MarketsTable({
   marketsData,
+  otherChainMarketsData = [],
 }: MarketsTableProps): JSX.Element {
-  const marketIds = marketsData.map((market) => market.marketId);
+  const defaultMarketIds = new Set(marketsData.map((m) => m.marketId));
+  const uniqueOtherChainMarkets = otherChainMarketsData.filter(
+    (market) => !defaultMarketIds.has(market.marketId)
+  );
+  const allMarketsData = [...marketsData, ...uniqueOtherChainMarkets];
+
+  const marketIds = allMarketsData.map((market) => market.marketId);
   const markets7d = useMarkets7d(marketIds);
   const redirectToTradePage = useRedirectToTradePage();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortableKeys;
+    direction: "ascending" | "descending";
+  } | null>(null);
 
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useMediaQuery("(max-width: 767px)");
+
+  const sortedData = React.useMemo(() => {
+    const sortableItems = [...marketsData];
+    if (sortConfig?.key) {
+      sortableItems.sort((a, b) => {
+        let aValue = 0,
+          bValue = 0;
+        const aMarket7d = markets7d.find((m) => m.marketId === a.marketId);
+        const bMarket7d = markets7d.find((m) => m.marketId === b.marketId);
+
+        switch (sortConfig.key) {
+          case "funding":
+            aValue = parseFloat(String(a.funding ?? "0"));
+            bValue = parseFloat(String(b.funding ?? "0"));
+            break;
+          case "oneHourChange":
+            aValue = parseFloat(aMarket7d?.oneHourChange?.toString() ?? "0");
+            bValue = parseFloat(bMarket7d?.oneHourChange?.toString() ?? "0");
+            break;
+          case "twentyFourHourChange":
+            aValue = parseFloat(
+              aMarket7d?.twentyFourHourChange?.toString() ?? "0"
+            );
+            bValue = parseFloat(
+              bMarket7d?.twentyFourHourChange?.toString() ?? "0"
+            );
+            break;
+          case "sevenDayChange":
+            aValue = parseFloat(aMarket7d?.sevenDayChange?.toString() ?? "0");
+            bValue = parseFloat(bMarket7d?.sevenDayChange?.toString() ?? "0");
+            break;
+        }
+
+        return aValue < bValue
+          ? sortConfig.direction === "ascending"
+            ? 1
+            : -1
+          : aValue > bValue
+          ? sortConfig.direction === "ascending"
+            ? -1
+            : 1
+          : 0;
+      });
+    }
+    return [...sortableItems, ...uniqueOtherChainMarkets];
+  }, [allMarketsData, markets7d, sortConfig]);
+
+  const requestSort = (key: SortableKeys) => {
+    let direction: "ascending" | "descending";
+
+    if (sortConfig?.key === key) {
+      direction =
+        sortConfig.direction === "ascending" ? "descending" : "ascending";
+    } else {
+      direction = "ascending";
+    }
+
+    setSortConfig({ key, direction });
+  };
 
   return (
     <Theme>
@@ -136,11 +215,118 @@ export default function MarketsTable({
               </Flex>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
-            {!isMobile && <Table.ColumnHeaderCell>1h</Table.ColumnHeaderCell>}
-            {!isMobile && <Table.ColumnHeaderCell>24h</Table.ColumnHeaderCell>}
-            {!isMobile && <Table.ColumnHeaderCell>7d</Table.ColumnHeaderCell>}
             {!isMobile && (
-              <Table.ColumnHeaderCell>Funding</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("oneHourChange")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>1h</span>
+                  {sortConfig?.key === "oneHourChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("twentyFourHourChange")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>24h</span>
+                  {sortConfig?.key === "twentyFourHourChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("sevenDayChange")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>7d</span>
+                  {sortConfig?.key === "sevenDayChange" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
+            )}
+            {!isMobile && (
+              <Table.ColumnHeaderCell
+                onClick={() => requestSort("funding")}
+                style={{
+                  cursor: "pointer",
+                  minWidth: "100px",
+                  width: "100px",
+                }}
+              >
+                <Flex
+                  align="center"
+                  justify="start"
+                  gap="1"
+                  style={{ width: "100%" }}
+                >
+                  <span>Funding</span>
+                  <span>24h</span>
+                  {sortConfig?.key === "funding" && (
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      {sortConfig.direction === "ascending" ? (
+                        <ChevronUpIcon />
+                      ) : (
+                        <ChevronDownIcon />
+                      )}
+                    </span>
+                  )}
+                </Flex>
+              </Table.ColumnHeaderCell>
             )}
             {!isMobile && (
               <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
@@ -154,12 +340,13 @@ export default function MarketsTable({
           </Table.Row>
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
-          {marketsData.length > 0 ? (
-            marketsData.map((market, index) => {
-              if (index === 0 || index === 5) return null;
+          {sortedData.length > 0 ? (
+            sortedData.map((market, index) => {
               const market7d = markets7d.find(
                 (m) => m.marketId === market.marketId
               );
+
+              const isComingSoon = !defaultMarketIds.has(market.marketId);
 
               const lineColor =
                 market7d &&
@@ -177,20 +364,62 @@ export default function MarketsTable({
                   key={index}
                   style={{
                     borderBottom: `1px solid ${theme.color.darkBlue}`,
-                    cursor: "pointer",
+                    cursor: isComingSoon ? "default" : "pointer",
+                    opacity: isComingSoon ? 0.8 : 1,
                   }}
-                  onClick={() => redirectToTradePage(market.marketId)}
+                  onClick={() =>
+                    !isComingSoon && redirectToTradePage(market.marketId)
+                  }
                 >
                   <Table.Cell
                     style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                   >
-                    <Flex>
-                      <MarketsLogos
-                        src={MARKETS_FULL_LOGOS[market.marketId]}
-                        alt={decodeURIComponent(market.marketId)}
-                        className="rounded-full"
-                      />
-                      <span style={{ alignSelf: "center", marginLeft: 20 }}>
+                    <Flex style={{ alignItems: "center" }}>
+                      <div
+                        style={{
+                          position: "relative",
+                          display: "inline-block",
+                        }}
+                      >
+                        <MarketsLogos
+                          src={getMarketLogo(market.marketId)}
+                          alt={decodeURIComponent(market.marketId)}
+                          className="rounded-full"
+                          style={{
+                            filter: isComingSoon
+                              ? "grayscale(100%) brightness(0.6)"
+                              : "none",
+                          }}
+                        />
+                        {isComingSoon && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "white",
+                              fontSize: "8px",
+                              fontWeight: "bold",
+                              textAlign: "center",
+                              borderRadius: "50%",
+                            }}
+                          >
+                            SOON
+                          </div>
+                        )}
+                      </div>
+                      <span
+                        style={{
+                          alignSelf: "center",
+                          marginLeft: 20,
+                          color: isComingSoon ? "#8B8B8B" : "inherit",
+                        }}
+                      >
                         {isMobile &&
                         decodeURIComponent(market.marketId).length > 28
                           ? `${decodeURIComponent(market.marketId).slice(
@@ -201,21 +430,23 @@ export default function MarketsTable({
                       </span>
                     </Flex>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell
+                    style={{ color: isComingSoon ? "#8B8B8B" : "inherit" }}
+                  >
                     {formatPriceWithCurrency(
                       market.price ?? 0,
-                      market.priceCurrency,
-                      isMobile ? 3 : 4
+                      market.priceCurrency
                     )}
                   </Table.Cell>
                   {!isMobile && (
                     <>
                       <Table.Cell
                         style={{
-                          color:
-                            (market7d?.oneHourChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
+                          color: isComingSoon
+                            ? "#8B8B8B"
+                            : (market7d?.oneHourChange ?? 0) >= 0
+                            ? theme.color.green2
+                            : theme.color.red2,
                         }}
                       >
                         <Skeleton loading={!market7d}>
@@ -224,10 +455,24 @@ export default function MarketsTable({
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color:
-                            (market7d?.sevenDayChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
+                          color: isComingSoon
+                            ? "#8B8B8B"
+                            : (market7d?.twentyFourHourChange ?? 0) >= 0
+                            ? theme.color.green2
+                            : theme.color.red2,
+                        }}
+                      >
+                        <Skeleton loading={!market7d}>
+                          {market7d?.twentyFourHourChange?.toFixed(2)}%
+                        </Skeleton>
+                      </Table.Cell>
+                      <Table.Cell
+                        style={{
+                          color: isComingSoon
+                            ? "#8B8B8B"
+                            : (market7d?.sevenDayChange ?? 0) >= 0
+                            ? theme.color.green2
+                            : theme.color.red2,
                         }}
                       >
                         <Skeleton loading={!market7d}>
@@ -236,47 +481,62 @@ export default function MarketsTable({
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color:
-                            (market7d?.twentyFourHourChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
+                          color: isComingSoon ? "#8B8B8B" : theme.color.green2,
                         }}
                       >
-                        <Skeleton loading={!market7d}>
-                          {market7d?.twentyFourHourChange?.toFixed(2)}%
-                        </Skeleton>
-                      </Table.Cell>
-                      <Table.Cell style={{ color: theme.color.green2 }}>
                         <span
                           style={{
-                            color:
-                              market.funding && Number(market.funding) < 0
-                                ? theme.color.red2
-                                : theme.color.green2,
+                            color: isComingSoon
+                              ? "#8B8B8B"
+                              : market.funding && Number(market.funding) < 0
+                              ? theme.color.red2
+                              : theme.color.green2,
                           }}
                         >
                           {market.funding && Number(market.funding) < 0
                             ? market.funding
                             : `+${market.funding}`}
+                          %
                         </span>
                       </Table.Cell>
                       <Table.Cell>
-                        <Flex align="center" gap="2">
-                          <Text size="2" style={{ color: theme.color.red2 }}>
-                            {Math.round(
-                              Number(market.shortPercentageOfTotalOi)
-                            )}
-                            %
+                        {isComingSoon ? (
+                          <Text
+                            size="4"
+                            style={{
+                              background:
+                                "linear-gradient(90deg, #A8A6A6 0%, #ff7cd5 100%)",
+                              backgroundClip: "text",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            Coming Soon
                           </Text>
-                          <ProgressBar
-                            max={100}
-                            value={Number(market.shortPercentageOfTotalOi)}
-                          />
-                          <Text size="2" style={{ color: theme.color.green2 }}>
-                            {Math.round(Number(market.longPercentageOfTotalOi))}
-                            %
-                          </Text>
-                        </Flex>
+                        ) : (
+                          <Flex align="center" gap="2">
+                            <Text size="2" style={{ color: theme.color.red2 }}>
+                              {Math.round(
+                                Number(market.shortPercentageOfTotalOi)
+                              )}
+                              %
+                            </Text>
+                            <ProgressBar
+                              max={100}
+                              value={Number(market.shortPercentageOfTotalOi)}
+                            />
+                            <Text
+                              size="2"
+                              style={{ color: theme.color.green2 }}
+                            >
+                              {Math.round(
+                                Number(market.longPercentageOfTotalOi)
+                              )}
+                              %
+                            </Text>
+                          </Flex>
+                        )}
                       </Table.Cell>
                       <Table.Cell style={{ textAlign: "center" }}>
                         <img
@@ -308,7 +568,7 @@ export default function MarketsTable({
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke={lineColor}
+                          stroke={isComingSoon ? "#8B8B8B" : lineColor}
                           strokeWidth={2}
                           dot={false}
                         />

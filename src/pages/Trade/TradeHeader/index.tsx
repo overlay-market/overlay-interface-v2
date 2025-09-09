@@ -8,24 +8,25 @@ import {
   StyledFlex,
   TradeHeaderContainer,
 } from "./trade-header-styles";
-import { useParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useTradeState } from "../../../state/trade/hooks";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals, toWei } from "overlay-sdk";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
-import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
 const TradeHeader: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
+
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
 
-  const [price, setPrice] = useState<string>("");
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
   const [funding, setFunding] = useState<string | undefined>(undefined);
   const [shortPercentageOfTotalOi, setShortPercentageOfTotalOi] =
@@ -33,76 +34,70 @@ const TradeHeader: React.FC = () => {
   const [longPercentageOfTotalOi, setLongPercentageOfTotalOi] =
     useState<string>("0");
 
+  const sdkRef = useRef(sdk);
   useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
+  useEffect(() => {
+    if (!marketId) return;
+
     const fetchPrice = async () => {
-      if (marketId) {
-        try {
-          const price = await sdk.trade.getPrice(
-            marketId,
-            typedValue ? toWei(typedValue) : undefined,
-            toWei(selectedLeverage),
-            isLong,
-            8
-          );
-          price && setPrice(limitDigitsInDecimals(price as string));
-        } catch (error) {
-          console.error("Error fetching price:", error);
+      try {
+        const price = await sdkRef.current.trade.getPrice(
+          marketId,
+          typedValue ? toWei(typedValue) : undefined,
+          toWei(selectedLeverage),
+          isLong,
+          8
+        );
+
+        if (price) {
+          const limited = limitDigitsInDecimals(price as string);
+
+          if (market) {
+            setCurrencyPrice(
+              formatPriceWithCurrency(limited, market.priceCurrency)
+            );
+          }
         }
+      } catch (error) {
+        console.error("Error fetching price:", error);
       }
     };
 
     fetchPrice();
     const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, typedValue, selectedLeverage, isLong, chainId, sdk]);
+  }, [marketId, typedValue, selectedLeverage, isLong, chainId, market]);
 
   useEffect(() => {
-    market &&
-      price &&
-      setCurrencyPrice(
-        `${market.priceCurrency}${formatPriceByCurrency(
-          price,
-          market.priceCurrency
-        )}`
-      );
-  }, [price, market]);
+    if (!marketId) return;
 
-  useEffect(() => {
-    const fetchFunding = async () => {
-      if (marketId) {
-        try {
-          const funding = await sdk.trade.getFunding(marketId);
-          funding && setFunding(funding);
-        } catch (error) {
-          console.error("Error fetching funding:", error);
+    const fetchStaticMarketData = async () => {
+      try {
+        const [funding, oiBalance] = await Promise.all([
+          sdkRef.current.trade.getFunding(marketId),
+          sdkRef.current.trade.getOIBalance(marketId),
+        ]);
+
+        if (funding) setFunding(funding);
+        if (oiBalance) {
+          setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
+          setLongPercentageOfTotalOi(oiBalance.longPercentageOfTotalOi);
         }
+      } catch (error) {
+        console.error("Error fetching static market data:", error);
       }
     };
 
-    fetchFunding();
-    const intervalId = setInterval(fetchFunding, TRADE_POLLING_INTERVAL);
+    fetchStaticMarketData();
+    const intervalId = setInterval(
+      fetchStaticMarketData,
+      TRADE_POLLING_INTERVAL
+    );
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
-
-  useEffect(() => {
-    const fetchOiBalance = async () => {
-      if (marketId) {
-        try {
-          const oiBalance = await sdk.trade.getOIBalance(marketId);
-          oiBalance &&
-            setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
-          oiBalance &&
-            setLongPercentageOfTotalOi(oiBalance.longPercentageOfTotalOi);
-        } catch (error) {
-          console.error("Error fetching oi balance:", error);
-        }
-      }
-    };
-
-    fetchOiBalance();
-    const intervalId = setInterval(fetchOiBalance, TRADE_POLLING_INTERVAL);
-    return () => clearInterval(intervalId);
-  }, [marketId, chainId, sdk]);
+  }, [marketId, chainId]);
 
   const isFundingRatePositive = useMemo(() => {
     return Math.sign(Number(funding)) > 0;
@@ -113,7 +108,7 @@ const TradeHeader: React.FC = () => {
       <MarketsList />
 
       <MarketInfoContainer>
-        <StyledFlex width={{ initial: "109px", sm: "167px", lg: "119px" }}>
+        <StyledFlex width={{ initial: "149px", sm: "167px", lg: "149px" }}>
           <Text weight="light" style={{ fontSize: "10px" }}>
             Price
           </Text>
@@ -127,8 +122,8 @@ const TradeHeader: React.FC = () => {
           <Text
             style={{
               color: isFundingRatePositive
-                ? theme.color.red2
-                : theme.color.green2,
+                ? theme.color.green2
+                : theme.color.red2,
             }}
           >
             {isFundingRatePositive ? `+` : ``}

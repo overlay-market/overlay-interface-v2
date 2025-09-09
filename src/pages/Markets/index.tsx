@@ -8,24 +8,44 @@ import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { OverlaySDK } from "overlay-sdk";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
+  const [otherChainMarketsData, setOtherChainMarketsData] = useState<
+    TransformedMarketData[]
+  >([]); // new state
   const [totalSupplyChange, setTotalSupplyChange] = useState<
     string | undefined
   >();
+  const [currentPrice, setCurrentPrice] = useState<number | undefined>();
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const activeMarkets = await sdk.markets.transformMarketsData();
-        const supplyChange = await sdk.ov.totalSupplyDayChange();
-
-        supplyChange &&
-          setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%", 4));
-        activeMarkets && setMarketsData(activeMarkets);
+        sdk.markets.transformMarketsData().then((activeMarkets) => {
+          activeMarkets && setMarketsData(activeMarkets);
+        });
+        sdk.ovl.totalSupplyDayChange().then((supplyChange) => {
+          supplyChange &&
+            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%"));
+        });
+        sdk.ovl.price().then((price) => {
+          price && setCurrentPrice(price);
+        });
+        // Fetch from BSC_TESTNET only (chainId 97)
+        const sdkForBscTestnet = new OverlaySDK({
+          chainId: 97,
+          rpcUrls: {
+            97: import.meta.env.VITE_BSC_TESTNET_RPC,
+          },
+          useShiva: true,
+        });
+        const bscTestnetMarkets =
+          await sdkForBscTestnet.markets.transformMarketsData();
+        setOtherChainMarketsData(bscTestnetMarkets);
       } catch (error) {
         console.error("Error fetching markets:", error);
       }
@@ -34,16 +54,24 @@ const Markets: React.FC = () => {
     fetchData();
 
     // const intervalId = setInterval(fetchData, 60000); // 5 minutes
-
     // return () => clearInterval(intervalId);
   }, [chainId]);
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
-      <MarketsHeader ovSupplyChange={totalSupplyChange} />
+      <MarketsHeader
+        ovlSupplyChange={totalSupplyChange}
+        ovlCurrentPrice={currentPrice}
+      />
       <FirstSection marketsData={marketsData} />
-      <Carousel marketsData={marketsData} />
-      <MarketsTable marketsData={marketsData} />
+      <Carousel
+        marketsData={marketsData}
+        otherChainMarketsData={otherChainMarketsData}
+      />
+      <MarketsTable
+        marketsData={marketsData}
+        otherChainMarketsData={otherChainMarketsData}
+      />
     </Flex>
   );
 };

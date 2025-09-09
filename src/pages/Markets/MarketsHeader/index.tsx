@@ -3,17 +3,35 @@ import {
   MarketHeaderContainer,
   StyledFlex,
   StyledText,
+  SupplyChangeText,
 } from "./market-header-styles";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
-import { SUPPORTED_CHAINID } from "../../../constants/chains";
 
 const MarketsHeader = ({
-  ovSupplyChange,
+  ovlSupplyChange,
+  ovlCurrentPrice,
 }: {
-  ovSupplyChange: string | undefined;
+  ovlSupplyChange: string | undefined;
+  ovlCurrentPrice: number | undefined;
 }) => {
-  const { chainId } = useMultichainContext();
-  const tokenTicker = SUPPORTED_CHAINID.MAINNET === chainId ? "OV" : "OVL";
+  const tokenTicker = "OVL";
+
+  const getSupplyChangeColor = (change: string | undefined) => {
+    if (!change) return "default";
+    const numericChange = parseFloat(change);
+    if (numericChange > 0) return "green";
+    if (numericChange < 0) return "red";
+    return "default";
+  };
+
+  const formatSupplyChange = (change: string | undefined) => {
+    if (!change) return "0%";
+    const numericChange = parseFloat(change);
+    if (numericChange === 0) return "0%";
+    const prefix = numericChange > 0 ? "+" : "";
+    const value = change.endsWith("%") ? change : `${change}%`;
+    return `${prefix}${value}`;
+  };
+
   return (
     <MarketHeaderContainer>
       <Flex direction="row" align={"center"} width={"100%"} height={"100%"}>
@@ -24,7 +42,7 @@ const MarketsHeader = ({
           ml={"5"}
         >
           <StyledText>{tokenTicker} PRICE</StyledText>
-          <Text>$~~</Text>
+          <Text>${ovlCurrentPrice}</Text>
         </StyledFlex>
 
         <StyledFlex
@@ -36,7 +54,11 @@ const MarketsHeader = ({
         >
           <StyledText>{tokenTicker} SUPPLY</StyledText>
           <div>
-            <Text>{ovSupplyChange}</Text>
+            <SupplyChangeText
+              $changeColor={getSupplyChangeColor(ovlSupplyChange)}
+            >
+              {formatSupplyChange(ovlSupplyChange)}
+            </SupplyChangeText>
             <Text> 24h</Text>
           </div>
         </StyledFlex>

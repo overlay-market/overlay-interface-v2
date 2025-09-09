@@ -14,7 +14,7 @@ export const AppContainer = styled(Flex)`
   }
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: calc(100vw - 16px);
+    width: calc(100vw - 20px);
     padding-right: 20px;
     padding-left: 0px;
   }

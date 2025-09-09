@@ -1,10 +1,10 @@
 import { Flex } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import Loader from "../../components/Loader";
@@ -12,45 +12,46 @@ import {
   useCurrentMarketActionHandlers,
   useCurrentMarketState,
 } from "../../state/currentMarket/hooks";
-import { useMarketsActionHandlers } from "../../state/markets/hooks";
 import PositionsTable from "./PositionsTable";
 import InfoMarketSection from "./InfoMarketSection";
-import { ExpandedMarketData } from "overlay-sdk";
 import { StyledFlex, TradeContainer } from "./trade-styles";
+import SuggestedCards from "./SuggestedCards";
+import { DEFAULT_MARKET } from "../../constants/applications";
+import useActiveMarkets from "../../hooks/useActiveMarkets";
 
 const Trade: React.FC = () => {
-  const { marketId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const marketParam = searchParams.get("market");
+
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
-  const navigate = useNavigate();
+
   const { currentMarket } = useCurrentMarketState();
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
-  const { handleMarketsUpdate } = useMarketsActionHandlers();
+  const { data: markets } = useActiveMarkets();
 
-  const [markets, setMarkets] = useState<ExpandedMarketData[] | undefined>(
-    undefined
-  );
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
 
   useEffect(() => {
-    const fetchActiveMarkets = async () => {
-      if (marketId) {
-        try {
-          const activeMarkets = await sdk.markets.getActiveMarkets();
-          activeMarkets && setMarkets(activeMarkets);
-        } catch (error) {
-          console.error("Error fetching markets:", error);
-        }
-      }
-    };
-
-    fetchActiveMarkets();
-  }, [chainId]);
+    if (!marketParam) {
+      setSearchParams({ market: DEFAULT_MARKET }, { replace: true });
+    }
+  }, [marketParam]);
 
   useEffect(() => {
-    if (markets) {
+    if (!markets || !marketParam) return;
+
+    if (markets && marketParam) {
+      const normalizedMarketParam =
+        decodeURIComponent(marketParam).toLowerCase();
+
       const currentMarket = markets.find(
-        (market) => market.marketName === marketId
+        (market) => market.marketName.toLowerCase() === normalizedMarketParam
       );
 
       if (currentMarket) {
@@ -58,20 +59,16 @@ const Trade: React.FC = () => {
       } else {
         const activeMarket = markets[0];
         handleCurrentMarketSet(activeMarket);
-        navigate(`/trade/${activeMarket.marketId}`);
+
+        const encodedMarket = encodeURIComponent(activeMarket.marketName);
+        navigate(`/trade?market=${encodedMarket}`, { replace: true });
       }
     }
-  }, [marketId, chainId, markets]);
-
-  useEffect(() => {
-    if (markets) {
-      handleMarketsUpdate(markets);
-    }
-  }, [chainId, markets]);
+  }, [marketParam, markets]);
 
   useEffect(() => {
     handleTradeStateReset();
-  }, [marketId, chainId, handleTradeStateReset]);
+  }, [marketParam, chainId, handleTradeStateReset]);
 
   return (
     <TradeContainer direction="column" width={"100%"} mb="100px">
@@ -103,6 +100,7 @@ const Trade: React.FC = () => {
         </StyledFlex>
         <PositionsTable />
         <InfoMarketSection />
+        <SuggestedCards />
       </Flex>
     </TradeContainer>
   );

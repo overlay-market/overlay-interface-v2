@@ -19,6 +19,42 @@ export const InfoIcon: FC = () => (
   </svg>
 );
 
+export const ClockIcon: FC = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g clipPath="url(#clip0_2105_6488)">
+      <path
+        d="M7.99867 14.6668C4.31677 14.6668 1.33203 11.682 1.33203 8.00016C1.33203 4.31826 4.3168 1.3335 7.99867 1.3335C10.9838 1.3335 13.4825 3.29542 14.332 6.00016H12.6653"
+        stroke="white"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 5.3335V8.00016L9.33333 9.3335"
+        stroke="white"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14.6367 8.66667C14.6565 8.44727 14.6667 8.22487 14.6667 8M10 14.6667C10.2277 14.5917 10.4502 14.5043 10.6667 14.4052M13.8604 11.3333C13.989 11.0856 14.1037 10.8289 14.2033 10.5641M12.1283 13.4861C12.3579 13.2961 12.5754 13.0905 12.7792 12.871"
+        stroke="white"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="clip0_2105_6488">
+        <rect width="16" height="16" fill="white" />
+      </clipPath>
+    </defs>
+  </svg>
+);
+
 export const CopyGradientIcon: FC = () => (
   <svg
     width="15"
@@ -44,6 +80,66 @@ export const CopyGradientIcon: FC = () => (
       >
         <stop stopColor="#FFC955" />
         <stop offset="1" stopColor="#FF7CD5" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+export const GradientOpenInNewIcon: FC = () => (
+  <svg
+    width="15"
+    height="16"
+    viewBox="0 0 15 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M3 2.5C2.44772 2.5 2 2.94772 2 3.5V12.5C2 13.0523 2.44772 13.5 3 13.5H12C12.5523 13.5 13 13.0523 13 12.5V9C13 8.72386 12.7761 8.5 12.5 8.5C12.2239 8.5 12 8.72386 12 9V12.5H3V3.5L6.5 3.5C6.77614 3.5 7 3.27614 7 3C7 2.72386 6.77614 2.5 6.5 2.5H3ZM12.8536 2.64645C12.9015 2.69439 12.9377 2.74964 12.9621 2.80861C12.9861 2.86669 12.9996 2.9303 13 2.997L13 3V3.00049V6C13 6.27614 12.7761 6.5 12.5 6.5C12.2239 6.5 12 6.27614 12 6V4.20711L6.85355 9.35355C6.65829 9.54882 6.34171 9.54882 6.14645 9.35355C5.95118 9.15829 5.95118 8.84171 6.14645 8.64645L11.2929 3.5H9.5C9.22386 3.5 9 3.27614 9 3C9 2.72386 9.22386 2.5 9.5 2.5H12.4999H12.5C12.5678 2.5 12.6324 2.51349 12.6914 2.53794C12.7504 2.56234 12.8056 2.59851 12.8536 2.64645Z"
+      fill="url(#paint0_linear_2721_4450)"
+    />
+    <defs>
+      <linearGradient
+        id="paint0_linear_2721_4450"
+        x1="2"
+        y1="8"
+        x2="13"
+        y2="8"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stop-color="#FFC955" />
+        <stop offset="1" stop-color="#FF7CD5" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+export const GradientRightArrowIcon: FC = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 15 15"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
+      fill="url(#paint0_linear_2721_4450)"
+    />
+    <defs>
+      <linearGradient
+        id="paint0_linear_2721_4450"
+        x1="2"
+        y1="8"
+        x2="13"
+        y2="8"
+        gradientUnits="userSpaceOnUse"
+      >
+        <stop stop-color="#FFC955" />
+        <stop offset="1" stop-color="#FF7CD5" />
       </linearGradient>
     </defs>
   </svg>
