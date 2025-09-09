@@ -83,8 +83,8 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
     {
       to: "/referrals",
       label: "Referrals",
-      icon: <RocketIcon />, // TODO change icon
-      activeIcon: <RocketActiveIcon />, // TODO change icon
+      icon: RocketIcon,
+      activeIcon: RocketActiveIcon,
       showOnMobile: true,
     },
     // {
