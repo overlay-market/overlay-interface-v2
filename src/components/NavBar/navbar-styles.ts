@@ -11,7 +11,7 @@ export const LinksWrapper = styled(Flex)`
   }
 `;
 
-export const MobileNavBar = styled(Box)`
+export const MobileNavBarContainer = styled(Box)`
   display: flex;
   justify-content: center;
   width: 100%;
