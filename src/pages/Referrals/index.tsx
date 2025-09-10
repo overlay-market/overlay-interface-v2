@@ -1,242 +1,84 @@
-import { useEffect, useState } from "react";
-import {
-  GradientLoaderButton,
-  GradientSolidButton,
-} from "../../components/Button";
-import { useAccount, useSignTypedData } from "wagmi";
+import { useEffect, useMemo, useState } from "react";
+import { useAccount } from "wagmi";
 import { shortenAddress } from "../../utils/web3";
 import { isAddress } from "viem";
 import { useSearchParams } from "react-router-dom";
-import { useModalHelper } from "../../components/ConnectWalletModal/utils";
 import { Flex, Text } from "@radix-ui/themes";
 import {
   ContentContainer,
   GradientBorderBox,
-  GradientText,
   LineSeparator,
-  StyledInput,
 } from "./referrals-styles";
 import theme from "../../theme";
 import Loader from "../../components/Loader";
 import AliasSubmit from "./AliasSubmit";
-import { REFERRAL_API_BASE_URL } from "../../constants/applications";
+import { useAffiliateAlias } from "../../hooks/referrals/useAffiliateAlias";
+import { useTraderStatus } from "../../hooks/referrals/useTraderStatus";
+import { useAffiliateAddress } from "../../hooks/referrals/useAffiliateAddress";
+import { usePostSignature } from "../../hooks/referrals/usePostSignature";
+import { Success } from "./Success";
+import { SignedUp } from "./SignedUp";
+import { Form } from "./Form";
+import { useSignature } from "../../hooks/referrals/useSignature";
 
 const Referrals: React.FC = () => {
   const [searchParams] = useSearchParams();
   const referralAddressFromURL = searchParams.get("referrer");
-  const { openModal } = useModalHelper();
 
   const { address: traderAddress, status } = useAccount();
-  const { signTypedDataAsync } = useSignTypedData();
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [checkingTraderStatus, setCheckingTraderStatus] = useState(false);
-  const [checkingAffiliateStatus, setCheckingAffiliateStatus] = useState(false);
-  const [fetchingSignature, setFetchingSignature] = useState(false);
-  const [affiliate, setAffiliate] = useState("");
-  const [traderSignedUpTo, setTraderSignedUpTo] = useState("");
+
+  const [affiliate, setAffiliate] = useState(referralAddressFromURL || "");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [succeededToSignUp, setSucceededToSignUp] = useState(false);
-  const [isAffiliate, setIsAffiliate] = useState(false);
-  const [alias, setAlias] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (referralAddressFromURL) {
-      setAffiliate(referralAddressFromURL);
-    }
-  }, [referralAddressFromURL]);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     setErrorMessage(null);
-    setTraderSignedUpTo("");
   }, [affiliate, traderAddress]);
 
-  // Check affiliate status
-  const checkAffiliateStatus = async (address: string) => {
-    setCheckingAffiliateStatus(true);
-    let affiliateStatus = false;
-    try {
-      const { isValid, alias } = await getAffiliateAlias(address);
-      setIsAffiliate(isValid);
-      setAlias(alias);
-      affiliateStatus = isValid;
-    } catch (error) {
-      console.error("Error checking affiliate status:", error);
-    } finally {
-      setCheckingAffiliateStatus(false);
-    }
-    return affiliateStatus;
-  };
-
-  // Check trader status
-  const checkTraderStatus = async (address: string) => {
-    setCheckingTraderStatus(true);
-    try {
-      const response = await fetch(
-        REFERRAL_API_BASE_URL + `/signatures/check/${address.toLowerCase()}`
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch trader status: ${response.statusText}`
-        );
-      }
-      const { affiliate }: { exists: boolean; affiliate: string } =
-        await response.json();
-
-      const { alias } = await getAffiliateAlias(affiliate);
-      if (alias) {
-        setTraderSignedUpTo(alias);
-      } else {
-        setTraderSignedUpTo(shortenAddress(affiliate, 7));
-      }
-    } catch (error) {
-      console.error("Error checking trader status:", error);
-    } finally {
-      setCheckingTraderStatus(false);
-    }
-  };
-
+  // Detect when wallet connection status is resolved
   useEffect(() => {
-    const checkStatus = async () => {
-      if (traderAddress) {
-        const affiliateStatus = await checkAffiliateStatus(traderAddress);
-        if (!affiliateStatus) {
-          await checkTraderStatus(traderAddress);
-        }
-      } else {
-        setTraderSignedUpTo("");
-        setSucceededToSignUp(false);
-        setIsAffiliate(false);
-        setAlias(null);
-      }
-      setInitialLoading(false);
-    };
-
-    checkStatus();
-  }, [traderAddress]);
-
-  const getAffiliateAddress = async (alias: string) => {
-    try {
-      const response = await fetch(
-        REFERRAL_API_BASE_URL + `/affiliates/aliases/${alias.toLowerCase()}`
-      );
-
-      if (response.status === 404) {
-        return null;
-      }
-      if (response.status === 200 && alias !== "") {
-        const result = await response.json();
-        return result.address;
-      }
-    } catch (error) {
-      console.error("Error getting affiliate", error);
+    if (status === "connected" || status === "disconnected") {
+      setIsInitialLoading(false);
     }
-  };
 
-  const getAffiliateAlias = async (address: string) => {
-    try {
-      const response = await fetch(
-        REFERRAL_API_BASE_URL + `/affiliates/${address.toLowerCase()}`
-      );
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch affiliate status: ${response.statusText}`
+    // Fallback timeout to prevent infinite loader
+    const timeout = setTimeout(() => {
+      if (isInitialLoading) {
+        console.warn(
+          "Wallet status did not resolve, forcing isInitialLoading to false"
         );
+        setIsInitialLoading(false);
       }
-      const { isValid, alias }: { isValid: boolean; alias: string | null } =
-        await response.json();
-      return { isValid, alias };
-    } catch (error) {
-      console.error("Error getting affiliate status", error);
-      return { isValid: false, alias: null };
-    }
-  };
+    }, 2000);
 
-  const postSignature = async (signature: string, affiliate: string) => {
-    if (!traderAddress) {
-      console.error("Trader address is missing");
-    }
+    return () => clearTimeout(timeout);
+  }, [status, isInitialLoading]);
 
-    setLoading(true);
-    try {
-      const response = await fetch(REFERRAL_API_BASE_URL + `/signatures`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          trader: traderAddress?.toLowerCase(),
-          affiliate: affiliate.toLowerCase(),
-          signature,
-        }),
-      });
+  const { data: affiliateAliasData, isLoading: loadingAffiliate } =
+    useAffiliateAlias(traderAddress);
 
-      if (!response.ok) {
-        const result = await response.json();
-        setErrorMessage(
-          `Failed to post signature: ${
-            result?.message ?? "Unable to get error message"
-          }`
-        );
-        throw new Error(`Failed to post signature: ${JSON.stringify(result)}`);
-      }
+  const { data: traderStatusData, isLoading: loadingTrader } = useTraderStatus(
+    traderAddress && !affiliateAliasData?.isValid ? traderAddress : undefined
+  );
 
-      const result = await response.json();
+  const { data: affiliateAddressData } = useAffiliateAddress(
+    !isAddress(affiliate) ? affiliate : undefined
+  );
 
-      if (result.createdAt && result.affiliate) {
-        setSucceededToSignUp(true);
-        if (result.affiliateAlias) {
-          setTraderSignedUpTo(result.affiliateAlias);
-        } else {
-          setTraderSignedUpTo(shortenAddress(result.affiliate, 7));
-        }
-        // TODO create toast notification
-      }
-    } catch (error) {
-      console.error("Error posting signature:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    data: aliasOfSignedUpAffiliate,
+    isLoading: loadingAliasOfSignedUpAffiliate,
+  } = useAffiliateAlias(traderStatusData?.affiliate);
 
-  // EIP 712 signature data
-  const domain = {
-    name: "Overlay Referrals",
-    version: "1.0",
-  };
-  const types = {
-    AffiliateTo: [{ name: "affiliate", type: "address" }],
-  };
-  const primaryType = "AffiliateTo";
+  const { fetchSignature, fetchingSignature, signatureError } = useSignature();
+  const postSignature = usePostSignature();
 
-  const fetchSignature = async (affiliate: string) => {
-    setFetchingSignature(true);
-    let signature;
-    const message = {
-      affiliate: affiliate.toLowerCase(),
-    };
-
-    try {
-      signature = await signTypedDataAsync({
-        domain,
-        types,
-        primaryType,
-        message,
-      });
-    } catch (error) {
-      const errorWithDetails = error as { details?: string };
-      if (errorWithDetails?.details) {
-        setErrorMessage(`${errorWithDetails.details}`);
-      } else {
-        setErrorMessage("unable to get error, see console");
-      }
-      console.error("Error fetching signature:", error);
-    } finally {
-      setFetchingSignature(false);
-    }
-    return signature;
-  };
+  const traderSignedUpTo = useMemo(() => {
+    const affiliateAddr = traderStatusData?.affiliate;
+    if (!affiliateAddr) return "";
+    return aliasOfSignedUpAffiliate?.alias ?? shortenAddress(affiliateAddr, 7);
+  }, [traderStatusData, aliasOfSignedUpAffiliate]);
 
   const handleSubmit = async () => {
     setErrorMessage(null);
@@ -247,108 +89,64 @@ const Referrals: React.FC = () => {
 
     if (isAddress(affiliate)) {
       affiliateAddress = affiliate;
-      const { isValid } = await getAffiliateAlias(affiliate);
-
-      if (!isValid) {
+      if (!affiliateAliasData?.isValid) {
         setErrorMessage("Affiliate not found");
-        isAffiliateValid = isValid;
+        isAffiliateValid = false;
       }
     } else {
-      const fetchedAffiliateAddress = await getAffiliateAddress(affiliate);
-
-      if (fetchedAffiliateAddress) {
-        affiliateAddress = fetchedAffiliateAddress;
-      } else {
-        setErrorMessage("Invalid affiliate");
-      }
+      affiliateAddress = affiliateAddressData?.address ?? null;
+      if (!affiliateAddress) setErrorMessage("Invalid affiliate");
     }
 
-    if (affiliateAddress && isAffiliateValid) {
+    if (!affiliateAddress || !isAffiliateValid) return;
+
+    try {
       const signature = await fetchSignature(affiliateAddress);
-      signature && (await postSignature(signature, affiliateAddress));
+
+      if (!signature) {
+        setErrorMessage(signatureError ?? "Failed to sign message");
+        return;
+      }
+
+      await postSignature.mutateAsync({
+        trader: traderAddress,
+        affiliate: affiliateAddress,
+        signature,
+      });
+      setSucceededToSignUp(true);
+    } catch (err: any) {
+      setErrorMessage(err.message);
     }
   };
 
-  // ---------- UI rendering ----------
-  const renderSignedUp = () => (
-    <ContentContainer>
-      <Flex direction="column" align="center" gap="8px">
-        <Text weight="medium" align="center">
-          You are already signed up for the referral program to
-        </Text>
-        <GradientText weight={"medium"} size={"4"}>
-          {isAddress(traderSignedUpTo)
-            ? traderSignedUpTo
-            : traderSignedUpTo.toUpperCase()}
-        </GradientText>
-      </Flex>
-      <GradientSolidButton title="Already Signed Up" isDisabled height="49px" />
-    </ContentContainer>
-  );
-
-  const renderForm = () => (
-    <ContentContainer>
-      <Text size={{ initial: "2", sm: "4" }} weight="bold" align="center">
-        Affiliate Address
-      </Text>
-      <Flex direction="column" gap="8px">
-        <StyledInput
-          type="text"
-          value={isAddress(affiliate) ? affiliate : affiliate.toUpperCase()}
-          disabled={fetchingSignature || loading}
-          onChange={(e) => setAffiliate(e.target.value.trim())}
-          placeholder="Enter Affiliate Address"
-        />
-        {errorMessage && (
-          <Text size="1" weight="medium" style={{ color: theme.color.red1 }}>
-            {errorMessage}
-          </Text>
-        )}
-      </Flex>
-      {!traderAddress ? (
-        <GradientSolidButton
-          title="Connect Wallet"
-          height={"49px"}
-          handleClick={openModal}
-        />
-      ) : fetchingSignature || loading ? (
-        <GradientLoaderButton title={"Processing ..."} height={"49px"} />
-      ) : (
-        <GradientSolidButton
-          title="Submit"
-          height={"49px"}
-          isDisabled={affiliate === ""}
-          handleClick={handleSubmit}
-        />
-      )}
-    </ContentContainer>
-  );
-
-  const renderSuccess = () => (
-    <ContentContainer align="center">
-      <Text size="7">🎉</Text>
-      <Text size="6" weight="bold">
-        Success!
-      </Text>
-      <Flex direction="column" align="center" gap="8px">
-        <Text weight="medium" size="3">
-          You signed up for the referral program to
-        </Text>
-        <GradientText weight={"medium"} size={"4"}>
-          {isAddress(traderSignedUpTo)
-            ? traderSignedUpTo
-            : traderSignedUpTo.toUpperCase()}
-        </GradientText>
-      </Flex>
-    </ContentContainer>
-  );
-
-  // ---------- main ----------
   const isLoading =
-    (status === "connecting" && !!traderAddress) ||
-    checkingAffiliateStatus ||
-    checkingTraderStatus ||
-    initialLoading;
+    isInitialLoading ||
+    loadingAffiliate ||
+    loadingTrader ||
+    loadingAliasOfSignedUpAffiliate;
+
+  const renderContent = () => {
+    if (affiliateAliasData?.isValid)
+      return <AliasSubmit alias={affiliateAliasData.alias} />;
+
+    if (succeededToSignUp)
+      return <Success traderSignedUpTo={traderSignedUpTo} />;
+
+    if (traderSignedUpTo)
+      return <SignedUp traderSignedUpTo={traderSignedUpTo} />;
+
+    return (
+      <Form
+        affiliate={affiliate}
+        setAffiliate={setAffiliate}
+        errorMessage={errorMessage}
+        fetchingSignature={fetchingSignature}
+        postingSignature={postSignature.isPending}
+        traderAddress={traderAddress}
+        handleSubmit={handleSubmit}
+      />
+    );
+  };
 
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
@@ -383,17 +181,7 @@ const Referrals: React.FC = () => {
             <Loader />
           </ContentContainer>
         ) : (
-          <GradientBorderBox>
-            {isAffiliate ? (
-              <AliasSubmit alias={alias} />
-            ) : succeededToSignUp ? (
-              renderSuccess()
-            ) : traderSignedUpTo ? (
-              renderSignedUp()
-            ) : (
-              renderForm()
-            )}
-          </GradientBorderBox>
+          <GradientBorderBox>{renderContent()}</GradientBorderBox>
         )}
       </Flex>
     </Flex>
