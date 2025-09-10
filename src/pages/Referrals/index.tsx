@@ -26,7 +26,7 @@ const Referrals: React.FC = () => {
   const referralAddressFromURL = searchParams.get("referrer");
   const { openModal } = useModalHelper();
 
-  const { address: traderAddress, isConnecting } = useAccount();
+  const { address: traderAddress, status } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -269,6 +269,87 @@ const Referrals: React.FC = () => {
     }
   };
 
+  // ---------- UI rendering ----------
+  const renderSignedUp = () => (
+    <ContentContainer>
+      <Flex direction="column" align="center" gap="8px">
+        <Text weight="medium" align="center">
+          You are already signed up for the referral program to
+        </Text>
+        <GradientText weight={"medium"} size={"4"}>
+          {isAddress(traderSignedUpTo)
+            ? traderSignedUpTo
+            : traderSignedUpTo.toUpperCase()}
+        </GradientText>
+      </Flex>
+      <GradientSolidButton title="Already Signed Up" isDisabled height="49px" />
+    </ContentContainer>
+  );
+
+  const renderForm = () => (
+    <ContentContainer>
+      <Text size={{ initial: "2", sm: "4" }} weight="bold" align="center">
+        Affiliate Address
+      </Text>
+      <Flex direction="column" gap="8px">
+        <StyledInput
+          type="text"
+          value={isAddress(affiliate) ? affiliate : affiliate.toUpperCase()}
+          disabled={fetchingSignature || loading}
+          onChange={(e) => setAffiliate(e.target.value.trim())}
+          placeholder="Enter Affiliate Address"
+        />
+        {errorMessage && (
+          <Text size="1" weight="medium" style={{ color: theme.color.red1 }}>
+            {errorMessage}
+          </Text>
+        )}
+      </Flex>
+      {!traderAddress ? (
+        <GradientSolidButton
+          title="Connect Wallet"
+          height={"49px"}
+          handleClick={openModal}
+        />
+      ) : fetchingSignature || loading ? (
+        <GradientLoaderButton title={"Processing ..."} height={"49px"} />
+      ) : (
+        <GradientSolidButton
+          title="Submit"
+          height={"49px"}
+          isDisabled={affiliate === ""}
+          handleClick={handleSubmit}
+        />
+      )}
+    </ContentContainer>
+  );
+
+  const renderSuccess = () => (
+    <ContentContainer align="center">
+      <Text size="7">🎉</Text>
+      <Text size="6" weight="bold">
+        Success!
+      </Text>
+      <Flex direction="column" align="center" gap="8px">
+        <Text weight="medium" size="3">
+          You signed up for the referral program to
+        </Text>
+        <GradientText weight={"medium"} size={"4"}>
+          {isAddress(traderSignedUpTo)
+            ? traderSignedUpTo
+            : traderSignedUpTo.toUpperCase()}
+        </GradientText>
+      </Flex>
+    </ContentContainer>
+  );
+
+  // ---------- main ----------
+  const isLoading =
+    (status === "connecting" && !!traderAddress) ||
+    checkingAffiliateStatus ||
+    checkingTraderStatus ||
+    initialLoading;
+
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>
       <Flex
@@ -293,10 +374,7 @@ const Referrals: React.FC = () => {
         height={"100%"}
         pt={{ initial: "60px", sm: "0" }}
       >
-        {isConnecting ||
-        checkingAffiliateStatus ||
-        checkingTraderStatus ||
-        initialLoading ? (
+        {isLoading ? (
           <ContentContainer
             align={"center"}
             justify={"center"}
@@ -308,109 +386,12 @@ const Referrals: React.FC = () => {
           <GradientBorderBox>
             {isAffiliate ? (
               <AliasSubmit alias={alias} />
+            ) : succeededToSignUp ? (
+              renderSuccess()
+            ) : traderSignedUpTo ? (
+              renderSignedUp()
             ) : (
-              <>
-                {!succeededToSignUp && (
-                  <>
-                    {traderSignedUpTo && (
-                      <ContentContainer>
-                        <Flex direction={"column"} align={"center"} gap="8px">
-                          <Text weight={"medium"} align={"center"}>
-                            You are already signed up for the referral program
-                            to{" "}
-                          </Text>
-                          <GradientText weight={"medium"} size={"4"}>
-                            {isAddress(traderSignedUpTo)
-                              ? traderSignedUpTo
-                              : traderSignedUpTo.toUpperCase()}
-                          </GradientText>
-                        </Flex>
-                        <GradientSolidButton
-                          title={`Already Signed Up`}
-                          isDisabled={true}
-                          height={"49px"}
-                        />
-                      </ContentContainer>
-                    )}
-                    {!traderSignedUpTo && (
-                      <ContentContainer>
-                        <Text
-                          size={{ initial: "2", sm: "4" }}
-                          weight={"bold"}
-                          align={"center"}
-                        >
-                          Affiliate Address
-                        </Text>
-
-                        <Flex direction={"column"} gap="8px">
-                          <StyledInput
-                            type="text"
-                            value={
-                              isAddress(affiliate)
-                                ? affiliate
-                                : affiliate.toUpperCase()
-                            }
-                            disabled={fetchingSignature || loading}
-                            onChange={(e) =>
-                              setAffiliate(e.target.value.trim())
-                            }
-                            placeholder="Enter Affiliate Address"
-                          />
-
-                          {errorMessage && (
-                            <Text
-                              size="1"
-                              weight={"medium"}
-                              style={{ color: theme.color.red1 }}
-                            >
-                              {errorMessage}
-                            </Text>
-                          )}
-                        </Flex>
-
-                        {!traderAddress ? (
-                          <GradientSolidButton
-                            title="Connect Wallet"
-                            height={"49px"}
-                            handleClick={openModal}
-                          />
-                        ) : fetchingSignature || loading ? (
-                          <GradientLoaderButton
-                            title={"Processing ..."}
-                            height={"49px"}
-                          />
-                        ) : (
-                          <GradientSolidButton
-                            title="Submit"
-                            height={"49px"}
-                            isDisabled={affiliate === ""}
-                            handleClick={handleSubmit}
-                          />
-                        )}
-                      </ContentContainer>
-                    )}
-                  </>
-                )}
-
-                {succeededToSignUp && (
-                  <ContentContainer align={"center"}>
-                    <Text size="7">🎉</Text>
-                    <Text size="6" weight={"bold"}>
-                      Success!
-                    </Text>
-                    <Flex direction={"column"} align={"center"} gap="8px">
-                      <Text weight={"medium"} size="3">
-                        You signed up for the referral program to
-                      </Text>
-                      <GradientText weight={"medium"} size={"4"}>
-                        {isAddress(traderSignedUpTo)
-                          ? traderSignedUpTo
-                          : traderSignedUpTo.toUpperCase()}
-                      </GradientText>
-                    </Flex>
-                  </ContentContainer>
-                )}
-              </>
+              renderForm()
             )}
           </GradientBorderBox>
         )}
