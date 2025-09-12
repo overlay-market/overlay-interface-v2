@@ -21,3 +21,4 @@ export enum NAVBAR_MODE {
 export const PERMANENT_LEADERBOARD_API = 'https://api.overlay.market/leaderboard/permanent/'
 
 export const FAUCET_API = 'https://api.overlay.market/faucet/'
+export const REWARDS_API = 'https://api.overlay.market/rewards'
