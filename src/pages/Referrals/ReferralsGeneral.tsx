@@ -90,6 +90,11 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             : "—",
         valueType: "volume left",
         valueTypeLink: false,
+        infoTooltip: {
+          title: `Trade ${minTradingVolume} ${UNIT} volume to be able to create a referral link.`,
+          description:
+            "You will need to sign transaction to become an affiliate.",
+        },
       },
       {
         title: "Rewards pending",
@@ -104,7 +109,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
         // buttonText: "Claim ->",
         // button: referralClaimCallback,
         // hasClaimableReward: Number(reward) > 0,
-        // tooltip:
+        // buttonTooltip:
         //   (reward && formatBigNumber(reward)) + " OVL available for claiming.",
       },
       {
@@ -128,6 +133,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
     ],
     [
       createCodeValue,
+      minTradingVolume,
       referralPositionsChecker,
       referralAccountData,
       // referralClaimCallback,
@@ -138,15 +144,16 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   // Post-process card logic
   cardsData.forEach((card) => {
     if (card.title === "Create a referral code") {
-      if (createCodeValue === 0) {
+      if (createCodeValue && createCodeValue <= 0) {
         card.value += " volume left";
-        card.valueType = "Create code →";
+        card.valueType = "Create code ->";
         card.valueTypeLink = true;
       }
       if (tier && tier > 0) {
+        card.title = "Referral code";
         card.valueTypeLink = true;
         card.value = affiliateLink;
-        card.valueType = "Copy link →";
+        card.valueType = "Copy link ->";
       }
     }
   });
@@ -202,6 +209,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
                 value={card.value || "0"}
                 valueType={card.valueType}
                 valueTypeLink={card.valueTypeLink}
+                infoTooltip={card.infoTooltip}
                 // buttonText={card?.buttonText}
                 // button={card?.button}
                 // showModal={setShowModalTrigger}

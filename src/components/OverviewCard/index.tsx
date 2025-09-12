@@ -2,7 +2,7 @@ import { Box, Flex, Text } from "@radix-ui/themes";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import theme from "../../theme";
 import { useState } from "react";
-import { Toast } from "./overview-card-styles";
+import { InfoIcon, Toast } from "./overview-card-styles";
 
 type OverviewCardProps = {
   title: string;
@@ -15,7 +15,11 @@ type OverviewCardProps = {
   button?: () => void;
   buttonText?: string;
   showModal?: (showModalTrigger: boolean) => void;
-  tooltip?: string;
+  infoTooltip?: {
+    title: string;
+    description?: string;
+  };
+  buttonTooltip?: string;
   hasClaimableReward?: boolean;
 };
 
@@ -30,7 +34,8 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
   button,
   buttonText,
   showModal,
-  tooltip,
+  infoTooltip,
+  buttonTooltip,
   hasClaimableReward,
 }) => {
   const [toastVisible, setToastVisible] = useState(false);
@@ -63,9 +68,63 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
         overflow: "hidden",
       }}
     >
-      <Text size="2" style={{ color: theme.color.grey3 }}>
-        {title}
-      </Text>
+      {/* Title with optional tooltip */}
+      <Flex align="center" gap="1">
+        <Text size="2" style={{ color: theme.color.grey3 }}>
+          {title}
+        </Text>
+
+        {infoTooltip && (
+          <Tooltip.Provider delayDuration={200}>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <InfoIcon size={14} />
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  side="top"
+                  sideOffset={6}
+                  style={{
+                    backgroundColor: theme.color.grey9,
+                    border: `1px solid ${theme.color.darkBlue}`,
+                    padding: "10px 14px",
+                    borderRadius: "6px",
+                    maxWidth: "260px",
+                    boxShadow: "0px 6px 12px rgba(0,0,0,0.25)",
+                    zIndex: 50,
+                  }}
+                >
+                  <Text
+                    style={{
+                      display: "block",
+                      marginBottom: "6px",
+                      fontSize: "12px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {infoTooltip.title}
+                  </Text>
+                  <Text
+                    style={{
+                      display: "block",
+                      fontSize: "12px",
+                      fontWeight: 400,
+                    }}
+                  >
+                    {infoTooltip.description}
+                  </Text>
+                  <Tooltip.Arrow
+                    offset={5}
+                    width={8}
+                    height={4}
+                    style={{ fill: theme.color.grey5 }}
+                  />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        )}
+      </Flex>
 
       {isOver1000OpenPositions && (
         <Flex direction="column" mt="4px">
@@ -196,7 +255,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
                       zIndex: 50,
                     }}
                   >
-                    {tooltip || ""}
+                    {buttonTooltip || ""}
                     <Tooltip.Arrow
                       offset={5}
                       width={8}

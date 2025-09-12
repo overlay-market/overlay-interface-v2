@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import theme from "../../theme";
+import { Info } from "react-feather";
 
 export const Toast = styled.div<{visible: string}>`
   position: fixed;
@@ -22,4 +23,13 @@ export const Toast = styled.div<{visible: string}>`
     bottom: 20px;
     left: 52.5%;
   } 
+`;
+
+export const InfoIcon = styled(Info)`
+  color: ${theme.color.grey2};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.color.blue2};
+  }
 `;
