@@ -154,6 +154,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
         card.valueTypeLink = true;
         card.value = affiliateLink;
         card.valueType = "Copy link ->";
+        card.infoTooltip = undefined;
       }
     }
   });

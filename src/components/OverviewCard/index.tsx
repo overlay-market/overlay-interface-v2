@@ -148,10 +148,13 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
             size="3"
             weight="bold"
             style={{
+              display: "block",
+              maxWidth: "100%",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
+            title={value.toString()}
           >
             {value}
           </Text>
