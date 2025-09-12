@@ -2,19 +2,19 @@ import { useEffect, useState } from "react";
 import {
   GradientLoaderButton,
   GradientSolidButton,
-} from "../../components/Button";
+} from "../../../components/Button";
 import { Flex, Text } from "@radix-ui/themes";
 import {
   ContentContainer,
   GradientText,
   StyledInput,
-} from "./referrals-styles";
-import theme from "../../theme";
-import useDebounce from "../../hooks/useDebounce";
-import { REFERRAL_API_BASE_URL } from "../../constants/applications";
+} from "../referrals-styles";
+import theme from "../../../theme";
+import useDebounce from "../../../hooks/useDebounce";
+import { REFERRAL_API_BASE_URL } from "../../../constants/applications";
 import { useAccount, useSignTypedData } from "wagmi";
 import { isAddress } from "viem";
-import { CopyGradientIcon } from "../../assets/icons/svg-icons";
+import { CopyGradientIcon } from "../../../assets/icons/svg-icons";
 import { CopyLink, Toast } from "./alias-submit-styles";
 import { useLocation } from "react-router-dom";
 

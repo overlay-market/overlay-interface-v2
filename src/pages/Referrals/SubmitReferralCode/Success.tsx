@@ -1,6 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { ContentContainer, GradientText } from "./referrals-styles";
 import { isAddress } from "viem";
+import { ContentContainer, GradientText } from "./submit-referral-code-styles";
 
 interface SuccessProps {
   traderSignedUpTo: string;

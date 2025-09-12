@@ -1,12 +1,12 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { ContentContainer, StyledInput } from "./referrals-styles";
+import { ContentContainer, StyledInput } from "../referrals-styles";
 import {
   GradientLoaderButton,
   GradientSolidButton,
-} from "../../components/Button";
-import { useModalHelper } from "../../components/ConnectWalletModal/utils";
+} from "../../../components/Button";
+import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
 import { isAddress } from "viem";
-import theme from "../../theme";
+import theme from "../../../theme";
 
 interface FormProps {
   affiliate: string;

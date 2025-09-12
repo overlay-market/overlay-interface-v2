@@ -1,7 +1,7 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { ContentContainer, GradientText } from "./referrals-styles";
+import { ContentContainer, GradientText } from "../referrals-styles";
 import { isAddress } from "viem";
-import { GradientSolidButton } from "../../components/Button";
+import { GradientSolidButton } from "../../../components/Button";
 
 interface SignedUpProps {
   traderSignedUpTo: string;
