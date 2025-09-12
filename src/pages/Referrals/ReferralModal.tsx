@@ -18,15 +18,21 @@ const ReferralModal = ({ tier }: ReferralModalProps) => {
     <>
       <Flex direction="row">
         {tier === "ambassador" && (
-          <Text as="p" size="2" style={{ marginBottom: "32px" }}>
-            Refer users to earn rewards. Ambassadors earn greater rewards.{" "}
+          <Flex
+            direction={{ initial: "column", md: "row" }}
+            gap="8px"
+            mb={"32px"}
+          >
+            <Text as="p" size="2">
+              Refer users to earn rewards. Ambassadors earn greater rewards.{" "}
+            </Text>
             <span
               onClick={handleOpen}
               style={{ color: theme.color.blue2, cursor: "pointer" }}
             >
               How does it work
             </span>
-          </Text>
+          </Flex>
         )}
         {tier === "affiliate" && (
           <Flex gap="8px">
