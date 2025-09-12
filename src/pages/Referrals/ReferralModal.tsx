@@ -2,7 +2,6 @@ import { Flex, Text } from "@radix-ui/themes";
 import { useState } from "react";
 import theme from "../../theme";
 import Modal from "../../components/Modal";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 interface ReferralModalProps {
   tier: string;
@@ -38,13 +37,10 @@ const ReferralModal = ({ tier }: ReferralModalProps) => {
           <Flex gap="8px">
             Need more info?
             <Flex
-              align="center"
-              gap="4px"
               onClick={handleOpen}
               style={{ color: theme.color.blue2, cursor: "pointer" }}
             >
-              <Text>Overlay Referral Program</Text>
-              <ArrowRightIcon color={theme.color.blue2} />
+              <Text>Overlay Referral Program -&gt;</Text>
             </Flex>
           </Flex>
         )}
@@ -85,15 +81,12 @@ const ReferralModal = ({ tier }: ReferralModalProps) => {
               rel="noreferrer"
               href="https://forms.gle/tAJQ7XUN43kp6smP7"
             >
-              <Flex align="center" gap="8px">
-                <Text
-                  size="2"
-                  style={{ color: theme.color.blue2, cursor: "pointer" }}
-                >
-                  Apply for the Ambassador program
-                </Text>
-                <ArrowRightIcon color={theme.color.blue2} />
-              </Flex>
+              <Text
+                size="2"
+                style={{ color: theme.color.blue2, cursor: "pointer" }}
+              >
+                Apply for the Ambassador program -&gt;
+              </Text>
             </a>
           </Text>
         </Flex>

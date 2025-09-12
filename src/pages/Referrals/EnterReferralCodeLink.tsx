@@ -12,6 +12,6 @@ export const EnterReferralCodeLink: React.FC<{ onClick: () => void }> = ({
     }}
     onClick={onClick}
   >
-    Enter a referral code →
+    Enter a referral code -&gt;
   </Text>
 );
