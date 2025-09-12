@@ -21,6 +21,7 @@ type OverviewCardProps = {
   };
   buttonTooltip?: string;
   hasClaimableReward?: boolean;
+  variant?: "profile" | "referrals";
 };
 
 const OverviewCard: React.FC<OverviewCardProps> = ({
@@ -37,6 +38,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
   infoTooltip,
   buttonTooltip,
   hasClaimableReward,
+  variant,
 }) => {
   const [toastVisible, setToastVisible] = useState(false);
 
@@ -145,8 +147,8 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
           </Text>
         ) : (
           <Text
-            size="3"
-            weight="bold"
+            size={variant === "referrals" ? "4" : "3"}
+            weight={variant === "referrals" ? "medium" : "bold"}
             style={{
               display: "block",
               maxWidth: "100%",
@@ -154,7 +156,6 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
               overflow: "hidden",
               textOverflow: "ellipsis",
             }}
-            title={value.toString()}
           >
             {value}
           </Text>

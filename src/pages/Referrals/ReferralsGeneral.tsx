@@ -145,7 +145,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   cardsData.forEach((card) => {
     if (card.title === "Create a referral code") {
       if (createCodeValue && createCodeValue <= 0) {
-        card.value += " volume left";
+        card.value = `0 ${UNIT} left`;
         card.valueType = "Create code ->";
         card.valueTypeLink = true;
       }
@@ -211,6 +211,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
                 valueType={card.valueType}
                 valueTypeLink={card.valueTypeLink}
                 infoTooltip={card.infoTooltip}
+                variant="referrals"
                 // buttonText={card?.buttonText}
                 // button={card?.button}
                 // showModal={setShowModalTrigger}
