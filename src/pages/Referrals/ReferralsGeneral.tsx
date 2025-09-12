@@ -10,6 +10,7 @@ import OverviewCard from "../../components/OverviewCard";
 import { formatBigNumber } from "../../utils/formatBigNumber";
 import { EnterReferralCodeLink } from "./EnterReferralCodeLink";
 import { useMinTradingVolume } from "../../hooks/referrals/useMinTradingVolume";
+import ConfirmAffiliateModal from "./ConfirmAffiliateModal";
 
 type ReferralsGeneralProps = {
   setShowSubmitReferralCodeForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -47,7 +48,8 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   const referralPositionsChecker =
     (referralAccountData?.account?.referralPositions?.length ?? 0) > 0;
 
-  // const [showModalTrigger, setShowModalTrigger] = useState(false);
+  const [showConfirmAffiliateModal, setShowConfirmAffiliateModal] =
+    useState(false);
   // const [reward, setReward] = useState("");
   // const [proof, setProof] = useState<string[]>([]);
 
@@ -160,7 +162,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   });
 
   return (
-    <Flex width={"100%"} height={"100%"} direction={"column"}>
+    <Flex width={"100%"} height={"100%"} direction={"column"} mb={"90px"}>
       <Flex
         justify={{ initial: "between", sm: "start" }}
         align={"center"}
@@ -214,7 +216,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
                 variant="referrals"
                 // buttonText={card?.buttonText}
                 // button={card?.button}
-                // showModal={setShowModalTrigger}
+                showModal={setShowConfirmAffiliateModal}
                 // tooltip={card.tooltip}
                 // hasClaimableReward={card.hasClaimableReward}
               />
@@ -224,10 +226,10 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
         {/* <RebatesTable /> */}
 
-        {/* <ConfirmAffiliateModal
-            isOpen={showModalTrigger}
-            onDismiss={() => setShowModalTrigger(false)}
-          /> */}
+        <ConfirmAffiliateModal
+          open={showConfirmAffiliateModal}
+          handleDismiss={() => setShowConfirmAffiliateModal(false)}
+        />
       </Flex>
     </Flex>
   );
