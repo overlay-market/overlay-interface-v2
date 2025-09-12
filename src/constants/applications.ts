@@ -1,3 +1,5 @@
+import { SUPPORTED_CHAINID } from "./chains";
+
 export enum MARKET_CHART_URL {
   BSC_TESTNET = "https://api.overlay.market/bsc-testnet-charts/v1/charts",
   BSC_MAINNET = "https://api.overlay.market/bsc-charts/v1/charts",
@@ -21,4 +23,9 @@ export enum NAVBAR_MODE {
 export const PERMANENT_LEADERBOARD_API = 'https://api.overlay.market/leaderboard/permanent/'
 
 export const FAUCET_API = 'https://api.overlay.market/faucet/'
-export const REWARDS_API = 'https://api.overlay.market/rewards'
+
+export type AddressMap = {[chainId: number]: string}
+
+export const REFERRAL_LIST_ADDRESS: AddressMap = {
+  [SUPPORTED_CHAINID.BSC_MAINNET]: '0x1A0eF183D548405705bb9B00E8b4ef3524AE090E',
+}
