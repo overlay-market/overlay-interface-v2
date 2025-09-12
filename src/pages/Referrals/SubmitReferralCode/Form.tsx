@@ -7,6 +7,7 @@ import {
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
 import { isAddress } from "viem";
 import theme from "../../../theme";
+import ReferralModal from "../ReferralModal";
 
 interface FormProps {
   affiliate: string;
@@ -32,9 +33,11 @@ export const Form: React.FC<FormProps> = ({
   return (
     <ContentContainer>
       <Text size={{ initial: "2", sm: "4" }} weight="bold" align="center">
-        Affiliate Address
+        Rebates. Fee discounts
       </Text>
-      <Flex direction="column" gap="8px">
+      <Flex direction="column" gap="20px">
+        <ReferralModal tier="affiliate" />
+
         <StyledInput
           type="text"
           value={isAddress(affiliate) ? affiliate : affiliate.toUpperCase()}
