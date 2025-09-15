@@ -5,11 +5,13 @@ import { PERMANENT_LEADERBOARD_API } from "../constants/applications";
 import { RANKING_BY } from "../pages/Leaderboard/LeaderboardTable/leaderboardConfig";
 
 
-export const usePermanentLeaderboard = (
+export const useLeaderboard = (
   numberOfRows: number,
   walletAddress: Address | undefined,
+  seasonId?: string
 ) => {
-  const endpoint = `all-time/leaderboard/${numberOfRows}${
+  const endpointBase = seasonId ? `seasonal/${seasonId}` : "all-time";
+  const endpoint = `${endpointBase}/leaderboard/${numberOfRows}${
     walletAddress ? `/${walletAddress}` : ""
   }?sortBy=${RANKING_BY}`;
 
@@ -26,7 +28,13 @@ export const usePermanentLeaderboard = (
   };
 
   return useQuery({
-    queryKey: ['permanentLeaderboard', numberOfRows, walletAddress, RANKING_BY],
+    queryKey: [
+      "permanentLeaderboard",
+      numberOfRows,
+      walletAddress,
+      RANKING_BY,
+      seasonId,
+    ],
     queryFn: fetchPermanentLeaderboard,
     refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
     staleTime: 10 * 60 * 1000, 
