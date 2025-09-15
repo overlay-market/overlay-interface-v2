@@ -15,7 +15,7 @@ export enum NAVBAR_MODE {
   DEFAULT = "default",
 }
 
-export const LEADERBOARD_API = 'http://localhost:5001/'
+export const LEADERBOARD_API = 'https://api.overlay.market/leaderboard/'
 
 export const PERMANENT_LEADERBOARD_API = LEADERBOARD_API + 'permanent/'
 
