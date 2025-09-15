@@ -6,40 +6,156 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ExtendedUserData, UserData } from "./types";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
-import { usePermanentLeaderboard } from "../../hooks/usePermanentLeaderboard";
+import { useLeaderboard } from "../../hooks/useLeaderboard";
 import { useENSName } from "../../hooks/useENSProfile";
 import LeaderboardUpdateSection from "./LeaderboardUpdateSection";
 import TopSection from "./TopSection";
 import LeaderboardTable from "./LeaderboardTable";
+import { useNavigate, useParams } from "react-router-dom";
+import * as Select from "@radix-ui/react-select";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
+import styled from "styled-components";
 
 const INITIAL_NUMBER_OF_ROWS = 15;
 const ROWS_PER_LOAD = 20;
 
+const DEFAULT_SEASON_VALUE = "all-time";
+
+const SEASON_OPTIONS = [
+  {
+    value: DEFAULT_SEASON_VALUE,
+    label: "All-Time Leaderboard",
+  },
+  {
+    value: "genesis",
+    label: "Genesis Leaderboard",
+  },
+];
+
+const formatSeasonLabel = (value: string) => {
+  const spacedValue = value.replace(/[-_]/g, " ");
+  const capitalized = spacedValue.replace(/\b\w/g, (char) => char.toUpperCase());
+  return `${capitalized} Leaderboard`;
+};
+
+const SeasonSelectTrigger = styled(Select.Trigger)`
+  width: 226px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: linear-gradient(${theme.color.background}, ${theme.color.background})
+      padding-box,
+    linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
+  color: ${theme.color.white};
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+
+  &:hover {
+    box-shadow: 0px 0px 12px 3px #ffffff73;
+  }
+`;
+
+const SeasonSelectContent = styled(Select.Content)`
+  background-color: ${theme.color.grey4};
+  border-radius: 12px;
+  padding: 6px;
+  border: 1px solid ${theme.color.darkBlue};
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+`;
+
+const SeasonSelectItem = styled(Select.Item)`
+  font-size: 14px;
+  line-height: 1;
+  color: ${theme.color.white};
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 32px 0 12px;
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+
+  &[data-highlighted] {
+    outline: none;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &[data-state="checked"] {
+    font-weight: 600;
+  }
+`;
+
 const Leaderboard: React.FC = () => {
   const { address: account } = useAccount();
   const { data: ensName } = useENSName(account);
+  const navigate = useNavigate();
+  const { seasonId: seasonIdParam } = useParams<{ seasonId?: string }>();
   const [allRanks, setAllRanks] = useState<UserData[]>([]);
   const [loadedNumberOfRows, setLoadedNumberOfRows] = useState(
     INITIAL_NUMBER_OF_ROWS
   );
   const observerRef = useRef<HTMLDivElement>(null);
+  const observer = useRef<IntersectionObserver>();
+  const isFirstTrigger = useRef(true);
+  const previousSeasonIdRef = useRef<string | undefined>(undefined);
 
-  const { data, isLoading, isError, error } = usePermanentLeaderboard(
+  const seasonId = seasonIdParam || undefined;
+  const normalizedSeasonValue = seasonId ?? DEFAULT_SEASON_VALUE;
+
+  const seasonOptions = useMemo(() => {
+    const options = [...SEASON_OPTIONS];
+    if (
+      seasonId &&
+      !options.some((option) => option.value.toLowerCase() === seasonId.toLowerCase())
+    ) {
+      options.push({
+        value: seasonId,
+        label: formatSeasonLabel(seasonId),
+      });
+    }
+    return options;
+  }, [seasonId]);
+
+  const { data, isLoading, isError, error } = useLeaderboard(
     loadedNumberOfRows,
-    account
+    account,
+    seasonId
   );
 
   useEffect(() => {
-    if (data?.leaderboard) {
-      setAllRanks((prev) => {
-        const existingRanks = new Set(prev.map((p) => p._id));
-        const newUsers = data.leaderboard.filter(
-          (u) => !existingRanks.has(u._id)
-        );
-        return [...prev, ...newUsers];
-      });
-    }
-  }, [data?.leaderboard]);
+    setAllRanks([]);
+    setLoadedNumberOfRows(INITIAL_NUMBER_OF_ROWS);
+    isFirstTrigger.current = true;
+  }, [seasonId]);
+
+  useEffect(() => {
+    if (!data?.leaderboard) return;
+
+    setAllRanks((prev) => {
+      const isNewSeason = previousSeasonIdRef.current !== seasonId;
+      const shouldReplace =
+        isNewSeason || prev.length === 0 || loadedNumberOfRows === INITIAL_NUMBER_OF_ROWS;
+
+      if (shouldReplace) {
+        previousSeasonIdRef.current = seasonId;
+        return data.leaderboard;
+      }
+
+      const existingRanks = new Set(prev.map((p) => p._id));
+      const newUsers = data.leaderboard.filter((u) => !existingRanks.has(u._id));
+
+      previousSeasonIdRef.current = seasonId;
+      return [...prev, ...newUsers];
+    });
+  }, [data?.leaderboard, seasonId, loadedNumberOfRows]);
 
   const leaderboardLastUpdated = useMemo<string | undefined>(() => {
     return data?.lastUpdated;
@@ -65,8 +181,16 @@ const Leaderboard: React.FC = () => {
     setLoadedNumberOfRows((prev) => prev + ROWS_PER_LOAD);
   };
 
-  const observer = useRef<IntersectionObserver>();
-  const isFirstTrigger = useRef(true);
+  const handleSeasonChange = (value: string) => {
+    if (value === normalizedSeasonValue) return;
+
+    if (value === DEFAULT_SEASON_VALUE) {
+      navigate("/leaderboard");
+      return;
+    }
+
+    navigate(`/leaderboard/${value}`);
+  };
 
   useEffect(() => {
     const loadMoreDataDebounced = debounce(() => {
@@ -135,9 +259,40 @@ const Leaderboard: React.FC = () => {
           gap={"12px"}
         >
           <TopSection />
-          <LeaderboardUpdateSection
-            leaderboardUpdatedAt={leaderboardLastUpdated}
-          />
+          <Flex
+            direction={{ initial: "column", sm: "row" }}
+            gap={"12px"}
+            align={"center"}
+          >
+            <Select.Root
+              value={normalizedSeasonValue}
+              onValueChange={handleSeasonChange}
+            >
+              <SeasonSelectTrigger aria-label="Select leaderboard season">
+                <Select.Value placeholder="Select season" />
+                <Select.Icon>
+                  <ChevronDownIcon />
+                </Select.Icon>
+              </SeasonSelectTrigger>
+              <Select.Portal>
+                <SeasonSelectContent
+                  position="popper"
+                  sideOffset={6}
+                >
+                  <Select.Viewport>
+                    {seasonOptions.map((option) => (
+                      <SeasonSelectItem key={option.value} value={option.value}>
+                        <Select.ItemText>{option.label}</Select.ItemText>
+                      </SeasonSelectItem>
+                    ))}
+                  </Select.Viewport>
+                </SeasonSelectContent>
+              </Select.Portal>
+            </Select.Root>
+            <LeaderboardUpdateSection
+              leaderboardUpdatedAt={leaderboardLastUpdated}
+            />
+          </Flex>
         </Flex>
 
         <LeaderboardTable ranks={allRanks} currentUserData={currentUserData} />
