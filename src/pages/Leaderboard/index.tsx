@@ -3,7 +3,7 @@ import theme from "../../theme";
 import { LineSeparator } from "./leaderboard-styles";
 import useAccount from "../../hooks/useAccount";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ExtendedUserData, UserData, Season } from "./types";
+import { ExtendedUserData, UserData } from "./types";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
 import { useLeaderboard, useSeasons } from "../../hooks/useLeaderboard";
