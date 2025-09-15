@@ -3,10 +3,10 @@ import theme from "../../theme";
 import { LineSeparator } from "./leaderboard-styles";
 import useAccount from "../../hooks/useAccount";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ExtendedUserData, UserData } from "./types";
+import { ExtendedUserData, UserData, Season } from "./types";
 import Loader from "../../components/Loader";
 import { debounce } from "../../utils/debounce";
-import { useLeaderboard } from "../../hooks/useLeaderboard";
+import { useLeaderboard, useSeasons } from "../../hooks/useLeaderboard";
 import { useENSName } from "../../hooks/useENSProfile";
 import LeaderboardUpdateSection from "./LeaderboardUpdateSection";
 import TopSection from "./TopSection";
@@ -20,17 +20,6 @@ const INITIAL_NUMBER_OF_ROWS = 15;
 const ROWS_PER_LOAD = 20;
 
 const DEFAULT_SEASON_VALUE = "all-time";
-
-const SEASON_OPTIONS = [
-  {
-    value: DEFAULT_SEASON_VALUE,
-    label: "All-Time Leaderboard",
-  },
-  {
-    value: "genesis",
-    label: "Genesis Leaderboard",
-  },
-];
 
 const formatSeasonLabel = (value: string) => {
   const spacedValue = value.replace(/[-_]/g, " ");
@@ -110,19 +99,44 @@ const Leaderboard: React.FC = () => {
   const seasonId = seasonIdParam || undefined;
   const normalizedSeasonValue = seasonId ?? DEFAULT_SEASON_VALUE;
 
+  const { data: seasonsData, isLoading: seasonsLoading } = useSeasons();
+
   const seasonOptions = useMemo(() => {
-    const options = [...SEASON_OPTIONS];
+    if (!seasonsData) {
+      return [
+        {
+          value: DEFAULT_SEASON_VALUE,
+          label: "All-Time Leaderboard",
+        },
+      ];
+    }
+
+    const filtered = seasonsData.filter((season) => season.hasData !== false);
+
+    const mapped = filtered.map((season) => ({
+      value: season.id,
+      label: season.name ? `${season.name} Leaderboard` : formatSeasonLabel(season.id),
+    }));
+
+    if (!mapped.some((option) => option.value === DEFAULT_SEASON_VALUE)) {
+      mapped.unshift({
+        value: DEFAULT_SEASON_VALUE,
+        label: "All-Time Leaderboard",
+      });
+    }
+
     if (
       seasonId &&
-      !options.some((option) => option.value.toLowerCase() === seasonId.toLowerCase())
+      !mapped.some((option) => option.value.toLowerCase() === seasonId.toLowerCase())
     ) {
-      options.push({
+      mapped.push({
         value: seasonId,
         label: formatSeasonLabel(seasonId),
       });
     }
-    return options;
-  }, [seasonId]);
+
+    return mapped;
+  }, [seasonsData, seasonId]);
 
   const { data, isLoading, isError, error } = useLeaderboard(
     loadedNumberOfRows,
@@ -267,6 +281,7 @@ const Leaderboard: React.FC = () => {
             <Select.Root
               value={normalizedSeasonValue}
               onValueChange={handleSeasonChange}
+              disabled={seasonsLoading}
             >
               <SeasonSelectTrigger aria-label="Select leaderboard season">
                 <Select.Value placeholder="Select season" />

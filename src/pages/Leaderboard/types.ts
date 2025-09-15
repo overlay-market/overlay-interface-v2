@@ -38,6 +38,16 @@ export interface PermanentLeaderboardData {
   lastUpdated: string;
 }
 
+export interface Season {
+  id: string;
+  name: string;
+  type?: string;
+  start?: string | null;
+  end?: string | null;
+  active?: boolean;
+  hasData?: boolean;
+}
+
 export type ColumnKey =
   | "profitOVL"
   | "profitUSD"

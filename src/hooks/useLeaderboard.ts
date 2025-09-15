@@ -1,6 +1,6 @@
 import { Address } from "viem";
 import { useQuery } from "@tanstack/react-query";
-import { PermanentLeaderboardData } from "../pages/Leaderboard/types";
+import { PermanentLeaderboardData, Season } from "../pages/Leaderboard/types";
 import { PERMANENT_LEADERBOARD_API } from "../constants/applications";
 import { RANKING_BY } from "../pages/Leaderboard/LeaderboardTable/leaderboardConfig";
 
@@ -38,5 +38,27 @@ export const useLeaderboard = (
     queryFn: fetchPermanentLeaderboard,
     refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
     staleTime: 10 * 60 * 1000, 
+  });
+};
+
+export const useSeasons = () => {
+  const fetchSeasons = async (): Promise<Season[]> => {
+    const response = await fetch(`${PERMANENT_LEADERBOARD_API}seasons`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch seasons: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.message || "Failed to fetch seasons");
+    }
+
+    return data.data as Season[];
+  };
+
+  return useQuery({
+    queryKey: ["leaderboardSeasons"],
+    queryFn: fetchSeasons,
+    staleTime: 10 * 60 * 1000,
   });
 };
