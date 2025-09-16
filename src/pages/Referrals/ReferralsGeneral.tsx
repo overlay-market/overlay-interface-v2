@@ -11,6 +11,7 @@ import { formatBigNumber } from "../../utils/formatBigNumber";
 import { EnterReferralCodeLink } from "./EnterReferralCodeLink";
 import { useMinTradingVolume } from "../../hooks/referrals/useMinTradingVolume";
 import ConfirmAffiliateModal from "./ConfirmAffiliateModal";
+import { RebatesTable } from "./RebatesTable";
 
 type ReferralsGeneralProps = {
   setShowSubmitReferralCodeForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -162,7 +163,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   });
 
   return (
-    <Flex width={"100%"} height={"100%"} direction={"column"} mb={"90px"}>
+    <Flex width={"100%"} height={"auto"} direction={"column"} mb={"90px"}>
       <Flex
         justify={{ initial: "between", sm: "start" }}
         align={"center"}
@@ -224,7 +225,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
           ))}
         </Grid>
 
-        {/* <RebatesTable /> */}
+        <RebatesTable />
 
         <ConfirmAffiliateModal
           open={showConfirmAffiliateModal}
