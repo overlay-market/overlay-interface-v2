@@ -23,5 +23,16 @@ export const referralListAbi = [
     ],
     "name": "AllowKOL",
     "type": "event"
-  }
+  },
+  {
+  "inputs": [
+    { "internalType": "address", "name": "to", "type": "address" },
+    { "internalType": "uint256", "name": "amount", "type": "uint256" },
+    { "internalType": "bytes32[]", "name": "proof", "type": "bytes32[]" }
+  ],
+  "name": "claimRewards",
+  "outputs": [],
+  "stateMutability": "nonpayable",
+  "type": "function"
+},
 ] as const;
