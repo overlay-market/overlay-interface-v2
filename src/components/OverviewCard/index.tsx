@@ -250,22 +250,14 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
                     side="top"
                     sideOffset={6}
                     style={{
-                      backgroundColor: theme.color.grey4,
                       color: theme.color.green2,
                       padding: "4px 8px",
                       borderRadius: "4px",
                       fontSize: "12px",
-                      boxShadow: "0px 4px 10px rgba(0,0,0,0.15)",
                       zIndex: 50,
                     }}
                   >
                     {buttonTooltip || ""}
-                    <Tooltip.Arrow
-                      offset={5}
-                      width={8}
-                      height={4}
-                      style={{ fill: theme.color.grey4 }}
-                    />
                   </Tooltip.Content>
                 </Tooltip.Portal>
               </Tooltip.Root>
