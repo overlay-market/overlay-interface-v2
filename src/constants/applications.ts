@@ -29,3 +29,5 @@ export type AddressMap = {[chainId: number]: string}
 export const REFERRAL_LIST_ADDRESS: AddressMap = {
   [SUPPORTED_CHAINID.BSC_MAINNET]: '0x1A0eF183D548405705bb9B00E8b4ef3524AE090E',
 }
+
+export const REWARDS_API = 'https://api.overlay.market/rewards'

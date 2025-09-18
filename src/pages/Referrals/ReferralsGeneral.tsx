@@ -5,13 +5,19 @@ import { Box, Flex, Grid, Text } from "@radix-ui/themes";
 import theme from "../../theme";
 import { LineSeparator } from "./referrals-styles";
 import ReferralModal from "./ReferralModal";
-import { UNIT } from "../../constants/applications";
+import { REWARDS_API, UNIT } from "../../constants/applications";
 import OverviewCard from "../../components/OverviewCard";
 import { formatBigNumber } from "../../utils/formatBigNumber";
 import { EnterReferralCodeLink } from "./EnterReferralCodeLink";
 import { useMinTradingVolume } from "../../hooks/referrals/useMinTradingVolume";
 import ConfirmAffiliateModal from "./ConfirmAffiliateModal";
 import { RebatesTable } from "./RebatesTable";
+import {
+  ReferralClaimCallbackState,
+  useReferralClaim,
+} from "../../hooks/referrals/useReferralClaim";
+import { Hex } from "viem";
+import { formatAmount } from "../../utils/formatAmount";
 
 type ReferralsGeneralProps = {
   setShowSubmitReferralCodeForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,25 +57,22 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
   const [showConfirmAffiliateModal, setShowConfirmAffiliateModal] =
     useState(false);
-  // const [reward, setReward] = useState("");
-  // const [proof, setProof] = useState<string[]>([]);
+  const [reward, setReward] = useState("");
+  const [proof, setProof] = useState<Hex[]>([]);
 
-  // const rewardsUrl = `${REWARDS_API}/rewards/${account?.toLowerCase()}?campaign=referral`;
+  const rewardsUrl = `${REWARDS_API}/rewards/${account?.toLowerCase()}?campaign=referral`;
 
-  // const { callback: referralClaimCallback } = useReferralClaimCallback(
-  //   reward,
-  //   proof
-  // );
+  const { callback: claim, state } = useReferralClaim(reward, proof);
 
-  // useEffect(() => {
-  //   fetch(rewardsUrl)
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       setReward((data.reward ?? [""]).toString());
-  //       setProof(data.proof ?? [""]);
-  //     })
-  //     .catch((err) => console.error("Error fetching rewards:", err));
-  // }, [rewardsUrl]);
+  useEffect(() => {
+    fetch(rewardsUrl)
+      .then((res) => res.json())
+      .then((data) => {
+        setReward((data.reward ?? "").toString());
+        setProof(data.proof ?? []);
+      })
+      .catch((err) => console.error("Error fetching rewards:", err));
+  }, [rewardsUrl]);
 
   useEffect(() => {
     if (!isUninitialized) refetch();
@@ -82,6 +85,17 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
       );
     }
   }, [account]);
+
+  const handleClaim = async () => {
+    if (state !== ReferralClaimCallbackState.VALID || !account || !claim)
+      return;
+
+    try {
+      await claim(account);
+    } catch (err) {
+      console.error("Claim failed", err);
+    }
+  };
 
   const cardsData = useMemo(
     () => [
@@ -103,22 +117,27 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
         title: "Rewards pending",
         value:
           (referralPositionsChecker &&
-            formatBigNumber(
+            formatAmount(
               referralAccountData?.account?.referralPositions[0]
                 ?.totalRewardsPending
             )) ??
           "0",
         valueType: UNIT,
-        // buttonText: "Claim ->",
-        // button: referralClaimCallback,
-        // hasClaimableReward: Number(reward) > 0,
-        // buttonTooltip:
-        //   (reward && formatBigNumber(reward)) + " OVL available for claiming.",
+        buttonText:
+          state === ReferralClaimCallbackState.LOADING
+            ? "Processing..."
+            : "Claim ->",
+        button: handleClaim,
+        hasClaimableReward: Number(reward) > 0,
+        buttonTooltip:
+          (reward &&
+            state !== ReferralClaimCallbackState.LOADING &&
+            formatAmount(reward)) + " OVL available for claiming",
       },
       {
         title: "Total Rewards earned",
         value: referralPositionsChecker
-          ? formatBigNumber(
+          ? formatAmount(
               referralAccountData?.account?.referralPositions[0]
                 ?.totalAirdroppedAmount
             ) ?? "0"
@@ -139,8 +158,9 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
       minTradingVolume,
       referralPositionsChecker,
       referralAccountData,
-      // referralClaimCallback,
-      // reward,
+      claim,
+      reward,
+      state,
     ]
   );
 
@@ -215,11 +235,11 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
                 valueTypeLink={card.valueTypeLink}
                 infoTooltip={card.infoTooltip}
                 variant="referrals"
-                // buttonText={card?.buttonText}
-                // button={card?.button}
+                buttonText={card?.buttonText}
+                button={card?.button}
                 showModal={setShowConfirmAffiliateModal}
-                // tooltip={card.tooltip}
-                // hasClaimableReward={card.hasClaimableReward}
+                buttonTooltip={card.buttonTooltip}
+                hasClaimableReward={card.hasClaimableReward}
               />
             </Box>
           ))}
