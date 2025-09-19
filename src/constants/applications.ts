@@ -27,7 +27,7 @@ export const FAUCET_API = 'https://api.overlay.market/faucet/'
 export type AddressMap = {[chainId: number]: string}
 
 export const REFERRAL_LIST_ADDRESS: AddressMap = {
-  [SUPPORTED_CHAINID.BSC_MAINNET]: '0x1A0eF183D548405705bb9B00E8b4ef3524AE090E',
+  [SUPPORTED_CHAINID.BSC_MAINNET]: '0xa19338c002a065f4dc3ad1949738ccdc4b10061d',
 }
 
 export const REWARDS_API = 'https://api.overlay.market/rewards'
