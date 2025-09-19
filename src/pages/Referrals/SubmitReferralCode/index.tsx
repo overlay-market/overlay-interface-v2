@@ -12,11 +12,9 @@ import { Form } from "./Form";
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
 import {
-  ContentContainer,
   GradientBorderBox,
   LineSeparator,
 } from "./submit-referral-code-styles";
-import Loader from "../../../components/Loader";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { ReferralAddAffiliateOrKOLCallbackState, useReferralAddAffiliateOrKOLCallback } from "../../../hooks/referrals/useReferralAddAffiliateOrKOLCallback";
 import { useAddPopup } from "../../../state/application/hooks";
