@@ -12,7 +12,8 @@ export interface UserData {
   mostTradedMarket: MostTradedMarket;
   profitablePositions: number;
   rank: number;
-  rankByVolume: number;
+  rankByVolume: number | null;
+  rankByFees: number | null;
   lastUpdated: string; 
   totalFeesOVL: number | string;
   totalFeesUSD: number | string;

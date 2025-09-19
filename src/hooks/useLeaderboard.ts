@@ -1,6 +1,6 @@
 import { Address } from "viem";
 import { useQuery } from "@tanstack/react-query";
-import { PermanentLeaderboardData, Season } from "../pages/Leaderboard/types";
+import { PermanentLeaderboardData, Ranking, Season } from "../pages/Leaderboard/types";
 import { PERMANENT_LEADERBOARD_API } from "../constants/applications";
 import { RANKING_BY } from "../pages/Leaderboard/LeaderboardTable/leaderboardConfig";
 
@@ -8,12 +8,13 @@ import { RANKING_BY } from "../pages/Leaderboard/LeaderboardTable/leaderboardCon
 export const useLeaderboard = (
   numberOfRows: number,
   walletAddress: Address | undefined,
-  seasonId?: string
+  seasonId?: string,
+  sortBy?: Ranking
 ) => {
   const endpointBase = seasonId ? `seasonal/${seasonId}` : "all-time";
-  const endpoint = `${endpointBase}/leaderboard/${numberOfRows}${
-    walletAddress ? `/${walletAddress}` : ""
-  }?sortBy=${RANKING_BY}`;
+  const endpoint = `${endpointBase}/leaderboard/${numberOfRows}
+    ${walletAddress ? `/${walletAddress}` : ""}
+    ${(sortBy || !seasonId) ? "?sortBy=" + (sortBy || RANKING_BY) : ""}`;
 
   const fetchPermanentLeaderboard = async (): Promise<PermanentLeaderboardData> => {
     const response = await fetch(`${PERMANENT_LEADERBOARD_API}${endpoint}`);
