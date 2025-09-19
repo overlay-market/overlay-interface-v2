@@ -1,15 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { useAffiliateAlias } from "../../../hooks/referrals/useAffiliateAlias";
-import { useTraderStatus } from "../../../hooks/referrals/useTraderStatus";
-import { useAffiliateAddress } from "../../../hooks/referrals/useAffiliateAddress";
+// import { useAffiliateAlias } from "../../../hooks/referrals/useAffiliateAlias";
+// import { useTraderStatus } from "../../../hooks/referrals/useTraderStatus";
+// import { useAffiliateAddress } from "../../../hooks/referrals/useAffiliateAddress";
 import { isAddress } from "viem";
-import { useSignature } from "../../../hooks/referrals/useSignature";
-import { usePostSignature } from "../../../hooks/referrals/usePostSignature";
 import { shortenAddress } from "../../../utils/web3";
-import AliasSubmit from "./AliasSubmit";
+// import AliasSubmit from "./AliasSubmit";
 import { Success } from "./Success";
-import { SignedUp } from "./SignedUp";
+// import { SignedUp } from "./SignedUp";
 import { Form } from "./Form";
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
@@ -20,6 +18,8 @@ import {
 } from "./submit-referral-code-styles";
 import Loader from "../../../components/Loader";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { ReferralAddAffiliateOrKOLCallbackState, useReferralAddAffiliateOrKOLCallback } from "../../../hooks/referrals/useReferralAddAffiliateOrKOLCallback";
+import { useAddPopup } from "../../../state/application/hooks";
 
 type SubmitReferralCodeProps = {
   affiliate: string;
@@ -33,10 +33,12 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
   handleBack,
 }) => {
   const { address: traderAddress, status } = useAccount();
+  const addPopup = useAddPopup();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [succeededToSignUp, setSucceededToSignUp] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [storedError, setStoredError] = useState<string | null>(null);
 
   useEffect(() => {
     setErrorMessage(null);
@@ -61,93 +63,96 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
     return () => clearTimeout(timeout);
   }, [status, isInitialLoading]);
 
-  const { data: affiliateAliasData, isLoading: loadingAffiliate } =
-    useAffiliateAlias(traderAddress);
+  // const { data: affiliateAliasData, isLoading: loadingAffiliate } =
+  //   useAffiliateAlias(traderAddress);
 
-  const { data: traderStatusData, isLoading: loadingTrader } = useTraderStatus(
-    traderAddress && !affiliateAliasData?.isValid ? traderAddress : undefined
-  );
+  // const { data: traderStatusData, isLoading: loadingTrader } = useTraderStatus(
+  //   traderAddress && !affiliateAliasData?.isValid ? traderAddress : undefined
+  // );
 
-  const { data: affiliateAddressData } = useAffiliateAddress(
-    !isAddress(affiliate) ? affiliate : undefined
-  );
+  // const {
+  //   data: aliasOfSignedUpAffiliate,
+  //   isLoading: loadingAliasOfSignedUpAffiliate,
+  // } = useAffiliateAlias(traderStatusData?.affiliate);
+
+  // const traderSignedUpTo = useMemo(() => {
+  //   const affiliateAddr = traderStatusData?.affiliate;
+  //   if (!affiliateAddr) return "";
+  //   return aliasOfSignedUpAffiliate?.alias ?? shortenAddress(affiliateAddr, 7);
+  // }, [traderStatusData, aliasOfSignedUpAffiliate]);
+
 
   const {
-    data: aliasOfSignedUpAffiliate,
-    isLoading: loadingAliasOfSignedUpAffiliate,
-  } = useAffiliateAlias(traderStatusData?.affiliate);
+    callback: referralAddAffiliateOrKOLCallback,
+    state,
+    error: hookError,
+  } = useReferralAddAffiliateOrKOLCallback(affiliate as `0x${string}`);
 
-  const { fetchSignature, fetchingSignature, signatureError } = useSignature();
-  const postSignature = usePostSignature();
-
-  const traderSignedUpTo = useMemo(() => {
-    const affiliateAddr = traderStatusData?.affiliate;
-    if (!affiliateAddr) return "";
-    return aliasOfSignedUpAffiliate?.alias ?? shortenAddress(affiliateAddr, 7);
-  }, [traderStatusData, aliasOfSignedUpAffiliate]);
-
-  const handleSubmit = async () => {
-    setErrorMessage(null);
-    if (!affiliate || !traderAddress) return;
-
-    let affiliateAddress: string | null = null;
-    let isAffiliateValid = true;
-
-    if (isAddress(affiliate)) {
-      affiliateAddress = affiliate;
-      if (!affiliateAliasData?.isValid) {
-        setErrorMessage("Affiliate not found");
-        isAffiliateValid = false;
-      }
-    } else {
-      affiliateAddress = affiliateAddressData?.address ?? null;
-      if (!affiliateAddress) setErrorMessage("Invalid affiliate");
+  const handleSubmit = useCallback(async () => {
+    if (!referralAddAffiliateOrKOLCallback) {
+      setStoredError(
+        isAddress(affiliate)
+          ? "Not an Address"
+          : "Transaction not ready"
+      );
+      addPopup({
+        txn: {
+          hash: Date.now().toString(),
+          success: false,
+          message: storedError || "Unknown error",
+          type: "error",
+        },
+      });
+      return;
     }
-
-    if (!affiliateAddress || !isAffiliateValid) return;
 
     try {
-      const signature = await fetchSignature(affiliateAddress);
+      await referralAddAffiliateOrKOLCallback();
+      setSucceededToSignUp(true)
+      setStoredError(null);
+    } catch (callbackError: any) {
+      console.error("Error creating affiliate:", callbackError);
+      const message =
+        callbackError?.message ||
+        hookError ||
+        "Failed to create referral affiliate";
+      setStoredError(message);
 
-      if (!signature) {
-        setErrorMessage(signatureError ?? "Failed to sign message");
-        return;
-      }
-
-      await postSignature.mutateAsync({
-        trader: traderAddress,
-        affiliate: affiliateAddress,
-        signature,
+      addPopup({
+        txn: {
+          hash: Date.now().toString(),
+          success: false,
+          message,
+          type: "error",
+        },
       });
-      setSucceededToSignUp(true);
-    } catch (err: any) {
-      setErrorMessage(err.message);
     }
-  };
+  }, [
+    referralAddAffiliateOrKOLCallback,
+    addPopup,
+    hookError,
+    storedError,
+  ]);
 
-  const isLoading =
-    isInitialLoading ||
-    loadingAffiliate ||
-    loadingTrader ||
-    loadingAliasOfSignedUpAffiliate;
+  const isLoading = state === ReferralAddAffiliateOrKOLCallbackState.LOADING
 
   const renderContent = () => {
-    if (affiliateAliasData?.isValid)
-      return <AliasSubmit alias={affiliateAliasData.alias} />;
+    // if (affiliateAliasData?.isValid)
+    //   return <AliasSubmit alias={affiliateAliasData.alias} />;
 
     if (succeededToSignUp)
-      return <Success traderSignedUpTo={traderSignedUpTo} />;
+      return <Success traderSignedUpTo={shortenAddress(affiliate)} />;
 
-    if (traderSignedUpTo)
-      return <SignedUp traderSignedUpTo={traderSignedUpTo} />;
+    // if (traderSignedUpTo)
+    //   return <SignedUp traderSignedUpTo={traderSignedUpTo} />;
 
     return (
       <Form
         affiliate={affiliate}
         setAffiliate={setAffiliate}
         errorMessage={errorMessage}
-        fetchingSignature={fetchingSignature}
-        postingSignature={postSignature.isPending}
+        fetchingSignature={isLoading}
+        postingSignature={false}
         traderAddress={traderAddress}
         handleSubmit={handleSubmit}
       />
@@ -192,17 +197,7 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
         height={"100%"}
         pt={{ initial: "60px", sm: "0" }}
       >
-        {isLoading ? (
-          <ContentContainer
-            align={"center"}
-            justify={"center"}
-            height={"224px"}
-          >
-            <Loader />
-          </ContentContainer>
-        ) : (
-          <GradientBorderBox>{renderContent()}</GradientBorderBox>
-        )}
+        <GradientBorderBox>{renderContent()}</GradientBorderBox>
       </Flex>
     </Flex>
   );
