@@ -4,6 +4,8 @@ export enum ClaimId {
   FJORD_BUYERS = 'FJORD_BUYERS',
   TORCH = 'TORCH',
   TORCH1 = 'TORCH-V1',
+  TORCH2 = 'TORCH-V2',
+  TORCH3 = 'TORCH-V3',
   OG_CONVERSION = 'DAO',
 }
 
@@ -20,6 +22,8 @@ export const MERKLE_DISTIBUTOR_ADDRESSES: ClaimMap = {
   [ClaimId.FJORD_BUYERS]: '0x1F96e8E650B54CA69A4974aC14e7dbEDa34C1f39-56',
   [ClaimId.TORCH]: 'https://docs.overlay.market/Token/TORCH%20Airdrop',
   [ClaimId.TORCH1]: '0xd4016a02b33a850f334d7f8b2ce7276901ff0aaa-56',
+  [ClaimId.TORCH2]: '0x92ecC9b5bd23eF60eBD3abaFC1DfEbE04024c0E9-56',
+  [ClaimId.TORCH3]: '0x62f61551fa94a2384a4bcfc86cf603c227cde4d9-56',
   [ClaimId.OG_CONVERSION]: '',
 }
 
@@ -57,6 +61,16 @@ export const AIRDROPS: AirdropMap = {
     subtitle: 'Follow instructions ->'
   },
   [ClaimId.TORCH1]: {
+    title: 'TORCH',
+    status: AirdropStatus.ACTIVATED,
+    subtitle: 'Claim Now!'
+  },
+  [ClaimId.TORCH2]: {
+    title: 'TORCH',
+    status: AirdropStatus.ACTIVATED,
+    subtitle: 'Claim Now!'
+  },
+  [ClaimId.TORCH3]: {
     title: 'TORCH',
     status: AirdropStatus.ACTIVATED,
     subtitle: 'Claim Now!'

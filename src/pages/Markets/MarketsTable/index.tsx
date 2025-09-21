@@ -49,7 +49,7 @@ export default function MarketsTable({
   const isMobile = useMediaQuery("(max-width: 767px)");
 
   const sortedData = React.useMemo(() => {
-    const sortableItems = [...allMarketsData];
+    const sortableItems = [...marketsData];
     if (sortConfig?.key) {
       sortableItems.sort((a, b) => {
         let aValue = 0,
@@ -91,7 +91,7 @@ export default function MarketsTable({
           : 0;
       });
     }
-    return sortableItems;
+    return [...sortableItems, ...uniqueOtherChainMarkets];
   }, [allMarketsData, markets7d, sortConfig]);
 
   const requestSort = (key: SortableKeys) => {

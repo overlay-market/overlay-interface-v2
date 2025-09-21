@@ -33,7 +33,7 @@ export interface TradeState {
 
 export const initialState: TradeState = {
   typedValue: "",
-  selectedLeverage: "1",
+  selectedLeverage: "5",
   isLong: true,
   slippageValue: "1",
   selectedChainId: getFromLocalStorage('lifiSelectedChainId', DEFAULT_CHAINID as number),

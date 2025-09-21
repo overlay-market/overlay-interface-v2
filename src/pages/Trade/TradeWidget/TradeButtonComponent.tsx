@@ -26,6 +26,7 @@ import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
 import { useLiFiBridge } from "../../../hooks/lifi/useLiFiBridge";
 
 const TRADE_WITH_LIFI = "Bridge & Trade";
+import { usePublicClient } from "wagmi";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -39,6 +40,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { address, chainId } = useAccount();
   const sdk = useSDK();
   const { openModal } = useModalHelper();
+  const publicClient = usePublicClient();
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
@@ -160,65 +162,132 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   ]);
 
   const handleTrade = async () => {
-    if (market && tradeState) {
-      setTradeConfig({
-        showConfirm,
-        attemptingTransaction: true,
+    if (!sdk || !publicClient || !address) {
+      console.error("Missing required dependencies for trade operation");
+      return;
+    }
+
+    if (!market || !tradeState || !typedValue || !selectedLeverage) {
+      console.error("Missing required parameters for trade operation");
+      return;
+    }
+
+    setTradeConfig({
+      showConfirm,
+      attemptingTransaction: true,
+    });
+
+    try {
+      const result = await sdk.market.build({
+        account: address,
+        marketAddress: market.id as Address,
+        collateral: toWei(typedValue),
+        leverage: toWei(selectedLeverage),
+        isLong,
+        priceLimit: toWei(tradeState.priceInfo.minPrice as string),
       });
 
-      sdk.market
-        .build({
-          account: address,
-          marketAddress: market?.id as Address,
-          collateral: toWei(typedValue),
-          leverage: toWei(selectedLeverage),
-          isLong,
-          priceLimit: toWei(tradeState.priceInfo.minPrice as string),
-        })
-        .then((result) => {
-          addPopup(
-            {
-              txn: {
-                hash: result.hash,
-                success: result.receipt?.status === "success",
-                message: "",
-                type: TransactionType.BUILD_OVL_POSITION,
-              },
-            },
-            result.hash
-          );
-          handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
-          handleTradeStateReset();
-          arcxAnalytics?.transaction({
-            transactionHash: result.hash,
-            account: address,
-            chainId,
-            metadata: {
-              action: TransactionType.BUILD_OVL_POSITION,
-            },
-          });
-        })
-        .catch((error: Error) => {
-          const { errorCode, errorMessage } = handleError(error);
+      let receipt = result.receipt;
 
-          addPopup(
-            {
-              txn: {
-                hash: currentTimeForId,
-                success: false,
-                message: errorMessage,
-                type: errorCode,
-              },
-            },
-            currentTimeForId
+      if (!receipt) {
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("TRANSACTION_TIMEOUT")), 60_000)
           );
-        })
-        .finally(() => {
-          setTradeConfig({
-            showConfirm: false,
-            attemptingTransaction: false,
-          });
+
+          receipt = await Promise.race([
+            publicClient.waitForTransactionReceipt({ hash: result.hash }),
+            timeoutPromise,
+          ]);
+        } catch (waitError: any) {
+          if (waitError.message === "TRANSACTION_TIMEOUT") {
+            console.warn("Transaction confirmation timeout:", waitError);
+
+            addPopup(
+              {
+                txn: {
+                  hash: result.hash,
+                  success: null,
+                  message:
+                    "Transaction is taking longer than expected. It may still confirm.",
+                  type: TransactionType.BUILD_OVL_POSITION,
+                },
+              },
+              result.hash
+            );
+            return;
+          } else {
+            throw waitError;
+          }
+        }
+      }
+
+      if (receipt) {
+        const isSuccess = receipt.status === "success";
+
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: isSuccess,
+              message: "",
+              type: TransactionType.BUILD_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+
+        if (receipt.blockNumber) {
+          handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
+        }
+
+        if (isSuccess) {
+          handleTradeStateReset();
+        }
+
+        arcxAnalytics?.transaction({
+          transactionHash: result.hash,
+          account: address,
+          chainId,
+          metadata: {
+            action: TransactionType.BUILD_OVL_POSITION,
+          },
         });
+      } else {
+        console.error("No receipt received after successful wait");
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: false,
+              message: "Transaction status unknown. Please check your wallet.",
+              type: TransactionType.BUILD_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+      }
+    } catch (error) {
+      console.error("Trade operation failed:", error);
+
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+    } finally {
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
     }
   };
 
@@ -238,16 +307,29 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   };
 
   const handleApprove = async () => {
-    if (!typedValue) {
+    if (!sdk || !publicClient || !address) {
+      console.error("Missing required dependencies for approval operation");
       return;
     }
+
+    if (!typedValue) {
+      console.error("Missing typed value for approval operation");
+      return;
+    }
+
+    // For non-Shiva approvals, validate market exists
+    const useShiva = sdk.core.usingShiva();
+    if (!useShiva && !market?.id) {
+      console.error("Missing market for approval operation");
+      return;
+    }
+
     setTradeConfig({
       showConfirm,
       attemptingTransaction: true,
     });
 
     try {
-      const useShiva = sdk.core.usingShiva();
       const result = useShiva
         ? await sdk.shiva.approveShiva({
             account: address,
@@ -258,20 +340,81 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             amount: maxUint256,
           });
 
-      addPopup({
-        txn: {
-          hash: result.hash,
-          success: result.receipt?.status === "success",
-          message: "",
-          type: TransactionType.APPROVAL,
-        },
-      });
+      let receipt = result.receipt;
 
-      handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
+      if (!receipt) {
+        try {
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error("TRANSACTION_TIMEOUT")), 60_000)
+          );
 
-      const isUpdated = await waitForTradeStateUpdate();
-      setIsApprovalPending(isUpdated);
+          receipt = await Promise.race([
+            publicClient.waitForTransactionReceipt({ hash: result.hash }),
+            timeoutPromise,
+          ]);
+        } catch (waitError: any) {
+          if (waitError.message === "TRANSACTION_TIMEOUT") {
+            console.warn("Transaction confirmation timeout:", waitError);
+
+            addPopup(
+              {
+                txn: {
+                  hash: result.hash,
+                  success: null,
+                  message:
+                    "Transaction is taking longer than expected. It may still confirm.",
+                  type: TransactionType.APPROVAL,
+                },
+              },
+              result.hash
+            );
+            return;
+          } else {
+            throw waitError;
+          }
+        }
+      }
+
+      if (receipt) {
+        const isSuccess = receipt.status === "success";
+
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: isSuccess,
+              message: "",
+              type: TransactionType.APPROVAL,
+            },
+          },
+          result.hash
+        );
+
+        if (receipt.blockNumber) {
+          handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
+        }
+
+        if (isSuccess) {
+          const isUpdated = await waitForTradeStateUpdate();
+          setIsApprovalPending(isUpdated);
+        }
+      } else {
+        console.error("No receipt received after successful wait");
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: false,
+              message: "Transaction status unknown. Please check your wallet.",
+              type: TransactionType.APPROVAL,
+            },
+          },
+          result.hash
+        );
+      }
     } catch (error) {
+      console.error("Approval operation failed:", error);
+
       const { errorCode, errorMessage } = handleError(error as Error);
 
       addPopup(
