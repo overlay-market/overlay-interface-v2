@@ -11,6 +11,9 @@ importers:
       '@0xarc-io/analytics':
         specifier: ^2.2.3
         version: 2.4.2(@types/react@18.3.24)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)
+      '@lifi/sdk':
+        specifier: ^3.10.1
+        version: 3.12.2(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(@types/react@18.3.24)(bufferutil@4.0.9)(immer@10.1.3)(react@18.3.1)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
       '@lifi/widget':
         specifier: ^3.28.0
         version: 3.30.1(eau47o2ggxk5mbv66ujx3d7sem)
