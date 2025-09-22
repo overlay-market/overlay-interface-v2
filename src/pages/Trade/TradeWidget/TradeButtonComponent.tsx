@@ -306,6 +306,39 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     return false;
   };
 
+  const waitForBalanceUpdate = async (
+    expectedAmount: bigint,
+    maxWaitTime: number = 30000,
+    checkInterval: number = 2000
+  ): Promise<boolean> => {
+    if (!sdk || !address) return false;
+
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitTime) {
+      try {
+        const currentBalanceRaw = await sdk.ovl.balance(address!);
+
+        const currentBalance =
+          typeof currentBalanceRaw === "bigint"
+            ? currentBalanceRaw
+            : BigInt(currentBalanceRaw.toString());
+
+        if (currentBalance >= expectedAmount) {
+          console.log("✅ Sufficient balance confirmed");
+          return true;
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, checkInterval));
+      } catch (error) {
+        console.error("Error checking balance:", error);
+      }
+    }
+
+    console.warn("⚠️ Timeout waiting for balance update");
+    return false;
+  };
+
   const handleApprove = async () => {
     if (!sdk || !publicClient || !address) {
       console.error("Missing required dependencies for approval operation");
@@ -549,10 +582,35 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
+    const requiredAmount = BigInt(bridgedAmount);
+
+    // Wait for balance to update
+    const balanceUpdated = await waitForBalanceUpdate(requiredAmount);
+    if (!balanceUpdated) {
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message:
+              "Bridged tokens not yet available. Please wait and try again.",
+            type: "BALANCE_TIMEOUT",
+          },
+        },
+        currentTimeForId
+      );
+
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
+      return;
+    }
+
     // Check if approval is needed before building position
     if (tradeState.tradeState === TradeState.NeedsApproval) {
       console.log("🔒 Approval needed for Shiva contract after bridge");
-      
+
       setTradeConfig({
         showConfirm,
         attemptingTransaction: true,
@@ -680,7 +738,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     if (bridgeStage.stage === "success" && !showConfirm) {
       setTradeConfig({
         showConfirm: true,
-        attemptingTransaction,
+        attemptingTransaction: false,
       });
     }
   }, [bridgeStage]);
