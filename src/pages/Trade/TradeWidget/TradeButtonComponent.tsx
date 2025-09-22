@@ -24,6 +24,7 @@ import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFee
 import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
 import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
 import { useLiFiBridge } from "../../../hooks/lifi/useLiFiBridge";
+import { GetBNBModal } from "../../../components/GetBNBModal";
 
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
@@ -54,6 +55,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     bridgeQuote,
     isBridging,
     getBridgeQuote,
+    proceedAfterGas,
   } = useLiFiBridge();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
@@ -65,6 +67,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     attemptingTransaction: false,
   });
   const [isApprovalPending, setIsApprovalPending] = useState<boolean>(false);
+  const [showGasModal, setShowGasModal] = useState<boolean>(false);
+  const [hasShownTradeModal, setHasShownTradeModal] = useState<boolean>(false);
+  const [hasShownGasModal, setHasShownGasModal] = useState<boolean>(false);
   const arcxAnalytics = useArcxAnalytics();
   const { maxInputIncludingFees } = useMaxInputIncludingFees({
     marketId: market?.marketId,
@@ -734,14 +739,38 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       });
   };
 
+  const handleGasModalClose = useCallback(() => {
+    console.log("🔋 Gas modal closed by user");
+    setShowGasModal(false);
+  }, []);
+
+
   useEffect(() => {
-    if (bridgeStage.stage === "success" && !showConfirm) {
+    if (bridgeStage.stage === "success" && !showConfirm && !hasShownTradeModal) {
+      console.log("🎯 Bridge success, showing trade confirmation modal");
       setTradeConfig({
         showConfirm: true,
         attemptingTransaction: false,
       });
+      setHasShownTradeModal(true);
+    } else if (bridgeStage.stage === "needs_gas" && !showGasModal && !hasShownGasModal) {
+      console.log("🔋 Bridge completed but needs gas, closing confirmation modal and showing gas modal");
+      setTradeConfig({
+        showConfirm: false,  // Close the confirmation modal
+        attemptingTransaction: false,
+      });
+      setShowGasModal(true);
+      setHasShownGasModal(true);
     }
-  }, [bridgeStage]);
+  }, [bridgeStage, showConfirm, showGasModal, hasShownTradeModal, hasShownGasModal, attemptingTransaction]);
+
+  // Reset modal tracking when bridge starts over or goes to idle
+  useEffect(() => {
+    if (bridgeStage.stage === 'idle' || bridgeStage.stage === 'quote' || bridgeStage.stage === 'approval') {
+      setHasShownTradeModal(false);
+      setHasShownGasModal(false);
+    }
+  }, [bridgeStage.stage]);
 
   const renderDefaultState = () => (
     <>
@@ -853,6 +882,16 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
               />
             ))}
         </>
+      )}
+
+      {/* Gas Modal */}
+      {showGasModal && bridgeStage.gasCheckResult && (
+        <GetBNBModal
+          isOpen={showGasModal}
+          onClose={handleGasModalClose}
+          gasCheckResult={bridgeStage.gasCheckResult}
+          onSkip={proceedAfterGas}
+        />
       )}
     </>
   );

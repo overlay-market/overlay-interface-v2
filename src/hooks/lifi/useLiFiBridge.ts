@@ -10,11 +10,13 @@ import { useSafeChainSwitch } from './useSafeChainSwitch';
 import { useAddPopup } from '../../state/application/hooks';
 import { BRIDGE_FEE, BRIDGE_SLIPPAGE } from '../../constants/bridge';
 import { calculateAdjustedBridgeAmount } from '../../utils/lifi/calculateBridgeAmount';
+import { useGasCheck, GasCheckResult } from '../useGasCheck';
 
 export interface BridgeStage {
-  stage: 'idle' | 'quote' | 'approval' | 'bridging' | 'success';
+  stage: 'idle' | 'quote' | 'approval' | 'bridging' | 'success' | 'needs_gas';
   message?: string;
   txHash?: string;
+  gasCheckResult?: GasCheckResult;
 }
 
 export interface BridgeQuoteInfo {
@@ -36,13 +38,15 @@ export const useLiFiBridge = () => {
   const { data: walletClient, refetch: refetchWalletClient } = useWalletClient();
   const { typedValue, selectedLeverage } = useTradeState();
   const { selectedChainId, selectedToken } = useChainAndTokenState();
-  const { approveIfNeeded } = useTokenApprovalWithLiFi({ 
+  const { approveIfNeeded } = useTokenApprovalWithLiFi({
     setTradeStage: (stage) => setBridgeStage({
       stage: stage.stage as BridgeStage['stage'],
       message: stage.message
     })
   });
   const addPopup = useAddPopup();
+  const { checkGas } = useGasCheck();
+  const isDebugMode = import.meta.env.VITE_LIFI_DEBUG === 'true';
 
   const { safeSwitch } = useSafeChainSwitch({
     onSwitchStart: (from, to) =>
@@ -52,6 +56,38 @@ export const useLiFiBridge = () => {
   const executeBridge = useCallback(async () => {
     if (!account || !walletClient || !selectedToken) {
       throw new Error('Missing required data for bridging');
+    }
+
+    // Debug mode: skip actual bridging and go straight to gas check
+    if (isDebugMode) {
+      console.log("🐛 Debug mode: Skipping actual bridge, simulating completion");
+
+      setBridgeStage({ stage: 'bridging', message: 'Debug: Simulating bridge...' });
+
+      // Simulate some delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage);
+      setBridgedAmount(adjustedOvlAmount.toString());
+
+      // Check gas (which will return insufficient in debug mode)
+      console.log("🔋 Debug: Checking gas requirements after mock bridge...");
+      const currentGasCheck = checkGas();
+
+      if (currentGasCheck.hasInsufficientGas) {
+        console.log("⚠️ Debug: Insufficient BNB for gas, showing gas modal");
+        setBridgeStage({
+          stage: 'needs_gas',
+          message: `Debug: Need ${currentGasCheck.gasDeficit} more BNB for gas`,
+          gasCheckResult: currentGasCheck
+        });
+      } else {
+        setBridgeStage({
+          stage: 'success',
+          message: `Debug: Successfully bridged to ${(Number(adjustedOvlAmount) / 1e18).toFixed(4)} OVL`
+        });
+      }
+      return;
     }
 
     // If we're already on BSC with OVL, no bridging needed
@@ -225,7 +261,7 @@ export const useLiFiBridge = () => {
 
       // Bridge completed successfully - use what Li.Fi actually delivers
       const actualOvlAmount = finalExpectedOvl;
-      
+
       console.log("✅ Bridge completed - setting bridged amount:", {
         actualOvlAmount: actualOvlAmount,
         actualOvlAmountReadable: (Number(actualOvlAmount) / 1e18).toFixed(6),
@@ -233,12 +269,27 @@ export const useLiFiBridge = () => {
         isString: typeof actualOvlAmount === 'string',
         bigIntConversion: actualOvlAmount ? BigInt(actualOvlAmount).toString() : 'failed'
       });
-      
-      setBridgeStage({ 
-        stage: 'success', 
-        message: `Successfully bridged to ${(Number(actualOvlAmount) / 1e18).toFixed(4)} OVL` 
-      });
+
       setBridgedAmount(actualOvlAmount);
+
+      // Check gas after successful bridge
+      console.log("🔋 Checking gas requirements after bridge...");
+      const currentGasCheck = checkGas();
+
+      if (currentGasCheck.hasInsufficientGas) {
+        console.log("⚠️ Insufficient BNB for gas, showing gas modal");
+        setBridgeStage({
+          stage: 'needs_gas',
+          message: `Bridge complete! Need ${currentGasCheck.gasDeficit} more BNB for gas`,
+          gasCheckResult: currentGasCheck
+        });
+      } else {
+        console.log("✅ Sufficient BNB for gas, proceeding to success");
+        setBridgeStage({
+          stage: 'success',
+          message: `Successfully bridged to ${(Number(actualOvlAmount) / 1e18).toFixed(4)} OVL`
+        });
+      }
 
     } catch (error: unknown) {
       console.error('Bridge error:', error);
@@ -266,7 +317,9 @@ export const useLiFiBridge = () => {
     safeSwitch,
     approveIfNeeded,
     addPopup,
-    refetchWalletClient
+    refetchWalletClient,
+    isDebugMode,
+    checkGas
   ]);
 
   const resetBridge = useCallback(() => {
@@ -278,6 +331,20 @@ export const useLiFiBridge = () => {
   const getBridgeQuote = useCallback(async (): Promise<BridgeQuoteResult> => {
     if (!account || !selectedToken || !typedValue) {
       return { error: new Error("Missing required data for quote") };
+    }
+
+    // Debug mode: return mock quote
+    if (isDebugMode) {
+      console.log("🐛 Debug mode: Returning mock bridge quote");
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage);
+      const quote: BridgeQuoteInfo = {
+        expectedOvlAmount: adjustedOvlAmount.toString(),
+        requiredInputAmount: (Number(adjustedOvlAmount) * 1.05).toString(), // Mock 5% higher input needed
+        exchangeRate: `1 OVL = 1.05 ${selectedToken.symbol}`,
+        fees: "Debug: Mock Bridge Fee (0.5%)",
+      };
+      setBridgeQuote(quote);
+      return { quote };
     }
 
     // If we're already on BSC with OVL, no quote needed
@@ -354,7 +421,34 @@ export const useLiFiBridge = () => {
       setBridgeStage({ stage: 'idle' });
       return { error: error as Error };
     }
-  }, [account, selectedToken, selectedChainId, typedValue, selectedLeverage]);
+  }, [account, selectedToken, selectedChainId, typedValue, selectedLeverage, isDebugMode]);
+
+  const proceedAfterGas = useCallback(() => {
+    console.log("✅ User got BNB, proceeding to success state");
+    setBridgeStage({
+      stage: 'success',
+      message: `Successfully bridged to ${(Number(bridgedAmount) / 1e18).toFixed(4)} OVL`
+    });
+  }, [bridgedAmount]);
+
+  const recheckGas = useCallback(() => {
+    console.log("🔋 Rechecking gas requirements...");
+    const currentGasCheck = checkGas();
+
+    if (currentGasCheck.hasInsufficientGas) {
+      console.log("⚠️ Still insufficient BNB for gas");
+      setBridgeStage(prev => ({
+        ...prev,
+        gasCheckResult: currentGasCheck,
+        message: `Need ${currentGasCheck.gasDeficit} more BNB for gas`
+      }));
+      return false;
+    } else {
+      console.log("✅ Sufficient BNB for gas now");
+      proceedAfterGas();
+      return true;
+    }
+  }, [checkGas, proceedAfterGas]);
 
   return {
     bridgeStage,
@@ -363,7 +457,10 @@ export const useLiFiBridge = () => {
     executeBridge,
     resetBridge,
     getBridgeQuote,
+    proceedAfterGas,
+    recheckGas,
     isBridging: ['quote', 'approval', 'bridging'].includes(bridgeStage.stage),
     isSuccess: bridgeStage.stage === 'success',
+    needsGas: bridgeStage.stage === 'needs_gas',
   };
 };
