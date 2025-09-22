@@ -736,14 +736,12 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   useEffect(() => {
     if (bridgeStage.stage === "success" && !showConfirm) {
-      setTimeout(() => {
-        setTradeConfig({
-          showConfirm: true,
-          attemptingTransaction: false,
-        });
-      }, 2000);
+      setTradeConfig({
+        showConfirm: true,
+        attemptingTransaction: false,
+      });
     }
-  }, [bridgeStage, showConfirm, attemptingTransaction]);
+  }, [bridgeStage]);
 
   const renderDefaultState = () => (
     <>
