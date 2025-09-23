@@ -478,7 +478,35 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       attemptingTransaction: true,
     });
 
-    const collateralAmount = BigInt(bridgedAmount);
+    let collateralAmount = 0n;
+    try {
+      const maxInput = await sdk.trade.getMaxInputIncludingFeesFromBalance(
+        market.marketName,
+        BigInt(bridgedAmount),
+        toWei(selectedLeverage),
+        6
+      );
+      collateralAmount = toWei(maxInput);
+    } catch (error) {
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
+      return;
+    }
 
     console.log("🏗️ Building position with:", {
       bridgedAmount: bridgedAmount,
