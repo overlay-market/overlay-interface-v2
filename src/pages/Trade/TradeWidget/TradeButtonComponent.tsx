@@ -339,6 +339,13 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
+    // Check if we're resuming from a needs_gas state
+    if (bridgeStage.stage === 'needs_gas') {
+      console.log("🔋 Resuming from needs_gas stage, reopening gas modal");
+      setShowGasModal(true);
+      return;
+    }
+
     const { quote, error } = await getBridgeQuote();
 
     if (quote) {
