@@ -63,8 +63,8 @@ dependencies:
     specifier: ^2.30.1
     version: 2.30.1
   overlay-sdk:
-    specifier: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz
-    version: '@github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0)(@types/react@18.3.24)(graphql@16.11.0)(hardhat@2.26.3)(react@18.3.1)(typescript@5.9.2)'
+    specifier: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz
+    version: '@github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0)(@types/react@18.3.24)(graphql@16.11.0)(hardhat@2.26.3)(react@18.3.1)(typescript@5.9.2)'
   react:
     specifier: ^18.2.0
     version: 18.3.1
@@ -12122,11 +12122,11 @@ packages:
       use-sync-external-store: 1.5.0(react@18.3.1)
     dev: false
 
-  '@github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0)(@types/react@18.3.24)(graphql@16.11.0)(hardhat@2.26.3)(react@18.3.1)(typescript@5.9.2)':
-    resolution: {tarball: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz}
-    id: '@github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz'
+  '@github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0)(@types/react@18.3.24)(graphql@16.11.0)(hardhat@2.26.3)(react@18.3.1)(typescript@5.9.2)':
+    resolution: {tarball: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz}
+    id: '@github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz'
     name: overlay-sdk
-    version: 0.1.25-beta
+    version: 0.1.26-beta
     dependencies:
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0)(@types/react@18.3.24)(react@18.3.1)
       '@uniswap/v3-sdk': 3.25.2(hardhat@2.26.3)
