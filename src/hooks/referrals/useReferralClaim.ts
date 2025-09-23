@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { encodeFunctionData, Hex } from "viem";
 import { useAddPopup } from "../../state/application/hooks";
@@ -53,6 +53,21 @@ export const useReferralClaim = (
       ? ReferralClaimCallbackState.VALID
       : ReferralClaimCallbackState.INVALID
   );
+
+  useEffect(() => {
+    const nextState =
+      account && calldata
+        ? ReferralClaimCallbackState.VALID
+        : ReferralClaimCallbackState.INVALID;
+
+    setState((prev) => {
+      if (prev === ReferralClaimCallbackState.LOADING) {
+        return prev;
+      }
+
+      return prev === nextState ? prev : nextState;
+    });
+  }, [account, calldata]);
 
   const callback = useCallback(
     async (claimAccount: `0x${string}`): Promise<`0x${string}`> => {
