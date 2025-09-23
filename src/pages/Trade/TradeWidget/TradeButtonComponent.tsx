@@ -45,16 +45,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     useTradeActionHandlers();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
-  const {
-    executeBridge,
-    bridgeStage,
-    resetBridge,
-    bridgedAmount,
-    bridgeQuote,
-    isBridging,
-    getBridgeQuote,
-    proceedAfterGas,
-  } = useLiFiBridge();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const [{ showConfirm, attemptingTransaction }, setTradeConfig] = useState<{
@@ -76,6 +66,17 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { data: riskParamsData } = useRiskParamsQuery({
     marketId: market?.id,
   });
+
+  const {
+    executeBridge,
+    bridgeStage,
+    resetBridge,
+    bridgedAmount,
+    bridgeQuote,
+    isBridging,
+    getBridgeQuote,
+    proceedAfterGas,
+  } = useLiFiBridge(riskParamsData?.markets?.[0]?.tradingFeeRate);
 
   const minCollateral = useMemo(() => {
     if (riskParamsData && riskParamsData.markets.length > 0) {
