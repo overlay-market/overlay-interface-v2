@@ -67,7 +67,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
       // Simulate some delay
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate || DEFAULT_TRADING_FEE);
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate ?? DEFAULT_TRADING_FEE);
       setBridgedAmount(adjustedOvlAmount.toString());
 
       // Check gas (which will return insufficient in debug mode)
@@ -92,7 +92,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
 
     // If we're already on BSC with OVL, no bridging needed
     if (selectedChainId === DEFAULT_CHAINID && selectedToken.address === OVL_ADDRESS[DEFAULT_CHAINID as number]) {
-      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate || DEFAULT_TRADING_FEE).toString();
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate ?? DEFAULT_TRADING_FEE).toString();
       setBridgeStage({ stage: 'success', message: 'Ready for position - already on BSC with OVL' });
       setBridgedAmount(adjustedOvlAmount);
       return;
@@ -102,7 +102,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
       setBridgeStage({ stage: 'quote', message: 'Getting bridge quote...' });
 
       // Calculate adjusted OVL amount including fees so user receives what they typed
-      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate || DEFAULT_TRADING_FEE);
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate ?? DEFAULT_TRADING_FEE);
 
       console.log("🎯 Using adjusted amount for bridge:", {
         userTypedValue: typedValue,
@@ -337,7 +337,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
     // Debug mode: return mock quote
     if (isDebugMode) {
       console.log("🐛 Debug mode: Returning mock bridge quote");
-      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate || DEFAULT_TRADING_FEE);
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate ?? DEFAULT_TRADING_FEE);
       const quote: BridgeQuoteInfo = {
         expectedOvlAmount: adjustedOvlAmount.toString(),
         requiredInputAmount: (Number(adjustedOvlAmount) * 1.05).toString(), // Mock 5% higher input needed
@@ -350,7 +350,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
 
     // If we're already on BSC with OVL, no quote needed
     if (selectedChainId === DEFAULT_CHAINID && selectedToken.address === OVL_ADDRESS[DEFAULT_CHAINID as number]) {
-      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate || DEFAULT_TRADING_FEE);
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate ?? DEFAULT_TRADING_FEE);
       const quote: BridgeQuoteInfo = {
         expectedOvlAmount: adjustedOvlAmount.toString(),
         requiredInputAmount: adjustedOvlAmount.toString(),
@@ -365,7 +365,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
       setBridgeStage({ stage: 'quote', message: 'Getting bridge quote...' });
 
       // Use adjusted OVL amount with toAmount (same as executeBridge)
-      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate || DEFAULT_TRADING_FEE);
+      const adjustedOvlAmount = calculateAdjustedBridgeAmount(typedValue, selectedLeverage, tradingFeeRate ?? DEFAULT_TRADING_FEE);
 
       console.log("🎯 getBridgeQuote using adjusted amount:", {
         userTypedValue: typedValue,
