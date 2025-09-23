@@ -65,6 +65,8 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   const { callback: claim, state } = useReferralClaim(reward, proof);
 
   useEffect(() => {
+    if (!account) return;
+
     fetch(rewardsUrl)
       .then((res) => res.json())
       .then((data) => {
@@ -72,7 +74,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
         setProof(data.proof ?? []);
       })
       .catch((err) => console.error("Error fetching rewards:", err));
-  }, [rewardsUrl]);
+  }, [rewardsUrl, account]);
 
   useEffect(() => {
     if (!isUninitialized) refetch();
