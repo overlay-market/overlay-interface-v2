@@ -4,6 +4,7 @@ import theme from "../../theme";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { GasCheckResult } from "../../hooks/useGasCheck";
+import Modal from "../Modal";
 
 // Native BNB address for LiFi widget
 const BNB_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
@@ -51,52 +52,18 @@ export const GetBNBModal: React.FC<GetBNBModalProps> = ({
   };
 
 
-  if (!isOpen) return null;
-
   return (
-    <Flex
-      position="fixed"
-      top="0"
-      left="0"
-      right="0"
-      bottom="0"
-      align="center"
-      justify="center"
-      style={{
-        backgroundColor: "rgba(0, 0, 0, 0.7)",
-        zIndex: 9999,
-      }}
-      onClick={onClose}
+    <Modal
+      triggerElement={null}
+      open={isOpen}
+      handleClose={onClose}
+      title="Get BNB for Gas"
+      fontSizeTitle="20px"
+      width={isMobile ? "90vw" : "480px"}
     >
-      <Box
-        style={{
-          backgroundColor: theme.color.background,
-          borderRadius: "12px",
-          padding: "20px",
-          width: isMobile ? "90vw" : "480px",
-          maxHeight: "90vh",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <Flex justify="between" align="start" mb="20px">
-          <Box style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <Text size="5" weight="bold" style={{ color: theme.color.grey1 }}>
-              Get BNB for Gas
-            </Text>
-            <Text size="2" style={{ color: theme.color.grey3 }}>
-              You need BNB to pay for transaction fees
-            </Text>
-          </Box>
-          <Button
-            variant="ghost"
-            size="1"
-            onClick={onClose}
-            style={{ cursor: "pointer" }}
-          >
-            ✕
-          </Button>
-        </Flex>
+      <Text size="2" style={{ color: theme.color.grey3, marginBottom: "20px", display: "block" }}>
+        You need BNB to pay for transaction fees
+      </Text>
 
         {/* Gas Info */}
         <Box
@@ -160,10 +127,12 @@ export const GetBNBModal: React.FC<GetBNBModalProps> = ({
               fontWeight: "600",
               width: "100%",
               marginBottom: "12px",
+              padding: "16px 24px",
+              height: "56px",
             }}
             onClick={handleGoToExchange}
           >
-            Get BNB on Exchange Page
+            Get BNB
           </Button>
         </Box>
 
@@ -181,7 +150,6 @@ export const GetBNBModal: React.FC<GetBNBModalProps> = ({
             Skip (I'll handle gas manually)
           </Button>
         </Flex>
-      </Box>
-    </Flex>
+    </Modal>
   );
 };
