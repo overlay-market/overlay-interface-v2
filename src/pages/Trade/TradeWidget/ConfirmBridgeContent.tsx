@@ -15,7 +15,7 @@ import {
   BridgeStage,
 } from "../../../hooks/lifi/useLiFiBridge";
 import { useSelectedChain } from "../../../hooks/lifi/useSelectedChain";
-import { BRIDGE_SLIPPAGE } from "../../../constants/bridge";
+import { BRIDGE_SLIPPAGE, DEFAULT_TRADING_FEE } from "../../../constants/bridge";
 import { formatAdjustedBridgeAmount } from "../../../utils/lifi/calculateBridgeAmount";
 
 type ConfirmBridgeContentProps = {
@@ -54,7 +54,7 @@ const ConfirmBridgeContent: React.FC<ConfirmBridgeContentProps> = ({
       return (Number(bridgeQuote.expectedOvlAmount) / 1e18).toFixed(4);
     } else {
       // Use the utility function to calculate adjusted amount consistently
-      return formatAdjustedBridgeAmount(typedValue, selectedLeverage);
+      return formatAdjustedBridgeAmount(typedValue, selectedLeverage, DEFAULT_TRADING_FEE);
     }
   }, [bridgeQuote, typedValue, selectedLeverage]);
 
