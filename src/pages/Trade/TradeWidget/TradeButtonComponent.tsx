@@ -47,16 +47,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     useTradeActionHandlers();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
-  const {
-    executeBridge,
-    bridgeStage,
-    resetBridge,
-    bridgedAmount,
-    bridgeQuote,
-    isBridging,
-    getBridgeQuote,
-    proceedAfterGas,
-  } = useLiFiBridge();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const [{ showConfirm, attemptingTransaction }, setTradeConfig] = useState<{
@@ -78,6 +68,17 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { data: riskParamsData } = useRiskParamsQuery({
     marketId: market?.id,
   });
+
+  const {
+    executeBridge,
+    bridgeStage,
+    resetBridge,
+    bridgedAmount,
+    bridgeQuote,
+    isBridging,
+    getBridgeQuote,
+    proceedAfterGas,
+  } = useLiFiBridge(riskParamsData?.markets?.[0]?.tradingFeeRate);
 
   const minCollateral = useMemo(() => {
     if (riskParamsData && riskParamsData.markets.length > 0) {
@@ -515,6 +516,13 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
+    // Check if we're resuming from a needs_gas state
+    if (bridgeStage.stage === 'needs_gas') {
+      console.log("🔋 Resuming from needs_gas stage, reopening gas modal");
+      setShowGasModal(true);
+      return;
+    }
+
     const { quote, error } = await getBridgeQuote();
 
     if (quote) {
@@ -671,7 +679,35 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       attemptingTransaction: true,
     });
 
-    const collateralAmount = BigInt(bridgedAmount);
+    let collateralAmount = 0n;
+    try {
+      const maxInput = await sdk.trade.getMaxInputIncludingFeesFromBalance(
+        market.marketId,
+        BigInt(bridgedAmount),
+        toWei(selectedLeverage),
+        6
+      );
+      collateralAmount = toWei(maxInput);
+    } catch (error) {
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
+      return;
+    }
 
     console.log("🏗️ Building position with:", {
       bridgedAmount: bridgedAmount,

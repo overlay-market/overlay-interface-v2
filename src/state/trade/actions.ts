@@ -1,9 +1,9 @@
 import { createAction } from '@reduxjs/toolkit';
 import { SelectState } from '../../types/selectChainAndTokenTypes';
 
-export enum DefaultTxnSettings { 
+export enum DefaultTxnSettings {
   DEFAULT_SLIPPAGE = '1',
-};
+}
 
 export const typeInput = createAction<{ typedValue: string }>('trade/typeInput');
 export const selectLeverage = createAction<{ selectedLeverage: string }>('trade/selectLeverage');
