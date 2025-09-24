@@ -11,6 +11,9 @@ importers:
       '@0xarc-io/analytics':
         specifier: ^2.2.3
         version: 2.4.2(@types/react@18.3.24)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)
+      '@lifi/sdk':
+        specifier: ^3.10.1
+        version: 3.12.2(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(@types/react@18.3.24)(bufferutil@4.0.9)(immer@10.1.3)(react@18.3.1)(typescript@5.9.2)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(viem@2.37.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
       '@lifi/widget':
         specifier: ^3.28.0
         version: 3.30.1(eau47o2ggxk5mbv66ujx3d7sem)
@@ -63,8 +66,8 @@ importers:
         specifier: ^2.30.1
         version: 2.30.1
       overlay-sdk:
-        specifier: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz
-        version: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.3.1))(@types/react@18.3.24)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.3(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.22.4)
+        specifier: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz
+        version: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.3.1))(@types/react@18.3.24)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.3(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.22.4)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -4645,9 +4648,9 @@ packages:
     resolution: {integrity: sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==}
     engines: {node: '>=0.10.0'}
 
-  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz:
-    resolution: {tarball: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz}
-    version: 0.1.25-beta
+  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz:
+    resolution: {tarball: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz}
+    version: 0.1.26-beta
 
   ox@0.6.7:
     resolution: {integrity: sha512-17Gk/eFsFRAZ80p5eKqv89a57uXjd3NgIf1CaXojATPBuujVc/fQSVhBeAU9JCRB+k7J50WQAyWTxK19T9GgbA==}
@@ -12193,7 +12196,7 @@ snapshots:
 
   os-tmpdir@1.0.2: {}
 
-  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.25-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.3.1))(@types/react@18.3.24)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.3(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.22.4):
+  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.26-beta/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.3.1))(@types/react@18.3.24)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.3(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.22.4):
     dependencies:
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.24)(react@18.3.1))(@types/react@18.3.24)(react@18.3.1)
       '@uniswap/v3-sdk': 3.25.2(hardhat@2.26.3(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))
