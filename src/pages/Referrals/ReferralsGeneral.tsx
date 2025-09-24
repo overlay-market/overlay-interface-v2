@@ -95,10 +95,35 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
     if (state !== ReferralClaimCallbackState.VALID || !account || !claim)
       return;
 
+    const initialEarnedRewards = Number(
+      referralAccountData?.account?.referralPositions?.[0]
+        ?.totalAirdroppedAmount ?? 0
+    );
+
     try {
       await claim(account);
-      await new Promise((res) => setTimeout(res, 2000)); // wait 2s for indexing
-      await refetch();
+
+      // Poll for updated rewards
+      const maxRetries = 10;
+      const delayMs = 2000;
+      let retries = 0;
+      let updated = false;
+
+      while (retries < maxRetries && !updated) {
+        await new Promise((res) => setTimeout(res, delayMs));
+        const { data } = await refetch();
+
+        const earnedRewardsAfter = Number(
+          data?.account?.referralPositions?.[0]?.totalAirdroppedAmount ?? 0
+        );
+
+        if (initialEarnedRewards < earnedRewardsAfter) {
+          updated = true;
+        }
+
+        retries++;
+      }
+
       await fetchRewards();
     } catch (err) {
       console.error("Claim failed", err);
