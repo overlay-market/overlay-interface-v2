@@ -481,7 +481,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     let collateralAmount = 0n;
     try {
       const maxInput = await sdk.trade.getMaxInputIncludingFeesFromBalance(
-        market.marketName,
+        market.marketId,
         BigInt(bridgedAmount),
         toWei(selectedLeverage),
         6
