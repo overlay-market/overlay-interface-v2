@@ -393,6 +393,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
               },
               result.hash
             );
+            setTradeConfig({
+              showConfirm: false,
+              attemptingTransaction: false,
+            });
             return;
           } else {
             throw waitError;
@@ -644,6 +648,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
                 },
                 result.hash
               );
+              setTradeConfig({
+                showConfirm: false,
+                attemptingTransaction: false,
+              });
               return;
             } else {
               throw waitError;
@@ -737,6 +745,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
               },
               result.hash
             );
+            setTradeConfig({
+              showConfirm: false,
+              attemptingTransaction: false,
+            });
             return;
           } else {
             throw waitError;
