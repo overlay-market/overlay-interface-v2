@@ -578,6 +578,11 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
+    if (!sdk || !publicClient) {
+      console.error("Missing required dependencies for trade operation");
+      return;
+    }
+
     const requiredAmount = BigInt(bridgedAmount);
 
     // Wait for balance to update
