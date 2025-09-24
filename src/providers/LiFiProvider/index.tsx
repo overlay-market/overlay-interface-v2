@@ -32,7 +32,7 @@ export const LiFiProvider = ({ children, sdkConfig }: LiFiProviderProps) => {
     if (isInitialized) return;
 
     createConfig({
-      integrator: "overlay",
+      integrator: "overlay-market",
       providers: [
         EVM({
           getWalletClient: async () => {
