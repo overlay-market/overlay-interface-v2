@@ -12,7 +12,8 @@ export interface UserData {
   mostTradedMarket: MostTradedMarket;
   profitablePositions: number;
   rank: number;
-  rankByVolume: number;
+  rankByVolume: number | null;
+  rankByFees: number | null;
   lastUpdated: string; 
   totalFeesOVL: number | string;
   totalFeesUSD: number | string;
@@ -36,6 +37,16 @@ export interface PermanentLeaderboardData {
   totalPages: number;
   userRank?: UserData | null;
   lastUpdated: string;
+}
+
+export interface Season {
+  id: string;
+  name: string;
+  type?: string;
+  start?: string | null;
+  end?: string | null;
+  active?: boolean;
+  hasData?: boolean;
 }
 
 export type ColumnKey =

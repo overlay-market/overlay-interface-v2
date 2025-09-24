@@ -4,8 +4,8 @@ import { shortenAddress } from "../../../utils/web3";
 import { StyledCell, StyledRow } from "./leaderboard-table-styles";
 import Avatar from "boring-avatars";
 import { getRandomColors, getRandomName } from "../../../utils/boringAvatars";
-import { DisplayUserData, ExtendedUserData, Ranking } from "../types";
-import { leaderboardColumns, RANKING_BY } from "./leaderboardConfig";
+import { DisplayUserData, ExtendedUserData } from "../types";
+import { leaderboardColumns } from "./leaderboardConfig";
 
 interface ENSProfile {
   username?: string;
@@ -42,8 +42,7 @@ const LeaderboardRows = ({
     const username =
       userProfile?.username ?? shortenAddress(rank.walletAddress);
     const avatarUrl = userProfile?.avatar ?? null;
-    const displayRank =
-      RANKING_BY === Ranking.ByVolume ? rank.rankByVolume : rank.rank;
+    const displayRank = rank.rank || rank.rankByVolume;
 
     return (
       <StyledRow key={rank.walletAddress}>

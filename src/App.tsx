@@ -45,6 +45,7 @@ const App = () => {
                   <Route path="/trade" element={<Trade />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
+                  <Route path="/leaderboard/:seasonId" element={<Leaderboard />} />
                   <Route path="/airdrops" element={<Airdrops />} />
                   <Route path="/exchange/*" element={<ExchangeLiFi />} />
                   {/* <Route path="/faucet" element={<Faucet />} /> */}
