@@ -105,8 +105,8 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
     }
   };
 
-  const cardsData = useMemo(
-    () => [
+  const cardsData = useMemo(() => {
+    const baseCards = [
       {
         title: "Create a referral code",
         value:
@@ -160,35 +160,42 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             "0"),
         valueType: "Users",
       },
-    ],
-    [
-      createCodeValue,
-      minTradingVolume,
-      referralPositionsChecker,
-      referralAccountData,
-      claim,
-      reward,
-      state,
-    ]
-  );
+    ];
 
-  // Post-process card logic
-  cardsData.forEach((card) => {
-    if (card.title === "Create a referral code") {
-      if (createCodeValue && createCodeValue <= 0) {
-        card.value = `0 ${UNIT} left`;
-        card.valueType = "Create code ->";
-        card.valueTypeLink = true;
+    return baseCards.map((card) => {
+      if (card.title === "Create a referral code") {
+        if (createCodeValue && createCodeValue <= 0) {
+          return {
+            ...card,
+            value: `0 ${UNIT} left`,
+            valueType: "Create code ->",
+            valueTypeLink: true,
+          };
+        }
+        if (tier && tier > 0) {
+          return {
+            ...card,
+            title: "Referral code",
+            value: affiliateLink,
+            valueType: "Copy link ->",
+            valueTypeLink: true,
+            infoTooltip: undefined,
+          };
+        }
       }
-      if (tier && tier > 0) {
-        card.title = "Referral code";
-        card.valueTypeLink = true;
-        card.value = affiliateLink;
-        card.valueType = "Copy link ->";
-        card.infoTooltip = undefined;
-      }
-    }
-  });
+      return card;
+    });
+  }, [
+    createCodeValue,
+    minTradingVolume,
+    referralPositionsChecker,
+    referralAccountData,
+    reward,
+    state,
+    tier,
+    affiliateLink,
+    handleClaim,
+  ]);
 
   return (
     <Flex width={"100%"} height={"auto"} direction={"column"} mb={"90px"}>
