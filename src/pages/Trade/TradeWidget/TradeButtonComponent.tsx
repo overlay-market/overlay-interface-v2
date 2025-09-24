@@ -28,6 +28,7 @@ import { GetBNBModal } from "../../../components/GetBNBModal";
 
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
+import { waitForReceiptWithTimeout } from "../../../utils/waitForReceiptWithTimeout";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -196,14 +197,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       if (!receipt) {
         try {
-          const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("TRANSACTION_TIMEOUT")), 60_000)
-          );
-
-          receipt = await Promise.race([
-            publicClient.waitForTransactionReceipt({ hash: result.hash }),
-            timeoutPromise,
-          ]);
+          receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
             console.warn("Transaction confirmation timeout:", waitError);
@@ -382,14 +376,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       if (!receipt) {
         try {
-          const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(() => reject(new Error("TRANSACTION_TIMEOUT")), 60_000)
-          );
-
-          receipt = await Promise.race([
-            publicClient.waitForTransactionReceipt({ hash: result.hash }),
-            timeoutPromise,
-          ]);
+          receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
             console.warn("Transaction confirmation timeout:", waitError);
@@ -622,7 +609,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       });
 
       try {
-        // Use existing handleApprove logic
         const useShiva = sdk.core.usingShiva();
         const result = useShiva
           ? await sdk.shiva.approveShiva({
@@ -634,17 +620,54 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
               amount: maxUint256,
             });
 
-        addPopup({
-          txn: {
-            hash: result.hash,
-            success: result.receipt?.status === "success",
-            message: "",
-            type: TransactionType.APPROVAL,
-          },
-        });
+        let receipt = result.receipt;
 
-        handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
-        console.log("✅ Approval completed, proceeding with position building");
+        if (!receipt) {
+          try {
+            receipt = await waitForReceiptWithTimeout(
+              publicClient,
+              result.hash
+            );
+          } catch (waitError: any) {
+            if (waitError.message === "TRANSACTION_TIMEOUT") {
+              console.warn("Approval confirmation timeout:", waitError);
+
+              addPopup(
+                {
+                  txn: {
+                    hash: result.hash,
+                    success: null,
+                    message:
+                      "Approval is taking longer than expected. It may still confirm.",
+                    type: TransactionType.APPROVAL,
+                  },
+                },
+                result.hash
+              );
+              return;
+            } else {
+              throw waitError;
+            }
+          }
+        }
+
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: receipt?.status === "success",
+              message: "",
+              type: TransactionType.APPROVAL,
+            },
+          },
+          result.hash
+        );
+
+        if (receipt?.blockNumber) {
+          handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
+        }
+
+        console.log("✅ Approval confirmed, proceeding with position build");
       } catch (error) {
         const { errorCode, errorMessage } = handleError(error as Error);
         addPopup(
@@ -683,29 +706,68 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       minCollateralRequired: minCollateral,
     });
 
-    sdk.market
-      .build({
+    try {
+      const result = await sdk.market.build({
         account: address,
         marketAddress: market?.id as Address,
         collateral: collateralAmount,
         leverage: toWei(selectedLeverage),
         isLong,
         priceLimit: toWei(tradeState.priceInfo.minPrice as string),
-      })
-      .then((result) => {
+      });
+
+      let receipt = result.receipt;
+
+      if (!receipt) {
+        try {
+          receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
+        } catch (waitError: any) {
+          if (waitError.message === "TRANSACTION_TIMEOUT") {
+            console.warn("Transaction confirmation timeout:", waitError);
+
+            addPopup(
+              {
+                txn: {
+                  hash: result.hash,
+                  success: null,
+                  message:
+                    "Transaction is taking longer than expected. It may still confirm.",
+                  type: TransactionType.BUILD_OVL_POSITION,
+                },
+              },
+              result.hash
+            );
+            return;
+          } else {
+            throw waitError;
+          }
+        }
+      }
+
+      if (receipt) {
+        const isSuccess = receipt.status === "success";
+
         addPopup(
           {
             txn: {
               hash: result.hash,
-              success: result.receipt?.status === "success",
+              success: isSuccess,
               message: "",
               type: TransactionType.BUILD_OVL_POSITION,
             },
           },
           result.hash
         );
-        handleTxnHashUpdate(result.hash, Number(result.receipt?.blockNumber));
-        handleTradeStateReset();
+
+        if (receipt.blockNumber) {
+          handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
+        }
+
+        if (isSuccess) {
+          handleTradeStateReset();
+          resetBridge();
+        }
+
         arcxAnalytics?.transaction({
           transactionHash: result.hash,
           account: address,
@@ -714,29 +776,42 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             action: TransactionType.BUILD_OVL_POSITION,
           },
         });
-        resetBridge();
-      })
-      .catch((error: Error) => {
-        const { errorCode, errorMessage } = handleError(error);
-
+      } else {
+        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
-              hash: currentTimeForId,
+              hash: result.hash,
               success: false,
-              message: errorMessage,
-              type: errorCode,
+              message: "Transaction status unknown. Please check your wallet.",
+              type: TransactionType.BUILD_OVL_POSITION,
             },
           },
-          currentTimeForId
+          result.hash
         );
-      })
-      .finally(() => {
-        setTradeConfig({
-          showConfirm: false,
-          attemptingTransaction: false,
-        });
+      }
+    } catch (error) {
+      console.error("Trade operation failed:", error);
+
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+    } finally {
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
       });
+    }
   };
 
   const handleGasModalClose = useCallback(() => {
@@ -744,29 +819,49 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     setShowGasModal(false);
   }, []);
 
-
   useEffect(() => {
-    if (bridgeStage.stage === "success" && !showConfirm && !hasShownTradeModal) {
+    if (
+      bridgeStage.stage === "success" &&
+      !showConfirm &&
+      !hasShownTradeModal
+    ) {
       console.log("🎯 Bridge success, showing trade confirmation modal");
       setTradeConfig({
         showConfirm: true,
         attemptingTransaction: false,
       });
       setHasShownTradeModal(true);
-    } else if (bridgeStage.stage === "needs_gas" && !showGasModal && !hasShownGasModal) {
-      console.log("🔋 Bridge completed but needs gas, closing confirmation modal and showing gas modal");
+    } else if (
+      bridgeStage.stage === "needs_gas" &&
+      !showGasModal &&
+      !hasShownGasModal
+    ) {
+      console.log(
+        "🔋 Bridge completed but needs gas, closing confirmation modal and showing gas modal"
+      );
       setTradeConfig({
-        showConfirm: false,  // Close the confirmation modal
+        showConfirm: false, // Close the confirmation modal
         attemptingTransaction: false,
       });
       setShowGasModal(true);
       setHasShownGasModal(true);
     }
-  }, [bridgeStage, showConfirm, showGasModal, hasShownTradeModal, hasShownGasModal, attemptingTransaction]);
+  }, [
+    bridgeStage,
+    showConfirm,
+    showGasModal,
+    hasShownTradeModal,
+    hasShownGasModal,
+    attemptingTransaction,
+  ]);
 
   // Reset modal tracking when bridge starts over or goes to idle
   useEffect(() => {
-    if (bridgeStage.stage === 'idle' || bridgeStage.stage === 'quote' || bridgeStage.stage === 'approval') {
+    if (
+      bridgeStage.stage === "idle" ||
+      bridgeStage.stage === "quote" ||
+      bridgeStage.stage === "approval"
+    ) {
       setHasShownTradeModal(false);
       setHasShownGasModal(false);
     }
