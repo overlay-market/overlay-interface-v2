@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useAccount from "../../hooks/useAccount";
 import { useReferralAccountData } from "../../hooks/referrals/useReferralAccountData";
 import { Box, Flex, Grid, Text } from "@radix-ui/themes";
@@ -64,17 +64,20 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
   const { callback: claim, state } = useReferralClaim(reward, proof);
 
-  useEffect(() => {
+  const fetchRewards = useCallback(() => {
     if (!account) return;
-
-    fetch(rewardsUrl)
+    return fetch(rewardsUrl)
       .then((res) => res.json())
       .then((data) => {
         setReward((data.reward ?? "").toString());
         setProof(data.proof ?? []);
       })
       .catch((err) => console.error("Error fetching rewards:", err));
-  }, [rewardsUrl, account]);
+  }, [account, rewardsUrl]);
+
+  useEffect(() => {
+    fetchRewards();
+  }, [fetchRewards]);
 
   useEffect(() => {
     if (!isUninitialized) refetch();
@@ -94,6 +97,9 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
     try {
       await claim(account);
+      await new Promise((res) => setTimeout(res, 2000)); // wait 2s for indexing
+      await refetch();
+      await fetchRewards();
     } catch (err) {
       console.error("Claim failed", err);
     }
