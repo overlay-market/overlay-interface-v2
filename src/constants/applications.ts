@@ -36,6 +36,10 @@ export const REFERRAL_LIST_ADDRESS: AddressMap = {
   [SUPPORTED_CHAINID.BSC_MAINNET]: '0xa19338c002a065f4dc3ad1949738ccdc4b10061d',
 }
 
+export const REFERRAL_CLAIM_ADDRESS: AddressMap = {
+  [SUPPORTED_CHAINID.BSC_MAINNET]: '0x8de4a375a373444e6737ef89ff86366e0e22da43',
+}
+
 export const REWARDS_API = 'https://api.overlay.market/rewards'
 
 export const SHIVA_ADDRESS: AddressMap = {
