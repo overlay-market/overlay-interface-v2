@@ -7,7 +7,7 @@ import { TransformedMarketData } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
-import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { calculateAbsoluteSupplyChange } from "../../utils/calculateAbsoluteSupplyChange";
 import { OverlaySDK } from "overlay-sdk";
 
 const Markets: React.FC = () => {
@@ -16,7 +16,7 @@ const Markets: React.FC = () => {
     TransformedMarketData[]
   >([]); // new state
   const [totalSupplyChange, setTotalSupplyChange] = useState<
-    string | undefined
+    number | undefined
   >();
   const [currentPrice, setCurrentPrice] = useState<number | undefined>();
   const sdk = useSDK();
@@ -28,9 +28,8 @@ const Markets: React.FC = () => {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
           activeMarkets && setMarketsData(activeMarkets);
         });
-        sdk.ovl.totalSupplyDayChange().then((supplyChange) => {
-          supplyChange &&
-            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%"));
+        calculateAbsoluteSupplyChange(sdk).then((supplyChange) => {
+          supplyChange !== undefined && setTotalSupplyChange(supplyChange);
         });
         sdk.ovl.price().then((price) => {
           price && setCurrentPrice(price);
