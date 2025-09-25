@@ -18,6 +18,7 @@ import {
 } from "../../hooks/referrals/useReferralClaim";
 import { Hex } from "viem";
 import { formatAmount } from "../../utils/formatAmount";
+import { useAlreadyClaimed } from "../../hooks/referrals/useAlreadyClaimed";
 
 type ReferralsGeneralProps = {
   setShowSubmitReferralCodeForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -63,6 +64,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   const rewardsUrl = `${REWARDS_API}/rewards/${account?.toLowerCase()}?campaign=referral`;
 
   const { callback: claim, state } = useReferralClaim(reward, proof);
+  const alreadyClaimed = useAlreadyClaimed(reward, proof);
 
   const fetchRewards = useCallback(() => {
     if (!account) return;
@@ -161,11 +163,14 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             ? "Processing..."
             : "Claim ->",
         button: handleClaim,
-        hasClaimableReward: Number(reward) > 0,
-        buttonTooltip:
-          (reward &&
-            state !== ReferralClaimCallbackState.LOADING &&
-            formatAmount(reward)) + " OVL available for claiming",
+        hasClaimableReward: alreadyClaimed === false && Number(reward) > 0,
+        buttonTooltip: `${
+          alreadyClaimed === false &&
+          state !== ReferralClaimCallbackState.LOADING &&
+          reward
+            ? formatAmount(reward)
+            : "0"
+        } OVL available for claiming`,
       },
       {
         title: "Total Rewards earned",
