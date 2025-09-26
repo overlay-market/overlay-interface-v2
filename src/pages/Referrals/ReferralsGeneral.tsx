@@ -194,14 +194,6 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
     return baseCards.map((card) => {
       if (card.title === "Create a referral code") {
-        if (createCodeValue && createCodeValue <= 0) {
-          return {
-            ...card,
-            value: `0 ${UNIT} left`,
-            valueType: "Create code ->",
-            valueTypeLink: true,
-          };
-        }
         if (tier && tier > 0) {
           return {
             ...card,
@@ -210,6 +202,14 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             valueType: "Copy link ->",
             valueTypeLink: true,
             infoTooltip: undefined,
+          };
+        }
+        if (createCodeValue && createCodeValue <= 0) {
+          return {
+            ...card,
+            value: `0 ${UNIT} left`,
+            valueType: "Create code ->",
+            valueTypeLink: true,
           };
         }
       }
