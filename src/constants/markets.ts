@@ -48,6 +48,7 @@ import StrategicReverseIndex from '../assets/images/markets-full-logos/strategic
 import BtcUsdLogo from '../assets/images/markets-full-logos/BTC-USD.webp';
 import EthUsdLogo from '../assets/images/markets-full-logos/ETH-USD.webp';
 import CoinVsHood from '../assets/images/markets-full-logos/coin-vs-hood.png';
+import AsterMyx from '../assets/images/markets-full-logos/aster-myx.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -100,6 +101,8 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "ETH%20%2F%20USD": EthUsdLogo,
   "BTC%20%2F%20USD": BtcUsdLogo,
   "Coin%20Vs%20Hood": CoinVsHood,
+  "ASTER%20%2F%20MYX": AsterMyx,
+  "ASTER%20vs%20MYX": AsterMyx,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -110,6 +113,8 @@ export const MARKETSORDER = [
   "amouranth%20vs%20peachJars",
   "binance%20alpha%20index",
   "Counter-Strike%202%20Skins",
+  "ASTER%20%2F%20MYX",
+  "ASTER%20vs%20MYX",
   "ETH%20%2F%20USD",
   "BTC%20%2F%20USD",
   "The%20Weeknd%20Index",
@@ -201,6 +206,8 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Crypto]: [
     "BTC%20Dominance",
     "ETH%20Dominance",
+    "ASTER%20%2F%20MYX",
+    "ASTER%20vs%20MYX",
     "AI%20Index",
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",

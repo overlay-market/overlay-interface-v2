@@ -1,8 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
-import React, { useEffect, useMemo, useState } from "react";
-import { CHAIN_SUBGRAPH_URL } from "../../../constants/subgraph";
-import useSDK from "../../../providers/SDKProvider/useSDK";
-import { gql, request } from "graphql-request";
+import React, { useMemo } from "react";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import {
@@ -11,112 +8,18 @@ import {
   RiskParamsTablesContainer,
 } from "./risk-parameters-styles";
 import theme from "../../../theme";
-
-const document = gql`
-  query RiskParams($marketId: String!) {
-    markets(
-      where: { id: $marketId }
-      orderBy: totalVolume
-      orderDirection: desc
-    ) {
-      id
-      k
-      lmbda
-      delta
-      capPayoff
-      capNotional
-      capLeverage
-      circuitBreakerWindow
-      circuitBreakerMintTarget
-      maintenanceMarginFraction
-      maintenanceMarginBurnRate
-      liquidationFeeRate
-      tradingFeeRate
-      minCollateral
-      priceDriftUpperLimit
-      averageBlockTime
-    }
-  }
-`;
-
-type RiskParamsItem = {
-  averageBlockTime: string;
-  capLeverage: string;
-  capNotional: string;
-  capPayoff: string;
-  circuitBreakerMintTarget: string;
-  circuitBreakerWindow: string;
-  delta: string;
-  id: string;
-  k: string;
-  liquidationFeeRate: string;
-  lmbda: string;
-  maintenanceMarginBurnRate: string;
-  maintenanceMarginFraction: string;
-  minCollateral: string;
-  priceDriftUpperLimit: string;
-  tradingFeeRate: string;
-};
-
-type RiskParamsData = RiskParamsItem[];
-
-type RiskParamsResponse = {
-  markets: RiskParamsData;
-};
+import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
+import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
 
 const RiskParameters: React.FC = () => {
-  const sdk = useSDK();
-  const subgraphUrl = CHAIN_SUBGRAPH_URL[sdk.core.chainId];
   const { currentMarket } = useCurrentMarketState();
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const [riskParamsData, setRiskParamsData] = useState<RiskParamsData | null>(
-    null
-  );
+  const { data } = useRiskParamsQuery({
+    marketId: currentMarket?.id,
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (currentMarket) {
-        try {
-          const data: RiskParamsResponse = await request(
-            subgraphUrl,
-            document,
-            {
-              marketId: currentMarket.id,
-            }
-          );
-          setRiskParamsData(data.markets);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-
-    fetchData();
-  }, [currentMarket, subgraphUrl]);
-
-  const formatAndTransform = (value: string) => {
-    if (value.trim() === "") return "-";
-
-    const bigIntValue = BigInt(value);
-    const divisor = BigInt(1e18);
-    const precision = BigInt(1e10);
-
-    const scaledValue = (bigIntValue * precision) / divisor;
-    const unscaledValue = Number(scaledValue) / 1e10;
-
-    if (unscaledValue < 1) {
-      return unscaledValue.toLocaleString("en-US", {
-        maximumSignificantDigits: 3,
-      });
-    } else {
-      return unscaledValue
-        .toLocaleString("en-US", {
-          maximumFractionDigits: 2,
-        })
-        .replaceAll(",", " ");
-    }
-  };
+  const riskParamsData = data?.markets ?? null;
 
   const averageBlockTime = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
@@ -128,7 +31,7 @@ const RiskParameters: React.FC = () => {
 
   const capLeverage = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].capLeverage);
+      return formatFixedPoint18(riskParamsData[0].capLeverage);
     } else {
       return "-";
     }
@@ -136,7 +39,7 @@ const RiskParameters: React.FC = () => {
 
   const capNotional = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].capNotional);
+      return formatFixedPoint18(riskParamsData[0].capNotional);
     } else {
       return "-";
     }
@@ -144,7 +47,7 @@ const RiskParameters: React.FC = () => {
 
   const capPayoff = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].capPayoff);
+      return formatFixedPoint18(riskParamsData[0].capPayoff);
     } else {
       return "-";
     }
@@ -152,7 +55,7 @@ const RiskParameters: React.FC = () => {
 
   const circuitBreakerMintTarget = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].circuitBreakerMintTarget);
+      return formatFixedPoint18(riskParamsData[0].circuitBreakerMintTarget);
     } else {
       return "-";
     }
@@ -170,7 +73,7 @@ const RiskParameters: React.FC = () => {
 
   const delta = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].delta);
+      return formatFixedPoint18(riskParamsData[0].delta);
     } else {
       return "-";
     }
@@ -178,7 +81,7 @@ const RiskParameters: React.FC = () => {
 
   const k = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return Number(formatAndTransform(riskParamsData[0].k)).toExponential();
+      return Number(formatFixedPoint18(riskParamsData[0].k)).toExponential();
     } else {
       return "-";
     }
@@ -186,7 +89,7 @@ const RiskParameters: React.FC = () => {
 
   const liquidationFeeRate = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].liquidationFeeRate);
+      return formatFixedPoint18(riskParamsData[0].liquidationFeeRate);
     } else {
       return "-";
     }
@@ -194,7 +97,7 @@ const RiskParameters: React.FC = () => {
 
   const lmbda = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].lmbda);
+      return formatFixedPoint18(riskParamsData[0].lmbda);
     } else {
       return "-";
     }
@@ -202,7 +105,7 @@ const RiskParameters: React.FC = () => {
 
   const maintenanceMarginBurnRate = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].maintenanceMarginBurnRate);
+      return formatFixedPoint18(riskParamsData[0].maintenanceMarginBurnRate);
     } else {
       return "-";
     }
@@ -210,7 +113,7 @@ const RiskParameters: React.FC = () => {
 
   const maintenanceMarginFraction = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].maintenanceMarginFraction);
+      return formatFixedPoint18(riskParamsData[0].maintenanceMarginFraction);
     } else {
       return "-";
     }
@@ -218,7 +121,7 @@ const RiskParameters: React.FC = () => {
 
   const minCollateral = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].minCollateral);
+      return formatFixedPoint18(riskParamsData[0].minCollateral);
     } else {
       return "-";
     }
@@ -226,7 +129,7 @@ const RiskParameters: React.FC = () => {
 
   const priceDriftUpperLimit = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].priceDriftUpperLimit);
+      return formatFixedPoint18(riskParamsData[0].priceDriftUpperLimit);
     } else {
       return "-";
     }
@@ -234,7 +137,7 @@ const RiskParameters: React.FC = () => {
 
   const tradingFeeRate = useMemo(() => {
     if (riskParamsData && riskParamsData.length > 0) {
-      return formatAndTransform(riskParamsData[0].tradingFeeRate);
+      return formatFixedPoint18(riskParamsData[0].tradingFeeRate);
     } else {
       return "-";
     }
