@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import useAccount from "../../hooks/useAccount";
 import { useReferralAccountData } from "../../hooks/referrals/useReferralAccountData";
 import { Box, Flex, Grid, Text } from "@radix-ui/themes";
@@ -18,6 +18,7 @@ import {
 } from "../../hooks/referrals/useReferralClaim";
 import { Hex } from "viem";
 import { formatAmount } from "../../utils/formatAmount";
+import { useAlreadyClaimed } from "../../hooks/referrals/useAlreadyClaimed";
 
 type ReferralsGeneralProps = {
   setShowSubmitReferralCodeForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -63,18 +64,22 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   const rewardsUrl = `${REWARDS_API}/rewards/${account?.toLowerCase()}?campaign=referral`;
 
   const { callback: claim, state } = useReferralClaim(reward, proof);
+  const alreadyClaimed = useAlreadyClaimed(reward, proof);
 
-  useEffect(() => {
+  const fetchRewards = useCallback(() => {
     if (!account) return;
-
-    fetch(rewardsUrl)
+    return fetch(rewardsUrl)
       .then((res) => res.json())
       .then((data) => {
         setReward((data.reward ?? "").toString());
         setProof(data.proof ?? []);
       })
       .catch((err) => console.error("Error fetching rewards:", err));
-  }, [rewardsUrl, account]);
+  }, [account, rewardsUrl]);
+
+  useEffect(() => {
+    fetchRewards();
+  }, [fetchRewards]);
 
   useEffect(() => {
     if (!isUninitialized) refetch();
@@ -92,15 +97,43 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
     if (state !== ReferralClaimCallbackState.VALID || !account || !claim)
       return;
 
+    const initialEarnedRewards = Number(
+      referralAccountData?.account?.referralPositions?.[0]
+        ?.totalAirdroppedAmount ?? 0
+    );
+
     try {
       await claim(account);
+
+      // Poll for updated rewards
+      const maxRetries = 10;
+      const delayMs = 2000;
+      let retries = 0;
+      let updated = false;
+
+      while (retries < maxRetries && !updated) {
+        await new Promise((res) => setTimeout(res, delayMs));
+        const { data } = await refetch();
+
+        const earnedRewardsAfter = Number(
+          data?.account?.referralPositions?.[0]?.totalAirdroppedAmount ?? 0
+        );
+
+        if (initialEarnedRewards < earnedRewardsAfter) {
+          updated = true;
+        }
+
+        retries++;
+      }
+
+      await fetchRewards();
     } catch (err) {
       console.error("Claim failed", err);
     }
   };
 
-  const cardsData = useMemo(
-    () => [
+  const cardsData = useMemo(() => {
+    const baseCards = [
       {
         title: "Create a referral code",
         value:
@@ -130,11 +163,14 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             ? "Processing..."
             : "Claim ->",
         button: handleClaim,
-        hasClaimableReward: Number(reward) > 0,
-        buttonTooltip:
-          (reward &&
-            state !== ReferralClaimCallbackState.LOADING &&
-            formatAmount(reward)) + " OVL available for claiming",
+        hasClaimableReward: alreadyClaimed === false && Number(reward) > 0,
+        buttonTooltip: `${
+          alreadyClaimed === false &&
+          state !== ReferralClaimCallbackState.LOADING &&
+          reward
+            ? formatAmount(reward)
+            : "0"
+        } OVL available for claiming`,
       },
       {
         title: "Total Rewards earned",
@@ -154,35 +190,42 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             "0"),
         valueType: "Users",
       },
-    ],
-    [
-      createCodeValue,
-      minTradingVolume,
-      referralPositionsChecker,
-      referralAccountData,
-      claim,
-      reward,
-      state,
-    ]
-  );
+    ];
 
-  // Post-process card logic
-  cardsData.forEach((card) => {
-    if (card.title === "Create a referral code") {
-      if (createCodeValue && createCodeValue <= 0) {
-        card.value = `0 ${UNIT} left`;
-        card.valueType = "Create code ->";
-        card.valueTypeLink = true;
+    return baseCards.map((card) => {
+      if (card.title === "Create a referral code") {
+        if (tier && tier > 0) {
+          return {
+            ...card,
+            title: "Referral code",
+            value: affiliateLink,
+            valueType: "Copy link ->",
+            valueTypeLink: true,
+            infoTooltip: undefined,
+          };
+        }
+        if (createCodeValue && createCodeValue <= 0) {
+          return {
+            ...card,
+            value: `0 ${UNIT} left`,
+            valueType: "Create code ->",
+            valueTypeLink: true,
+          };
+        }
       }
-      if (tier && tier > 0) {
-        card.title = "Referral code";
-        card.valueTypeLink = true;
-        card.value = affiliateLink;
-        card.valueType = "Copy link ->";
-        card.infoTooltip = undefined;
-      }
-    }
-  });
+      return card;
+    });
+  }, [
+    createCodeValue,
+    minTradingVolume,
+    referralPositionsChecker,
+    referralAccountData,
+    reward,
+    state,
+    tier,
+    affiliateLink,
+    handleClaim,
+  ]);
 
   return (
     <Flex width={"100%"} height={"auto"} direction={"column"} mb={"90px"}>

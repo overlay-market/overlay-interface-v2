@@ -4,12 +4,19 @@ import { Box, Flex } from "@radix-ui/themes";
 import { GradientOutlineButton } from "../Button";
 import ChainSwitch from "./ChainSwitch";
 import ConnectWalletModal from "../ConnectWalletModal";
+import { DEFAULT_CHAINID } from "../../constants/chains";
+import { OVL_ADDRESS } from "overlay-sdk";
 
 const Wallet: React.FC = () => {
   const navigate = useNavigate();
 
   const toggleWidget = () => {
-    navigate("/exchange");
+    // Navigate to exchange with OVL pre-selected as target token
+    const searchParams = new URLSearchParams({
+      toChain: DEFAULT_CHAINID.toString(),
+      toToken: OVL_ADDRESS[DEFAULT_CHAINID as number],
+    });
+    navigate(`/exchange?${searchParams.toString()}`);
   };
 
   return (

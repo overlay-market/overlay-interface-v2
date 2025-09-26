@@ -162,17 +162,20 @@ const OpenPositionsTable: React.FC = () => {
             </tr>
           ) : (
             positions &&
-            positions.map((position: OpenPositionData) => (
-              <OpenPosition
-                position={position}
-                key={position.positionId}
-                showCheckbox={showCheckboxes}
-                onCheckboxChange={(checked) =>
-                  handlePositionSelect(position, checked)
-                }
-                isChecked={selectedPositions.has(getPositionKey(position))}
-              />
-            ))
+            positions.map((position: OpenPositionData) => {
+              const positionKey = getPositionKey(position);
+              return (
+                <OpenPosition
+                  position={position}
+                  key={positionKey}
+                  showCheckbox={showCheckboxes}
+                  onCheckboxChange={(checked) =>
+                    handlePositionSelect(position, checked)
+                  }
+                  isChecked={selectedPositions.has(positionKey)}
+                />
+              );
+            })
           )
         }
       />

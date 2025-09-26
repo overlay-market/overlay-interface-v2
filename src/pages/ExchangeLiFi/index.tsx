@@ -3,7 +3,6 @@ import { LiFiWidget, WidgetConfig, WidgetDrawer } from "@lifi/widget";
 import { Box, Flex } from "@radix-ui/themes";
 import theme from "../../theme";
 import { DEFAULT_CHAINID } from "../../constants/chains";
-import { OVL_ADDRESS } from "overlay-sdk";
 import { LiFiWidgetEventsHandler } from "./LiFiWidgetEventsHandler";
 import useChainSwitch from "../../hooks/useChainSwitch";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
@@ -39,8 +38,6 @@ const ExchangeLiFi: React.FC = () => {
     variant: "compact",
     subvariant: "default",
     appearance: "dark",
-    toChain: Number(DEFAULT_CHAINID),
-    toToken: OVL_ADDRESS[DEFAULT_CHAINID as number],
     formUpdateKey: new Date().valueOf().toString(),
     theme: {
       colorSchemes: {

@@ -1,6 +1,9 @@
 export const SOLANA_DEVNET_EID = 30168; // LayerZero endpoint id for Solana mainnet
 export const BRIDGE_CONTRACT_ADDRESS = "0x551D0BCd03aA13609a6982Cf8554f9ACa04C9464"; // BSC mainnet OvlOFTAdapter
 export const OVL_TOKEN_ADDRESS = "0x1F34c87ded863Fe3A3Cd76FAc8adA9608137C8c3";
+export const BRIDGE_SLIPPAGE = 0.01; // 1%
+export const BRIDGE_FEE = 0.005; // 0.5%
+export const DEFAULT_TRADING_FEE = "10000000000000000"; // 1% in FixedPoint18 format
 
 export const BRIDGE_ABI = [
         {

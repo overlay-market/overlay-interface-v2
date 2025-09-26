@@ -12,7 +12,7 @@ import useAccount from "../../hooks/useAccount";
 import theme from "../../theme";
 import formatUnixTimestampToDate from "../../utils/formatUnixTimestampToDate";
 import { useTokenTransfersReferralData } from "../../hooks/referrals/useTokenTransfersReferralData";
-import { REFERRAL_LIST_ADDRESS, UNIT } from "../../constants/applications";
+import { REFERRAL_CLAIM_ADDRESS, UNIT } from "../../constants/applications";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { OVL_TOKEN_ADDRESS } from "../../constants/bridge";
 import * as Collapsible from "@radix-ui/react-collapsible";
@@ -28,14 +28,14 @@ export const RebatesTable = () => {
   const [open, setOpen] = useState(true);
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const referralListAddress = chainId
-    ? REFERRAL_LIST_ADDRESS[chainId]
-    : REFERRAL_LIST_ADDRESS[DEFAULT_CHAINID as number];
+  const referralClaimAddress = chainId
+    ? REFERRAL_CLAIM_ADDRESS[chainId]
+    : REFERRAL_CLAIM_ADDRESS[DEFAULT_CHAINID as number];
 
   const { tokenTransfersData, isLoading, refetch, isUninitialized } =
     useTokenTransfersReferralData(
       account,
-      referralListAddress,
+      referralClaimAddress,
       OVL_TOKEN_ADDRESS
     );
 
