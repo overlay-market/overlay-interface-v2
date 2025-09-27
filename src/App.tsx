@@ -13,6 +13,7 @@ import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
+import Referrals from "./pages/Referrals";
 import Trackers from "./components/Trackers";
 import Leaderboard from "./pages/Leaderboard";
 import { LiFiProvider } from "./providers/LiFiProvider";
@@ -45,7 +46,11 @@ const App = () => {
                   <Route path="/trade" element={<Trade />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
-                  <Route path="/leaderboard/:seasonId" element={<Leaderboard />} />
+                  <Route
+                    path="/leaderboard/:seasonId"
+                    element={<Leaderboard />}
+                  />
+                  <Route path="/referrals" element={<Referrals />} />
                   <Route path="/airdrops" element={<Airdrops />} />
                   <Route path="/exchange/*" element={<ExchangeLiFi />} />
                   {/* <Route path="/faucet" element={<Faucet />} /> */}
@@ -55,7 +60,7 @@ const App = () => {
               </Flex>
             </AppContainer>
           </Theme>
-        </LiFiProvider>   
+        </LiFiProvider>
       </SDKProvider>
     </MultichainContextProvider>
   );

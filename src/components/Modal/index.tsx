@@ -55,7 +55,7 @@ const Modal: React.FC<ModalProps> = ({
         >
           <Dialog.Title
             style={{
-              margin: "0",
+              margin: "0 18px 0 0",
               fontSize: fontSizeTitle,
               textAlign: textAlignTitle,
             }}
