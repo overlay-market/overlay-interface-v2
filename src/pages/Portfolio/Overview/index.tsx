@@ -1,7 +1,6 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
 import { InfoCardsGrid, MainCardsGrid } from "./overview-styles";
-import OverviewCard from "./OverviewCard";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
@@ -12,6 +11,7 @@ import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
 import { useOverviewDataRefresh } from "./hooks";
+import OverviewCard from "../../../components/OverviewCard";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
@@ -74,25 +74,26 @@ const Overview: React.FC = () => {
             <OverviewCard
               title="Open Positions"
               value={overviewData?.numberOfOpenPositions}
+              valueType={null}
             />
 
             <OverviewCard
               title="Locked Sum"
               value={overviewData?.totalValueLocked}
-              unit={UNIT}
+              valueType={UNIT}
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
 
             <OverviewCard
               title="Realized"
               value={overviewData?.realizedPnl}
-              unit={UNIT}
+              valueType={UNIT}
             />
 
             <OverviewCard
               title="Unrealized"
               value={overviewData?.unrealizedPnL}
-              unit={UNIT}
+              valueType={UNIT}
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
           </InfoCardsGrid>
