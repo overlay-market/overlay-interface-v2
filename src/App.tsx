@@ -51,6 +51,7 @@ const App = () => {
                     path="/leaderboard/:seasonId"
                     element={<Leaderboard />}
                   />
+                  <Route path="/referrals" element={<Referrals />} />
                   <Route path="/airdrops" element={<Airdrops />} />
                   <Route path="/exchange/*" element={<ExchangeLiFi />} />
                   {/* <Route path="/faucet" element={<Faucet />} /> */}

@@ -33,7 +33,7 @@ export const Form: React.FC<FormProps> = ({
   return (
     <ContentContainer>
       <Text size={{ initial: "2", sm: "4" }} weight="bold" align="center">
-        Rebates. Fee discounts
+        Earn while others trade.
       </Text>
       <Flex direction="column" gap="20px">
         <ReferralModal tier="affiliate" />

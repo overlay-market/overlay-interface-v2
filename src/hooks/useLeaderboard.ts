@@ -12,9 +12,7 @@ export const useLeaderboard = (
   sortBy?: Ranking
 ) => {
   const endpointBase = seasonId ? `seasonal/${seasonId}` : "all-time";
-  const endpoint = `${endpointBase}/leaderboard/${numberOfRows}
-    ${walletAddress ? `/${walletAddress}` : ""}
-    ${(sortBy || !seasonId) ? "?sortBy=" + (sortBy || RANKING_BY) : ""}`;
+  const endpoint = `${endpointBase}/leaderboard/${numberOfRows}${walletAddress ? `/${walletAddress}` : ""}${(sortBy || !seasonId) ? "?sortBy=" + (sortBy || RANKING_BY) : ""}`;
 
   const fetchPermanentLeaderboard = async (): Promise<PermanentLeaderboardData> => {
     const response = await fetch(`${PERMANENT_LEADERBOARD_API}${endpoint}`);

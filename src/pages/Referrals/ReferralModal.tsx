@@ -23,7 +23,7 @@ const ReferralModal = ({ tier }: ReferralModalProps) => {
             mb={"32px"}
           >
             <Text as="p" size="2">
-              Refer users to earn rewards. Ambassadors earn greater rewards.{" "}
+              Become Ambassadors to earn greater rewards.{" "}
             </Text>
             <span
               onClick={handleOpen}
@@ -62,11 +62,11 @@ const ReferralModal = ({ tier }: ReferralModalProps) => {
         >
           <Text size="3" mt="16px">
             Referrers earn 10% of referred users’ fees, and referred users
-            receive a 4% fee discount. Referral earnings will have a cap per
+            receive a x% discount of fees. Referral earnings will have a cap per
             referred user.
           </Text>
           <Text size="3" mt="12px">
-            If you have over $10M volume on Overlay in 30d or have 5000+ social
+            If you have over $xM volume on Overlay in 30d or have 5000+ social
             media followers, you can apply for the Ambassador Program.
           </Text>
 
