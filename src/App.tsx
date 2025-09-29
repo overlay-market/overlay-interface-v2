@@ -45,6 +45,7 @@ const App = () => {
                   <Route path="/markets" element={<Markets />} />
                   <Route path="/trade" element={<Trade />} />
                   <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/referrals" element={<Referrals />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
                   <Route
                     path="/leaderboard/:seasonId"
