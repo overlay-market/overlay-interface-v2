@@ -14,7 +14,8 @@ import Loader from "../Loader";
 import UnwindPosition from "./UnwindPosition";
 import PositionNotFound from "./PositionNotFound";
 import WithdrawOVL from "./WithdrawOVL";
-import { useTradeState, useUnwindPreference } from "../../state/trade/hooks";
+import ShareSuccess from "./ShareSuccess";
+import { useTradeState, useUnwindPreference, useTradeActionHandlers } from "../../state/trade/hooks";
 import useSDK from "../../providers/SDKProvider/useSDK";
 
 type PositionUnwindModalProps = {
@@ -34,6 +35,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
   const isUnwindStateError = useTypeGuard<UnwindStateError>("error");
   const { slippageValue } = useTradeState();
   const unwindPreference = useUnwindPreference();
+  const { handleTxnHashUpdate } = useTradeActionHandlers();
 
   const [unwindState, setUnwindState] = useState<UnwindStateData | undefined>(
     undefined
@@ -44,9 +46,49 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
   const [quoteLoading, setQuoteLoading] = useState(false);
   const [quoteFailed, setQuoteFailed] = useState(false);
 
+  // State for handling successful unwind with profit sharing
+  const [showShareSuccess, setShowShareSuccess] = useState<boolean>(false);
+  const [shareData, setShareData] = useState<{
+    unwindState: UnwindStateSuccess;
+    inputValue: string;
+    unwindPercentage: number;
+    transactionHash?: string;
+    blockNumber?: number;
+  } | null>(null);
+
   useEffect(() => {
     setInputValue("");
+    setShowShareSuccess(false);
+    setShareData(null);
   }, [open]);
+
+  const handleUnwindSuccess = (
+    finalUnwindState: UnwindStateSuccess,
+    finalInputValue: string,
+    finalUnwindPercentage: number,
+    transactionHash?: string,
+    blockNumber?: number
+  ) => {
+    // Always show share success modal for any unwind (profit or loss)
+    setShareData({
+      unwindState: finalUnwindState,
+      inputValue: finalInputValue,
+      unwindPercentage: finalUnwindPercentage,
+      transactionHash,
+      blockNumber,
+    });
+    setShowShareSuccess(true);
+  };
+
+  const handleShareModalDismiss = () => {
+    // Intentionally delay transaction hash update until after share modal dismissal
+    // This prevents portfolio refresh while user is viewing/sharing their results
+    // Better UX: user sees their trade card without data changing underneath
+    if (shareData?.transactionHash && shareData?.blockNumber) {
+      handleTxnHashUpdate(shareData.transactionHash, shareData.blockNumber);
+    }
+    handleDismiss();
+  };
 
   useEffect(() => {
     let isCancelled = false; // Flag to track if the effect should be cancelled
@@ -150,7 +192,8 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
   }, [open, unwindPreference, unwindState, account, slippageValue, sdk, isUnwindStateSuccess]);
 
   return (
-    <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
+    <>
+    <Modal triggerElement={null} open={open && !showShareSuccess} handleClose={handleDismiss}>
       <Flex mt={"24px"} direction={"column"} width={"100%"} align={"center"}>
         <Text
           style={{
@@ -179,7 +222,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
         </Flex>
       )}
 
-      {isUnwindStateSuccess(unwindState) && (
+      {isUnwindStateSuccess(unwindState) && !showShareSuccess && (
         <UnwindPosition
           position={position}
           unwindState={unwindState}
@@ -192,8 +235,10 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
           quoteLoading={quoteLoading}
           quoteFailed={quoteFailed}
           slippageValue={slippageValue}
+          onUnwindSuccess={handleUnwindSuccess}
         />
       )}
+
 
       {isUnwindStateError(unwindState) && unwindState.isShutdown && (
         <WithdrawOVL
@@ -207,6 +252,19 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
         <PositionNotFound />
       )}
     </Modal>
+
+    {/* ShareSuccess as standalone modal */}
+    {showShareSuccess && shareData && (
+      <ShareSuccess
+        open={showShareSuccess}
+        position={position}
+        unwindState={shareData.unwindState}
+        unwindPercentage={shareData.unwindPercentage}
+        transactionHash={shareData.transactionHash}
+        handleDismiss={handleShareModalDismiss}
+      />
+    )}
+    </>
   );
 };
 

@@ -28,6 +28,13 @@ type UnwindPositionProps = {
   quoteLoading: boolean;
   quoteFailed: boolean;
   slippageValue: string | number;
+  onUnwindSuccess?: (
+    unwindState: UnwindStateSuccess,
+    inputValue: string,
+    unwindPercentage: number,
+    transactionHash?: string,
+    blockNumber?: number
+  ) => void;
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({
@@ -42,6 +49,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   quoteLoading,
   quoteFailed,
   slippageValue,
+  onUnwindSuccess,
 }) => {
   const [percentageValue, setPercentageValue] = useState<string>("");
   const [selectedPercent, setSelectedPercent] = useState<number>(0);
@@ -245,6 +253,8 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           isPendingTime={isPendingTime}
           unwindStable={shouldUseStableUnwind}
           handleDismiss={handleDismiss}
+          unwindState={unwindState}
+          onUnwindSuccess={onUnwindSuccess}
         />
       </Flex>
 
