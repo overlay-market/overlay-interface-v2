@@ -8,6 +8,8 @@ import type { Address } from "viem";
 import { useAppSelector } from "../hooks";
 import { TransactionType } from "../../constants/transaction";
 import usePrevious from "../../hooks/usePrevious";
+import { SHIVA_ADDRESS } from "../../constants/applications";
+import { getZeroValuePositions } from "../../utils/getZeroValuePositions";
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
@@ -103,8 +105,35 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData = !arePositionsEqual(validPositions, previousValidPositions) && Boolean(validPositions);
-        setPositions(validPositions);
+        const invalidPositionsWithMarket = result.data.filter(
+        (pos: OpenPositionData) =>
+          pos &&
+          pos.marketAddress &&
+          !(
+            pos.size &&
+            pos.currentPrice &&
+            pos.liquidatePrice
+          )
+      );
+
+      let zeroValuePositions: OpenPositionData[] = [];
+      if (invalidPositionsWithMarket.length > 0) {
+        zeroValuePositions = await getZeroValuePositions(
+          sdkRef.current.core,
+          invalidPositionsWithMarket,
+          SHIVA_ADDRESS[sdkRef.current.core.chainId].toLowerCase() as Address
+        );
+      }
+
+        const allValidPositions = [...validPositions, ...zeroValuePositions];
+        allValidPositions.sort((a, b) => {
+          const dateA = new Date(a.parsedCreatedTimestamp ?? "").getTime();
+          const dateB = new Date(b.parsedCreatedTimestamp ?? "").getTime();
+          return dateB - dateA;
+        });
+
+        const hasNewData = !arePositionsEqual(allValidPositions, previousValidPositions) && Boolean(allValidPositions);
+        setPositions(allValidPositions);
         setPositionsTotalNumber(result.total);
         return hasNewData;
       } catch (error) {
