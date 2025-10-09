@@ -2,7 +2,7 @@ import { Text } from "@radix-ui/themes";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   LineSeparator,
   PositionsTableContainer,
@@ -16,6 +16,8 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { getZeroValuePositions } from "../../../utils/getZeroValuePositions";
+import { SHIVA_ADDRESS } from "../../../constants/applications";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -49,42 +51,85 @@ const PositionsTable: React.FC = () => {
     sdkRef.current = sdk;
   }, [sdk]);
 
-  useEffect(() => {
-    const fetchOpenPositions = async () => {
+  const fetchPositions = useCallback(
+    async (retryCount = 0): Promise<boolean> => {
       if (!account || !marketId) {
         setPositions(undefined);
         setPositionsTotalNumber(0);
+        return false;
       }
 
-      if (marketId && account) {
-        const refreshData = isNewTxnHash;
-        setLoading(true);
-        try {
-          const positions =
-            await sdkRef.current.openPositions.transformOpenPositions(
-              currentPage,
-              itemsPerPage,
-              marketId,
-              account as Address,
-              refreshData
-            );
+      try {
+        const result =
+          await sdkRef.current.openPositions.transformOpenPositions(
+            currentPage,
+            itemsPerPage,
+            marketId,
+            account as Address,
+            isNewTxnHash
+          );
 
-          positions && setPositions(positions.data);
-          positions && setPositionsTotalNumber(positions.total);
-          if (!positions) {
-            setPositions(undefined);
-            setPositionsTotalNumber(0);
-          }
-        } catch (error) {
-          console.error("Error fetching open positions:", error);
-        } finally {
-          setLoading(false);
+        if (!result || !result.data) {
+          throw new Error("No position data received");
         }
-      }
-    };
 
-    fetchOpenPositions();
-  }, [chainId, marketId, account, isNewTxnHash, currentPage, itemsPerPage]);
+        const validPositions = result.data.filter((pos: OpenPositionData) => {
+          return (
+            pos &&
+            pos.marketName &&
+            pos.size &&
+            pos.positionSide &&
+            pos.entryPrice &&
+            pos.currentPrice &&
+            pos.liquidatePrice &&
+            pos.parsedCreatedTimestamp
+          );
+        });
+
+        const invalidPositionsWithMarket = result.data.filter(
+          (pos: OpenPositionData) =>
+            pos && pos.marketAddress && !(pos.size && pos.liquidatePrice)
+        );
+
+        let zeroValuePositions: OpenPositionData[] = [];
+
+        if (invalidPositionsWithMarket.length > 0) {
+          zeroValuePositions = await getZeroValuePositions(
+            sdkRef.current.core,
+            invalidPositionsWithMarket,
+            SHIVA_ADDRESS[sdkRef.current.core.chainId].toLowerCase() as Address
+          );
+        }
+
+        const allValidPositions = [...validPositions, ...zeroValuePositions];
+        allValidPositions.sort((a, b) => {
+          const dateA = new Date(a.parsedCreatedTimestamp ?? "").getTime();
+          const dateB = new Date(b.parsedCreatedTimestamp ?? "").getTime();
+          return dateB - dateA;
+        });
+
+        setPositions(allValidPositions);
+        setPositionsTotalNumber(result.total ?? allValidPositions.length);
+
+        return true;
+      } catch (error) {
+        console.error("Error fetching positions:", error);
+        if (retryCount < 2) {
+          console.warn("Retrying fetchPositions...");
+          return fetchPositions(retryCount + 1);
+        }
+        return false;
+      }
+    },
+    [account, currentPage, itemsPerPage, marketId, isNewTxnHash]
+  );
+
+  useEffect(() => {
+    if (!sdkRef.current || !chainId) return;
+
+    setLoading(true);
+    fetchPositions().finally(() => setLoading(false));
+  }, [fetchPositions, chainId]);
 
   useEffect(() => {
     setCurrentPage(1);
