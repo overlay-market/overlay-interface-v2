@@ -8,6 +8,17 @@ export type PositionData = {
   cost: bigint;
   tradingFee: bigint;
   marketMid: bigint;
+  currentOi: bigint;
+  info: {
+    notionalInitial: bigint;
+    debtInitial: bigint;
+    midTick: number;
+    entryTick: number;
+    isLong: boolean;
+    liquidated: boolean;
+    oiShares: bigint;
+    fractionRemaining: number;
+  };
 };
 
 export async function getOnchainPositionsData(
@@ -26,6 +37,12 @@ export async function getOnchainPositionsData(
   const costFn = OverlayV1StateABIFunctions.find((abi) => abi.name === "cost");
   const tradingFeeFn = OverlayV1StateABIFunctions.find(
     (abi) => abi.name === "tradingFee"
+  );
+  const infoFn = OverlayV1StateABIFunctions.find(
+    (abi) => abi.name === "position"
+  );
+  const currentOiFn = OverlayV1StateABIFunctions.find(
+    (abi) => abi.name === "oi"
   );
 
   const calls: {
@@ -63,6 +80,18 @@ export async function getOnchainPositionsData(
         functionName: "tradingFee",
         args: [marketId, walletClient, positionId],
       },
+      {
+        address: V1_PERIPHERY_ADDRESS[chainId],
+        abi: [infoFn!] as Abi,
+        functionName: "position",
+        args: [marketId, walletClient, positionId],
+      },
+      {
+        address: V1_PERIPHERY_ADDRESS[chainId],
+        abi: [currentOiFn!] as Abi,
+        functionName: "oi",
+        args: [marketId, walletClient, positionId],
+      }
     );
   }
 
@@ -81,12 +110,16 @@ export async function getOnchainPositionsData(
     const midRes = results[baseIndex + 1];
     const costRes = results[baseIndex + 2];
     const feeRes = results[baseIndex + 3];
+    const infoRes = results[baseIndex + 4];
+    const oiRes = results[baseIndex + 5];
 
     if (
       liqRes.status === "success" ||
       midRes.status === "success" ||
       costRes.status === "success" ||
-      feeRes.status === "success" 
+      feeRes.status === "success" ||
+      infoRes.status === "success" ||
+      oiRes.status === "success"
     ) {
       data[`${marketId}-${positionId}`] = {
         liquidatePrice:
@@ -96,6 +129,17 @@ export async function getOnchainPositionsData(
            cost: costRes.status === "success" ? (costRes.result as bigint) : 0n,
         tradingFee:
           feeRes.status === "success" ? (feeRes.result as bigint) : 0n, 
+        info: infoRes.status === "success" ? (infoRes.result as {
+          notionalInitial: bigint;
+          debtInitial: bigint;
+          midTick: number;
+          entryTick: number;
+          isLong: boolean;
+          liquidated: boolean;
+          oiShares: bigint;
+          fractionRemaining: number;
+        }) : {},
+        currentOi: oiRes.status === "success" ? (oiRes.result as bigint) : 0n,
       } as PositionData;
     } else {
       data[`${marketId}-${positionId}`] = null;

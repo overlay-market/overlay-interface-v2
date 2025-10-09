@@ -31,7 +31,7 @@ export async function getZeroValuePositions(
       const fetched = extraData[key];
       if (!fetched) return pos;
 
-      const { liquidatePrice, cost, tradingFee, marketMid } = fetched;            
+      const { liquidatePrice, cost, tradingFee, marketMid, currentOi, info } = fetched;            
 
       const unrealizedPnL: string | number | undefined = (() => {
         const diff =
@@ -39,6 +39,20 @@ export async function getZeroValuePositions(
           10 ** 18;
         return diff < 1 ? diff.toFixed(6) : diff.toFixed(2);
       })();
+
+      const ONE_BN = 10n ** 18n;
+      const tickToPrice = (tick: number): bigint => BigInt(Math.floor(Math.pow(1.0001, tick) * 1e18)); 
+
+      const parsedFunding: string | number | undefined = (() => { 
+        if (info === undefined || !currentOi || !marketMid) return undefined; 
+        const baseFractionRemaining = 10000n; 
+        const remainingNotionalInitial = (BigInt(info.notionalInitial) * BigInt(info.fractionRemaining)) / baseFractionRemaining; 
+        const remainingOiInitial = (remainingNotionalInitial * ONE_BN) / tickToPrice(info.midTick); 
+        if (remainingOiInitial === 0n) return undefined; 
+        const fundingPayments = (BigInt(marketMid) * (BigInt(currentOi) - remainingOiInitial)) / ONE_BN; 
+        const fullValue = formatBigNumber( fundingPayments < 0n ? -fundingPayments : fundingPayments, 18, 18 ); 
+        if (fullValue === undefined) return "-"; 
+        return +fullValue < 1 ? formatBigNumber(fundingPayments, 18, 6) : formatBigNumber(fundingPayments, 18, 2); })();
 
       return {
         ...pos,
@@ -50,7 +64,7 @@ export async function getZeroValuePositions(
           ? formatPriceWithCurrency(formatBigNumber(liquidatePrice, Number(18), 4), pos.priceCurrency) 
           : "-", 
         unrealizedPnL: unrealizedPnL ? unrealizedPnL : "-",  
-        parsedFunding: "0",
+        parsedFunding: parsedFunding ? parsedFunding : "-",
       };
     });
 
