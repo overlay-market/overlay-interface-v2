@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { MARKET_CHART_URL } from "../constants/applications";
 import { CHAINS } from "overlay-sdk";
+import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
+import { SUPPORTED_CHAINID } from "../constants/chains";
 
 interface MarketDataPoint {
   latestPrice: number;
@@ -22,6 +24,7 @@ interface MarketDataWithOpenPrice {
 }
 
 export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
+  const { chainId } = useMultichainContext();
   const [marketsData, setMarketsData] = useState<MarketDataWithOpenPrice[]>([]);
   const [marketAddressMapping, setMarketAddressMapping] = useState<
     Record<string, string>
@@ -29,6 +32,14 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
 
   // Memoized version of marketIds to avoid unnecessary re-fetches
   const stableMarketIds = useMemo(() => marketIds, [marketIds]);
+
+  // Determine chart URL based on chain ID
+  const chartUrl = useMemo(() => {
+    if (chainId === SUPPORTED_CHAINID.BSC_TESTNET) {
+      return MARKET_CHART_URL.BSC_TESTNET;
+    }
+    return MARKET_CHART_URL.BSC_MAINNET;
+  }, [chainId]);
 
   // Fetch the market address mapping once
   useEffect(() => {
@@ -69,7 +80,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
 
       try {
         const responseOverview = await axios.get<MarketDataPoint[]>(
-          `${MARKET_CHART_URL.BSC_MAINNET}/marketsPricesOverview`
+          `${chartUrl}/marketsPricesOverview`
         );
         const chartDataArray = responseOverview.data;
 
@@ -140,7 +151,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
     const intervalId = setInterval(fetchMarketsPricesOverview, 300000); // 5 minutes interval
 
     return () => clearInterval(intervalId);
-  }, [marketAddressMapping, stableMarketIds]);
+  }, [marketAddressMapping, stableMarketIds, chartUrl]);
 
   return marketsData;
 }
