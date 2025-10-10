@@ -11,7 +11,6 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
-import { useArcxAnalytics } from "@0xarc-io/analytics";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
 
@@ -38,8 +37,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
-  const arcxAnalytics = useArcxAnalytics();
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
   const publicClient = usePublicClient();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
@@ -140,15 +138,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         if (receipt.blockNumber) {
           handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
         }
-
-        arcxAnalytics?.transaction({
-          transactionHash: result.hash,
-          account: address,
-          chainId,
-          metadata: {
-            action: TransactionType.UNWIND_OVL_POSITION,
-          },
-        });
       } else {
         console.error("No receipt received after successful wait");
         addPopup(
