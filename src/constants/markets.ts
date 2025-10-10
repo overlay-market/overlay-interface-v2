@@ -50,6 +50,7 @@ import EthUsdLogo from '../assets/images/markets-full-logos/ETH-USD.webp';
 import CoinVsHood from '../assets/images/markets-full-logos/coin-vs-hood.png';
 import AsterMyx from '../assets/images/markets-full-logos/aster-myx.jpg';
 import MrBeastLogo from '../assets/images/markets-full-logos/MrBeast.jpg';
+import GoldUsdLogo from '../assets/images/markets-full-logos/gold-usd-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -104,6 +105,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Coin%20Vs%20Hood": CoinVsHood,
   "ASTER%20vs%20MYX": AsterMyx,
   "MrBeast%20Index": MrBeastLogo,
+  "GOLD%20%2F%20USD": GoldUsdLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
