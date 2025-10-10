@@ -31,6 +31,7 @@ export type AddressMap = { [chainId: number]: Address };
 
 export const SHIVA_ADDRESS: AddressMap = {
   [SUPPORTED_CHAINID.BSC_MAINNET]: "0xeB497c228F130BD91E7F13f81c312243961d894A",
+  [SUPPORTED_CHAINID.BSC_TESTNET]: "0x9fB7D92526Fc13bB3c0603d39E55e5C371c26Ce6",
 };
 
 export const DEFAULT_TOKEN_SYMBOL = "OVL";
