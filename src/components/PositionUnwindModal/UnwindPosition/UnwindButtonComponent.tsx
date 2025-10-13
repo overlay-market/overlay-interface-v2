@@ -13,6 +13,7 @@ import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
+import { trackEvent } from "../../../utils/analytics";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -135,6 +136,12 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           result.hash
         );
 
+        trackEvent("unwind_ovl_position_success", {
+          transaction_hash: result.hash,
+          account: address,
+          timestamp: new Date().toISOString(),
+        });
+
         if (receipt.blockNumber) {
           handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
         }
@@ -168,6 +175,12 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         },
         currentTimeForId
       );
+
+      trackEvent("unwind_ovl_position_failed", {
+        error_message: errorMessage,
+        account: address,
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setAttemptingUnwind(false);
       handleDismiss();
