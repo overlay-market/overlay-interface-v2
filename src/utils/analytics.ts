@@ -2,7 +2,10 @@ export const GA_TRACKING_ID = "G-LBE2VY2GPX";
 
 export const trackEvent = (action: string, params?: Record<string, any>) => {
   if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", action, params);
+    const safeParams = Object.fromEntries(
+      Object.entries(params || {}).map(([key, val]) => [key, String(val)])
+    );
+    (window as any).gtag("event", action, safeParams);
   }
 };
 
