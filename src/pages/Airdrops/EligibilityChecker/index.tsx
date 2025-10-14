@@ -18,6 +18,7 @@ import {
 import { EligibilityStatus } from "..";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { LINKS } from "../../../constants/links";
+import { trackEvent } from "../../../utils/analytics";
 
 type EligibilityCheckerProps = {
   eligibilityStatus: EligibilityStatus;
@@ -153,14 +154,21 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
             <InfoContainer>
               <Text size={"1"} style={{ lineHeight: "14.5px" }}>
                 <span style={{ fontWeight: "600" }}>
-                  Not eligible this round? Stay updated on X for future opportunities.
+                  Not eligible this round? Stay updated on X for future
+                  opportunities.
                 </span>{" "}
               </Text>
 
-              <StyledLink 
+              <StyledLink
                 to={LINKS.X}
-                target="_blank" 
+                target="_blank"
                 style={{ textDecoration: "none" }}
+                onClick={() => {
+                  trackEvent("airdrop_x_link_click", {
+                    address: address,
+                    timestamp: new Date().toISOString(),
+                  });
+                }}
               >
                 <GradientRightArrowIcon />
               </StyledLink>

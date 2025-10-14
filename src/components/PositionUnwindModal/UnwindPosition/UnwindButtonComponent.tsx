@@ -11,9 +11,9 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
-import { useArcxAnalytics } from "@0xarc-io/analytics";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
+import { trackEvent } from "../../../utils/analytics";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -38,8 +38,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
-  const arcxAnalytics = useArcxAnalytics();
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
   const publicClient = usePublicClient();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
@@ -137,18 +136,15 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           result.hash
         );
 
+        trackEvent("unwind_ovl_position_success", {
+          transaction_hash: result.hash,
+          account: address,
+          timestamp: new Date().toISOString(),
+        });
+
         if (receipt.blockNumber) {
           handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
         }
-
-        arcxAnalytics?.transaction({
-          transactionHash: result.hash,
-          account: address,
-          chainId,
-          metadata: {
-            action: TransactionType.UNWIND_OVL_POSITION,
-          },
-        });
       } else {
         console.error("No receipt received after successful wait");
         addPopup(
@@ -179,6 +175,12 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         },
         currentTimeForId
       );
+
+      trackEvent("unwind_ovl_position_failed", {
+        error_message: errorMessage,
+        account: address,
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setAttemptingUnwind(false);
       handleDismiss();

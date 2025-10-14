@@ -28,6 +28,7 @@ import {
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import useDebounce from "../../hooks/useDebounce";
+import { trackEvent } from "../../utils/analytics";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -136,6 +137,15 @@ const Bridge: React.FC = () => {
         hash,
         confirmations: 1,
       });
+
+      trackEvent("bridge_ovl_success", {
+        account: address,
+        amount,
+        destination,
+        transaction_hash: hash,
+        timestamp: new Date().toISOString(),
+      });
+
       await refetch();
 
       setAmount("");
@@ -166,6 +176,15 @@ const Bridge: React.FC = () => {
         message = "Invalid Solana address";
       }
       console.error(error);
+
+      trackEvent("bridge_ovl_failed", {
+        account: address,
+        amount,
+        destination,
+        error_message: message,
+        timestamp: new Date().toISOString(),
+      });
+
       addPopup(
         {
           txn: {
