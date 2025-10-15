@@ -137,8 +137,8 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         );
 
         trackEvent("unwind_ovl_position_success", {
-          transaction_hash: result.hash,
-          account: address,
+          transaction_hash: `hash_${result.hash}`,
+          wallet_address: address,
           timestamp: new Date().toISOString(),
         });
 
@@ -178,7 +178,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
 
       trackEvent("unwind_ovl_position_failed", {
         error_message: errorMessage,
-        account: address,
+        wallet_address: address,
         timestamp: new Date().toISOString(),
       });
     } finally {

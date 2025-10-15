@@ -9,7 +9,7 @@ const WalletTracker = () => {
   useEffect(() => {
     if (address && prevAddress.current === null) {
       trackEvent("connect_wallet_click", {
-        address,
+        wallet_address: address,
         timestamp: new Date().toISOString(),
       });
     }

@@ -242,8 +242,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
         if (isSuccess) {
           trackEvent("build_ovl_position_success", {
-            transaction_hash: result.hash,
-            account: address,
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
             market: market.marketName,
             initial_collateral: typedValue,
             trade_type: "direct",
@@ -285,7 +285,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       trackEvent("build_ovl_position_failed", {
         error_message: errorMessage,
-        account: address,
+        wallet_address: address,
         market: market.marketName,
         trade_type: "direct",
         timestamp: new Date().toISOString(),
@@ -825,8 +825,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
         if (isSuccess) {
           trackEvent("build_ovl_position_success", {
-            transaction_hash: result.hash,
-            account: address,
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
             market: market.marketName,
             initial_collateral: typedValue,
             trade_type: "lifi",
@@ -869,7 +869,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       trackEvent("build_ovl_position_failed", {
         error_message: errorMessage,
-        account: address,
+        wallet_address: address,
         market: market.marketName,
         trade_type: "lifi",
         timestamp: new Date().toISOString(),

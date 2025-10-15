@@ -70,7 +70,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({
     setAirdropIdForErrorClaimAlias(null);
 
     trackEvent("airdrop_claim_click", {
-      address: address,
+      wallet_address: address,
       airdrop_id: airdropId,
       disqualified: disqualifiedTorch,
       total_amount: totalAmount,
@@ -96,7 +96,7 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({
     const shareText = `I just got my $OVL airdrop from @OverlayProtocol! ${totalAmount} $OVL 🚀🔥 \n\nCheck yours and start trading today at app.overlay.market/airdrops`;
 
     trackEvent("airdrop_share_on_x", {
-      address: address,
+      wallet_address: address,
       total_amount: totalAmount,
       timestamp: new Date().toISOString(),
     });

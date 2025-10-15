@@ -165,7 +165,7 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
                 style={{ textDecoration: "none" }}
                 onClick={() => {
                   trackEvent("airdrop_x_link_click", {
-                    address: address,
+                    wallet_address: address,
                     timestamp: new Date().toISOString(),
                   });
                 }}

@@ -190,7 +190,7 @@ const Airdrops: React.FC = () => {
   useEffect(() => {
     if (eligibilityStatus !== EligibilityStatus.Null && address) {
       trackEvent("airdrop_check_result", {
-        address,
+        wallet_address: address,
         eligibility_status: eligibilityStatus,
         timestamp: new Date().toISOString(),
       });
