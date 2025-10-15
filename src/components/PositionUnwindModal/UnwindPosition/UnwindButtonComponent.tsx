@@ -13,7 +13,7 @@ import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
-import { trackEvent } from "../../../utils/analytics";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -137,8 +137,8 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         );
 
         trackEvent("unwind_ovl_position_success", {
-          transaction_hash: result.hash,
-          account: address,
+          transaction_hash: `hash_${result.hash}`,
+          wallet_address: address,
           timestamp: new Date().toISOString(),
         });
 
@@ -178,7 +178,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
 
       trackEvent("unwind_ovl_position_failed", {
         error_message: errorMessage,
-        account: address,
+        wallet_address: address,
         timestamp: new Date().toISOString(),
       });
     } finally {

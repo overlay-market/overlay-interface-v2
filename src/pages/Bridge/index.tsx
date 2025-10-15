@@ -28,7 +28,7 @@ import {
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import useDebounce from "../../hooks/useDebounce";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);
@@ -139,10 +139,10 @@ const Bridge: React.FC = () => {
       });
 
       trackEvent("bridge_ovl_success", {
-        account: address,
+        wallet_address: address,
         amount,
         destination,
-        transaction_hash: hash,
+        transaction_hash: `hash_${hash}`,
         timestamp: new Date().toISOString(),
       });
 
@@ -178,7 +178,7 @@ const Bridge: React.FC = () => {
       console.error(error);
 
       trackEvent("bridge_ovl_failed", {
-        account: address,
+        wallet_address: address,
         amount,
         destination,
         error_message: message,

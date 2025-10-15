@@ -11,7 +11,7 @@ import {
 import EligibilityChecker from "./EligibilityChecker";
 import AirdropsClaim from "./AirdropsClaim";
 import useAccount from "../../hooks/useAccount";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 export enum EligibilityStatus {
   Eligible = "eligible",
@@ -190,7 +190,7 @@ const Airdrops: React.FC = () => {
   useEffect(() => {
     if (eligibilityStatus !== EligibilityStatus.Null && address) {
       trackEvent("airdrop_check_result", {
-        address,
+        wallet_address: address,
         eligibility_status: eligibilityStatus,
         timestamp: new Date().toISOString(),
       });

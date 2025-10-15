@@ -17,8 +17,9 @@ import Leaderboard from "./pages/Leaderboard";
 import { LiFiProvider } from "./providers/LiFiProvider";
 import Airdrops from "./pages/Airdrops";
 import ExchangeLiFi from "./pages/ExchangeLiFi";
-import AnalyticsListener from "./components/Trackers/AnalyticsListener";
-import WalletTracker from "./components/Trackers/WalletTracker";
+import AnalyticsListener from "./analytics/AnalyticsListener";
+import WalletTracker from "./analytics/WalletTracker";
+
 // import Faucet from "./pages/Faucet";
 // import Bridge from "./pages/Bridge";
 

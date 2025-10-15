@@ -11,7 +11,7 @@ import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { Address } from "viem";
 import useAccount from "../../hooks/useAccount";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 type WithdrawOVLProps = {
   position: OpenPositionData;
@@ -49,10 +49,10 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
         })
         .then((result) => {
           trackEvent("withdraw_ovl_success", {
-            address: account,
+            wallet_address: account,
             position_id: position.positionId,
             market_name: position.marketName,
-            transaction_hash: result.hash,
+            transaction_hash: `hash_${result.hash}`,
             timestamp: new Date().toISOString(),
           });
 
@@ -73,7 +73,7 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
           const { errorCode, errorMessage } = handleError(error);
 
           trackEvent("withdraw_ovl_failed", {
-            address: account,
+            wallet_address: account,
             position_id: position.positionId,
             market_name: position.marketName,
             error_message: errorMessage,

@@ -28,7 +28,7 @@ import { GetBNBModal } from "../../../components/GetBNBModal";
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
 import { waitForReceiptWithTimeout } from "../../../utils/waitForReceiptWithTimeout";
-import { trackEvent } from "../../../utils/analytics";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -242,9 +242,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
         if (isSuccess) {
           trackEvent("build_ovl_position_success", {
-            transaction_hash: result.hash,
-            account: address,
-            market: market.marketName,
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
+            market_name: market.marketName,
             initial_collateral: typedValue,
             trade_type: "direct",
             timestamp: new Date().toISOString(),
@@ -285,8 +285,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       trackEvent("build_ovl_position_failed", {
         error_message: errorMessage,
-        account: address,
-        market: market.marketName,
+        wallet_address: address,
+        market_name: market.marketName,
         trade_type: "direct",
         timestamp: new Date().toISOString(),
       });
@@ -825,9 +825,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
         if (isSuccess) {
           trackEvent("build_ovl_position_success", {
-            transaction_hash: result.hash,
-            account: address,
-            market: market.marketName,
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
+            market_name: market.marketName,
             initial_collateral: typedValue,
             trade_type: "lifi",
             timestamp: new Date().toISOString(),
@@ -869,8 +869,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       trackEvent("build_ovl_position_failed", {
         error_message: errorMessage,
-        account: address,
-        market: market.marketName,
+        wallet_address: address,
+        market_name: market.marketName,
         trade_type: "lifi",
         timestamp: new Date().toISOString(),
       });

@@ -18,7 +18,7 @@ import {
 import { EligibilityStatus } from "..";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { LINKS } from "../../../constants/links";
-import { trackEvent } from "../../../utils/analytics";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type EligibilityCheckerProps = {
   eligibilityStatus: EligibilityStatus;
@@ -165,7 +165,7 @@ const EligibilityChecker: React.FC<EligibilityCheckerProps> = ({
                 style={{ textDecoration: "none" }}
                 onClick={() => {
                   trackEvent("airdrop_x_link_click", {
-                    address: address,
+                    wallet_address: address,
                     timestamp: new Date().toISOString(),
                   });
                 }}

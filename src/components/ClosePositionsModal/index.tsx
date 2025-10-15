@@ -10,7 +10,7 @@ import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { TransactionResult } from "overlay-sdk/dist/core/types";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 type ClosePositionsModalProps = {
   open: boolean;
@@ -66,8 +66,8 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
           );
 
           trackEvent("unwind_ovl_position_success", {
-            transaction_hash: txnResult.hash,
-            account: account,
+            transaction_hash: `hash_${txnResult.hash}`,
+            wallet_address: account,
             timestamp: new Date().toISOString(),
           });
 
@@ -88,7 +88,7 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
 
           trackEvent("unwind_ovl_position_failed", {
             error_message: error.message,
-            account: account,
+            wallet_address: account,
             timestamp: new Date().toISOString(),
           });
         }

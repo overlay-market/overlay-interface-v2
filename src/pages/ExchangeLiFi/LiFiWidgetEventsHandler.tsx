@@ -5,7 +5,7 @@ import {
   WidgetEvent,
 } from "@lifi/widget";
 import { useEffect } from "react";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 import useAccount from "../../hooks/useAccount";
 
 interface Props {
@@ -27,7 +27,7 @@ export const LiFiWidgetEventsHandler: React.FC<Props> = ({
         to_chain: route.toChainId,
         from_token: route.fromToken.symbol,
         to_token: route.toToken.symbol,
-        address: route.fromAddress ?? address ?? "not_connected",
+        wallet_address: route.fromAddress ?? address ?? "not_connected",
         timestamp: new Date().toISOString(),
       });
 
@@ -42,7 +42,7 @@ export const LiFiWidgetEventsHandler: React.FC<Props> = ({
         to_chain: update.route.toChainId,
         from_token: update.route.fromToken.symbol,
         to_token: update.route.toToken.symbol,
-        address: update.route.fromAddress ?? address ?? "not_connected",
+        wallet_address: update.route.fromAddress ?? address ?? "not_connected",
         process_type: update.process.type,
         process_status: update.process.status,
         process_substatus: update.process.substatus ?? "unknown",
