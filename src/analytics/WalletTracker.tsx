@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import useAccount from "../../hooks/useAccount";
-import { trackEvent } from "../../utils/analytics";
+import useAccount from "../hooks/useAccount";
+import { trackEvent } from "./trackEvent";
 
 const WalletTracker = () => {
   const { address } = useAccount();
