@@ -21,6 +21,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
 
   const handleItemClick = () => {
+    if (position.size === "0") return;
+
     setSelectedPosition(position);
     setShowModal(true);
   };
