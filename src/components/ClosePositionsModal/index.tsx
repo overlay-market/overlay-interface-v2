@@ -10,7 +10,7 @@ import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { TransactionResult } from "overlay-sdk/dist/core/types";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 type ClosePositionsModalProps = {
   open: boolean;

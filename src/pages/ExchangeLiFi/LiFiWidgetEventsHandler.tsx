@@ -5,7 +5,7 @@ import {
   WidgetEvent,
 } from "@lifi/widget";
 import { useEffect } from "react";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 import useAccount from "../../hooks/useAccount";
 
 interface Props {

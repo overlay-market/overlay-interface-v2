@@ -18,7 +18,7 @@ import {
 import { EligibilityStatus } from "..";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { LINKS } from "../../../constants/links";
-import { trackEvent } from "../../../utils/analytics";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type EligibilityCheckerProps = {
   eligibilityStatus: EligibilityStatus;

@@ -28,7 +28,7 @@ import {
 import theme from "../../theme";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
 import useDebounce from "../../hooks/useDebounce";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 const toBytes32 = (addr: string): `0x${string}` => {
   const decoded = bs58.decode(addr);

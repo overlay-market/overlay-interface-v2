@@ -11,7 +11,7 @@ import {
 import EligibilityChecker from "./EligibilityChecker";
 import AirdropsClaim from "./AirdropsClaim";
 import useAccount from "../../hooks/useAccount";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 export enum EligibilityStatus {
   Eligible = "eligible",

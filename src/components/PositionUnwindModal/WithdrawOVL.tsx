@@ -11,7 +11,7 @@ import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { Address } from "viem";
 import useAccount from "../../hooks/useAccount";
-import { trackEvent } from "../../utils/analytics";
+import { trackEvent } from "../../analytics/trackEvent";
 
 type WithdrawOVLProps = {
   position: OpenPositionData;

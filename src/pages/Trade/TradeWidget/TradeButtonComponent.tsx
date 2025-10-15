@@ -28,7 +28,7 @@ import { GetBNBModal } from "../../../components/GetBNBModal";
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
 import { waitForReceiptWithTimeout } from "../../../utils/waitForReceiptWithTimeout";
-import { trackEvent } from "../../../utils/analytics";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type TradeButtonComponentProps = {
   loading: boolean;

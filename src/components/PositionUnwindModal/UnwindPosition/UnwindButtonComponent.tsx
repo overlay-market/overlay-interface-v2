@@ -13,7 +13,7 @@ import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
-import { trackEvent } from "../../../utils/analytics";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;

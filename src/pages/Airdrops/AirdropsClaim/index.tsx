@@ -35,8 +35,8 @@ import {
   StyledLink,
 } from "../EligibilityChecker/eligibility-checker-styles";
 import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
-import { trackEvent } from "../../../utils/analytics";
 import useAccount from "../../../hooks/useAccount";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type AirdropClaimProps = {
   airdropsAmounts: AirdropsAmounts | null;
