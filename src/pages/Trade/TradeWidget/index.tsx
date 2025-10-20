@@ -128,16 +128,36 @@ const TradeWidget: React.FC = () => {
           market.id as Address
         );
         const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
-        parsedCapLeverage &&
-          setCapleverage((prev) =>
-            prev === parsedCapLeverage ? prev : parsedCapLeverage
-          );
+        if (parsedCapLeverage) {
+          setCapleverage(parsedCapLeverage);
+
+          // Always adjust leverage when market changes
+          // Get current leverage from Redux state
+          const currentLeverage = Number(selectedLeverage);
+
+          if (parsedCapLeverage <= 1) {
+            // Market has fixed leverage at 1x - always set to 1
+            handleLeverageSelect("1");
+            setDisplayedLeverage("1");
+          } else if (currentLeverage > parsedCapLeverage) {
+            // Selected leverage exceeds new market's max leverage - clamp it
+            const newLeverage = Math.min(currentLeverage, parsedCapLeverage).toString();
+            handleLeverageSelect(newLeverage);
+            setDisplayedLeverage(newLeverage);
+          } else if (currentLeverage < 1) {
+            // Edge case: leverage is somehow less than 1, reset to minimum
+            handleLeverageSelect("1");
+            setDisplayedLeverage("1");
+          }
+        }
       } catch (error) {
         console.error("Error fetching capLeverage:", error);
       }
     };
 
     fetchCapLeverage();
+    // Only run when market changes, not when leverage changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [market?.id]);
 
   const handleLeverageInput = (newValue: number[]) => {
@@ -163,7 +183,7 @@ const TradeWidget: React.FC = () => {
         title={"Leverage"}
         min={1}
         max={capLeverage ?? 1}
-        step={0.1}
+        step={capLeverage <= 1 ? 1 : 0.1}
         value={Number(displayedLeverage)}
         valueUnit={"x"}
         handleChange={(newValue: number[]) => handleLeverageInput(newValue)}

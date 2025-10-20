@@ -29,7 +29,7 @@
     "graphql-request": "^7.1.2",
     "lucide-react": "^0.451.0",
     "moment": "^2.30.1",
-    "overlay-sdk": "https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.27-alpha.3/overlay-sdk-dist.tar.gz",
+    "overlay-sdk": "https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.27-alpha.4/overlay-sdk-dist.tar.gz",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
