@@ -3,7 +3,7 @@ import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
 import MarketsTable from "./MarketsTable";
-import { TransformedMarketData, OverlaySDK, getSupplyChange24h } from "overlay-sdk";
+import { TransformedMarketData, OverlaySDK, getSupplyChange24h, CHAINS } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
@@ -26,7 +26,7 @@ const Markets: React.FC = () => {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
           activeMarkets && setMarketsData(activeMarkets);
         });
-        getSupplyChange24h(chainId).then((supplyChange) => {
+        getSupplyChange24h(chainId as CHAINS).then((supplyChange) => {
           supplyChange !== undefined && setTotalSupplyChange(supplyChange);
         });
         sdk.ovl.price().then((price) => {
