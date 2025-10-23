@@ -156,9 +156,9 @@ const TradeWidget: React.FC = () => {
     };
 
     fetchCapLeverage();
-    // Only run when market changes, not when leverage changes
+    // Run when market changes or wallet connects/disconnects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [market?.id]);
+  }, [market?.id, address]);
 
   const handleLeverageInput = (newValue: number[]) => {
     const stringValue = newValue[0].toString();
