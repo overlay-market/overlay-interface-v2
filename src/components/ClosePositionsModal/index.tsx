@@ -10,6 +10,7 @@ import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { TransactionResult } from "overlay-sdk/dist/core/types";
 import useSDK from "../../providers/SDKProvider/useSDK";
+import { trackEvent } from "../../analytics/trackEvent";
 
 type ClosePositionsModalProps = {
   open: boolean;
@@ -63,6 +64,13 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
             },
             txnResult.hash
           );
+
+          trackEvent("unwind_ovl_position_success", {
+            transaction_hash: `hash_${txnResult.hash}`,
+            wallet_address: account,
+            timestamp: new Date().toISOString(),
+          });
+
           handleTxnHashUpdate(txnResult.hash, 0);
         } else {
           const error = tx.reason as SDKError;
@@ -77,6 +85,12 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
             },
             currentTimeForId
           );
+
+          trackEvent("unwind_ovl_position_failed", {
+            error_message: error.message,
+            wallet_address: account,
+            timestamp: new Date().toISOString(),
+          });
         }
       });
 

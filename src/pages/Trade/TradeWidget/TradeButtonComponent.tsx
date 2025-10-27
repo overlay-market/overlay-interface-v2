@@ -18,7 +18,6 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useModalHelper } from "../../../components/ConnectWalletModal/utils";
-import { useArcxAnalytics } from "@0xarc-io/analytics";
 import { SelectState } from "../../../types/selectChainAndTokenTypes";
 import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFees";
 import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
@@ -29,6 +28,7 @@ import { GetBNBModal } from "../../../components/GetBNBModal";
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
 import { waitForReceiptWithTimeout } from "../../../utils/waitForReceiptWithTimeout";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type TradeButtonComponentProps = {
   loading: boolean;
@@ -39,7 +39,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   loading,
   tradeState,
 }) => {
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
   const sdk = useSDK();
   const { openModal } = useModalHelper();
   const publicClient = usePublicClient();
@@ -61,7 +61,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const [showGasModal, setShowGasModal] = useState<boolean>(false);
   const [hasShownTradeModal, setHasShownTradeModal] = useState<boolean>(false);
   const [hasShownGasModal, setHasShownGasModal] = useState<boolean>(false);
-  const arcxAnalytics = useArcxAnalytics();
   const { maxInputIncludingFees } = useMaxInputIncludingFees({
     marketId: market?.marketId,
   });
@@ -242,17 +241,17 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         }
 
         if (isSuccess) {
+          trackEvent("build_ovl_position_success", {
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
+            market_name: market.marketName,
+            initial_collateral: typedValue,
+            trade_type: "direct",
+            timestamp: new Date().toISOString(),
+          });
+
           handleTradeStateReset();
         }
-
-        arcxAnalytics?.transaction({
-          transactionHash: result.hash,
-          account: address,
-          chainId,
-          metadata: {
-            action: TransactionType.BUILD_OVL_POSITION,
-          },
-        });
       } else {
         console.error("No receipt received after successful wait");
         addPopup(
@@ -283,6 +282,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         },
         currentTimeForId
       );
+
+      trackEvent("build_ovl_position_failed", {
+        error_message: errorMessage,
+        wallet_address: address,
+        market_name: market.marketName,
+        trade_type: "direct",
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setTradeConfig({
         showConfirm: false,
@@ -508,7 +515,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     }
 
     // Check if we're resuming from a needs_gas state
-    if (bridgeStage.stage === 'needs_gas') {
+    if (bridgeStage.stage === "needs_gas") {
       console.log("🔋 Resuming from needs_gas stage, reopening gas modal");
       setShowGasModal(true);
       return;
@@ -817,18 +824,18 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         }
 
         if (isSuccess) {
+          trackEvent("build_ovl_position_success", {
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
+            market_name: market.marketName,
+            initial_collateral: typedValue,
+            trade_type: "lifi",
+            timestamp: new Date().toISOString(),
+          });
+
           handleTradeStateReset();
           resetBridge();
         }
-
-        arcxAnalytics?.transaction({
-          transactionHash: result.hash,
-          account: address,
-          chainId,
-          metadata: {
-            action: TransactionType.BUILD_OVL_POSITION,
-          },
-        });
       } else {
         console.error("No receipt received after successful wait");
         addPopup(
@@ -859,6 +866,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         },
         currentTimeForId
       );
+
+      trackEvent("build_ovl_position_failed", {
+        error_message: errorMessage,
+        wallet_address: address,
+        market_name: market.marketName,
+        trade_type: "lifi",
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setTradeConfig({
         showConfirm: false,
