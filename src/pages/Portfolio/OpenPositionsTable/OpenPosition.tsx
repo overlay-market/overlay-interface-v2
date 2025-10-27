@@ -30,6 +30,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   const isFundingPositive = Number(position.parsedFunding) > 0;
 
   const handleItemClick = (event: React.MouseEvent) => {
+    if (position.size === "0") return;
+
     if ((event.target as HTMLElement).tagName !== "INPUT") {
       setSelectedPosition(position);
       setShowModal(true);

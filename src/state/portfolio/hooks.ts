@@ -94,7 +94,6 @@ export function usePositionRefresh(
           return (
             pos &&
             pos.marketName &&
-            pos.size &&
             pos.positionSide &&
             pos.entryPrice &&
             pos.currentPrice &&
