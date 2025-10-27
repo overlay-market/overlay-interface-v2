@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Text, Badge } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
@@ -28,7 +28,16 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
   return (
     <>
       <StyledRow onClick={handleItemClick}>
-        <StyledCell>{position.size} OVL</StyledCell>
+        <StyledCell>
+          <Flex gap="6px" align="center">
+            {position.size} OVL
+            {position.deprecated && (
+              <Badge color="orange" size="1">
+                Deprecated
+              </Badge>
+            )}
+          </Flex>
+        </StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
             {positionLeverage}

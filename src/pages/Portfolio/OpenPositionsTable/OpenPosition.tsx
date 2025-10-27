@@ -1,4 +1,4 @@
-import { Flex, Text, Checkbox } from "@radix-ui/themes";
+import { Flex, Text, Checkbox, Badge } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
@@ -62,7 +62,16 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             />
           </StyledCell>
         )}
-        <StyledCell>{position.marketName}</StyledCell>
+        <StyledCell>
+          <Flex gap="6px" align="center">
+            {position.marketName}
+            {position.deprecated && (
+              <Badge color="orange" size="1">
+                Deprecated
+              </Badge>
+            )}
+          </Flex>
+        </StyledCell>
         <StyledCell>{position.size} OVL</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
