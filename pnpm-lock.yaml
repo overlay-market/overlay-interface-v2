@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@0xarc-io/analytics':
-        specifier: ^2.2.3
-        version: 2.4.2(@types/react@18.3.23)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)
       '@lifi/sdk':
         specifier: ^3.10.1
         version: 3.10.1(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@18.3.23)(bufferutil@4.0.9)(immer@10.1.1)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(viem@2.33.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
@@ -66,8 +63,8 @@ importers:
         specifier: ^2.30.1
         version: 2.30.1
       overlay-sdk:
-        specifier: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.27-alpha.5/overlay-sdk-dist.tar.gz
-        version: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.27-alpha.5/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1))(@types/react@18.3.23)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+        specifier: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.28-beta/overlay-sdk-dist-7.tar.gz
+        version: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.28-beta/overlay-sdk-dist-7.tar.gz(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1))(@types/react@18.3.23)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -154,12 +151,6 @@ packages:
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
-
-  '@0xarc-io/analytics@2.4.2':
-    resolution: {integrity: sha512-qXZkDWCj3BgNJxFT7Nh9yRCLzBhDxspBhCVJRKMrzQgcs3myM3zE2CPH3uoFvUOCXs1B5VsZgUGOpuH1qdwMPg==}
-    peerDependencies:
-      '@types/react': '>=16.14.34'
-      react: '>=16.14.0'
 
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
@@ -2121,9 +2112,6 @@ packages:
   '@reown/appkit@1.7.8':
     resolution: {integrity: sha512-51kTleozhA618T1UvMghkhKfaPcc9JlKwLJ5uV+riHyvSoWPKPRIa5A6M1Wano5puNyW0s3fwywhyqTHSilkaA==}
 
-  '@restless/sanitizers@0.2.5':
-    resolution: {integrity: sha512-utsOFwv5owNnbj8HijF7uML/AURgUl5YvY4S2gpxQsrp2D1EP/4rQU/HSyYdIQaL89BoZ/5NHveRJrcFyuHo/w==}
-
   '@rolldown/pluginutils@1.0.0-beta.27':
     resolution: {integrity: sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==}
 
@@ -2634,6 +2622,7 @@ packages:
   '@uniswap/swap-router-contracts@1.3.1':
     resolution: {integrity: sha512-mh/YNbwKb7Mut96VuEtL+Z5bRe0xVIbjjiryn+iMMrK2sFKhR4duk/86mEz0UO5gSx4pQIw9G5276P5heY/7Rg==}
     engines: {node: '>=10'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   '@uniswap/v2-core@1.0.1':
     resolution: {integrity: sha512-MtybtkUPSyysqLY2U210NBDeCHX+ltHt3oADGdjqoThZaFRDKwM6k1Nb3F0A3hk5hwuQvytFWhrWHOEq6nVJ8Q==}
@@ -4650,9 +4639,9 @@ packages:
     resolution: {integrity: sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==}
     engines: {node: '>=0.10.0'}
 
-  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.27-alpha.5/overlay-sdk-dist.tar.gz:
-    resolution: {tarball: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.27-alpha.5/overlay-sdk-dist.tar.gz}
-    version: 0.1.27-alpha.5
+  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.28-beta/overlay-sdk-dist-7.tar.gz:
+    resolution: {tarball: https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.28-beta/overlay-sdk-dist-7.tar.gz}
+    version: 0.1.28-beta
 
   ox@0.6.7:
     resolution: {integrity: sha512-17Gk/eFsFRAZ80p5eKqv89a57uXjd3NgIf1CaXojATPBuujVc/fQSVhBeAU9JCRB+k7J50WQAyWTxK19T9GgbA==}
@@ -6065,17 +6054,6 @@ snapshots:
       '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.8.3)
       graphql: 16.11.0
       typescript: 5.8.3
-
-  '@0xarc-io/analytics@2.4.2(@types/react@18.3.23)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@restless/sanitizers': 0.2.5
-      '@types/react': 18.3.23
-      react: 18.3.1
-      socket.io-client: 4.8.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
 
   '@adraffy/ens-normalize@1.11.0': {}
 
@@ -8857,8 +8835,6 @@ snapshots:
       - uploadthing
       - utf-8-validate
       - zod
-
-  '@restless/sanitizers@0.2.5': {}
 
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
@@ -12275,7 +12251,7 @@ snapshots:
 
   os-tmpdir@1.0.2: {}
 
-  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.27-alpha.5/overlay-sdk-dist.tar.gz(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1))(@types/react@18.3.23)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4):
+  overlay-sdk@https://github.com/overlay-market/overlay-sdk/releases/download/v0.1.28-beta/overlay-sdk-dist-7.tar.gz(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1))(@types/react@18.3.23)(bufferutil@4.0.9)(graphql@16.11.0)(hardhat@2.26.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4):
     dependencies:
       '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@18.3.23)(react@18.3.1))(@types/react@18.3.23)(react@18.3.1)
       '@uniswap/v3-sdk': 3.25.2(hardhat@2.26.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
