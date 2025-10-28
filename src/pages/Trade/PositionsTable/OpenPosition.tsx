@@ -1,4 +1,4 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Text, Badge, Tooltip } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
@@ -28,7 +28,21 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
   return (
     <>
       <StyledRow onClick={handleItemClick}>
-        <StyledCell>{position.size} OVL</StyledCell>
+        <StyledCell>
+          <Flex gap="6px" align="center">
+            {position.size} OVL
+            {position.deprecated && (
+              <Tooltip
+                content="This position was built on a deprecated version of the market. You can still unwind it."
+                style={{ background: theme.tooltip.background, borderRadius: theme.tooltip.borderRadius, padding: theme.tooltip.padding }}
+              >
+                <Badge color="orange" size="1" style={{ cursor: "help" }}>
+                  Deprecated
+                </Badge>
+              </Tooltip>
+            )}
+          </Flex>
+        </StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
             {positionLeverage}
