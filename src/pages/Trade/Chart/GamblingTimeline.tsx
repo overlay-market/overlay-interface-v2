@@ -400,7 +400,11 @@ const formatPercent = (value: number) => {
 
 const TimelineContainer = styled.div`
   width: 100%;
-  height: 258px;
+  flex: 1;
+  min-height: 258px;
+  height: 100%;
+  max-height: 100%;
+  box-sizing: border-box;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   background: rgba(9, 13, 24, 0.6);
@@ -410,11 +414,11 @@ const TimelineContainer = styled.div`
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3);
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    height: 561px;
+    min-height: 561px;
   }
 
   @media (min-width: ${theme.breakpoints.xxl}) {
-    height: 643px;
+    min-height: 643px;
   }
 `;
 
