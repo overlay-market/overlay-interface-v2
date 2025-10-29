@@ -116,6 +116,85 @@ const GamblingTimeline: React.FC = () => {
 
   const latestSignal = signals[signals.length - 1];
 
+  const nextUpdatePrediction = useMemo(() => {
+    if (signals.length < 2) {
+      return null;
+    }
+
+    const lastSignal = signals[signals.length - 1];
+    const previousSignal = signals[signals.length - 2];
+    const intervalMs = lastSignal.time - previousSignal.time;
+
+    if (!Number.isFinite(intervalMs) || intervalMs <= 0) {
+      return null;
+    }
+
+    return {
+      predictedAt: lastSignal.time + intervalMs,
+      intervalMs,
+    };
+  }, [signals]);
+
+  const predictedAt = nextUpdatePrediction?.predictedAt ?? null;
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (!predictedAt) {
+      return;
+    }
+
+    setNow(Date.now());
+
+    const tick = () => setNow(Date.now());
+    const intervalId =
+      typeof window !== "undefined" ? window.setInterval(tick, 1000) : null;
+
+    return () => {
+      if (intervalId !== null && typeof window !== "undefined") {
+        window.clearInterval(intervalId);
+      }
+    };
+  }, [predictedAt]);
+
+  const remainingMs = useMemo(() => {
+    if (predictedAt === null) {
+      return null;
+    }
+
+    return predictedAt - now;
+  }, [predictedAt, now]);
+
+  const countdownDisplay = useMemo(() => {
+    if (remainingMs === null) {
+      return null;
+    }
+
+    const clamped = Math.max(remainingMs, 0);
+    const totalSeconds = Math.floor(clamped / 1000);
+    const minutes = Math.floor(totalSeconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+
+    return `${minutes}:${seconds}`;
+  }, [remainingMs]);
+
+  const countdownLabel = useMemo(() => {
+    if (remainingMs === null) {
+      return null;
+    }
+
+    if (remainingMs <= 0) {
+      return "Updating…";
+    }
+
+    if (!countdownDisplay) {
+      return null;
+    }
+
+    return `${countdownDisplay}`;
+  }, [countdownDisplay, remainingMs]);
+
   return (
     <TimelineContainer>
       <Header direction="column" gap="8px">
@@ -170,6 +249,22 @@ const GamblingTimeline: React.FC = () => {
                 </TimestampLabel>
               </SignalItem>
             ))}
+            {countdownLabel ? (
+              <GhostSignalItem>
+                <GhostBurst>
+                  <Loader size="20px" />
+                </GhostBurst>
+                <CountdownLabel>{countdownLabel}</CountdownLabel>
+                {/* {countdownDisplay &&
+                remainingMs !== null &&
+                remainingMs > 0 &&
+                predictedAt !== null ? (
+                  <CountdownTimestamp>
+                    {moment(predictedAt).format("HH:mm")}
+                  </CountdownTimestamp>
+                ) : null} */}
+              </GhostSignalItem>
+            ) : null}
           </TimelineTrack>
         )}
       </SignalsArea>
@@ -282,4 +377,27 @@ const TimestampLabel = styled(Text)`
   color: rgba(255, 255, 255, 0.7);
   letter-spacing: 0.08em;
   display: block;
+`;
+
+const GhostSignalItem = styled(SignalItem)`
+  opacity: 0.7;
+  gap: 12px;
+`;
+
+const GhostBurst = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CountdownLabel = styled(Text)`
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
 `;
