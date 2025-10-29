@@ -1,7 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -17,7 +17,9 @@ import InfoMarketSection from "./InfoMarketSection";
 import { StyledFlex, TradeContainer } from "./trade-styles";
 import SuggestedCards from "./SuggestedCards";
 import { DEFAULT_MARKET } from "../../constants/applications";
+import { MARKETS_WITH_GAMBLING_TIMELINE } from "../../constants/markets";
 import useActiveMarkets from "../../hooks/useActiveMarkets";
+import GamblingTimeline from "./Chart/GamblingTimeline";
 
 const Trade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,6 +33,14 @@ const Trade: React.FC = () => {
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { data: markets } = useActiveMarkets();
+  const shouldRenderGamblingTimeline = useMemo(() => {
+    if (!currentMarket) {
+      return false;
+    }
+
+    const encodedMarketName = encodeURIComponent(currentMarket.marketName);
+    return MARKETS_WITH_GAMBLING_TIMELINE.includes(encodedMarketName);
+  }, [currentMarket]);
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -84,7 +94,11 @@ const Trade: React.FC = () => {
         >
           {currentMarket ? (
             <>
-              <Chart />
+              {shouldRenderGamblingTimeline ? (
+                <GamblingTimeline />
+              ) : (
+                <Chart />
+              )}
               <TradeWidget />
             </>
           ) : (

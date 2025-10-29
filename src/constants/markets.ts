@@ -165,6 +165,8 @@ export const MARKETSORDER = [
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
 
+export const MARKETS_WITH_GAMBLING_TIMELINE = ["Double%20or%20Nothing"];
+
 export enum CategoryName {
   MemeWar = "Meme Wars",
   CounterStrikeSkins = "Counter-Strike",
