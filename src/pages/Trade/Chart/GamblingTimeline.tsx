@@ -219,8 +219,8 @@ const GamblingTimeline: React.FC = () => {
       }));
   }, [data]);
 
-  const latestSignal = signals[signals.length - 1];
-  const lastSignalTime = latestSignal?.time ?? null;
+  const lastSignalTime =
+    signals.length > 0 ? signals[signals.length - 1].time : null;
 
   const nextUpdatePrediction = useMemo(() => {
     if (signals.length < 2) {
@@ -320,29 +320,6 @@ const GamblingTimeline: React.FC = () => {
 
   return (
     <TimelineContainer>
-      <Header direction="column" gap="8px">
-        <Text size="2" color="gray" style={{ letterSpacing: "0.12em" }}>
-          Gambling Timeline
-        </Text>
-        {latestSignal ? (
-          <Flex direction="column" gap="4px">
-            <SignalSummary
-              size="6"
-              weight="bold"
-              $direction={latestSignal.direction}
-            >
-              {formatPercent(latestSignal.changePercent)}
-            </SignalSummary>
-            <MutedText>
-              {latestSignal.direction === "up" ? "Spike" : "Drop"} at{" "}
-              {moment(latestSignal.time).format("HH:mm")}
-            </MutedText>
-          </Flex>
-        ) : (
-          <MutedText>No significant moves detected</MutedText>
-        )}
-      </Header>
-
       <SignalsArea>
         {isLoading ? (
           <Centered>
@@ -389,15 +366,6 @@ const GamblingTimeline: React.FC = () => {
 
 export default GamblingTimeline;
 
-const formatPercent = (value: number) => {
-  if (!Number.isFinite(value)) {
-    return "0.00%";
-  }
-
-  const formatted = value.toFixed(2);
-  return `${value >= 0 ? "+" : ""}${formatted}%`;
-};
-
 const TimelineContainer = styled.div`
   width: 100%;
   flex: 1;
@@ -422,10 +390,6 @@ const TimelineContainer = styled.div`
   }
 `;
 
-const Header = styled(Flex)`
-  margin-bottom: 12px;
-`;
-
 const SignalsArea = styled.div`
   flex: 1;
   min-height: 0;
@@ -444,11 +408,6 @@ const Centered = styled(Flex)`
 
 const MutedText = styled(Text)`
   color: rgba(255, 255, 255, 0.5);
-`;
-
-const SignalSummary = styled(Text)<{ $direction: "up" | "down" }>`
-  color: ${({ $direction }) =>
-    $direction === "up" ? "#3bd783" : "#f16060"};
 `;
 
 const TimelineTrack = styled.div`
