@@ -369,6 +369,8 @@ export default GamblingTimeline;
 const TimelineContainer = styled.div`
   width: 100%;
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
   min-height: 258px;
   height: 100%;
   max-height: 100%;
@@ -380,6 +382,7 @@ const TimelineContainer = styled.div`
   display: flex;
   flex-direction: column;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
 
   @media (min-width: ${theme.breakpoints.sm}) {
     min-height: 561px;
@@ -396,6 +399,7 @@ const SignalsArea = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
+  overflow: hidden;
 `;
 
 const Centered = styled(Flex)`
@@ -415,19 +419,17 @@ const TimelineTrack = styled.div`
   align-items: center;
   gap: 48px;
   width: 100%;
+  max-width: 100%;
   flex: 1;
   height: 100%;
   overflow-x: auto;
   padding: 16px 8px 24px;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  box-sizing: border-box;
 
   &::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
+    display: none;
   }
 `;
 
@@ -436,7 +438,8 @@ const SignalItem = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  min-width: 0;
 `;
 
 const Triangle = styled.div<{ $direction: "up" | "down" }>`
