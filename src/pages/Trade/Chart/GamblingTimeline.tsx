@@ -29,6 +29,7 @@ const GamblingTimeline: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const hasFetchedRef = useRef(false);
+  const timelineTrackRef = useRef<HTMLDivElement | null>(null);
 
   const marketAddress = useMemo(() => {
     return currentMarket?.id ? currentMarket.id.toLowerCase() : undefined;
@@ -115,6 +116,7 @@ const GamblingTimeline: React.FC = () => {
   }, [data]);
 
   const latestSignal = signals[signals.length - 1];
+  const lastSignalTime = latestSignal?.time ?? null;
 
   const nextUpdatePrediction = useMemo(() => {
     if (signals.length < 2) {
@@ -195,6 +197,23 @@ const GamblingTimeline: React.FC = () => {
     return `${countdownDisplay}`;
   }, [countdownDisplay, remainingMs]);
 
+  useEffect(() => {
+    const track = timelineTrackRef.current;
+    if (!track) {
+      return;
+    }
+
+    const scrollToEnd = () => {
+      track.scrollLeft = track.scrollWidth;
+    };
+
+    if (typeof window !== "undefined" && "requestAnimationFrame" in window) {
+      window.requestAnimationFrame(scrollToEnd);
+    } else {
+      scrollToEnd();
+    }
+  }, [signals.length, lastSignalTime]);
+
   return (
     <TimelineContainer>
       <Header direction="column" gap="8px">
@@ -240,7 +259,7 @@ const GamblingTimeline: React.FC = () => {
             </MutedText>
           </Centered>
         ) : (
-          <TimelineTrack>
+          <TimelineTrack ref={timelineTrackRef}>
             {signals.map((signal) => (
               <SignalItem key={signal.time}>
                 <Triangle $direction={signal.direction} />
@@ -255,14 +274,6 @@ const GamblingTimeline: React.FC = () => {
                   <Loader size="20px" />
                 </GhostBurst>
                 <CountdownLabel>{countdownLabel}</CountdownLabel>
-                {/* {countdownDisplay &&
-                remainingMs !== null &&
-                remainingMs > 0 &&
-                predictedAt !== null ? (
-                  <CountdownTimestamp>
-                    {moment(predictedAt).format("HH:mm")}
-                  </CountdownTimestamp>
-                ) : null} */}
               </GhostSignalItem>
             ) : null}
           </TimelineTrack>
