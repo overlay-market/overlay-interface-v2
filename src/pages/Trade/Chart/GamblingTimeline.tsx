@@ -1,15 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  TooltipProps,
-} from "recharts";
 import moment from "moment";
 import { Flex, Text } from "@radix-ui/themes";
 
@@ -27,6 +17,9 @@ import {
 
 const CANDLE_INTERVAL_MINUTES = 1;
 const DEFAULT_CANDLE_COUNT = 180; // roughly three hours of history
+const POSITIVE_THRESHOLD = 50;
+const NEGATIVE_THRESHOLD = -25;
+type SignalPoint = TimelinePoint & { direction: "up" | "down" };
 
 const GamblingTimeline: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
@@ -107,8 +100,21 @@ const GamblingTimeline: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chainId, marketAddress]);
 
-  const latestPoint = data[data.length - 1];
-  const latestChange = latestPoint?.changePercent ?? 0;
+  const signals = useMemo<SignalPoint[]>(() => {
+    return data
+      .filter(
+        (point) =>
+          point.changePercent >= POSITIVE_THRESHOLD ||
+          point.changePercent <= NEGATIVE_THRESHOLD
+      )
+      .map((point) => ({
+        ...point,
+        direction:
+          point.changePercent >= POSITIVE_THRESHOLD ? "up" : "down",
+      }));
+  }, [data]);
+
+  const latestSignal = signals[signals.length - 1];
 
   return (
     <TimelineContainer>
@@ -116,19 +122,26 @@ const GamblingTimeline: React.FC = () => {
         <Text size="2" color="gray" style={{ letterSpacing: "0.12em" }}>
           Gambling Timeline
         </Text>
-        {latestPoint ? (
+        {latestSignal ? (
           <Flex direction="column" gap="4px">
-            <ChangeValue size="6" weight="bold" $trend={latestChange}>
-              {formatPercent(latestChange)}
-            </ChangeValue>
-            <MutedText>Change vs previous 1m candle</MutedText>
+            <SignalSummary
+              size="6"
+              weight="bold"
+              $direction={latestSignal.direction}
+            >
+              {formatPercent(latestSignal.changePercent)}
+            </SignalSummary>
+            <MutedText>
+              {latestSignal.direction === "up" ? "Spike" : "Drop"} at{" "}
+              {moment(latestSignal.time).format("HH:mm")}
+            </MutedText>
           </Flex>
         ) : (
-          <MutedText>No data yet</MutedText>
+          <MutedText>No significant moves detected</MutedText>
         )}
       </Header>
 
-      <ChartArea>
+      <SignalsArea>
         {isLoading ? (
           <Centered>
             <Loader size="32px" />
@@ -141,82 +154,30 @@ const GamblingTimeline: React.FC = () => {
           <Centered>
             <MutedText>No candle data available</MutedText>
           </Centered>
+        ) : signals.length === 0 ? (
+          <Centered>
+            <MutedText>
+              No spikes ≥ {POSITIVE_THRESHOLD}% or drops ≤ {NEGATIVE_THRESHOLD}%
+            </MutedText>
+          </Centered>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data}>
-              <CartesianGrid
-                stroke="rgba(255, 255, 255, 0.05)"
-                vertical={false}
-                strokeDasharray="3 3"
-              />
-              <XAxis
-                dataKey="time"
-                tickFormatter={(timestamp) => moment(timestamp).format("HH:mm")}
-                stroke="rgba(255, 255, 255, 0.4)"
-                tickLine={false}
-                axisLine={false}
-                minTickGap={32}
-              />
-              <YAxis
-                stroke="rgba(255, 255, 255, 0.4)"
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) =>
-                  typeof value === "number" ? formatPercentAxis(value) : value
-                }
-                width={72}
-              />
-              <Tooltip content={<TimelineTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="changePercent"
-                stroke="#4DA1FF"
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <TimelineTrack>
+            {signals.map((signal) => (
+              <SignalItem key={signal.time}>
+                <Triangle $direction={signal.direction} />
+                <TimestampLabel>
+                  {moment(signal.time).format("HH:mm")}
+                </TimestampLabel>
+              </SignalItem>
+            ))}
+          </TimelineTrack>
         )}
-      </ChartArea>
+      </SignalsArea>
     </TimelineContainer>
   );
 };
 
 export default GamblingTimeline;
-
-const TimelineTooltip: React.FC<TooltipProps<number, string>> = ({
-  active,
-  payload,
-}) => {
-  if (!active || !payload || payload.length === 0) {
-    return null;
-  }
-
-  const point = payload[0]?.payload as TimelinePoint | undefined;
-  if (!point) {
-    return null;
-  }
-
-  return (
-    <TooltipBox>
-      <TooltipRow>{moment(point.time).format("MMM D, HH:mm")}</TooltipRow>
-      <TooltipRow>Change: {formatPercent(point.changePercent)}</TooltipRow>
-    </TooltipBox>
-  );
-};
-
-const formatPercentAxis = (value: number) => {
-  if (!Number.isFinite(value)) {
-    return "0%";
-  }
-  if (Math.abs(value) >= 100) {
-    return `${value.toFixed(0)}%`;
-  }
-  if (Math.abs(value) >= 10) {
-    return `${value.toFixed(1)}%`;
-  }
-  return `${value.toFixed(2)}%`;
-};
 
 const formatPercent = (value: number) => {
   if (!Number.isFinite(value)) {
@@ -251,9 +212,12 @@ const Header = styled(Flex)`
   margin-bottom: 12px;
 `;
 
-const ChartArea = styled.div`
+const SignalsArea = styled.div`
   flex: 1;
   min-height: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
 `;
 
 const Centered = styled(Flex)`
@@ -268,24 +232,54 @@ const MutedText = styled(Text)`
   color: rgba(255, 255, 255, 0.5);
 `;
 
-const ChangeValue = styled(Text)<{ $trend: number }>`
-  color: ${({ $trend }) =>
-    $trend > 0 ? "#089981" : $trend < 0 ? "#f23645" : "rgba(255, 255, 255, 0.7)"};
-  font-weight: 600;
+const SignalSummary = styled(Text)<{ $direction: "up" | "down" }>`
+  color: ${({ $direction }) =>
+    $direction === "up" ? "#3bd783" : "#f16060"};
 `;
 
-const TooltipBox = styled.div`
-  background: rgba(10, 14, 24, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 12px;
-  border-radius: 8px;
+const TimelineTrack = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  width: 100%;
+  flex: 1;
+  height: 100%;
+  overflow-x: auto;
+  padding: 16px 8px 24px;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+  }
+`;
+
+const SignalItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 `;
 
-const TooltipRow = styled.div`
-  white-space: nowrap;
+const Triangle = styled.div<{ $direction: "up" | "down" }>`
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  ${({ $direction }) =>
+    $direction === "up"
+      ? "border-bottom: 36px solid #3bd783;"
+      : "border-top: 36px solid #f16060;"}
+`;
+
+const TimestampLabel = styled(Text)`
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.08em;
+  display: block;
 `;
