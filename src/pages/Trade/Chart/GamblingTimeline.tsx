@@ -10,6 +10,7 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import {
   CandleApiResponse,
+  NormalizedCandle,
   TimelinePoint,
   buildTimelineFromCandles,
   normalizeCandles,
@@ -17,6 +18,8 @@ import {
 
 const CANDLE_INTERVAL_MINUTES = 1;
 const DEFAULT_CANDLE_COUNT = 180; // roughly three hours of history
+const CANDLE_BUFFER_COUNT = 10;
+const SSE_RECONNECT_DELAY_MS = 5000;
 const POSITIVE_THRESHOLD = 50;
 const NEGATIVE_THRESHOLD = -25;
 type SignalPoint = TimelinePoint & { direction: "up" | "down" };
@@ -28,8 +31,10 @@ const GamblingTimeline: React.FC = () => {
   const [data, setData] = useState<TimelinePoint[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const hasFetchedRef = useRef(false);
   const timelineTrackRef = useRef<HTMLDivElement | null>(null);
+  const candlesRef = useRef<NormalizedCandle[]>([]);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const retryTimeoutRef = useRef<number | null>(null);
 
   const marketAddress = useMemo(() => {
     return currentMarket?.id ? currentMarket.id.toLowerCase() : undefined;
@@ -40,26 +45,62 @@ const GamblingTimeline: React.FC = () => {
       return;
     }
 
+    setIsLoading(true);
+    setError(null);
+    setData([]);
+    candlesRef.current = [];
+
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+
+    if (retryTimeoutRef.current !== null && typeof window !== "undefined") {
+      window.clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+
     let isActive = true;
     const intervalMs = CANDLE_INTERVAL_MINUTES * 60 * 1000;
     const candleCount = DEFAULT_CANDLE_COUNT;
+    const maxCandles = candleCount + CANDLE_BUFFER_COUNT;
+    const baseUrl = getMarketChartUrl(chainId);
+
+    const mergeCandles = (incoming: NormalizedCandle[]) => {
+      if (!isActive || incoming.length === 0) {
+        return;
+      }
+
+      const merged = new Map<number, NormalizedCandle>();
+      candlesRef.current.forEach((candle) => {
+        merged.set(candle.time, candle);
+      });
+      incoming.forEach((candle) => {
+        merged.set(candle.time, candle);
+      });
+
+      const sorted = Array.from(merged.values()).sort(
+        (a, b) => a.time - b.time
+      );
+
+      const limited = sorted.slice(-maxCandles);
+      candlesRef.current = limited;
+
+      const timelinePoints = buildTimelineFromCandles(limited);
+      setData(timelinePoints.slice(-candleCount));
+    };
 
     const fetchCandles = async () => {
       try {
-        if (!hasFetchedRef.current) {
-          setIsLoading(true);
-        }
-
         const now = Date.now();
-        const from = now - candleCount * intervalMs;
+        const from = now - maxCandles * intervalMs;
 
-        const baseUrl = getMarketChartUrl(chainId);
         const url = new URL(baseUrl);
         url.searchParams.set("market", marketAddress);
         url.searchParams.set("binSize", CANDLE_INTERVAL_MINUTES.toString());
         url.searchParams.set("binUnit", "minute");
         url.searchParams.set("from", from.toString());
-        url.searchParams.set("limit", (candleCount + 10).toString());
+        url.searchParams.set("limit", maxCandles.toString());
 
         const response = await fetch(url.toString());
 
@@ -70,12 +111,9 @@ const GamblingTimeline: React.FC = () => {
         const candles: CandleApiResponse[] = await response.json();
 
         const normalized = normalizeCandles(candles);
-        const timelinePoints = buildTimelineFromCandles(normalized);
-
+        mergeCandles(normalized);
         if (isActive) {
-          setData(timelinePoints.slice(-candleCount));
           setError(null);
-          hasFetchedRef.current = true;
         }
       } catch (err) {
         console.error("Error fetching gambling timeline:", err);
@@ -92,13 +130,79 @@ const GamblingTimeline: React.FC = () => {
     };
 
     fetchCandles();
-    const intervalId = window.setInterval(fetchCandles, intervalMs);
+    const setupEventSource = () => {
+      if (
+        !isActive ||
+        typeof window === "undefined" ||
+        typeof EventSource === "undefined"
+      ) {
+        return;
+      }
+
+      const sseUrl = new URL(`${baseUrl}/sse`);
+      sseUrl.searchParams.set("market", marketAddress);
+      sseUrl.searchParams.set("binSize", CANDLE_INTERVAL_MINUTES.toString());
+      sseUrl.searchParams.set("binUnit", "minute");
+
+      const eventSource = new EventSource(sseUrl.toString());
+      eventSourceRef.current = eventSource;
+
+      eventSource.onmessage = (event) => {
+        if (!isActive) {
+          return;
+        }
+
+        try {
+          const payload = JSON.parse(event.data) as CandleApiResponse[];
+          if (!Array.isArray(payload) || payload.length === 0) {
+            return;
+          }
+
+          const normalized = normalizeCandles(payload);
+          if (normalized.length === 0) {
+            return;
+          }
+
+          mergeCandles(normalized);
+        } catch (messageError) {
+          console.error("Error processing gambling timeline update:", messageError);
+        }
+      };
+
+      eventSource.onerror = (eventError) => {
+        console.error("Gambling timeline SSE error:", eventError);
+        eventSource.close();
+        eventSourceRef.current = null;
+
+        if (!isActive || typeof window === "undefined") {
+          return;
+        }
+
+        if (retryTimeoutRef.current !== null) {
+          window.clearTimeout(retryTimeoutRef.current);
+        }
+
+        retryTimeoutRef.current = window.setTimeout(() => {
+          retryTimeoutRef.current = null;
+          setupEventSource();
+        }, SSE_RECONNECT_DELAY_MS);
+      };
+    };
+
+    setupEventSource();
 
     return () => {
       isActive = false;
-      window.clearInterval(intervalId);
+      if (retryTimeoutRef.current !== null && typeof window !== "undefined") {
+        window.clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
+
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chainId, marketAddress]);
 
   const signals = useMemo<SignalPoint[]>(() => {
