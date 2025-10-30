@@ -22,6 +22,7 @@ import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
 import { Flex } from "@radix-ui/themes";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 const TradeWidget: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -49,6 +50,7 @@ const TradeWidget: React.FC = () => {
   const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
 
   const sdkRef = useRef(sdk);
+  const isGambling = isGamblingMarket(market?.marketName);
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
@@ -58,10 +60,22 @@ const TradeWidget: React.FC = () => {
   }, [selectedLeverage]);
 
   useEffect(() => {
-    if (debouncedSelectedLeverage !== null) {
+    if (!isGambling) {
+      return;
+    }
+
+    if (selectedLeverage !== "1") {
+      handleLeverageSelect("1");
+    }
+    setDisplayedLeverage("1");
+    setLeverageInputValue("1");
+  }, [isGambling, selectedLeverage, handleLeverageSelect]);
+
+  useEffect(() => {
+    if (debouncedSelectedLeverage !== null && !isGambling) {
       handleLeverageSelect(debouncedSelectedLeverage);
     }
-  }, [debouncedSelectedLeverage]);
+  }, [debouncedSelectedLeverage, isGambling, handleLeverageSelect]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -179,15 +193,17 @@ const TradeWidget: React.FC = () => {
     >
       <PositionSelectComponent />
 
-      <Slider
-        title={"Leverage"}
-        min={1}
-        max={capLeverage ?? 1}
-        step={capLeverage <= 1 ? 1 : 0.1}
-        value={Number(displayedLeverage)}
-        valueUnit={"x"}
-        handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
-      />
+      {!isGambling ? (
+        <Slider
+          title={"Leverage"}
+          min={1}
+          max={capLeverage ?? 1}
+          step={capLeverage <= 1 ? 1 : 0.1}
+          value={Number(displayedLeverage)}
+          valueUnit={"x"}
+          handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
+        />
+      ) : null}
 
       <ChainAndTokenSelect />
       <CollateralInputComponent />

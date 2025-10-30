@@ -17,9 +17,9 @@ import InfoMarketSection from "./InfoMarketSection";
 import { StyledFlex, TradeContainer } from "./trade-styles";
 import SuggestedCards from "./SuggestedCards";
 import { DEFAULT_MARKET } from "../../constants/applications";
-import { MARKETS_WITH_GAMBLING_TIMELINE } from "../../constants/markets";
 import useActiveMarkets from "../../hooks/useActiveMarkets";
 import GamblingTimeline from "./Chart/GamblingTimeline";
+import { isGamblingMarket } from "../../utils/marketGuards";
 
 const Trade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,8 +38,7 @@ const Trade: React.FC = () => {
       return false;
     }
 
-    const encodedMarketName = encodeURIComponent(currentMarket.marketName);
-    return MARKETS_WITH_GAMBLING_TIMELINE.includes(encodedMarketName);
+    return isGamblingMarket(currentMarket.marketName);
   }, [currentMarket]);
 
   const sdkRef = useRef(sdk);
