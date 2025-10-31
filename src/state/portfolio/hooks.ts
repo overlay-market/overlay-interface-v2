@@ -54,6 +54,19 @@ export function usePositionRefresh(
     sdkRef.current = sdk;
   }, [sdk]);
 
+  const accountRef = useRef(account);
+
+  // Keep accountRef always in sync
+  useEffect(() => {
+    accountRef.current = account;
+
+    // ✅ Clear disconnect timer when wallet reconnects
+    if (account && disconnectTimer.current) {
+      clearTimeout(disconnectTimer.current);
+      disconnectTimer.current = null;
+    }
+  }, [account]);
+
   const arePositionsEqual = (
     arr1: OpenPositionData[] | undefined,
     arr2: OpenPositionData[] | undefined
@@ -76,7 +89,7 @@ export function usePositionRefresh(
         if (disconnectTimer.current) clearTimeout(disconnectTimer.current);
         disconnectTimer.current = setTimeout(() => {
           // If still no account after delay → real disconnect
-          if (!account) {
+          if (!accountRef.current) {
             setPositions(undefined);
             setPositionsTotalNumber(0);
           }
