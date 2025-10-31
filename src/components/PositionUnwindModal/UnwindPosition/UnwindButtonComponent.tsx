@@ -11,9 +11,9 @@ import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers } from "../../../state/trade/hooks";
-import { useArcxAnalytics } from "@0xarc-io/analytics";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -48,8 +48,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
-  const arcxAnalytics = useArcxAnalytics();
-  const { address, chainId } = useAccount();
+  const { address } = useAccount();
   const publicClient = usePublicClient();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
@@ -148,13 +147,10 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           result.hash
         );
 
-        arcxAnalytics?.transaction({
-          transactionHash: result.hash,
-          account: address,
-          chainId,
-          metadata: {
-            action: TransactionType.UNWIND_OVL_POSITION,
-          },
+        trackEvent("unwind_ovl_position_success", {
+          transaction_hash: `hash_${result.hash}`,
+          wallet_address: address,
+          timestamp: new Date().toISOString(),
         });
 
         // Handle successful unwind - call onUnwindSuccess if provided
@@ -203,6 +199,12 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         },
         currentTimeForId
       );
+
+      trackEvent("unwind_ovl_position_failed", {
+        error_message: errorMessage,
+        wallet_address: address,
+        timestamp: new Date().toISOString(),
+      });
     } finally {
       setAttemptingUnwind(false);
       // Only dismiss if we haven't handled success via onUnwindSuccess callback

@@ -128,8 +128,8 @@ const OverviewChart: React.FC<OverviewChartProps> = ({
 
       return (
         <Box
-          p={"8px"}
-          style={{ background: "rgba(32, 36, 49, 0.8)", borderRadius: "8px" }}
+          p={theme.tooltip.padding}
+          style={{ background: theme.tooltip.background, borderRadius: theme.tooltip.borderRadius }}
         >
           <Text>{rangeLabel}</Text>
           <Flex align="center">

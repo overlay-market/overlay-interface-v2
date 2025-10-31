@@ -1,12 +1,13 @@
 import { Address } from "viem";
 export interface MarketDataParsed {
   ask: string;
-  bid: string; 
+  bid: string;
   capOi: string;
   circuitBreakerLevel: string;
   currency: string;
   descriptionText?: string;
   disabled: boolean;
+  deprecated?: boolean;
   fullLogo?: string;
   fundingRate: string;
   id: string;

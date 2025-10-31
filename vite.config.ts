@@ -16,7 +16,6 @@ export default defineConfig({
         manualChunks: {
           "react-vendor": ["react", "react-dom", "react-router-dom"],
           "radix-vendor": ["@radix-ui/themes"],
-          "web3-vendor": ["@0xarc-io/analytics"],
           utils: [
             "./src/utils/formatDecimal.ts",
             "./src/utils/formatPriceByCurrency.ts",
@@ -52,7 +51,6 @@ export default defineConfig({
       "react-dom",
       "react-router-dom",
       "@radix-ui/themes",
-      "@0xarc-io/analytics",
     ],
     exclude: ["@radix-ui/themes/styles.css"],
   },

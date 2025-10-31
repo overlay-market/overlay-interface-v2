@@ -47,3 +47,5 @@ export const DEFAULT_TOKEN = {
 } as TokenAmount;
 
 export const OVL_DECIMALS = 18;
+
+export const GA_TRACKING_ID = "G-LBE2VY2GPX";

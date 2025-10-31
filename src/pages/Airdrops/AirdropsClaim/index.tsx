@@ -35,13 +35,19 @@ import {
   StyledLink,
 } from "../EligibilityChecker/eligibility-checker-styles";
 import { GradientOpenInNewIcon } from "../../../assets/icons/svg-icons";
+import useAccount from "../../../hooks/useAccount";
+import { trackEvent } from "../../../analytics/trackEvent";
 
 type AirdropClaimProps = {
   airdropsAmounts: AirdropsAmounts | null;
   disqualifiedTorch: Boolean | null;
 };
 
-const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualifiedTorch }) => {
+const AirdropsClaim: React.FC<AirdropClaimProps> = ({
+  airdropsAmounts,
+  disqualifiedTorch,
+}) => {
+  const { address } = useAccount();
   const [airdropIdForErrorClaimAlias, setAirdropIdForErrorClaimAlias] =
     useState<string | null>(null);
 
@@ -62,15 +68,23 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualif
 
   const handleClaim = (airdropId: string) => {
     setAirdropIdForErrorClaimAlias(null);
+
+    trackEvent("airdrop_claim_click", {
+      wallet_address: address,
+      airdrop_id: airdropId,
+      disqualified: disqualifiedTorch,
+      total_amount: totalAmount,
+      timestamp: new Date().toISOString(),
+    });
+
     const alias = MERKLE_DISTIBUTOR_ADDRESSES[airdropId];
 
     if (alias) {
-      let url
+      let url;
       if (alias.startsWith("0x")) {
         url = `${SABLIER_VESTING_URL}${alias}`;
-      }
-      else {
-        url = alias
+      } else {
+        url = alias;
       }
       window.open(url, "_blank");
     } else {
@@ -80,6 +94,12 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualif
 
   const handleShareOnX = () => {
     const shareText = `I just got my $OVL airdrop from @OverlayProtocol! ${totalAmount} $OVL 🚀🔥 \n\nCheck yours and start trading today at app.overlay.market/airdrops`;
+
+    trackEvent("airdrop_share_on_x", {
+      wallet_address: address,
+      total_amount: totalAmount,
+      timestamp: new Date().toISOString(),
+    });
 
     const XshareUrl = `https://x.com/intent/post?text=${encodeURIComponent(
       shareText
@@ -142,13 +162,19 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualif
                     </Text>
                   )}
 
-                  <GradientText style={{ 
-                    color: disqualifiedTorch ? theme.color.grey10 : undefined,
-                    background: disqualifiedTorch ? "none" : undefined,
-                    backgroundClip: disqualifiedTorch ? "unset" : undefined,
-                    WebkitBackgroundClip: disqualifiedTorch ? "unset" : undefined,
-                    WebkitTextFillColor: disqualifiedTorch ? theme.color.grey10 : "transparent"
-                  }}>
+                  <GradientText
+                    style={{
+                      color: disqualifiedTorch ? theme.color.grey10 : undefined,
+                      background: disqualifiedTorch ? "none" : undefined,
+                      backgroundClip: disqualifiedTorch ? "unset" : undefined,
+                      WebkitBackgroundClip: disqualifiedTorch
+                        ? "unset"
+                        : undefined,
+                      WebkitTextFillColor: disqualifiedTorch
+                        ? theme.color.grey10
+                        : "transparent",
+                    }}
+                  >
                     {totalAmount}{" "}
                     <span style={{ fontFamily: "Inter" }}>OVL</span>
                   </GradientText>
@@ -179,13 +205,11 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualif
                       weight={"medium"}
                     >
                       {AIRDROPS[airdropId].title}
-                      {
-                        airdropId === ClaimId.TORCH 
-                          ? disqualifiedTorch
-                            ? " - DISQUALIFIED"
-                            : " - QUALIFIED" 
-                          : ""
-                      }
+                      {airdropId === ClaimId.TORCH
+                        ? disqualifiedTorch
+                          ? " - DISQUALIFIED"
+                          : " - QUALIFIED"
+                        : ""}
                     </Text>
                     <Text
                       ml={{ initial: "0", sm: "auto" }}
@@ -208,7 +232,13 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualif
                       /> */}
                       {MERKLE_DISTIBUTOR_ADDRESSES[airdropId] && (
                         <GradientOutlineButton
-                          title={airdropId === ClaimId.TORCH ? `How to ${disqualifiedTorch ? "Appeal" : "Claim"}` : "Claim"}
+                          title={
+                            airdropId === ClaimId.TORCH
+                              ? `How to ${
+                                  disqualifiedTorch ? "Appeal" : "Claim"
+                                }`
+                              : "Claim"
+                          }
                           height={"32px"}
                           size={"12px"}
                           handleClick={() => handleClaim(airdropId)}
@@ -227,17 +257,19 @@ const AirdropsClaim: React.FC<AirdropClaimProps> = ({ airdropsAmounts, disqualif
                       An error occurred. Please contact the team.
                     </Text>
                   )}
-                  {!MERKLE_DISTIBUTOR_ADDRESSES[airdropId] && !AIRDROPS[airdropId].subtitle && (
-                    <Text
-                      size={"1"}
-                      weight={"medium"}
-                      style={{
-                        color: theme.color.white,
-                      }}
-                    >
-                      {AIRDROPS[airdropId].subtitle ?? "Available after [redacted]"}
-                    </Text>
-                  )}
+                  {!MERKLE_DISTIBUTOR_ADDRESSES[airdropId] &&
+                    !AIRDROPS[airdropId].subtitle && (
+                      <Text
+                        size={"1"}
+                        weight={"medium"}
+                        style={{
+                          color: theme.color.white,
+                        }}
+                      >
+                        {AIRDROPS[airdropId].subtitle ??
+                          "Available after [redacted]"}
+                      </Text>
+                    )}
                   {AIRDROPS[airdropId].subtitle && (
                     <Text
                       size={"1"}
