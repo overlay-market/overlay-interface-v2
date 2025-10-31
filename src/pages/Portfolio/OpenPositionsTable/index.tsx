@@ -120,7 +120,7 @@ const OpenPositionsTable: React.FC = () => {
                   setSelectedPositions(new Set());
                 }}
                 width="140px"
-                bgColor={theme.color.grey4}
+                bgcolor={theme.color.grey4}
                 color={theme.color.grey1}
               >
                 Cancel Selection
