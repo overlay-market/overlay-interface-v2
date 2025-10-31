@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 type ColorButtonProps = {
   width?: string;
-  bgColor?: string;
+  bgcolor?: string;
   color?: string;
   disabled?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
@@ -10,7 +10,7 @@ type ColorButtonProps = {
 export const ColorButton = styled.button<ColorButtonProps>`
   width: ${({ width }) => width ?? "auto"};
   color: ${({ color }) => color ?? "white"};
-  background: ${({ bgColor }) => bgColor ?? "#53b1f9"};
+  background: ${({ bgcolor }) => bgcolor ?? "#53b1f9"};
   opacity: ${({ disabled }) => (disabled ? "0.5" : "1")};
   cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
   height: 42px;

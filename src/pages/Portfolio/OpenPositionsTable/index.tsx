@@ -115,7 +115,7 @@ const OpenPositionsTable: React.FC = () => {
                   setSelectedPositions(new Set());
                 }}
                 width="140px"
-                bgColor={theme.color.grey4}
+                bgcolor={theme.color.grey4}
                 color={theme.color.grey1}
               >
                 Cancel Selection
@@ -151,7 +151,24 @@ const OpenPositionsTable: React.FC = () => {
         showCheckbox={showCheckboxes}
         onSelectAll={handleSelectAll}
         body={
-          loading && positions ? (
+          positions && positions.length > 0 ? (
+            <>
+              {positions.map((pos) => {
+                const key = getPositionKey(pos);
+                return (
+                  <OpenPosition
+                    key={key}
+                    position={pos}
+                    showCheckbox={showCheckboxes}
+                    onCheckboxChange={(checked) =>
+                      handlePositionSelect(pos, checked)
+                    }
+                    isChecked={selectedPositions.has(key)}
+                  />
+                );
+              })}
+            </>
+          ) : loading ? (
             <tr>
               <td
                 colSpan={POSITIONS_COLUMNS.length}
@@ -160,34 +177,29 @@ const OpenPositionsTable: React.FC = () => {
                 <Loader />
               </td>
             </tr>
+          ) : account ? (
+            <tr>
+              <td
+                colSpan={POSITIONS_COLUMNS.length}
+                style={{ padding: "20px 0" }}
+              >
+                <Text>You have no open positions</Text>
+              </td>
+            </tr>
           ) : (
-            positions &&
-            positions.map((position: OpenPositionData) => {
-              const positionKey = getPositionKey(position);
-              return (
-                <OpenPosition
-                  position={position}
-                  key={positionKey}
-                  showCheckbox={showCheckboxes}
-                  onCheckboxChange={(checked) =>
-                    handlePositionSelect(position, checked)
-                  }
-                  isChecked={selectedPositions.has(positionKey)}
-                />
-              );
-            })
+            <tr>
+              <td
+                colSpan={POSITIONS_COLUMNS.length}
+                style={{ padding: "20px 0" }}
+              >
+                <Text style={{ color: theme.color.grey3 }}>
+                  No wallet connected
+                </Text>
+              </td>
+            </tr>
           )
         }
       />
-
-      {loading && !positions ? (
-        <Loader />
-      ) : account ? (
-        positions &&
-        positionsTotalNumber === 0 && <Text>You have no open positions</Text>
-      ) : (
-        <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
-      )}
 
       <ClosePositionsModal
         open={showCloseModal}

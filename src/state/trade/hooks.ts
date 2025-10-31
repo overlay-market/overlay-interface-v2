@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
 import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
@@ -159,9 +159,14 @@ export const useTradeActionHandlers = (): {
 
 export const useIsNewTxnHash = (): boolean => {
   const txnHash = useAppSelector((state) => state.trade.txnHash);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const previousTxnHash = usePrevious(txnHash)
-  
-  return txnHash !== '' && txnHash !== previousTxnHash
+
+  useEffect(() => {
+    setHasInitialized(true);
+  }, []);
+
+  return hasInitialized && txnHash !== '' && txnHash !== previousTxnHash;
 }
 
 export const useSelectStateManager = () => {
