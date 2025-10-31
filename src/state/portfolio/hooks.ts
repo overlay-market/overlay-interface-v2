@@ -109,9 +109,7 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData =
-          !arePositionsEqual(validPositions, previousValidPositions) &&
-          validPositions.length > 0;
+        const hasNewData = !arePositionsEqual(validPositions, previousValidPositions);
 
         if (hasNewData || !positions) {
           setPositions(validPositions);
