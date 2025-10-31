@@ -7,6 +7,8 @@ import {
 import { Skeleton } from "@radix-ui/themes";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 import { getMarketLogo } from "../../utils/getMarketLogo";
+import { useMemo } from "react";
+import { isGamblingMarket } from "../../utils/marketGuards";
 
 interface MarketCardsProps {
   priceWithCurrency: string;
@@ -21,6 +23,10 @@ const MarketCards = ({
   id,
   isComingSoon = false,
 }: MarketCardsProps) => {
+  const isDoubleOrNothing = useMemo(
+    () => isGamblingMarket(title),
+    [title]
+  );
   const redirectToTradePage = useRedirectToTradePage();
   return (
     <Skeleton loading={false}>
@@ -60,7 +66,7 @@ const MarketCards = ({
         )}
         <CardContent direction="column" align="center" style={{ zIndex: isComingSoon ? 3 : 1, position: "relative" }}>
           <CardsValue style={{ opacity: 1 }}>
-            {priceWithCurrency}
+            {!isDoubleOrNothing ? priceWithCurrency : null}
           </CardsValue>
           <CardsTitle style={{ opacity: isComingSoon ? 0.7 : 1 }}>
             {title}
