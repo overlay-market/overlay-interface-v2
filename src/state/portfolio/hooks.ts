@@ -13,6 +13,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const POLLING_INTERVAL = 5000;
 const MAX_POLLING_TIME = 60000;
+const DISCONNECT_CLEAR_DELAY = 500;
 
 export function useIsNewUnwindTxn(): boolean {
   const txnHash = useAppSelector((state) => state.trade.txnHash);
@@ -38,17 +39,17 @@ export function usePositionRefresh(
   itemsPerPage: number
 ) {
   const [loading, setLoading] = useState(false);
-  const [positions, setPositions] = useState<OpenPositionData[] | undefined>(
-    undefined
-  );
+  const [positions, setPositions] = useState<OpenPositionData[] | undefined>();
   const [positionsTotalNumber, setPositionsTotalNumber] = useState(0);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const sdkRef = useRef(sdk);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
+  const disconnectTimer = useRef<NodeJS.Timeout | null>(null);
   const isNewUnwindTxn = useIsNewUnwindTxn();
   const previousValidPositions = usePrevious(positions);
 
-  const sdkRef = useRef(sdk);
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
@@ -72,8 +73,14 @@ export function usePositionRefresh(
   const fetchPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
       if (!account) {
-        setPositions(undefined);
-        setPositionsTotalNumber(0);
+        if (disconnectTimer.current) clearTimeout(disconnectTimer.current);
+        disconnectTimer.current = setTimeout(() => {
+          // If still no account after delay → real disconnect
+          if (!account) {
+            setPositions(undefined);
+            setPositionsTotalNumber(0);
+          }
+        }, DISCONNECT_CLEAR_DELAY);
         return false;
       }
 
@@ -102,9 +109,15 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData = !arePositionsEqual(validPositions, previousValidPositions) && Boolean(validPositions);
-        setPositions(validPositions);
-        setPositionsTotalNumber(result.total);
+        const hasNewData =
+          !arePositionsEqual(validPositions, previousValidPositions) &&
+          validPositions.length > 0;
+
+        if (hasNewData || !positions) {
+          setPositions(validPositions);
+          setPositionsTotalNumber(result.total);
+        }
+
         return hasNewData;
       } catch (error) {
         console.error(
@@ -116,8 +129,8 @@ export function usePositionRefresh(
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
           return fetchPositions(retryCount + 1);
         } else {
-          setPositions(undefined);
-          setPositionsTotalNumber(0);
+          setPositions((prev) => prev ?? []);
+          setPositionsTotalNumber((prev) => prev ?? 0);
           return false;
         }
       }
@@ -176,7 +189,8 @@ export function usePositionRefresh(
   }, [isNewTxnHash, isNewUnwindTxn, startPolling]);
 
   return {
-    loading: loading || isUpdating,
+    loading,
+    isUpdating,
     positions,
     positionsTotalNumber,
     refreshPositions: fetchPositions,
