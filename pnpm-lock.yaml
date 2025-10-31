@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@0xarc-io/analytics':
-        specifier: ^2.2.3
-        version: 2.4.2(@types/react@18.3.23)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)
       '@lifi/sdk':
         specifier: ^3.10.1
         version: 3.10.1(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@18.3.23)(bufferutil@4.0.9)(immer@10.1.1)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(viem@2.33.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
@@ -154,12 +151,6 @@ packages:
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
-
-  '@0xarc-io/analytics@2.4.2':
-    resolution: {integrity: sha512-qXZkDWCj3BgNJxFT7Nh9yRCLzBhDxspBhCVJRKMrzQgcs3myM3zE2CPH3uoFvUOCXs1B5VsZgUGOpuH1qdwMPg==}
-    peerDependencies:
-      '@types/react': '>=16.14.34'
-      react: '>=16.14.0'
 
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
@@ -2120,9 +2111,6 @@ packages:
 
   '@reown/appkit@1.7.8':
     resolution: {integrity: sha512-51kTleozhA618T1UvMghkhKfaPcc9JlKwLJ5uV+riHyvSoWPKPRIa5A6M1Wano5puNyW0s3fwywhyqTHSilkaA==}
-
-  '@restless/sanitizers@0.2.5':
-    resolution: {integrity: sha512-utsOFwv5owNnbj8HijF7uML/AURgUl5YvY4S2gpxQsrp2D1EP/4rQU/HSyYdIQaL89BoZ/5NHveRJrcFyuHo/w==}
 
   '@rolldown/pluginutils@1.0.0-beta.27':
     resolution: {integrity: sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==}
@@ -6068,17 +6056,6 @@ snapshots:
       graphql: 16.11.0
       typescript: 5.8.3
 
-  '@0xarc-io/analytics@2.4.2(@types/react@18.3.23)(bufferutil@4.0.9)(react@18.3.1)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@restless/sanitizers': 0.2.5
-      '@types/react': 18.3.23
-      react: 18.3.1
-      socket.io-client: 4.8.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
   '@adraffy/ens-normalize@1.11.0': {}
 
   '@ampproject/remapping@2.3.0':
@@ -8859,8 +8836,6 @@ snapshots:
       - uploadthing
       - utf-8-validate
       - zod
-
-  '@restless/sanitizers@0.2.5': {}
 
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
