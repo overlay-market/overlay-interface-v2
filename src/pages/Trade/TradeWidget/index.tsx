@@ -22,6 +22,7 @@ import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
 import { Flex } from "@radix-ui/themes";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 const TradeWidget: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -49,6 +50,7 @@ const TradeWidget: React.FC = () => {
   const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
 
   const sdkRef = useRef(sdk);
+  const isGambling = isGamblingMarket(market?.marketName);
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
@@ -58,10 +60,22 @@ const TradeWidget: React.FC = () => {
   }, [selectedLeverage]);
 
   useEffect(() => {
-    if (debouncedSelectedLeverage !== null) {
+    if (!isGambling) {
+      return;
+    }
+
+    if (selectedLeverage !== "1") {
+      handleLeverageSelect("1");
+    }
+    setDisplayedLeverage("1");
+    setLeverageInputValue("1");
+  }, [isGambling, selectedLeverage, handleLeverageSelect]);
+
+  useEffect(() => {
+    if (debouncedSelectedLeverage !== null && !isGambling) {
       handleLeverageSelect(debouncedSelectedLeverage);
     }
-  }, [debouncedSelectedLeverage]);
+  }, [debouncedSelectedLeverage, isGambling, handleLeverageSelect]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -128,17 +142,37 @@ const TradeWidget: React.FC = () => {
           market.id as Address
         );
         const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
-        parsedCapLeverage &&
-          setCapleverage((prev) =>
-            prev === parsedCapLeverage ? prev : parsedCapLeverage
-          );
+        if (parsedCapLeverage) {
+          setCapleverage(parsedCapLeverage);
+
+          // Always adjust leverage when market changes
+          // Get current leverage from Redux state
+          const currentLeverage = Number(selectedLeverage);
+
+          if (parsedCapLeverage <= 1) {
+            // Market has fixed leverage at 1x - always set to 1
+            handleLeverageSelect("1");
+            setDisplayedLeverage("1");
+          } else if (currentLeverage > parsedCapLeverage) {
+            // Selected leverage exceeds new market's max leverage - clamp it
+            const newLeverage = Math.min(currentLeverage, parsedCapLeverage).toString();
+            handleLeverageSelect(newLeverage);
+            setDisplayedLeverage(newLeverage);
+          } else if (currentLeverage < 1) {
+            // Edge case: leverage is somehow less than 1, reset to minimum
+            handleLeverageSelect("1");
+            setDisplayedLeverage("1");
+          }
+        }
       } catch (error) {
         console.error("Error fetching capLeverage:", error);
       }
     };
 
     fetchCapLeverage();
-  }, [market?.id]);
+    // Run when market changes or wallet connects/disconnects
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [market?.id, address]);
 
   const handleLeverageInput = (newValue: number[]) => {
     const stringValue = newValue[0].toString();
@@ -159,15 +193,17 @@ const TradeWidget: React.FC = () => {
     >
       <PositionSelectComponent />
 
-      <Slider
-        title={"Leverage"}
-        min={1}
-        max={capLeverage ?? 1}
-        step={0.1}
-        value={Number(displayedLeverage)}
-        valueUnit={"x"}
-        handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
-      />
+      {!isGambling ? (
+        <Slider
+          title={"Leverage"}
+          min={1}
+          max={capLeverage ?? 1}
+          step={capLeverage <= 1 ? 1 : 0.1}
+          value={Number(displayedLeverage)}
+          valueUnit={"x"}
+          handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
+        />
+      ) : null}
 
       <ChainAndTokenSelect />
       <CollateralInputComponent />

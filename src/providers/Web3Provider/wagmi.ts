@@ -1,17 +1,20 @@
 import { http, createConfig } from 'wagmi'
-import { bsc } from 'wagmi/chains'
+import { bsc, bscTestnet } from 'wagmi/chains'
 import { getDefaultConfig } from 'connectkit'
 import { mainnetChains } from './chains';
+import { isTestnetMode } from '../../constants/chains';
 
 const projectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string
 
-const chains = [bsc,...mainnetChains] as const;
+const chains = isTestnetMode ? [bsc, bscTestnet, ...mainnetChains] as const : [bsc, ...mainnetChains] as const;
 
 const transports = Object.fromEntries(
   chains.map((chain) => [
     chain.id,
     chain.id === bsc.id
-      ? http(import.meta.env.VITE_BSC_MAINNET_RPC) // custom for BSC
+      ? http(import.meta.env.VITE_BSC_MAINNET_RPC) // custom for BSC mainnet
+      : chain.id === bscTestnet.id
+      ? http() // default RPC for BSC testnet
       : http()
   ])
 );

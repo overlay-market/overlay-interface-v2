@@ -51,6 +51,7 @@ import CoinVsHood from '../assets/images/markets-full-logos/coin-vs-hood.png';
 import AsterMyx from '../assets/images/markets-full-logos/aster-myx.jpg';
 import MrBeastLogo from '../assets/images/markets-full-logos/MrBeast.jpg';
 import GoldUsdLogo from '../assets/images/markets-full-logos/gold-usd-logo.jpg';
+import DoNLogo from '../assets/images/markets-full-logos/DoN.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -106,6 +107,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "ASTER%20vs%20MYX": AsterMyx,
   "MrBeast%20Index": MrBeastLogo,
   "GOLD%20%2F%20USD": GoldUsdLogo,
+  "Double%20or%20Nothing": DoNLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -164,6 +166,8 @@ export const MARKETSORDER = [
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
+
+export const MARKETS_WITH_GAMBLING_TIMELINE = ["Double%20or%20Nothing"];
 
 export enum CategoryName {
   MemeWar = "Meme Wars",

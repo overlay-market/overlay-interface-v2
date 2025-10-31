@@ -7,6 +7,7 @@ import {
   MarketPrice,
 } from "./market-item-styles";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 type MarketItemProps = {
   marketLogo?: string;
@@ -29,13 +30,14 @@ const MarketItem: React.FC<MarketItemProps> = ({
     toggleDropdown();
     redirectToTradePage(marketId);
   };
+  const isGambling = isGamblingMarket(marketName);
 
   return (
     <MarketInfo onClick={() => handleMarketSelect(marketId)}>
       <MarketLogo src={marketLogo} alt={`logo`} />
       <Flex gap={"8px"} width={"100%"} justify={"between"} align={"center"}>
         <MarketName>{marketName}</MarketName>
-        <MarketPrice>{currencyPrice}</MarketPrice>
+        <MarketPrice>{!isGambling ? currencyPrice : "-"}</MarketPrice>
       </Flex>
     </MarketInfo>
   );

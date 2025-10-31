@@ -17,6 +17,7 @@ import { limitDigitsInDecimals, toWei } from "overlay-sdk";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 const TradeHeader: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -39,8 +40,13 @@ const TradeHeader: React.FC = () => {
     sdkRef.current = sdk;
   }, [sdk]);
 
+  const isGambling = useMemo(
+    () => isGamblingMarket(market?.marketName),
+    [market?.marketName]
+  );
+
   useEffect(() => {
-    if (!marketId) return;
+    if (!marketId || isGambling) return;
 
     const fetchPrice = async () => {
       try {
@@ -69,10 +75,10 @@ const TradeHeader: React.FC = () => {
     fetchPrice();
     const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, typedValue, selectedLeverage, isLong, chainId, market]);
+  }, [marketId, typedValue, selectedLeverage, isLong, chainId, market, isGambling]);
 
   useEffect(() => {
-    if (!marketId) return;
+    if (!marketId || isGambling) return;
 
     const fetchStaticMarketData = async () => {
       try {
@@ -97,7 +103,7 @@ const TradeHeader: React.FC = () => {
       TRADE_POLLING_INTERVAL
     );
     return () => clearInterval(intervalId);
-  }, [marketId, chainId]);
+  }, [marketId, chainId, isGambling]);
 
   const isFundingRatePositive = useMemo(() => {
     return Math.sign(Number(funding)) > 0;
@@ -107,54 +113,56 @@ const TradeHeader: React.FC = () => {
     <TradeHeaderContainer>
       <MarketsList />
 
-      <MarketInfoContainer>
-        <StyledFlex width={{ initial: "149px", sm: "167px", lg: "149px" }}>
-          <Text weight="light" style={{ fontSize: "10px" }}>
-            Price
-          </Text>
-          <Text>{currencyPrice}</Text>
-        </StyledFlex>
+      {!isGambling ? (
+        <MarketInfoContainer>
+          <StyledFlex width={{ initial: "149px", sm: "167px", lg: "149px" }}>
+            <Text weight="light" style={{ fontSize: "10px" }}>
+              Price
+            </Text>
+            <Text>{currencyPrice}</Text>
+          </StyledFlex>
 
-        <StyledFlex width={{ initial: "72px", sm: "167px", lg: "97px" }}>
-          <Text weight="light" style={{ fontSize: "10px" }}>
-            Funding
-          </Text>
-          <Text
-            style={{
-              color: isFundingRatePositive
-                ? theme.color.green2
-                : theme.color.red2,
-            }}
+          <StyledFlex width={{ initial: "72px", sm: "167px", lg: "97px" }}>
+            <Text weight="light" style={{ fontSize: "10px" }}>
+              Funding
+            </Text>
+            <Text
+              style={{
+                color: isFundingRatePositive
+                  ? theme.color.green2
+                  : theme.color.red2,
+              }}
+            >
+              {isFundingRatePositive ? `+` : ``}
+              {funding ? `${funding}%` : `-`}
+            </Text>
+          </StyledFlex>
+
+          <BalanceFlex
+            direction={"column"}
+            width={{ initial: "184px", sm: "336px", lg: "195px" }}
+            height={"100%"}
+            justify={"center"}
+            align={"end"}
+            pr={{ initial: "12px", sm: "20px", lg: "12px" }}
+            pl={"10px"}
+            ml={{ sm: "auto", lg: "0" }}
           >
-            {isFundingRatePositive ? `+` : ``}
-            {funding ? `${funding}%` : `-`}
-          </Text>
-        </StyledFlex>
-
-        <BalanceFlex
-          direction={"column"}
-          width={{ initial: "184px", sm: "336px", lg: "195px" }}
-          height={"100%"}
-          justify={"center"}
-          align={"end"}
-          pr={{ initial: "12px", sm: "20px", lg: "12px" }}
-          pl={"10px"}
-          ml={{ sm: "auto", lg: "0" }}
-        >
-          <Text weight="light" style={{ fontSize: "10px" }}>
-            OI balance
-          </Text>
-          <Flex gap={"4px"} align={"center"}>
-            <Text style={{ color: theme.color.red2 }}>
-              {shortPercentageOfTotalOi}%
+            <Text weight="light" style={{ fontSize: "10px" }}>
+              OI balance
             </Text>
-            <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
-            <Text style={{ color: theme.color.green2 }}>
-              {longPercentageOfTotalOi}%
-            </Text>
-          </Flex>
-        </BalanceFlex>
-      </MarketInfoContainer>
+            <Flex gap={"4px"} align={"center"}>
+              <Text style={{ color: theme.color.red2 }}>
+                {shortPercentageOfTotalOi}%
+              </Text>
+              <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
+              <Text style={{ color: theme.color.green2 }}>
+                {longPercentageOfTotalOi}%
+              </Text>
+            </Flex>
+          </BalanceFlex>
+        </MarketInfoContainer>
+      ) : null}
     </TradeHeaderContainer>
   );
 };
