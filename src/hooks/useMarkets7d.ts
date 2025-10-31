@@ -53,10 +53,12 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
         response2.data[CHAINS.BscMainnet].forEach(
           (item: {
             marketId: string;
-            chains: { deploymentAddress: string }[];
+            chains: { deploymentAddress: string; deprecated?: boolean }[];
           }) => {
+            // Prefer non-deprecated chains when multiple exist
+            const chain = item.chains.find((c) => !c.deprecated) || item.chains[0];
             mapping[item.marketId] =
-              item.chains[0]?.deploymentAddress.toLowerCase();
+              chain?.deploymentAddress.toLowerCase();
           }
         );
 

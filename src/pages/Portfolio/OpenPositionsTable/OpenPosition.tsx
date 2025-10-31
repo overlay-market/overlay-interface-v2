@@ -1,4 +1,4 @@
-import { Flex, Text, Checkbox } from "@radix-ui/themes";
+import { Flex, Text, Checkbox, Badge, Tooltip } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
@@ -62,7 +62,21 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             />
           </StyledCell>
         )}
-        <StyledCell>{position.marketName}</StyledCell>
+        <StyledCell>
+          <Flex gap="6px" align="center">
+            {position.marketName}
+            {position.deprecated && (
+              <Tooltip
+                content="This position was built on a deprecated version of the market. You can still unwind it."
+                style={{ background: theme.tooltip.background, borderRadius: theme.tooltip.borderRadius, padding: theme.tooltip.padding }}
+              >
+                <Badge color="orange" size="1" style={{ cursor: "help" }}>
+                  Deprecated
+                </Badge>
+              </Tooltip>
+            )}
+          </Flex>
+        </StyledCell>
         <StyledCell>{position.size} OVL</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
