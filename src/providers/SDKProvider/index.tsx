@@ -15,6 +15,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       chainId: chainId ? (chainId as number) : (DEFAULT_CHAINID as number),
       rpcUrls: {
         [SUPPORTED_CHAINID.BSC_MAINNET]: import.meta.env.VITE_BSC_MAINNET_RPC,
+        [SUPPORTED_CHAINID.BSC_TESTNET]: import.meta.env.VITE_BSC_TESTNET_RPC || "https://data-seed-prebsc-1-s1.binance.org:8545",
       },
       web3Provider: walletClient as any,
       useShiva: true,

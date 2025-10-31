@@ -27,3 +27,14 @@ export const ShortPositionSelectButton = styled(Box)<{ active: string }>`
     box-shadow: 0px 0px 10px 0px ${theme.color.red1};
   }
 `
+
+export const Triangle = styled.div<{ $direction: "up" | "down" }>`
+  width: 0;
+  height: 0;
+  border-left: 24px solid transparent;
+  border-right: 24px solid transparent;
+  ${({ $direction }) =>
+    $direction === "up"
+      ? "border-bottom: 36px solid #3bd783;"
+      : "border-top: 36px solid #f16060;"}
+`

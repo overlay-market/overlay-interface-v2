@@ -26,12 +26,14 @@ const Slider: React.FC<SliderProps> = ({
   max,
   step,
 }) => {
+  const isDisabled = min === max;
+
   return (
     <Flex direction={"column"} gap={"4px"}>
       <Flex justify={"between"} height={"19px"}>
         {title && (
           <Text size={"3"} style={{ color: theme.color.blue1 }}>
-            {title}
+            {title} {isDisabled && <span style={{ color: theme.color.grey3, fontSize: "12px" }}>(Fixed)</span>}
           </Text>
         )}
 
@@ -47,6 +49,11 @@ const Slider: React.FC<SliderProps> = ({
         min={min}
         max={max}
         step={step}
+        disabled={isDisabled}
+        style={{
+          opacity: isDisabled ? 0.5 : 1,
+          cursor: isDisabled ? 'not-allowed' : 'pointer'
+        }}
       >
         <StyledTrack>
           <Range />
