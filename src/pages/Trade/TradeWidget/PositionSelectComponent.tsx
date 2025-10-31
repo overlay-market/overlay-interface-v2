@@ -1,6 +1,6 @@
-import { Flex } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import {
   useTradeActionHandlers,
   useTradeState,
@@ -11,11 +11,34 @@ import {
   Triangle,
 } from "./position-select-component-styles";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import { useSearchParams } from "react-router-dom";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import useBidAndAsk from "../../../hooks/useBidAndAsk";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 const PositionSelectComponent: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const marketId = searchParams.get("market");
+  const { bid, ask } = useBidAndAsk(marketId);
+
   const { currentMarket: market } = useCurrentMarketState();
   const { isLong } = useTradeState();
   const { handlePositionSideSelect } = useTradeActionHandlers();
+
+  const [currencyAsk, setCurrencyAsk] = useState<string>("-");
+  const [currencyBid, setCurrencyBid] = useState<string>("-");
+
+  useEffect(() => {
+    ask &&
+      market &&
+      setCurrencyAsk(formatPriceWithCurrency(ask, market.priceCurrency));
+  }, [ask, market]);
+
+  useEffect(() => {
+    bid &&
+      market &&
+      setCurrencyBid(formatPriceWithCurrency(bid, market.priceCurrency));
+  }, [bid, market]);
 
   const handleSelectPositionSide = useCallback(
     (isLong: boolean) => {
@@ -31,6 +54,11 @@ const PositionSelectComponent: React.FC = () => {
     };
   }, [market]);
 
+  const isDoubleOrNothing = useMemo(
+    () => isGamblingMarket(market?.marketName),
+    [market?.marketName]
+  );
+
   return (
     <Flex height={"52px"} gap={"8px"}>
       <LongPositionSelectButton
@@ -38,20 +66,44 @@ const PositionSelectComponent: React.FC = () => {
         onClick={() => handleSelectPositionSide(true)}
         style={{ background: theme.color.grey4 }}
         aria-label={longLabel}
+        title={longLabel}
       >
-        <Flex direction={"column"} justify={"center"} align={"center"}>
-          <Triangle $direction="up" />
-        </Flex>
+        {isDoubleOrNothing ? (
+          <Flex direction={"column"} justify={"center"} align={"center"}>
+            <Triangle $direction="up" />
+          </Flex>
+        ) : (
+          <Flex direction={"column"} justify={"center"} align={"center"}>
+            <Text size={"3"} weight={"bold"}>
+              {market?.buttons?.long ?? "Buy"}
+            </Text>
+            <Text size={"1"} style={{ color: theme.color.blue1 }}>
+              {currencyAsk}
+            </Text>
+          </Flex>
+        )}
       </LongPositionSelectButton>
       <ShortPositionSelectButton
         active={isLong.toString()}
         onClick={() => handleSelectPositionSide(false)}
         style={{ background: theme.color.grey4 }}
         aria-label={shortLabel}
+        title={shortLabel}
       >
-        <Flex direction={"column"} justify={"center"} align={"center"}>
-          <Triangle $direction="down" />
-        </Flex>
+        {isDoubleOrNothing ? (
+          <Flex direction={"column"} justify={"center"} align={"center"}>
+            <Triangle $direction="down" />
+          </Flex>
+        ) : (
+          <Flex direction={"column"} justify={"center"} align={"center"}>
+            <Text size={"3"} weight={"bold"}>
+              {market?.buttons?.short ?? "Sell"}
+            </Text>
+            <Text size={"1"} style={{ color: theme.color.blue1 }}>
+              {currencyBid}
+            </Text>
+          </Flex>
+        )}
       </ShortPositionSelectButton>
     </Flex>
   );
