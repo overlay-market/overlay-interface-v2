@@ -41,7 +41,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
     return MARKET_CHART_URL.BSC_MAINNET;
   }, [chainId]);
 
-  // Fetch the market address mapping once
+  // Fetch the market address mapping once per active chain
   useEffect(() => {
     const fetchMarketAddressMapping = async () => {
       try {
@@ -50,15 +50,40 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
         );
         const mapping: Record<string, string> = {};
 
-        response2.data[CHAINS.BscMainnet].forEach(
+        const activeChainId =
+          chainId === SUPPORTED_CHAINID.BSC_TESTNET
+            ? CHAINS.BscTestnet
+            : CHAINS.BscMainnet;
+
+        const marketsForChain = Array.isArray(response2.data?.[activeChainId])
+          ? response2.data[activeChainId]
+          : [];
+
+        marketsForChain.forEach(
           (item: {
             marketId: string;
-            chains: { deploymentAddress: string; deprecated?: boolean }[];
+            chains: {
+              chainId?: number;
+              deploymentAddress: string;
+              deprecated?: boolean;
+            }[];
           }) => {
-            // Prefer non-deprecated chains when multiple exist
-            const chain = item.chains.find((c) => !c.deprecated) || item.chains[0];
-            mapping[item.marketId] =
-              chain?.deploymentAddress.toLowerCase();
+            if (!Array.isArray(item.chains) || item.chains.length === 0) {
+              return;
+            }
+
+            // Prefer deployment that matches the active chain when available
+            const chainDeployment =
+              item.chains.find(
+                (c) => c.chainId === activeChainId && !c.deprecated
+              ) ||
+              item.chains.find((c) => c.chainId === activeChainId) ||
+              item.chains.find((c) => !c.deprecated) ||
+              item.chains[0];
+
+            if (chainDeployment?.deploymentAddress) {
+              mapping[item.marketId] = chainDeployment.deploymentAddress.toLowerCase();
+            }
           }
         );
 
@@ -69,7 +94,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
     };
 
     fetchMarketAddressMapping();
-  }, []);
+  }, [chainId]);
 
   // Fetch marketsPricesOverview whenever marketIds or the mapping changes
   useEffect(() => {
