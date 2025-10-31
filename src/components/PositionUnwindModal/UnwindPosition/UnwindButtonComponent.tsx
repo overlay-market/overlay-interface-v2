@@ -5,7 +5,7 @@ import {
 } from "../../../components/Button";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useMemo, useState } from "react";
-import { OpenPositionData, toWei } from "overlay-sdk";
+import { OpenPositionData, UnwindStateSuccess, toWei } from "overlay-sdk";
 import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
@@ -23,6 +23,14 @@ type UnwindButtonComponentProps = {
   priceLimit: bigint;
   isPendingTime: boolean;
   handleDismiss: () => void;
+  unwindState: UnwindStateSuccess;
+  onUnwindSuccess?: (
+    unwindState: UnwindStateSuccess,
+    inputValue: string,
+    unwindPercentage: number,
+    transactionHash?: string,
+    blockNumber?: number
+  ) => void;
 };
 
 const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
@@ -33,6 +41,8 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   priceLimit,
   isPendingTime,
   handleDismiss,
+  unwindState,
+  onUnwindSuccess,
 }) => {
   const sdk = useSDK();
   const addPopup = useAddPopup();
@@ -77,6 +87,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     }
 
     setAttemptingUnwind(true);
+    let handledByCallback = false;
 
     try {
       const result = await sdk.market.unwind({
@@ -142,7 +153,20 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           timestamp: new Date().toISOString(),
         });
 
-        if (receipt.blockNumber) {
+        // Handle successful unwind - call onUnwindSuccess if provided
+        if (isSuccess && onUnwindSuccess) {
+          handledByCallback = true;
+          onUnwindSuccess(
+            unwindState,
+            inputValue,
+            unwindPercentage,
+            result.hash,
+            receipt.blockNumber ? Number(receipt.blockNumber) : undefined
+          );
+          // Don't update transaction hash immediately - let the share modal handle it
+          // This prevents portfolio refresh while user is viewing/sharing
+        } else if (isSuccess && receipt.blockNumber) {
+          // Only update transaction hash if not showing share modal
           handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
         }
       } else {
@@ -183,7 +207,10 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
       });
     } finally {
       setAttemptingUnwind(false);
-      handleDismiss();
+      // Only dismiss if we haven't handled success via onUnwindSuccess callback
+      if (!handledByCallback) {
+        handleDismiss();
+      }
     }
   };
 
