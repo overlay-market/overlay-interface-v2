@@ -49,19 +49,14 @@ const OpenPositionsTable: React.FC = () => {
 
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const {
-    loading,
-    isUpdating,
-    positions,
-    positionsTotalNumber,
-    refreshPositions,
-  } = usePositionRefresh(
-    sdk,
-    account,
-    isNewTxnHash || isNewUnwindTxn,
-    currentPage,
-    itemsPerPage
-  );
+  const { loading, positions, positionsTotalNumber, refreshPositions } =
+    usePositionRefresh(
+      sdk,
+      account,
+      isNewTxnHash || isNewUnwindTxn,
+      currentPage,
+      itemsPerPage
+    );
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
@@ -172,16 +167,6 @@ const OpenPositionsTable: React.FC = () => {
                   />
                 );
               })}
-              {(loading || isUpdating) && (
-                <tr>
-                  <td
-                    colSpan={POSITIONS_COLUMNS.length}
-                    style={{ padding: "20px 0" }}
-                  >
-                    <Loader />
-                  </td>
-                </tr>
-              )}
             </>
           ) : loading ? (
             <tr>
