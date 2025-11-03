@@ -187,6 +187,25 @@ export const formatProfitForSharing = (
 };
 
 /**
+ * Detects if the user is on a mobile device
+ */
+export const isMobileDevice = (): boolean => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+    return false;
+  }
+
+  // Check for touch support and screen size
+  const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const hasSmallScreen = window.innerWidth <= 768;
+
+  // Check user agent for mobile devices
+  const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  const isMobileUA = mobileRegex.test(navigator.userAgent);
+
+  return (hasTouchScreen && hasSmallScreen) || isMobileUA;
+};
+
+/**
  * Checks if sharing is supported by the browser
  */
 export const isSharingSupported = (): boolean => {
@@ -232,14 +251,23 @@ export const copyImageToClipboard = async (dataUrl: string): Promise<boolean> =>
 /**
  * Share to Twitter with image using Web Share API (if available)
  * Falls back to clipboard copy + Twitter intent on desktop
+ * On mobile, uses native share menu without Twitter fallback
  */
 export const shareToTwitterWithImage = async (
   text: string,
   imageDataUrl: string,
   filename: string = 'trade-result.png'
-): Promise<{ method: 'web-share' | 'clipboard' | 'text-only'; success: boolean }> => {
-  // Try Web Share API first (primarily for mobile)
-  if (navigator.share && navigator.canShare) {
+): Promise<{ method: 'web-share' | 'web-share-text' | 'clipboard' | 'text-only'; success: boolean }> => {
+  const isMobile = isMobileDevice();
+
+  console.log('shareToTwitterWithImage: Starting share flow', {
+    isMobile,
+    hasWebShare: !!navigator.share,
+    hasCanShare: !!navigator.canShare
+  });
+
+  // Try Web Share API first (prioritized for mobile)
+  if (navigator.share) {
     try {
       const imageFile = await dataUrlToFile(imageDataUrl, filename);
 
@@ -249,29 +277,72 @@ export const shareToTwitterWithImage = async (
         files: [imageFile]
       };
 
-      // Check if this data can be shared
-      if (navigator.canShare(shareData)) {
+      // Check if this data can be shared (if canShare is available)
+      const canShare = navigator.canShare ? navigator.canShare(shareData) : true;
+
+      console.log('shareToTwitterWithImage: Attempting Web Share API with image', {
+        canShare,
+        fileSize: imageFile.size,
+        fileType: imageFile.type
+      });
+
+      if (canShare) {
         await navigator.share(shareData);
+        console.log('shareToTwitterWithImage: Web Share API succeeded with image');
         return { method: 'web-share', success: true };
+      } else {
+        console.log('shareToTwitterWithImage: canShare returned false for data with files');
       }
     } catch (error) {
-      console.log('Web Share API failed, trying clipboard approach', error);
+      console.log('shareToTwitterWithImage: Web Share API failed with image', {
+        error: error instanceof Error ? error.message : String(error),
+        errorName: error instanceof Error ? error.name : 'Unknown'
+      });
+
+      // On mobile, try Web Share API again without the image (text only)
+      if (isMobile && navigator.share) {
+        try {
+          console.log('shareToTwitterWithImage: Attempting Web Share API with text only (mobile fallback)');
+          await navigator.share({
+            title: 'Overlay Trade',
+            text: text,
+          });
+          console.log('shareToTwitterWithImage: Web Share API succeeded with text only');
+          return { method: 'web-share-text', success: true };
+        } catch (textShareError) {
+          console.log('shareToTwitterWithImage: Web Share API failed even with text only', {
+            error: textShareError instanceof Error ? textShareError.message : String(textShareError)
+          });
+          // User cancelled or error - don't fall back to Twitter on mobile
+          return { method: 'web-share-text', success: false };
+        }
+      }
     }
   }
 
   // Desktop fallback: Copy to clipboard + open Twitter
-  if (navigator.clipboard && window.ClipboardItem) {
+  // Skip this on mobile to avoid opening Twitter directly
+  if (!isMobile && navigator.clipboard && window.ClipboardItem) {
+    console.log('shareToTwitterWithImage: Attempting clipboard + Twitter intent (desktop)');
     const clipboardSuccess = await copyImageToClipboard(imageDataUrl);
     if (clipboardSuccess) {
       // Open Twitter with text
       shareToTwitter(text);
+      console.log('shareToTwitterWithImage: Clipboard succeeded, Twitter opened');
       return { method: 'clipboard', success: true };
     }
   }
 
-  // Final fallback: Text-only Twitter intent
-  shareToTwitter(text);
-  return { method: 'text-only', success: true };
+  // Final fallback: Text-only Twitter intent (desktop only)
+  if (!isMobile) {
+    console.log('shareToTwitterWithImage: Final fallback - text-only Twitter (desktop)');
+    shareToTwitter(text);
+    return { method: 'text-only', success: true };
+  }
+
+  // On mobile, if we got here, everything failed - don't open Twitter
+  console.log('shareToTwitterWithImage: All share methods failed on mobile');
+  return { method: 'web-share-text', success: false };
 };
 
 /**
