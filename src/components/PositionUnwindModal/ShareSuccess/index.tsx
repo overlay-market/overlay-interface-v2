@@ -228,7 +228,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
 
             <ButtonGroup>
               <GradientSolidButton
-                title={isCapturing ? "Generating..." : "Share on X"}
+                title={isCapturing ? "Generating..." : (isDesktop ? "Share on X" : "Share")}
                 width="100%"
                 height="46px"
                 handleClick={handleShareToTwitter}
@@ -327,7 +327,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
         {/* Action Buttons */}
         <ButtonGroup>
           <GradientSolidButton
-            title={isCapturing ? "Generating..." : "Share on X"}
+            title={isCapturing ? "Generating..." : (isDesktop ? "Share on X" : "Share")}
             width="100%"
             height="46px"
             handleClick={handleShareToTwitter}

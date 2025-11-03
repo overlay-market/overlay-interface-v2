@@ -7,7 +7,7 @@ import type {
 import type { Address } from "viem";
 import { useAppSelector } from "../hooks";
 import { TransactionType } from "../../constants/transaction";
-import usePrevious from "../../hooks/usePrevious";
+
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
@@ -43,12 +43,12 @@ export function usePositionRefresh(
   const [positionsTotalNumber, setPositionsTotalNumber] = useState(0);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const previousValidPositions = usePrevious(positions);
   const sdkRef = useRef(sdk);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const disconnectTimer = useRef<NodeJS.Timeout | null>(null);
   const fetchingRef = useRef(false);
+  const previousValidPositionsRef = useRef<OpenPositionData[] | undefined>();
   const isNewUnwindTxn = useIsNewUnwindTxn();
 
   useEffect(() => {
@@ -129,11 +129,12 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData = !arePositionsEqual(validPositions, previousValidPositions);
+        const hasNewData = !arePositionsEqual(validPositions, previousValidPositionsRef.current);
 
         if (hasNewData || !positions) {
           setPositions(validPositions);
           setPositionsTotalNumber(result.total);
+          previousValidPositionsRef.current = validPositions;
         }
 
         return hasNewData;
@@ -159,6 +160,8 @@ export function usePositionRefresh(
       account,
       currentPage,
       itemsPerPage,
+      isNewTxnHash,
+      positions,
     ]
   );
 
@@ -305,6 +308,7 @@ export function useUnwindPositionRefresh(
       account,
       currentPage,
       itemsPerPage,
+      isNewTxnHash,
     ]
   );
 
