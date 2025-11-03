@@ -131,7 +131,7 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
           <ColorButton
             onClick={handleDismiss}
             width="140px"
-            bgColor={theme.color.grey4}
+            bgcolor={theme.color.grey4}
             color={theme.color.grey1}
             disabled={isUnwinding}
           >

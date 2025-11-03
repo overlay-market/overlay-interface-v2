@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { MARKET_CHART_URL } from "../constants/applications";
 import { CHAINS } from "overlay-sdk";
+import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
+import { SUPPORTED_CHAINID } from "../constants/chains";
 
 interface MarketDataPoint {
   latestPrice: number;
@@ -22,6 +24,7 @@ interface MarketDataWithOpenPrice {
 }
 
 export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
+  const { chainId } = useMultichainContext();
   const [marketsData, setMarketsData] = useState<MarketDataWithOpenPrice[]>([]);
   const [marketAddressMapping, setMarketAddressMapping] = useState<
     Record<string, string>
@@ -30,7 +33,15 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
   // Memoized version of marketIds to avoid unnecessary re-fetches
   const stableMarketIds = useMemo(() => marketIds, [marketIds]);
 
-  // Fetch the market address mapping once
+  // Determine chart URL based on chain ID
+  const chartUrl = useMemo(() => {
+    if (chainId === SUPPORTED_CHAINID.BSC_TESTNET) {
+      return MARKET_CHART_URL.BSC_TESTNET;
+    }
+    return MARKET_CHART_URL.BSC_MAINNET;
+  }, [chainId]);
+
+  // Fetch the market address mapping once per active chain
   useEffect(() => {
     const fetchMarketAddressMapping = async () => {
       try {
@@ -39,15 +50,40 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
         );
         const mapping: Record<string, string> = {};
 
-        response2.data[CHAINS.BscMainnet].forEach(
+        const activeChainId =
+          chainId === SUPPORTED_CHAINID.BSC_TESTNET
+            ? CHAINS.BscTestnet
+            : CHAINS.BscMainnet;
+
+        const marketsForChain = Array.isArray(response2.data?.[activeChainId])
+          ? response2.data[activeChainId]
+          : [];
+
+        marketsForChain.forEach(
           (item: {
             marketId: string;
-            chains: { deploymentAddress: string; deprecated?: boolean }[];
+            chains: {
+              chainId?: number;
+              deploymentAddress: string;
+              deprecated?: boolean;
+            }[];
           }) => {
-            // Prefer non-deprecated chains when multiple exist
-            const chain = item.chains.find((c) => !c.deprecated) || item.chains[0];
-            mapping[item.marketId] =
-              chain?.deploymentAddress.toLowerCase();
+            if (!Array.isArray(item.chains) || item.chains.length === 0) {
+              return;
+            }
+
+            // Prefer deployment that matches the active chain when available
+            const chainDeployment =
+              item.chains.find(
+                (c) => c.chainId === activeChainId && !c.deprecated
+              ) ||
+              item.chains.find((c) => c.chainId === activeChainId) ||
+              item.chains.find((c) => !c.deprecated) ||
+              item.chains[0];
+
+            if (chainDeployment?.deploymentAddress) {
+              mapping[item.marketId] = chainDeployment.deploymentAddress.toLowerCase();
+            }
           }
         );
 
@@ -58,7 +94,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
     };
 
     fetchMarketAddressMapping();
-  }, []);
+  }, [chainId]);
 
   // Fetch marketsPricesOverview whenever marketIds or the mapping changes
   useEffect(() => {
@@ -71,7 +107,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
 
       try {
         const responseOverview = await axios.get<MarketDataPoint[]>(
-          `${MARKET_CHART_URL.BSC_MAINNET}/marketsPricesOverview`
+          `${chartUrl}/marketsPricesOverview`
         );
         const chartDataArray = responseOverview.data;
 
@@ -142,7 +178,7 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
     const intervalId = setInterval(fetchMarketsPricesOverview, 300000); // 5 minutes interval
 
     return () => clearInterval(intervalId);
-  }, [marketAddressMapping, stableMarketIds]);
+  }, [marketAddressMapping, stableMarketIds, chartUrl]);
 
   return marketsData;
 }

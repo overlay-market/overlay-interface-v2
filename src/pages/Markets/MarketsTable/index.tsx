@@ -14,6 +14,7 @@ import { MarketsLogos } from "./markets-table-styles";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import * as React from "react";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
@@ -347,6 +348,9 @@ export default function MarketsTable({
               );
 
               const isComingSoon = !defaultMarketIds.has(market.marketId);
+              const marketName =
+                market.marketName ?? decodeURIComponent(market.marketId);
+              const isGambling = isGamblingMarket(marketName);
 
               const lineColor =
                 market7d &&
@@ -431,73 +435,96 @@ export default function MarketsTable({
                     </Flex>
                   </Table.Cell>
                   <Table.Cell
-                    style={{ color: isComingSoon ? "#8B8B8B" : "inherit" }}
+                    style={{
+                      color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
+                    }}
                   >
-                    {formatPriceWithCurrency(
-                      market.price ?? 0,
-                      market.priceCurrency
-                    )}
+                    {!isGambling
+                      ? formatPriceWithCurrency(
+                          market.price ?? 0,
+                          market.priceCurrency
+                        )
+                      : "-"}
                   </Table.Cell>
                   {!isMobile && (
                     <>
                       <Table.Cell
                         style={{
-                          color: isComingSoon
+                          color: isComingSoon || isGambling
                             ? "#8B8B8B"
                             : (market7d?.oneHourChange ?? 0) >= 0
                             ? theme.color.green2
                             : theme.color.red2,
                         }}
                       >
-                        <Skeleton loading={!market7d}>
-                          {market7d?.oneHourChange?.toFixed(2)}%
-                        </Skeleton>
+                        {isGambling ? (
+                          "-"
+                        ) : (
+                          <Skeleton loading={!market7d}>
+                            {market7d?.oneHourChange?.toFixed(2)}%
+                          </Skeleton>
+                        )}
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color: isComingSoon
+                          color: isComingSoon || isGambling
                             ? "#8B8B8B"
                             : (market7d?.twentyFourHourChange ?? 0) >= 0
                             ? theme.color.green2
                             : theme.color.red2,
                         }}
                       >
-                        <Skeleton loading={!market7d}>
-                          {market7d?.twentyFourHourChange?.toFixed(2)}%
-                        </Skeleton>
+                        {isGambling ? (
+                          "-"
+                        ) : (
+                          <Skeleton loading={!market7d}>
+                            {market7d?.twentyFourHourChange?.toFixed(2)}%
+                          </Skeleton>
+                        )}
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color: isComingSoon
+                          color: isComingSoon || isGambling
                             ? "#8B8B8B"
                             : (market7d?.sevenDayChange ?? 0) >= 0
                             ? theme.color.green2
                             : theme.color.red2,
                         }}
                       >
-                        <Skeleton loading={!market7d}>
-                          {market7d?.sevenDayChange?.toFixed(2)}%
-                        </Skeleton>
+                        {isGambling ? (
+                          "-"
+                        ) : (
+                          <Skeleton loading={!market7d}>
+                            {market7d?.sevenDayChange?.toFixed(2)}%
+                          </Skeleton>
+                        )}
                       </Table.Cell>
                       <Table.Cell
                         style={{
-                          color: isComingSoon ? "#8B8B8B" : theme.color.green2,
+                          color:
+                            isComingSoon || isGambling
+                              ? "#8B8B8B"
+                              : theme.color.green2,
                         }}
                       >
-                        <span
-                          style={{
-                            color: isComingSoon
-                              ? "#8B8B8B"
-                              : market.funding && Number(market.funding) < 0
-                              ? theme.color.red2
-                              : theme.color.green2,
-                          }}
-                        >
-                          {market.funding && Number(market.funding) < 0
-                            ? market.funding
-                            : `+${market.funding}`}
-                          %
-                        </span>
+                        {isGambling ? (
+                          "-"
+                        ) : (
+                          <span
+                            style={{
+                              color: isComingSoon
+                                ? "#8B8B8B"
+                                : market.funding && Number(market.funding) < 0
+                                ? theme.color.red2
+                                : theme.color.green2,
+                            }}
+                          >
+                            {market.funding && Number(market.funding) < 0
+                              ? market.funding
+                              : `+${market.funding}`}
+                            %
+                          </span>
+                        )}
                       </Table.Cell>
                       <Table.Cell>
                         {isComingSoon ? (
@@ -513,6 +540,10 @@ export default function MarketsTable({
                             }}
                           >
                             Coming Soon
+                          </Text>
+                        ) : isGambling ? (
+                          <Text size="2" style={{ color: "#8B8B8B" }}>
+                            -
                           </Text>
                         ) : (
                           <Flex align="center" gap="2">
@@ -550,30 +581,40 @@ export default function MarketsTable({
                       </Table.Cell>
                     </>
                   )}
-                  <Table.Cell>
-                    <Skeleton loading={!market7d}>
-                      <LineChart
-                        width={isMobile ? 80 : 100}
-                        height={30}
-                        data={market7d?.sevenDaysChartData?.map((value) => ({
-                          value,
-                        }))}
-                        margin={{ top: 0, bottom: 0 }}
-                      >
-                        <YAxis
-                          type="number"
-                          domain={["dataMin", "dataMax"]}
-                          hide
-                        />
-                        <Line
-                          type="monotone"
-                          dataKey="value"
-                          stroke={isComingSoon ? "#8B8B8B" : lineColor}
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                      </LineChart>
-                    </Skeleton>
+                  <Table.Cell
+                    style={{
+                      color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
+                    }}
+                  >
+                    {isGambling ? (
+                      "-"
+                    ) : (
+                      <Skeleton loading={!market7d}>
+                        <LineChart
+                          width={isMobile ? 80 : 100}
+                          height={30}
+                          data={market7d?.sevenDaysChartData?.map(
+                            (value) => ({
+                              value,
+                            })
+                          )}
+                          margin={{ top: 0, bottom: 0 }}
+                        >
+                          <YAxis
+                            type="number"
+                            domain={["dataMin", "dataMax"]}
+                            hide
+                          />
+                          <Line
+                            type="monotone"
+                            dataKey="value"
+                            stroke={isComingSoon ? "#8B8B8B" : lineColor}
+                            strokeWidth={2}
+                            dot={false}
+                          />
+                        </LineChart>
+                      </Skeleton>
+                    )}
                   </Table.Cell>
                 </Table.Row>
               );
