@@ -119,7 +119,9 @@ const GamblingTimeline: React.FC = () => {
         console.error("Error fetching gambling timeline:", err);
         if (isActive) {
           setError(
-            err instanceof Error ? err.message : "Unknown error loading timeline"
+            err instanceof Error
+              ? err.message
+              : "Unknown error loading timeline"
           );
         }
       } finally {
@@ -165,7 +167,10 @@ const GamblingTimeline: React.FC = () => {
 
           mergeCandles(normalized);
         } catch (messageError) {
-          console.error("Error processing gambling timeline update:", messageError);
+          console.error(
+            "Error processing gambling timeline update:",
+            messageError
+          );
         }
       };
 
@@ -214,8 +219,7 @@ const GamblingTimeline: React.FC = () => {
       )
       .map((point) => ({
         ...point,
-        direction:
-          point.changePercent >= POSITIVE_THRESHOLD ? "up" : "down",
+        direction: point.changePercent >= POSITIVE_THRESHOLD ? "up" : "down",
       }));
   }, [data]);
 
@@ -418,7 +422,7 @@ const TimelineTrack = styled.div`
   display: flex;
   align-items: center;
   gap: 48px;
-  width: 100%;
+  width: 0;
   max-width: 100%;
   flex: 1;
   height: 100%;
