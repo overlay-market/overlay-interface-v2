@@ -57,16 +57,13 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const { data: walletClient } = useConnectorClient();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
-  const [walletTimeout, setWalletTimeout] = useState(false);
   const [pendingMessage, setPendingMessage] = useState("Pending confirmation...");
-  const [elapsedTime, setElapsedTime] = useState(0);
 
   const isMobile = isMobileDevice();
 
   // Progressive message updates while waiting for wallet signature
   useEffect(() => {
     if (!attemptingUnwind) {
-      setElapsedTime(0);
       setPendingMessage("Pending confirmation...");
       return;
     }
@@ -74,7 +71,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     const startTime = Date.now();
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startTime) / 1000);
-      setElapsedTime(elapsed);
 
       if (elapsed < 5) {
         setPendingMessage("Waiting for wallet...");
@@ -110,42 +106,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     return { errorCode, errorMessage };
   };
 
-  const handleCancel = () => {
-    console.log("User cancelled after wallet timeout");
-    setAttemptingUnwind(false);
-    setWalletTimeout(false);
-    handleDismiss();
-  };
-
-  const handleRetry = () => {
-    console.log("User retrying after wallet timeout");
-    setWalletTimeout(false);
-    setAttemptingUnwind(false);
-    // Reset and retry after a brief moment
-    setTimeout(() => {
-      handleUnwind();
-    }, 100);
-  };
-
-  const handleOpenWallet = () => {
-    console.log("User attempting to manually open wallet");
-    // On mobile, this provides a hint - user still needs to manually open their wallet app
-    // The transaction should be queued there
-    if (isMobile) {
-      addPopup(
-        {
-          txn: {
-            hash: currentTimeForId,
-            success: null,
-            message: "Please open your wallet app and sign any pending transactions.",
-            type: "WALLET_INSTRUCTION",
-          },
-        },
-        currentTimeForId
-      );
-    }
-  };
-
   const handleUnwind = async () => {
     if (!sdk || !publicClient || !address) {
       console.error("Missing required dependencies for unwind operation");
@@ -174,9 +134,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     }
 
     setAttemptingUnwind(true);
-    setWalletTimeout(false);
     let handledByCallback = false;
-    let isSignatureTimeout = false;
 
     console.log("Starting unwind transaction", {
       isMobile,
@@ -198,9 +156,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         fraction: toWei(unwindPercentage),
         priceLimit,
       };
-
-      // Wrap unwind operation with timeout to detect stuck wallet signatures
-      const SIGNATURE_TIMEOUT_MS = 15000; // 15 seconds
 
       const executeUnwind = async () => {
         // Try stable unwind if preference is set
@@ -256,14 +211,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         }
       };
 
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => {
-          console.warn("Wallet signature timeout - transaction may be queued in wallet");
-          reject(new Error("WALLET_SIGNATURE_TIMEOUT"));
-        }, SIGNATURE_TIMEOUT_MS)
-      );
-
-      const result = await Promise.race([executeUnwind(), timeoutPromise]);
+      const result = await executeUnwind();
 
       let receipt = result.receipt;
 
@@ -354,27 +302,6 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     } catch (error) {
       console.error("Unwind operation failed:", error);
 
-      // Handle wallet signature timeout specifically
-      if ((error as Error).message === "WALLET_SIGNATURE_TIMEOUT") {
-        console.warn("Wallet signature timeout detected", {
-          isMobile,
-          elapsedTime,
-        });
-
-        isSignatureTimeout = true;
-        setWalletTimeout(true);
-        // Don't reset attemptingUnwind yet - let user retry or cancel
-        // Don't call handleDismiss - show retry/cancel options instead
-
-        trackEvent("unwind_wallet_timeout", {
-          is_mobile: isMobile,
-          elapsed_time: elapsedTime,
-          wallet_address: address,
-          timestamp: new Date().toISOString(),
-        });
-        return; // Exit early, don't reset state yet
-      }
-
       const { errorCode, errorMessage } = handleError(error as Error);
 
       addPopup(
@@ -395,82 +322,17 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         timestamp: new Date().toISOString(),
       });
     } finally {
-      // Only reset state if not in wallet timeout (which has its own handling)
-      if (!isSignatureTimeout) {
-        setAttemptingUnwind(false);
-        // Only dismiss if we haven't handled success via onUnwindSuccess callback
-        if (!handledByCallback) {
-          handleDismiss();
-        }
+      setAttemptingUnwind(false);
+      // Only dismiss if we haven't handled success via onUnwindSuccess callback
+      if (!handledByCallback) {
+        handleDismiss();
       }
     }
   };
 
   return (
     <>
-      {/* Wallet timeout state - show retry/cancel options */}
-      {walletTimeout && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%" }}>
-          <div style={{
-            padding: "12px",
-            background: "rgba(255, 193, 7, 0.1)",
-            border: "1px solid rgba(255, 193, 7, 0.3)",
-            borderRadius: "8px",
-            fontSize: "13px",
-            lineHeight: "1.4",
-            color: "#ffc107"
-          }}>
-            {isMobile
-              ? "Your wallet may not be showing the transaction. Please open your wallet app to check for pending transactions."
-              : "Your wallet extension may not be showing the transaction prompt. Please check your wallet extension."}
-          </div>
-
-          {isMobile ? (
-            <>
-              <GradientSolidButton
-                title="Open Wallet"
-                width="100%"
-                height="46px"
-                handleClick={handleOpenWallet}
-              />
-              <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-                <GradientSolidButton
-                  title="Retry"
-                  width="50%"
-                  height="46px"
-                  handleClick={handleRetry}
-                />
-                <GradientOutlineButton
-                  title="Cancel"
-                  width="50%"
-                  height="46px"
-                  size="14px"
-                  handleClick={handleCancel}
-                />
-              </div>
-            </>
-          ) : (
-            <div style={{ display: "flex", gap: "8px", width: "100%" }}>
-              <GradientSolidButton
-                title="Retry"
-                width="50%"
-                height="46px"
-                handleClick={handleRetry}
-              />
-              <GradientOutlineButton
-                title="Cancel"
-                width="50%"
-                height="46px"
-                size="14px"
-                handleClick={handleCancel}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Normal unwind button when not attempting and no timeout */}
-      {!isDisabledUnwindButton && !attemptingUnwind && !walletTimeout && (
+      {!isDisabledUnwindButton && !attemptingUnwind && (
         <GradientSolidButton
           title={"Unwind"}
           width={"100%"}
@@ -480,8 +342,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         />
       )}
 
-      {/* Disabled state */}
-      {isDisabledUnwindButton && !attemptingUnwind && !walletTimeout && (
+      {isDisabledUnwindButton && !attemptingUnwind && (
         <GradientOutlineButton
           title={title}
           width={"100%"}
@@ -491,8 +352,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         />
       )}
 
-      {/* Loading state with progressive messages */}
-      {attemptingUnwind && !walletTimeout && (
+      {attemptingUnwind && (
         <GradientLoaderButton
           height={"46px"}
           size={"14px"}
