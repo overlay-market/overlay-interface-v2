@@ -8,7 +8,6 @@ import ShareCard from "./ShareCard";
 import { captureShareCard, downloadImage, shareToTwitterWithImage } from "../../../utils/shareUtils";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { useAddPopup } from "../../../state/application/hooks";
 import {
   CelebrationContainer,
   ProfitBadge,
@@ -43,14 +42,16 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
 }) => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [profitDisplayMode, setProfitDisplayMode] = useState<ProfitDisplayMode>('both');
+  const [showClipboardSuccess, setShowClipboardSuccess] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const addPopup = useAddPopup();
 
   // Preload html2canvas when modal opens to avoid first-click delay
   useEffect(() => {
     if (open) {
       import("html2canvas");
+      // Reset clipboard success message when modal opens
+      setShowClipboardSuccess(false);
     }
   }, [open]);
 
@@ -113,16 +114,9 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
         `overlay-trade-${position.marketName}-${Date.now()}.png`
       );
 
-      // Show feedback for clipboard copy on desktop
+      // Show inline feedback for clipboard copy on desktop
       if (result.method === 'clipboard' && result.success) {
-        addPopup({
-          txn: {
-            hash: Date.now().toString(),
-            success: true,
-            message: "Image copied! Paste it in your tweet (Ctrl+V / Cmd+V)",
-            type: "CLIPBOARD_COPY"
-          }
-        }, Date.now().toString());
+        setShowClipboardSuccess(true);
       }
 
       // Track share event
@@ -226,6 +220,26 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
               </ProfitDisplayControl>
             </div>
 
+            {/* Clipboard success message */}
+            {showClipboardSuccess && (
+              <div style={{ width: "100%", padding: "0 24px" }}>
+                <div style={{
+                  padding: "10px 12px",
+                  background: "rgba(34, 197, 94, 0.1)",
+                  border: "1px solid rgba(34, 197, 94, 0.3)",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "13px",
+                  color: "#22c55e"
+                }}>
+                  <CheckCircle size={16} color="#22c55e" />
+                  <span>Image copied! Paste it in your tweet (Ctrl+V / Cmd+V)</span>
+                </div>
+              </div>
+            )}
+
             <ButtonGroup>
               <GradientSolidButton
                 title={isCapturing ? "Generating..." : (isDesktop ? "Share on X" : "Share")}
@@ -323,6 +337,26 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
             </ProfitDisplayOption>
           </ProfitDisplayControl>
         </div>
+
+        {/* Clipboard success message */}
+        {showClipboardSuccess && (
+          <div style={{ width: "100%", padding: "0 24px" }}>
+            <div style={{
+              padding: "10px 12px",
+              background: "rgba(34, 197, 94, 0.1)",
+              border: "1px solid rgba(34, 197, 94, 0.3)",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "13px",
+              color: "#22c55e"
+            }}>
+              <CheckCircle size={16} color="#22c55e" />
+              <span>Image copied! Paste it in your tweet (Ctrl+V / Cmd+V)</span>
+            </div>
+          </div>
+        )}
 
         {/* Action Buttons */}
         <ButtonGroup>
