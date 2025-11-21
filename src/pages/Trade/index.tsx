@@ -33,6 +33,8 @@ const Trade: React.FC = () => {
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { data: markets } = useActiveMarkets();
+  const prevMarketRef = useRef<string | undefined>();
+
   const shouldRenderGamblingTimeline = useMemo(() => {
     if (!currentMarket) {
       return false;
@@ -73,10 +75,16 @@ const Trade: React.FC = () => {
     });
   }, [marketParam, markets]);
 
- useEffect(() => {
-  if (!currentMarket) return;
-  handleTradeStateReset();
-}, [currentMarket, chainId]);
+  useEffect(() => {
+    if (!currentMarket) return;
+
+    const name = currentMarket.marketName;
+    if (prevMarketRef.current !== name) {
+      handleTradeStateReset();
+    }
+
+    prevMarketRef.current = name;
+  }, [currentMarket, chainId]);
 
   return (
     <TradeContainer direction="column" width={"100%"} mb="100px">
