@@ -1,4 +1,4 @@
-import { useAccount } from "wagmi";
+import useAccount from "../useAccount";
 import { useChainAndTokenState } from "../../state/trade/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { getTokenBalance } from "@lifi/sdk";

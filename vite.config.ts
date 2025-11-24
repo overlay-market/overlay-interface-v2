@@ -56,6 +56,9 @@ export default defineConfig({
   },
   server: {
     open: true,
+    allowedHosts: [
+      "99137595334e.ngrok-free.app",
+    ],
     hmr: {
       overlay: true,
     },

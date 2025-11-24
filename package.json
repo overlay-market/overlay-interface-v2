@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@lemoncash/mini-app-sdk": "^0.1.9",
     "@lifi/sdk": "^3.10.1",
     "@lifi/widget": "^3.28.0",
     "@radix-ui/react-dialog": "^1.1.1",

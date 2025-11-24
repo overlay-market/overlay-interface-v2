@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@lemoncash/mini-app-sdk':
+        specifier: ^0.1.9
+        version: 0.1.9
       '@lifi/sdk':
         specifier: ^3.10.1
         version: 3.10.1(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@18.3.23)(bufferutil@4.0.9)(immer@10.1.1)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(viem@2.33.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)
@@ -814,6 +817,10 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.29':
     resolution: {integrity: sha512-uw6guiW/gcAGPDhLmd77/6lW8QLeiV5RUTsAX46Db6oLhGaVj4lhnPwb184s1bkc8kdVg/+h988dro8GRDpmYQ==}
+
+  '@lemoncash/mini-app-sdk@0.1.9':
+    resolution: {integrity: sha512-64lIm40FyKcoY1hsEiA5r0qeiQv5KgtQPgAziG8AhguzMBS76IY8L+DYhsJZ1O2Im65HLgnw6ZClev7OKeg7gg==}
+    engines: {node: '>=18.0.0'}
 
   '@lifi/sdk@3.10.1':
     resolution: {integrity: sha512-YzG5Xj1ebTTmKgswk3QkaJ8qk2ofLRVzLfAGEnXtgADHvMSKyju0GzvJwcxWXeMw2WFYzODA0dHaWalLK7WBdQ==}
@@ -6949,6 +6956,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
+
+  '@lemoncash/mini-app-sdk@0.1.9': {}
 
   '@lifi/sdk@3.10.1(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(@types/react@18.3.23)(bufferutil@4.0.9)(immer@10.1.1)(react@18.3.1)(typescript@5.8.3)(use-sync-external-store@1.4.0(react@18.3.1))(utf-8-validate@5.0.10)(viem@2.33.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4))(zod@3.22.4)':
     dependencies:

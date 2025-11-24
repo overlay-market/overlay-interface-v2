@@ -10,6 +10,8 @@ import theme from "./theme";
 import { Provider } from "react-redux";
 import store from "./state/state.tsx";
 import Web3Provider from "./providers/Web3Provider";
+import MiniAppSdkProvider from "./providers/MiniAppSdkProvider";
+import MiniAppGate from "./components/MiniAppGate";
 
 const assets = import.meta.glob(
   "/src/assets/**/*.{png,jpg,jpeg,webp,gif,mp4}",
@@ -39,15 +41,19 @@ preloadAssets();
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <Web3Provider>
-        <BrowserRouter>
-          <ThemeProvider theme={theme}>
-            <DefaultRadixTheme>
-              <App />
-            </DefaultRadixTheme>
-          </ThemeProvider>
-        </BrowserRouter>
-      </Web3Provider>
+      <MiniAppSdkProvider>
+        <Web3Provider>
+          <BrowserRouter>
+            <ThemeProvider theme={theme}>
+              <DefaultRadixTheme>
+                <MiniAppGate>
+                  <App />
+                </MiniAppGate>
+              </DefaultRadixTheme>
+            </ThemeProvider>
+          </BrowserRouter>
+        </Web3Provider>
+      </MiniAppSdkProvider>
     </Provider>
   </React.StrictMode>
 );

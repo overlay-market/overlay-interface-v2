@@ -1,13 +1,14 @@
 import { useCallback } from 'react';
 import type { Address, WalletClient } from 'viem';
 import { checkAndApproveToken } from '../../utils/lifi/checkAndApproveToken';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 import { waitForTransactionReceipt } from 'wagmi/actions';
 import { wagmiConfig } from '../../providers/Web3Provider/wagmi';
 import { Token } from '../../types/selectChainAndTokenTypes';
 import { TransactionType } from '../../constants/transaction';
 import { useAddPopup } from '../../state/application/hooks';
 import { BridgeStage } from './useLiFiBridge';
+import useAccount from '../useAccount';
 
 export const useTokenApprovalWithLiFi = ({setTradeStage}: {setTradeStage: (stage: BridgeStage) => void;}) => {
   const { data: walletClient } = useWalletClient();
