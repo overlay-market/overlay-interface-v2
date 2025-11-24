@@ -14,6 +14,8 @@ import UnwindButtonComponent from "./UnwindButtonComponent";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import useDebounce from "../../../hooks/useDebounce";
 import usePrevious from "../../../hooks/usePrevious";
+import useSDK from "../../../providers/SDKProvider/useSDK";
+import { Address } from "viem";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
@@ -34,9 +36,27 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   setUnwindPercentage,
   handleDismiss,
 }) => {
+  const sdk = useSDK();
   const [percentageValue, setPercentageValue] = useState<string>("");
   const [selectedPercent, setSelectedPercent] = useState<number>(0);
+  const [hasLoan, setHasLoan] = useState<boolean>(false);
   const debouncedSelectedPercent = useDebounce(selectedPercent, 500);
+
+  // Check if position has a loan (LBSC position)
+  useEffect(() => {
+    const checkLoan = async () => {
+      try {
+        const loanId = await sdk.shiva.getLoanId(
+          position.marketAddress as Address,
+          BigInt(position.positionId)
+        );
+        setHasLoan(loanId > 0n);
+      } catch {
+        setHasLoan(false);
+      }
+    };
+    checkLoan();
+  }, [position.marketAddress, position.positionId, sdk]);
 
   const { value, currentPrice, fractionValue, unwindBtnState } = useMemo(() => {
     const value = unwindState.value
@@ -75,6 +95,15 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   }, [fractionValue, previousFractionValue]);
 
   const maxAmount: number = useMemo(() => Number(value) ?? 0, [value]);
+
+  // Force 100% unwind when position has a loan
+  useEffect(() => {
+    if (hasLoan && maxAmount > 0) {
+      setPercentageValue("100");
+      setSelectedPercent(1);
+      setInputValue(maxAmount.toString());
+    }
+  }, [hasLoan, maxAmount, setInputValue]);
 
   const handleQuickInput = (percentage: number) => {
     if (percentage < 0 || percentage > 100) {
@@ -157,32 +186,52 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         </Text>
       </Flex>
 
-      <UnwindAmountContainer handleQuickInput={handleQuickInput} />
+      {hasLoan && (
+        <Flex
+          width="100%"
+          p="8px"
+          my="8px"
+          style={{
+            background: 'rgba(255, 193, 7, 0.1)',
+            borderRadius: '4px',
+          }}
+        >
+          <Text size="1" style={{ color: '#ffc107' }}>
+            This position was built with USDT and must be fully unwound (100%)
+          </Text>
+        </Flex>
+      )}
 
-      <NumericalInputContainer
-        inputValue={inputValue}
-        handleUserInput={handleUserInput}
-      />
+      {!hasLoan && <UnwindAmountContainer handleQuickInput={handleQuickInput} />}
+
+      {!hasLoan && (
+        <NumericalInputContainer
+          inputValue={inputValue}
+          handleUserInput={handleUserInput}
+        />
+      )}
 
       <Flex width={"100%"} direction={"column"} py={"10px"} gap={"36px"}>
-        <Slider
-          title={" "}
-          min={0}
-          max={100}
-          step={1}
-          value={
-            Number(percentageValue) >= 0.01
-              ? Number(Number(percentageValue).toFixed(2))
-              : 0
-          }
-          valueUnit={"%"}
-          prefixSign={
-            Number(percentageValue) <= 0.01 && Boolean(percentageValue)
-              ? "~"
-              : ""
-          }
-          handleChange={(input: number[]) => handlePercentageInput(input)}
-        />
+        {!hasLoan && (
+          <Slider
+            title={" "}
+            min={0}
+            max={100}
+            step={1}
+            value={
+              Number(percentageValue) >= 0.01
+                ? Number(Number(percentageValue).toFixed(2))
+                : 0
+            }
+            valueUnit={"%"}
+            prefixSign={
+              Number(percentageValue) <= 0.01 && Boolean(percentageValue)
+                ? "~"
+                : ""
+            }
+            handleChange={(input: number[]) => handlePercentageInput(input)}
+          />
+        )}
 
         <UnwindButtonComponent
           position={position}

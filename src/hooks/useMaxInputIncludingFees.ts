@@ -1,9 +1,9 @@
 import { useAccount } from "wagmi";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../providers/SDKProvider/useSDK";
-import { useChainAndTokenState, useTradeState } from "../state/trade/hooks";
+import { useChainAndTokenState, useTradeState, useCollateralType } from "../state/trade/hooks";
 import { SelectState } from "../types/selectChainAndTokenTypes";
-import { toWei } from "overlay-sdk";
+import { toWei, formatWeiToParsedNumber } from "overlay-sdk";
 import { useSelectedTokenBalance } from "./lifi/useSelectedTokenBalance";
 import { calculateOvlAmountFromToken } from "../utils/lifi/tokenOvlConversion";
 import { useQuery } from "@tanstack/react-query";
@@ -24,16 +24,18 @@ export const useMaxInputIncludingFees = ({
   const sdk = useSDK();
   const { selectedLeverage } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
+  const collateralType = useCollateralType();
   const { data: selectedToken } = useSelectedTokenBalance();
    const { data: ovlPrice } = useOvlPrice();
 
   const isDefaultState = chainState === SelectState.DEFAULT && tokenState === SelectState.DEFAULT;
   const isSelectedState = chainState === SelectState.SELECTED && tokenState === SelectState.SELECTED;
+  const isUsdtCollateral = collateralType === 'USDT';
 
   const enabled = Boolean(
     address &&
     marketId &&
-    (isDefaultState || (isSelectedState && selectedToken))
+    (isUsdtCollateral || isDefaultState || (isSelectedState && selectedToken))
   );
 
   const query = useQuery({
@@ -43,12 +45,53 @@ export const useMaxInputIncludingFees = ({
       address,
       selectedLeverage,
       chainId,
-      serializeWithBigInt(selectedToken), 
+      serializeWithBigInt(selectedToken),
       chainState,
       tokenState,
+      collateralType,
     ],
     queryFn: async () => {
       if (!address || !marketId) return 0;
+
+      // Handle USDT collateral - get USDT balance
+      if (isUsdtCollateral) {
+        try {
+          const stableTokenAddress = await sdk.lbsc.getStableTokenAddress();
+
+          // Get token decimals
+          const decimals = await sdk.core.rpcProvider.readContract({
+            address: stableTokenAddress,
+            abi: [{
+              type: 'function',
+              name: 'decimals',
+              inputs: [],
+              outputs: [{ name: '', type: 'uint8' }],
+              stateMutability: 'view',
+            }],
+            functionName: 'decimals',
+          });
+
+          const balance = await sdk.core.rpcProvider.readContract({
+            address: stableTokenAddress,
+            abi: [{
+              type: 'function',
+              name: 'balanceOf',
+              inputs: [{ name: 'account', type: 'address' }],
+              outputs: [{ name: '', type: 'uint256' }],
+              stateMutability: 'view',
+            }],
+            functionName: 'balanceOf',
+            args: [address],
+          });
+
+          // Format based on actual token decimals
+          const formatted = Number(balance) / Math.pow(10, decimals);
+          return Number(formatted.toFixed(6));
+        } catch (error) {
+          console.error('Error fetching USDT balance:', error);
+          return 0;
+        }
+      }
 
       if (isDefaultState) {
         return await sdk.trade.getMaxInputIncludingFees(

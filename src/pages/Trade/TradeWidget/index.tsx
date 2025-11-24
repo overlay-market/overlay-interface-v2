@@ -3,6 +3,7 @@ import {
   useIsNewTxnHash,
   useTradeActionHandlers,
   useTradeState,
+  useCollateralType,
 } from "../../../state/trade/hooks";
 import AdditionalTradeDetails from "./AdditionalTradeDetails";
 import TradeButtonComponent from "./TradeButtonComponent";
@@ -21,6 +22,7 @@ import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
+import CollateralTypeToggle from "./CollateralTypeToggle";
 import { Flex } from "@radix-ui/themes";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 
@@ -34,6 +36,7 @@ const TradeWidget: React.FC = () => {
   const isNewTxnHash = useIsNewTxnHash();
   const { typedValue, selectedLeverage, isLong, slippageValue } =
     useTradeState();
+  const collateralType = useCollateralType();
   const { handleLeverageSelect } = useTradeActionHandlers();
   const [loading, setLoading] = useState<boolean>(false);
   const [capLeverage, setCapleverage] = useState<number>(5);
@@ -205,7 +208,8 @@ const TradeWidget: React.FC = () => {
         />
       ) : null}
 
-      <ChainAndTokenSelect />
+      <CollateralTypeToggle />
+      {collateralType === 'OVL' && <ChainAndTokenSelect />}
       <CollateralInputComponent />
       <TradeButtonComponent loading={loading} tradeState={tradeState} />
       <button
