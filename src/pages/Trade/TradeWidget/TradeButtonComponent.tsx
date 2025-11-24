@@ -9,9 +9,11 @@ import {
   useChainAndTokenState,
   useTradeActionHandlers,
   useTradeState,
+  useCollateralType,
 } from "../../../state/trade/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toWei, TradeState, TradeStateData } from "overlay-sdk";
+import { parseUnits } from "viem";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
@@ -46,8 +48,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
-  const { typedValue, selectedLeverage, isLong } = useTradeState();
+  const { typedValue, selectedLeverage, isLong, slippageValue } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
+  const collateralType = useCollateralType();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const [{ showConfirm, attemptingTransaction }, setTradeConfig] = useState<{
@@ -298,6 +301,161 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     }
   };
 
+  const handleTradeStable = async () => {
+    if (!sdk || !publicClient || !address) {
+      console.error("Missing required dependencies for stable trade operation");
+      return;
+    }
+
+    if (!market || !tradeState || !typedValue || !selectedLeverage) {
+      console.error("Missing required parameters for stable trade operation");
+      return;
+    }
+
+    setTradeConfig({
+      showConfirm,
+      attemptingTransaction: true,
+    });
+
+    try {
+      // Get stable token decimals
+      const stableTokenAddress = await sdk.lbsc.getStableTokenAddress();
+      const decimals = await sdk.core.rpcProvider.readContract({
+        address: stableTokenAddress,
+        abi: [{
+          type: 'function',
+          name: 'decimals',
+          inputs: [],
+          outputs: [{ name: '', type: 'uint8' }],
+          stateMutability: 'view',
+        }],
+        functionName: 'decimals',
+      });
+
+      // Get OVL preview for minOvl calculation
+      const stableAmount = parseUnits(typedValue, decimals);
+      const ovlPreview = await sdk.lbsc.previewBorrow(stableAmount);
+      // Apply slippage to minOvl (e.g., 1% slippage = 99% of preview)
+      const slippageMultiplier = BigInt(Math.floor((100 - Number(slippageValue)) * 100));
+      const minOvl = (ovlPreview * slippageMultiplier) / 10000n;
+
+      const result = await sdk.shiva.buildStable({
+        account: address,
+        params: {
+          marketAddress: market.id as Address,
+          stableCollateral: stableAmount,
+          leverage: toWei(selectedLeverage),
+          isLong,
+          priceLimit: toWei(tradeState.priceInfo.minPrice as string),
+          minOvl,
+        },
+      });
+
+      let receipt = result.receipt;
+
+      if (!receipt) {
+        try {
+          receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
+        } catch (waitError: any) {
+          if (waitError.message === "TRANSACTION_TIMEOUT") {
+            console.warn("Transaction confirmation timeout:", waitError);
+
+            addPopup(
+              {
+                txn: {
+                  hash: result.hash,
+                  success: null,
+                  message:
+                    "Transaction is taking longer than expected. It may still confirm.",
+                  type: TransactionType.BUILD_OVL_POSITION,
+                },
+              },
+              result.hash
+            );
+            return;
+          } else {
+            throw waitError;
+          }
+        }
+      }
+
+      if (receipt) {
+        const isSuccess = receipt.status === "success";
+
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: isSuccess,
+              message: "",
+              type: TransactionType.BUILD_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+
+        if (receipt.blockNumber) {
+          handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
+        }
+
+        if (isSuccess) {
+          trackEvent("build_ovl_position_success", {
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
+            market_name: market.marketName,
+            initial_collateral: typedValue,
+            trade_type: "stable",
+            timestamp: new Date().toISOString(),
+          });
+
+          handleTradeStateReset();
+        }
+      } else {
+        console.error("No receipt received after successful wait");
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: false,
+              message: "Transaction status unknown. Please check your wallet.",
+              type: TransactionType.BUILD_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+      }
+    } catch (error) {
+      console.error("Stable trade operation failed:", error);
+
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+
+      trackEvent("build_ovl_position_failed", {
+        error_message: errorMessage,
+        wallet_address: address,
+        market_name: market.marketName,
+        trade_type: "stable",
+        timestamp: new Date().toISOString(),
+      });
+    } finally {
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
+    }
+  };
+
   const waitForTradeStateUpdate = async (
     timeoutMs: number = 20000,
     intervalMs: number = 2000
@@ -370,15 +528,25 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
 
     try {
-      const result = useShiva
-        ? await sdk.shiva.approveShiva({
-            account: address,
-            amount: maxUint256,
-          })
-        : await sdk.ovl.approve({
-            to: market?.id as Address,
-            amount: maxUint256,
-          });
+      let result;
+
+      if (collateralType === 'USDT') {
+        // For USDT collateral, approve USDT to LBSC
+        result = await sdk.lbsc.approveStable({
+          account: address,
+          amount: maxUint256,
+        });
+      } else if (useShiva) {
+        result = await sdk.shiva.approveShiva({
+          account: address,
+          amount: maxUint256,
+        });
+      } else {
+        result = await sdk.ovl.approve({
+          to: market?.id as Address,
+          amount: maxUint256,
+        });
+      }
 
       let receipt = result.receipt;
 
@@ -966,7 +1134,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           <GradientLoaderButton title={"Pending confirmation..."} />
         ) : (
           <GradientOutlineButton
-            title={"Approve OVL"}
+            title={collateralType === 'USDT' ? "Approve USDT" : "Approve OVL"}
             width={"100%"}
             handleClick={handleApprove}
           />
@@ -980,9 +1148,23 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             tradeState={tradeState}
             attemptingTransaction={attemptingTransaction}
             handleDismiss={handleDismiss}
-            handleTrade={handleTrade}
+            handleTrade={collateralType === 'USDT' ? handleTradeStable : handleTrade}
           />
         )}
+
+      {/* Warning for USDT positions about 100% unwind requirement */}
+      {collateralType === 'USDT' && typedValue && Number(typedValue) > 0 && (
+        <div style={{
+          marginTop: '8px',
+          padding: '8px',
+          background: 'rgba(255, 193, 7, 0.1)',
+          borderRadius: '4px',
+          fontSize: '12px',
+          color: '#ffc107'
+        }}>
+          Note: Positions built with USDT must be fully unwound (100%)
+        </div>
+      )}
     </>
   );
 

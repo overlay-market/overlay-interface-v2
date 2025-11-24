@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setCollateralType, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import {  TokenAmount } from "@lifi/sdk";
@@ -17,6 +17,10 @@ export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
 export function useTradeState(): AppState['trade'] {
   return useAppSelector((state) => state.trade);
+}
+
+export function useCollateralType(): 'OVL' | 'USDT' {
+  return useAppSelector((state) => state.trade.collateralType);
 }
 
 export function useChainAndTokenState(): {
@@ -45,6 +49,7 @@ export const useTradeActionHandlers = (): {
   handleTokenSelect: (selectedToken: TokenAmount) => void;
   handleChainStateChange: (chainState: SelectState) => void;
   handleTokenStateChange: (tokenState: SelectState) => void;
+  handleCollateralTypeChange: (collateralType: 'OVL' | 'USDT') => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -119,6 +124,14 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   );
 
+  const handleCollateralTypeChange = useCallback(
+    (collateralType: 'OVL' | 'USDT') => {
+      dispatch(setCollateralType({ collateralType }));
+      localStorage.setItem('collateralType', collateralType);
+    },
+    [dispatch]
+  );
+
   const handleTxnHashUpdate =  useCallback(
     async (txnHash: string, txnBlockNumber: number) => {
       const checkSubgraphBlock = async () => {
@@ -153,6 +166,7 @@ export const useTradeActionHandlers = (): {
     handleTxnHashUpdate,
     handleChainStateChange,
     handleTokenStateChange,
+    handleCollateralTypeChange,
     handleTradeStateReset,
   }
 };

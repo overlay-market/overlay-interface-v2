@@ -18,4 +18,7 @@ export const setChainState = createAction<{
 export const setTokenState = createAction<{
   tokenState: SelectState;
 }>('trade/setTokenState');
+export const setCollateralType = createAction<{
+  collateralType: 'OVL' | 'USDT';
+}>('trade/setCollateralType');
 export const resetTradeState = createAction<void>('trade/resetTradeState');

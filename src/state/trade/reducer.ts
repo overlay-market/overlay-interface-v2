@@ -10,7 +10,8 @@ import {
   resetTradeState,
   selectToken,
   setChainState,
-  setTokenState
+  setTokenState,
+  setCollateralType
 } from "./actions";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { getFromLocalStorage } from "../../utils/getFromLocalStorage";
@@ -24,11 +25,12 @@ export interface TradeState {
   readonly isLong: boolean;
   readonly slippageValue: DefaultTxnSettings | string;
   readonly selectedChainId: number;
-  readonly selectedToken: string; 
+  readonly selectedToken: string;
   readonly txnHash: string;
   readonly previousTxnHash: string;
   readonly chainState: SelectState;
   readonly tokenState: SelectState;
+  readonly collateralType: 'OVL' | 'USDT';
 }
 
 export const initialState: TradeState = {
@@ -46,6 +48,7 @@ export const initialState: TradeState = {
   previousTxnHash: '',
   chainState: SelectState.LOADING,
   tokenState: SelectState.LOADING,
+  collateralType: getFromLocalStorage('collateralType', 'OVL') as 'OVL' | 'USDT',
 };
 
 export default createReducer<TradeState>(initialState, (builder) =>
@@ -77,6 +80,9 @@ export default createReducer<TradeState>(initialState, (builder) =>
     .addCase(updateTxnHash, (state, action) => {
       state.previousTxnHash = state.txnHash;
       state.txnHash = action.payload.txnHash;
+    })
+    .addCase(setCollateralType, (state, action) => {
+      state.collateralType = action.payload.collateralType;
     })
     .addCase(resetTradeState, (state) => {
       state.typedValue = initialState.typedValue;
