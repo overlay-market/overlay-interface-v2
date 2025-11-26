@@ -24,6 +24,7 @@ import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
 import { Flex, Checkbox, Text } from "@radix-ui/themes";
 import { isGamblingMarket } from "../../../utils/marketGuards";
+import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
 const TradeWidget: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -36,10 +37,10 @@ const TradeWidget: React.FC = () => {
   const { typedValue, selectedLeverage, isLong, slippageValue } =
     useTradeState();
   const collateralType = useCollateralType();
-  console.error('🔶 TradeWidget render - collateralType from Redux:', collateralType);
   const { handleLeverageSelect, handleCollateralTypeChange } = useTradeActionHandlers();
   const [loading, setLoading] = useState<boolean>(false);
   const [capLeverage, setCapleverage] = useState<number>(5);
+  const [isLbscAvailable, setIsLbscAvailable] = useState<boolean>(true);
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
     undefined
   );
@@ -54,9 +55,19 @@ const TradeWidget: React.FC = () => {
 
   const sdkRef = useRef(sdk);
   const isGambling = isGamblingMarket(market?.marketName);
+  const { data: stableTokenInfo } = useStableTokenInfo();
+
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
+
+  // Check if LBSC is available on current chain
+  useEffect(() => {
+    if (!sdkRef.current) return;
+    sdkRef.current.lbsc.isAvailable()
+      .then(setIsLbscAvailable)
+      .catch(() => setIsLbscAvailable(false));
+  }, [chainId]);
 
   useEffect(() => {
     setDisplayedLeverage(selectedLeverage);
@@ -101,27 +112,16 @@ const TradeWidget: React.FC = () => {
           // Get collateral amount in correct decimals
           let collateralAmount: bigint;
           if (collateralType === 'USDT') {
-            // For USDT: get token decimals and use them
-            const stableTokenAddress = await sdkRef.current.lbsc.getStableTokenAddress();
-            const decimals = await sdkRef.current.core.rpcProvider.readContract({
-              address: stableTokenAddress,
-              abi: [{
-                type: 'function',
-                name: 'decimals',
-                inputs: [],
-                outputs: [{ name: '', type: 'uint8' }],
-                stateMutability: 'view',
-              }],
-              functionName: 'decimals',
-            });
-            collateralAmount = parseUnits(debouncedTypedValue, decimals);
+            // For USDT: use token decimals from hook
+            if (!stableTokenInfo) {
+              // Skip if stable token info not loaded yet
+              return;
+            }
+            collateralAmount = parseUnits(debouncedTypedValue, stableTokenInfo.decimals);
           } else {
             // For OVL: use 18 decimals
             collateralAmount = toWei(debouncedTypedValue);
           }
-
-          console.error('🟡 FRONTEND: About to call getTradeState with collateralType:', collateralType);
-          console.error('🟡 FRONTEND: collateralAmount:', collateralAmount.toString());
 
           const tradeState = await sdkRef.current.trade.getTradeState(
             marketId,
@@ -132,14 +132,11 @@ const TradeWidget: React.FC = () => {
             address,
             collateralType
           );
-
-          console.error('🟡 FRONTEND: getTradeState returned:', tradeState);
           if (!isCancelled && tradeState) {
             setTradeState(tradeState);
-            console.log("Trade state fetched:", tradeState);
           }
         } catch (error) {
-          console.error("Error fetching trade state:", error);
+          // Error fetching trade state
         } finally {
           if (!isCancelled) {
             setLoading(false);
@@ -163,6 +160,7 @@ const TradeWidget: React.FC = () => {
     slippageValue,
     isNewTxnHash,
     collateralType,
+    stableTokenInfo,
   ]);
 
   useEffect(() => {
@@ -197,7 +195,7 @@ const TradeWidget: React.FC = () => {
           }
         }
       } catch (error) {
-        console.error("Error fetching capLeverage:", error);
+        // Error fetching capLeverage
       }
     };
 
@@ -272,15 +270,17 @@ const TradeWidget: React.FC = () => {
           gap="16px"
         >
           <Flex direction="column" gap="12px" p="8px">
-            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
-              <Checkbox
-                checked={collateralType === 'OVL'}
-                onCheckedChange={(checked) => handleCollateralTypeChange(checked ? 'OVL' : 'USDT')}
-              />
-              <Text size="2" style={{ color: theme.color.grey1 }}>
-                Use OVL as collateral (cross-chain)
-              </Text>
-            </label>
+            {isLbscAvailable && (
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <Checkbox
+                  checked={collateralType === 'OVL'}
+                  onCheckedChange={(checked) => handleCollateralTypeChange(checked ? 'OVL' : 'USDT')}
+                />
+                <Text size="2" style={{ color: theme.color.grey1 }}>
+                  Use OVL as collateral (cross-chain)
+                </Text>
+              </label>
+            )}
           </Flex>
 
           <MainTradeDetails tradeState={tradeState} />

@@ -12,13 +12,16 @@ function safeLoad(states: string[]) {
   try {
     const loaded = load({ states });
     // Merge loaded trade state with initialState to fill in missing fields
-    if (loaded && loaded.trade) {
-      loaded.trade = { ...tradeInitialState, ...loaded.trade };
+    if (loaded && typeof loaded === 'object' && 'trade' in loaded) {
+      (loaded as Record<string, unknown>).trade = {
+        ...tradeInitialState,
+        ...(loaded.trade as Record<string, unknown>)
+      };
     }
     return loaded;
   } catch (e) {
     console.warn("[Redux-LocalStorage-Simple] load failed, using defaults", e);
-    return {}; // fall back to reducer defaults
+    return undefined; // fall back to reducer defaults
   }
 }
 
@@ -29,7 +32,7 @@ const store = configureStore({
     currentMarket,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ thunk: true }).concat(
+    getDefaultMiddleware({ thunk: true, serializableCheck: false }).concat(
       save({ states: PERSISTED_KEYS, debounce: 1000 })
     ),
   preloadedState: safeLoad(PERSISTED_KEYS),

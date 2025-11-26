@@ -12,7 +12,7 @@ import {
   useCollateralType,
 } from "../../../state/trade/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toWei, TradeState, TradeStateData } from "overlay-sdk";
+import { toWei, TradeState, TradeStateData, formatWeiToParsedNumber } from "overlay-sdk";
 import { parseUnits } from "viem";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { Address, maxUint256 } from "viem";
@@ -26,6 +26,7 @@ import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
 import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
 import { useLiFiBridge } from "../../../hooks/lifi/useLiFiBridge";
 import { GetBNBModal } from "../../../components/GetBNBModal";
+import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
@@ -71,6 +72,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { data: riskParamsData } = useRiskParamsQuery({
     marketId: market?.id,
   });
+
+  const { data: stableTokenInfo } = useStableTokenInfo();
 
   const {
     executeBridge,
@@ -172,12 +175,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleTrade = async () => {
     if (!sdk || !publicClient || !address) {
-      console.error("Missing required dependencies for trade operation");
       return;
     }
 
     if (!market || !tradeState || !typedValue || !selectedLeverage) {
-      console.error("Missing required parameters for trade operation");
       return;
     }
 
@@ -203,7 +204,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
-            console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
               {
@@ -256,7 +256,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           handleTradeStateReset();
         }
       } else {
-        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
@@ -270,7 +269,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
       }
     } catch (error) {
-      console.error("Trade operation failed:", error);
 
       const { errorCode, errorMessage } = handleError(error as Error);
 
@@ -303,12 +301,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleTradeStable = async () => {
     if (!sdk || !publicClient || !address) {
-      console.error("Missing required dependencies for stable trade operation");
       return;
     }
 
     if (!market || !tradeState || !typedValue || !selectedLeverage) {
-      console.error("Missing required parameters for stable trade operation");
       return;
     }
 
@@ -318,35 +314,28 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
 
     try {
-      // Get stable token decimals
-      const stableTokenAddress = await sdk.lbsc.getStableTokenAddress();
-      console.log("[LBSC DEBUG] Stable token address:", stableTokenAddress);
+      // Use stable token info from hook
+      if (!stableTokenInfo) {
+        throw new Error("Stable token information not available");
+      }
 
-      const decimals = await sdk.core.rpcProvider.readContract({
-        address: stableTokenAddress,
-        abi: [{
-          type: 'function',
-          name: 'decimals',
-          inputs: [],
-          outputs: [{ name: '', type: 'uint8' }],
-          stateMutability: 'view',
-        }],
-        functionName: 'decimals',
-      });
-      console.log("[LBSC DEBUG] Decimals from contract:", decimals, "type:", typeof decimals);
+      // Parse stable amount with correct decimals
+      const stableAmount = parseUnits(typedValue, stableTokenInfo.decimals);
 
-      // Get OVL preview for minOvl calculation
-      console.log("[LBSC DEBUG] typedValue:", typedValue, "type:", typeof typedValue);
-      const stableAmount = parseUnits(typedValue, decimals);
-      console.log("[LBSC DEBUG] stableAmount after parseUnits:", stableAmount.toString());
+      // Validate LBSC has sufficient liquidity and get preview
+      const validation = await sdk.lbsc.getPreviewWithValidation(stableAmount);
 
-      const ovlPreview = await sdk.lbsc.previewBorrow(stableAmount);
-      console.log("[LBSC DEBUG] ovlPreview from LBSC:", ovlPreview.toString());
+      if (!validation.canBorrow) {
+        const availableFormatted = formatWeiToParsedNumber(validation.availableLiquidity, 18, 2);
+        const requiredFormatted = formatWeiToParsedNumber(validation.ovlAmount, 18, 2);
+        throw new Error(
+          `Insufficient LBSC liquidity.\nAvailable: ${availableFormatted} OVL\nRequired: ${requiredFormatted} OVL`
+        );
+      }
 
       // Apply slippage to minOvl (e.g., 1% slippage = 99% of preview)
       const slippageMultiplier = BigInt(Math.floor((100 - Number(slippageValue)) * 100));
-      const minOvl = (ovlPreview * slippageMultiplier) / 10000n;
-      console.log("[LBSC DEBUG] minOvl after slippage:", minOvl.toString());
+      const minOvl = (validation.ovlAmount * slippageMultiplier) / 10000n;
 
       const buildParams = {
         marketAddress: market.id as Address,
@@ -356,13 +345,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         priceLimit: toWei(tradeState.priceInfo.minPrice as string),
         minOvl,
       };
-      console.log("[LBSC DEBUG] buildStable params:", {
-        ...buildParams,
-        stableCollateral: buildParams.stableCollateral.toString(),
-        leverage: buildParams.leverage.toString(),
-        priceLimit: buildParams.priceLimit.toString(),
-        minOvl: buildParams.minOvl.toString(),
-      });
 
       const result = await sdk.shiva.buildStable({
         account: address,
@@ -376,7 +358,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
-            console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
               {
@@ -429,7 +410,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           handleTradeStateReset();
         }
       } else {
-        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
@@ -443,7 +423,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
       }
     } catch (error) {
-      console.error("Stable trade operation failed:", error);
 
       const { errorCode, errorMessage } = handleError(error as Error);
 
@@ -508,35 +487,29 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             : BigInt(currentBalanceRaw.toString());
 
         if (currentBalance >= expectedAmount) {
-          console.log("✅ Sufficient balance confirmed");
           return true;
         }
 
         await new Promise((resolve) => setTimeout(resolve, checkInterval));
       } catch (error) {
-        console.error("Error checking balance:", error);
       }
     }
 
-    console.warn("⚠️ Timeout waiting for balance update");
     return false;
   };
 
   const handleApprove = async () => {
     if (!sdk || !publicClient || !address) {
-      console.error("Missing required dependencies for approval operation");
       return;
     }
 
     if (!typedValue) {
-      console.error("Missing typed value for approval operation");
       return;
     }
 
     // For non-Shiva approvals, validate market exists
     const useShiva = sdk.core.usingShiva();
     if (!useShiva && !market?.id) {
-      console.error("Missing market for approval operation");
       return;
     }
 
@@ -573,7 +546,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
-            console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
               {
@@ -622,7 +594,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           setIsApprovalPending(isUpdated);
         }
       } else {
-        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
@@ -636,7 +607,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
       }
     } catch (error) {
-      console.error("Approval operation failed:", error);
 
       const { errorCode, errorMessage } = handleError(error as Error);
 
@@ -679,7 +649,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       return { errorCode, errorMessage };
     } catch (parseError) {
-      console.error("Error parsing error object:", parseError);
       return {
         errorCode: "PARSE_ERROR",
         errorMessage: error.message || "An unknown error occurred",
@@ -696,13 +665,11 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleLiFiGetBridgeQuote = async () => {
     if (!address || !market || !tradeState || !typedValue) {
-      console.error("Missing required parameters for cross-chain trade");
       return;
     }
 
     // Check if we're resuming from a needs_gas state
     if (bridgeStage.stage === "needs_gas") {
-      console.log("🔋 Resuming from needs_gas stage, reopening gas modal");
       setShowGasModal(true);
       return;
     }
@@ -747,7 +714,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleBridge = async () => {
     if (!address || !market || !tradeState || !typedValue || !bridgeQuote) {
-      console.error("Missing required parameters for bridge");
       return;
     }
 
@@ -775,12 +741,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleLiFiTrade = async () => {
     if (!address || !market || !tradeState || !bridgedAmount) {
-      console.error("Missing required parameters for position opening");
       return;
     }
 
     if (!sdk || !publicClient) {
-      console.error("Missing required dependencies for trade operation");
       return;
     }
 
@@ -811,7 +775,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
     // Check if approval is needed before building position
     if (tradeState.tradeState === TradeState.NeedsApproval) {
-      console.log("🔒 Approval needed for Shiva contract after bridge");
 
       setTradeConfig({
         showConfirm,
@@ -840,7 +803,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             );
           } catch (waitError: any) {
             if (waitError.message === "TRANSACTION_TIMEOUT") {
-              console.warn("Approval confirmation timeout:", waitError);
 
               addPopup(
                 {
@@ -881,7 +843,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
         }
 
-        console.log("✅ Approval confirmed, proceeding with position build");
       } catch (error) {
         const { errorCode, errorMessage } = handleError(error as Error);
         addPopup(
@@ -938,16 +899,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
-    console.log("🏗️ Building position with:", {
-      bridgedAmount: bridgedAmount,
-      bridgedAmountReadable: (Number(bridgedAmount) / 1e18).toFixed(6),
-      collateralAmount: collateralAmount.toString(),
-      collateralReadable: (Number(collateralAmount) / 1e18).toFixed(6),
-      leverage: selectedLeverage,
-      dataType: typeof bridgedAmount,
-      minCollateralRequired: minCollateral,
-    });
-
     try {
       const result = await sdk.market.build({
         account: address,
@@ -965,7 +916,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
-            console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
               {
@@ -1023,7 +973,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           resetBridge();
         }
       } else {
-        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
@@ -1037,7 +986,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
       }
     } catch (error) {
-      console.error("Trade operation failed:", error);
 
       const { errorCode, errorMessage } = handleError(error as Error);
 
@@ -1069,7 +1017,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   };
 
   const handleGasModalClose = useCallback(() => {
-    console.log("🔋 Gas modal closed by user");
     setShowGasModal(false);
   }, []);
 
@@ -1079,7 +1026,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       !showConfirm &&
       !hasShownTradeModal
     ) {
-      console.log("🎯 Bridge success, showing trade confirmation modal");
       setTradeConfig({
         showConfirm: true,
         attemptingTransaction: false,
@@ -1090,9 +1036,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       !showGasModal &&
       !hasShownGasModal
     ) {
-      console.log(
-        "🔋 Bridge completed but needs gas, closing confirmation modal and showing gas modal"
-      );
       setTradeConfig({
         showConfirm: false, // Close the confirmation modal
         attemptingTransaction: false,
