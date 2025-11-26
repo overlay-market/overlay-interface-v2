@@ -3,7 +3,7 @@ import useMultichainContext from "../providers/MultichainContextProvider/useMult
 import useSDK from "../providers/SDKProvider/useSDK";
 import { useChainAndTokenState, useTradeState, useCollateralType } from "../state/trade/hooks";
 import { SelectState } from "../types/selectChainAndTokenTypes";
-import { toWei, formatWeiToParsedNumber } from "overlay-sdk";
+import { toWei } from "overlay-sdk";
 import { useSelectedTokenBalance } from "./lifi/useSelectedTokenBalance";
 import { calculateOvlAmountFromToken } from "../utils/lifi/tokenOvlConversion";
 import { useQuery } from "@tanstack/react-query";

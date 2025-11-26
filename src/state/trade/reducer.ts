@@ -48,7 +48,7 @@ export const initialState: TradeState = {
   previousTxnHash: '',
   chainState: SelectState.LOADING,
   tokenState: SelectState.LOADING,
-  collateralType: getFromLocalStorage('collateralType', 'OVL') as 'OVL' | 'USDT',
+  collateralType: getFromLocalStorage('collateralType', 'USDT') as 'OVL' | 'USDT',
 };
 
 export default createReducer<TradeState>(initialState, (builder) =>

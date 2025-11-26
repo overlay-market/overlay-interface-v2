@@ -12,7 +12,7 @@ import CollateralInputComponent from "./CollateralInputComponent";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useRef, useState } from "react";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
@@ -22,8 +22,7 @@ import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
-import CollateralTypeToggle from "./CollateralTypeToggle";
-import { Flex } from "@radix-ui/themes";
+import { Flex, Checkbox, Text } from "@radix-ui/themes";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 
 const TradeWidget: React.FC = () => {
@@ -37,7 +36,8 @@ const TradeWidget: React.FC = () => {
   const { typedValue, selectedLeverage, isLong, slippageValue } =
     useTradeState();
   const collateralType = useCollateralType();
-  const { handleLeverageSelect } = useTradeActionHandlers();
+  console.error('🔶 TradeWidget render - collateralType from Redux:', collateralType);
+  const { handleLeverageSelect, handleCollateralTypeChange } = useTradeActionHandlers();
   const [loading, setLoading] = useState<boolean>(false);
   const [capLeverage, setCapleverage] = useState<number>(5);
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
@@ -98,14 +98,42 @@ const TradeWidget: React.FC = () => {
         setLoading(true);
 
         try {
+          // Get collateral amount in correct decimals
+          let collateralAmount: bigint;
+          if (collateralType === 'USDT') {
+            // For USDT: get token decimals and use them
+            const stableTokenAddress = await sdkRef.current.lbsc.getStableTokenAddress();
+            const decimals = await sdkRef.current.core.rpcProvider.readContract({
+              address: stableTokenAddress,
+              abi: [{
+                type: 'function',
+                name: 'decimals',
+                inputs: [],
+                outputs: [{ name: '', type: 'uint8' }],
+                stateMutability: 'view',
+              }],
+              functionName: 'decimals',
+            });
+            collateralAmount = parseUnits(debouncedTypedValue, decimals);
+          } else {
+            // For OVL: use 18 decimals
+            collateralAmount = toWei(debouncedTypedValue);
+          }
+
+          console.error('🟡 FRONTEND: About to call getTradeState with collateralType:', collateralType);
+          console.error('🟡 FRONTEND: collateralAmount:', collateralAmount.toString());
+
           const tradeState = await sdkRef.current.trade.getTradeState(
             marketId,
-            toWei(debouncedTypedValue),
+            collateralAmount,
             toWei(selectedLeverage),
             Number(slippageValue),
             isLong,
-            address
+            address,
+            collateralType
           );
+
+          console.error('🟡 FRONTEND: getTradeState returned:', tradeState);
           if (!isCancelled && tradeState) {
             setTradeState(tradeState);
             console.log("Trade state fetched:", tradeState);
@@ -134,6 +162,7 @@ const TradeWidget: React.FC = () => {
     isLong,
     slippageValue,
     isNewTxnHash,
+    collateralType,
   ]);
 
   useEffect(() => {
@@ -208,7 +237,6 @@ const TradeWidget: React.FC = () => {
         />
       ) : null}
 
-      <CollateralTypeToggle />
       {collateralType === 'OVL' && <ChainAndTokenSelect />}
       <CollateralInputComponent />
       <TradeButtonComponent loading={loading} tradeState={tradeState} />
@@ -227,7 +255,7 @@ const TradeWidget: React.FC = () => {
           outline: "none",
         }}
       >
-        {detailsOpen ? "Hide Info ▲" : "More Info ▼"}
+        {detailsOpen ? "Hide Advanced Settings ▲" : "Advanced Settings ▼"}
       </button>
 
       {/* Conditionally render details */}
@@ -241,7 +269,20 @@ const TradeWidget: React.FC = () => {
             marginTop: "-14px",
           }}
           direction={"column"}
+          gap="16px"
         >
+          <Flex direction="column" gap="12px" p="8px">
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+              <Checkbox
+                checked={collateralType === 'OVL'}
+                onCheckedChange={(checked) => handleCollateralTypeChange(checked ? 'OVL' : 'USDT')}
+              />
+              <Text size="2" style={{ color: theme.color.grey1 }}>
+                Use OVL as collateral (cross-chain)
+              </Text>
+            </label>
+          </Flex>
+
           <MainTradeDetails tradeState={tradeState} />
           <AdditionalTradeDetails tradeState={tradeState} />
         </Flex>
