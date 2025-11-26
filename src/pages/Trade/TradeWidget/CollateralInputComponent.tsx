@@ -13,6 +13,7 @@ import useSDK from "../../../providers/SDKProvider/useSDK";
 import { formatWeiToParsedNumber } from "overlay-sdk";
 import useDebounce from "../../../hooks/useDebounce";
 import { parseUnits } from "viem";
+import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
 const CollateralInputComponent: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -31,9 +32,14 @@ const CollateralInputComponent: React.FC = () => {
 
   const debouncedTypedValue = useDebounce(typedValue, 500);
 
+  // Fetch stable token info with oracle price
+  const { data: stableTokenInfo } = useStableTokenInfo({
+    includeOraclePrice: true,
+  });
+
   // Fetch OVL preview when USDT is selected
   useEffect(() => {
-    if (collateralType !== 'USDT' || !debouncedTypedValue || Number(debouncedTypedValue) === 0) {
+    if (collateralType !== 'USDT' || !debouncedTypedValue || Number(debouncedTypedValue) === 0 || !stableTokenInfo) {
       setOvlPreview(null);
       return;
     }
@@ -41,26 +47,11 @@ const CollateralInputComponent: React.FC = () => {
     const fetchPreview = async () => {
       setPreviewLoading(true);
       try {
-        // Get stable token decimals (USDT is typically 6 or 18 decimals)
-        const stableTokenAddress = await sdk.lbsc.getStableTokenAddress();
-        const decimals = await sdk.core.rpcProvider.readContract({
-          address: stableTokenAddress,
-          abi: [{
-            type: 'function',
-            name: 'decimals',
-            inputs: [],
-            outputs: [{ name: '', type: 'uint8' }],
-            stateMutability: 'view',
-          }],
-          functionName: 'decimals',
-        });
-
-        const stableAmount = parseUnits(debouncedTypedValue, decimals);
+        const stableAmount = parseUnits(debouncedTypedValue, stableTokenInfo.decimals);
         const ovlAmount = await sdk.lbsc.previewBorrow(stableAmount);
-        const formatted = formatWeiToParsedNumber(ovlAmount, 4);
-        setOvlPreview(formatted?.toString() ?? null);
+        const formattedOvl = formatWeiToParsedNumber(ovlAmount, 4);
+        setOvlPreview(formattedOvl?.toString() ?? null);
       } catch (err) {
-        console.error('Error fetching OVL preview:', err);
         setOvlPreview(null);
       } finally {
         setPreviewLoading(false);
@@ -68,7 +59,7 @@ const CollateralInputComponent: React.FC = () => {
     };
 
     fetchPreview();
-  }, [collateralType, debouncedTypedValue, sdk]);
+  }, [collateralType, debouncedTypedValue, stableTokenInfo, sdk]);
 
   const handleUserInput = useCallback(
     (input: string) => {
@@ -136,14 +127,26 @@ const CollateralInputComponent: React.FC = () => {
         </Flex>
 
         {collateralType === 'USDT' && (
-          <Flex justify="between" style={{ marginTop: '8px' }}>
-            <Text size="1" style={{ color: theme.color.grey3 }}>
-              OVL Collateral
-            </Text>
-            <Text size="1" style={{ color: theme.color.blue1 }}>
-              {previewLoading ? 'Calculating...' : ovlPreview ? `~${ovlPreview} OVL` : '-'}
-            </Text>
-          </Flex>
+          <>
+            <Flex justify="between" style={{ marginTop: '8px' }}>
+              <Text size="1" style={{ color: theme.color.grey3 }}>
+                OVL Collateral
+              </Text>
+              <Text size="1" style={{ color: theme.color.blue1 }}>
+                {previewLoading ? 'Calculating...' : ovlPreview ? `~${ovlPreview} OVL` : '-'}
+              </Text>
+            </Flex>
+            <Flex justify="between" style={{ marginTop: '4px' }}>
+              <Text size="1" style={{ color: theme.color.grey3 }}>
+                Borrow Price
+              </Text>
+              <Text size="1" style={{ color: theme.color.grey2 }}>
+                {stableTokenInfo?.oraclePrice
+                  ? `1 OVL = $${formatWeiToParsedNumber(stableTokenInfo.oraclePrice, 4)}`
+                  : '-'}
+              </Text>
+            </Flex>
+          </>
         )}
       </Flex>
     </Box>
