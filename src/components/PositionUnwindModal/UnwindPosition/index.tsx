@@ -194,9 +194,10 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           style={{
             background: 'rgba(255, 193, 7, 0.1)',
             borderRadius: '4px',
+            border: `1px solid ${theme.color.yellow1}`,
           }}
         >
-          <Text size="1" style={{ color: '#ffc107' }}>
+          <Text size="1" style={{ color: theme.color.yellow1 }}>
             This position was built with USDT and must be fully unwound (100%)
           </Text>
         </Flex>

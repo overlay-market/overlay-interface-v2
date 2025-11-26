@@ -60,8 +60,10 @@ const OpenPositionsTable: React.FC = () => {
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
+      // Only select positions without loans (non-LBSC positions)
+      const selectablePositions = positions?.filter(p => !p.loan) || [];
       setSelectedPositions(
-        new Set(positions?.map((p) => getPositionKey(p)) || [])
+        new Set(selectablePositions.map((p) => getPositionKey(p)))
       );
     } else {
       setSelectedPositions(new Set());

@@ -320,6 +320,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     try {
       // Get stable token decimals
       const stableTokenAddress = await sdk.lbsc.getStableTokenAddress();
+      console.log("[LBSC DEBUG] Stable token address:", stableTokenAddress);
+
       const decimals = await sdk.core.rpcProvider.readContract({
         address: stableTokenAddress,
         abi: [{
@@ -331,24 +333,40 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         }],
         functionName: 'decimals',
       });
+      console.log("[LBSC DEBUG] Decimals from contract:", decimals, "type:", typeof decimals);
 
       // Get OVL preview for minOvl calculation
+      console.log("[LBSC DEBUG] typedValue:", typedValue, "type:", typeof typedValue);
       const stableAmount = parseUnits(typedValue, decimals);
+      console.log("[LBSC DEBUG] stableAmount after parseUnits:", stableAmount.toString());
+
       const ovlPreview = await sdk.lbsc.previewBorrow(stableAmount);
+      console.log("[LBSC DEBUG] ovlPreview from LBSC:", ovlPreview.toString());
+
       // Apply slippage to minOvl (e.g., 1% slippage = 99% of preview)
       const slippageMultiplier = BigInt(Math.floor((100 - Number(slippageValue)) * 100));
       const minOvl = (ovlPreview * slippageMultiplier) / 10000n;
+      console.log("[LBSC DEBUG] minOvl after slippage:", minOvl.toString());
+
+      const buildParams = {
+        marketAddress: market.id as Address,
+        stableCollateral: stableAmount,
+        leverage: toWei(selectedLeverage),
+        isLong,
+        priceLimit: toWei(tradeState.priceInfo.minPrice as string),
+        minOvl,
+      };
+      console.log("[LBSC DEBUG] buildStable params:", {
+        ...buildParams,
+        stableCollateral: buildParams.stableCollateral.toString(),
+        leverage: buildParams.leverage.toString(),
+        priceLimit: buildParams.priceLimit.toString(),
+        minOvl: buildParams.minOvl.toString(),
+      });
 
       const result = await sdk.shiva.buildStable({
         account: address,
-        params: {
-          marketAddress: market.id as Address,
-          stableCollateral: stableAmount,
-          leverage: toWei(selectedLeverage),
-          isLong,
-          priceLimit: toWei(tradeState.priceInfo.minPrice as string),
-          minOvl,
-        },
+        params: buildParams,
       });
 
       let receipt = result.receipt;
@@ -1151,20 +1169,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             handleTrade={collateralType === 'USDT' ? handleTradeStable : handleTrade}
           />
         )}
-
-      {/* Warning for USDT positions about 100% unwind requirement */}
-      {collateralType === 'USDT' && typedValue && Number(typedValue) > 0 && (
-        <div style={{
-          marginTop: '8px',
-          padding: '8px',
-          background: 'rgba(255, 193, 7, 0.1)',
-          borderRadius: '4px',
-          fontSize: '12px',
-          color: '#ffc107'
-        }}>
-          Note: Positions built with USDT must be fully unwound (100%)
-        </div>
-      )}
     </>
   );
 
@@ -1205,9 +1209,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   return (
     <>
-      {isDefaultState && renderDefaultState()}
-      {isSelectedState && renderSelectedState()}
-      {!isDefaultState && !isSelectedState && (
+      {(isDefaultState || collateralType === 'USDT') && renderDefaultState()}
+      {isSelectedState && collateralType === 'OVL' && renderSelectedState()}
+      {!isDefaultState && !isSelectedState && collateralType === 'OVL' && (
         <>
           {loading && <GradientLoaderButton title={"Trade"} />}
 

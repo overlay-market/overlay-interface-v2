@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { save, load } from "redux-localstorage-simple";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { updateVersion } from "./global/actions";
-import trade from "./trade/reducer";
+import trade, { initialState as tradeInitialState } from "./trade/reducer";
 import currentMarket from "./currentMarket/reducer";
 import application from "./application/reducer";
 
@@ -10,7 +10,12 @@ const PERSISTED_KEYS: string[] = ["application", "trade", "currentMarket"];
 
 function safeLoad(states: string[]) {
   try {
-    return load({ states });
+    const loaded = load({ states });
+    // Merge loaded trade state with initialState to fill in missing fields
+    if (loaded && loaded.trade) {
+      loaded.trade = { ...tradeInitialState, ...loaded.trade };
+    }
+    return loaded;
   } catch (e) {
     console.warn("[Redux-LocalStorage-Simple] load failed, using defaults", e);
     return {}; // fall back to reducer defaults
