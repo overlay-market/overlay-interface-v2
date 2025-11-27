@@ -6,6 +6,7 @@ import { useState } from "react";
 import { OpenPositionData } from "overlay-sdk";
 import { useChainId } from "wagmi";
 import { SUPPORTED_CHAINID } from "../../../constants/chains";
+import { formatUnits } from "viem";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -37,7 +38,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   // Testnet mock USDT has 18 decimals, mainnet USDT has 6 decimals
   const stableDecimals = chainId === SUPPORTED_CHAINID.BSC_TESTNET ? 18 : 6;
   const collateralAmount = hasLoan && position.loan
-    ? `${(Number(position.loan.stableAmount) / 10 ** stableDecimals).toFixed(2)} USDT`
+    ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
     : `${position.size} OVL`;
 
   const handleItemClick = (event: React.MouseEvent) => {

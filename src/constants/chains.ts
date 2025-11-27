@@ -41,6 +41,5 @@ export const CHAIN_LIST: { [chainId in SUPPORTED_CHAINID | number]: string } = {
 };
 
 export const CHAIN_LIST_ORDER: { [x: number]: number } = {
-  [0]: SUPPORTED_CHAINID.BSC_TESTNET,
-  [1]: SUPPORTED_CHAINID.BSC_MAINNET,
+  [0]: SUPPORTED_CHAINID.BSC_MAINNET,
 };
