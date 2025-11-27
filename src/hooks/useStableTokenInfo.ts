@@ -47,7 +47,7 @@ export const useStableTokenInfo = (options?: UseStableTokenInfoOptions) => {
         oraclePrice,
       };
     },
-    staleTime: 5 * 60 * 1000, // cache for 5 minutes
-    refetchInterval: 5 * 60 * 1000, // refetch every 5 minutes
+    staleTime: 30 * 1000, // cache for 30 seconds
+    refetchInterval: 30 * 1000, // refetch every 30 seconds
   });
 };

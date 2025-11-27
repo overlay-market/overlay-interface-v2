@@ -33,7 +33,7 @@ const CollateralInputComponent: React.FC = () => {
   const debouncedTypedValue = useDebounce(typedValue, 500);
 
   // Fetch stable token info with oracle price
-  const { data: stableTokenInfo } = useStableTokenInfo({
+  const { data: stableTokenInfo, refetch: refetchStableTokenInfo, isRefetching } = useStableTokenInfo({
     includeOraclePrice: true,
   });
 
@@ -49,7 +49,7 @@ const CollateralInputComponent: React.FC = () => {
       try {
         const stableAmount = parseUnits(debouncedTypedValue, stableTokenInfo.decimals);
         const ovlAmount = await sdk.lbsc.previewBorrow(stableAmount);
-        const formattedOvl = formatWeiToParsedNumber(ovlAmount, 4);
+        const formattedOvl = formatWeiToParsedNumber(ovlAmount, 18, 4);
         setOvlPreview(formattedOvl?.toString() ?? null);
       } catch (err) {
         setOvlPreview(null);
@@ -137,12 +137,28 @@ const CollateralInputComponent: React.FC = () => {
               </Text>
             </Flex>
             <Flex justify="between" style={{ marginTop: '4px' }}>
-              <Text size="1" style={{ color: theme.color.grey3 }}>
-                Borrow Price
-              </Text>
+              <Flex align="center" gap="1">
+                <Text size="1" style={{ color: theme.color.grey3 }}>
+                  Borrow Price
+                </Text>
+                <Text
+                  size="1"
+                  onClick={() => refetchStableTokenInfo()}
+                  style={{
+                    color: theme.color.blue1,
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    opacity: isRefetching ? 0.5 : 1,
+                    transition: 'opacity 0.2s'
+                  }}
+                  title="Refresh oracle price"
+                >
+                  {isRefetching ? '⟳' : '↻'}
+                </Text>
+              </Flex>
               <Text size="1" style={{ color: theme.color.grey2 }}>
                 {stableTokenInfo?.oraclePrice
-                  ? `1 OVL = $${formatWeiToParsedNumber(stableTokenInfo.oraclePrice, 4)}`
+                  ? `1 OVL = $${formatWeiToParsedNumber(stableTokenInfo.oraclePrice, 18, 4)?.toFixed(4) ?? '0.0000'}`
                   : '-'}
               </Text>
             </Flex>

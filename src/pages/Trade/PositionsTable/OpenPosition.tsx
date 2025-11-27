@@ -4,12 +4,15 @@ import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useState } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
+import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
+import { formatUnits } from "viem";
 
 type OpenPositionProps = {
   position: OpenPositionData;
 };
 
 const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
+  const { data: stableTokenInfo } = useStableTokenInfo();
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);
@@ -19,6 +22,12 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     : [undefined, undefined];
   const isLong = positionSide === "Long";
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
+
+  // Format collateral amount with correct decimals
+  const stableDecimals = stableTokenInfo?.decimals ?? 18;
+  const collateralAmount = position.loan
+    ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
+    : `${position.size} OVL`;
 
   const handleItemClick = () => {
     if (position.size === "0") return;
@@ -32,7 +41,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
       <StyledRow onClick={handleItemClick}>
         <StyledCell>
           <Flex gap="6px" align="center">
-            {position.size} OVL
+            {collateralAmount}
             {position.deprecated && (
               <Tooltip
                 content="This position was built on a deprecated version of the market. You can still unwind it."

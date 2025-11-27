@@ -171,7 +171,7 @@ const TradeWidget: React.FC = () => {
         const capLeverage = await sdkRef.current.market.getCapLeverage(
           market.id as Address
         );
-        const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
+        const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 18, 2);
         if (parsedCapLeverage) {
           setCapleverage(parsedCapLeverage);
 
