@@ -14,8 +14,6 @@ import UnwindButtonComponent from "./UnwindButtonComponent";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import useDebounce from "../../../hooks/useDebounce";
 import usePrevious from "../../../hooks/usePrevious";
-import useSDK from "../../../providers/SDKProvider/useSDK";
-import { Address } from "viem";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
@@ -25,6 +23,7 @@ type UnwindPositionProps = {
   unwindPercentage: number;
   setUnwindPercentage: (unwindPercentage: number) => void;
   handleDismiss: () => void;
+  hasLoan?: boolean
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({
@@ -36,27 +35,11 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   setUnwindPercentage,
   handleDismiss,
 }) => {
-  const sdk = useSDK();
   const [percentageValue, setPercentageValue] = useState<string>("");
   const [selectedPercent, setSelectedPercent] = useState<number>(0);
-  const [hasLoan, setHasLoan] = useState<boolean>(false);
   const debouncedSelectedPercent = useDebounce(selectedPercent, 500);
 
-  // Check if position has a loan (LBSC position)
-  useEffect(() => {
-    const checkLoan = async () => {
-      try {
-        const loanId = await sdk.shiva.getLoanId(
-          position.marketAddress as Address,
-          BigInt(position.positionId)
-        );
-        setHasLoan(loanId > 0n);
-      } catch {
-        setHasLoan(false);
-      }
-    };
-    checkLoan();
-  }, [position.marketAddress, position.positionId, sdk]);
+  const hasLoan = !!position.loan?.id;
 
   const { value, currentPrice, fractionValue, unwindBtnState } = useMemo(() => {
     const value = unwindState.value
