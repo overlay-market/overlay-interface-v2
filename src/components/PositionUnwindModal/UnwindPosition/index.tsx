@@ -91,7 +91,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
       Number(inputValue) === 0
     )
       return false;
-    return fractionValue === previousFractionValue;
+    return fractionValue === previousFractionValue && !hasLoan;
   }, [fractionValue, previousFractionValue]);
 
   const maxAmount: number = useMemo(() => Number(value) ?? 0, [value]);
