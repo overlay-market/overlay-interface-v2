@@ -52,6 +52,9 @@ import AsterMyx from '../assets/images/markets-full-logos/aster-myx.jpg';
 import MrBeastLogo from '../assets/images/markets-full-logos/MrBeast.jpg';
 import GoldUsdLogo from '../assets/images/markets-full-logos/gold-usd-logo.jpg';
 import DoNLogo from '../assets/images/markets-full-logos/DoN.jpg';
+import JamesWynnLogo from '../assets/images/markets-full-logos/JamesWynnLogo.jpg';
+import ElonMuskIndexLogo from '../assets/images/markets-full-logos/ElonMuskIndex.jpg';
+import FoundersOperationsLogo from '../assets/images/markets-full-logos/FoundersOperationsLogo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -108,6 +111,9 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "MrBeast%20Index": MrBeastLogo,
   "GOLD%20%2F%20USD": GoldUsdLogo,
   "Double%20or%20Nothing": DoNLogo,
+  "James%20Wynn%20Mind%20Stability%20Index": JamesWynnLogo,
+  "Elon%20Musk%20Mood%20Index": ElonMuskIndexLogo,
+  "Founders%20Operations%20Index": FoundersOperationsLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -115,9 +121,13 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 };
 
 export const MARKETSORDER = [
+  "Elon%20Musk%20Mood%20Index",
   "MrBeast%20Index",
-  "amouranth%20vs%20peachJars",
-  "binance%20alpha%20index",
+  "Double%20or%20Nothing",
+  "Amouranth%20vs%20peachJars",
+  "James%20Wynn%20Mind%20Stability%20Index",
+  "Binance%20Alpha%20Index",
+  "Founders%20Operations%20Index",
   "Counter-Strike%202%20Skins",
   "ASTER%20vs%20MYX",
   "ETH%20%2F%20USD",
@@ -148,6 +158,7 @@ export const MARKETSORDER = [
   "HoneyComb%20and%20Jars%20NFT%20Index",
   "Defi%20Index",
   "Lana%20Del%20Rey",
+  "Coin%20Vs%20Hood",
   "ETH%20%2F%20SOL",
   "Quantum%20Cats",
   "Bitcoin%20Frogs",
@@ -180,6 +191,7 @@ export enum CategoryName {
   Fansly = "Fansly",
   Other = "Other",
   YouTube = "YouTube",
+  Twitter = "Twitter",
 }
 
 export type MarketCategoryMap = {
@@ -233,6 +245,11 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   ],
   [CategoryName.YouTube]: [
     "MrBeast%20Index",
+  ],
+  [CategoryName.Twitter]: [
+    "James%20Wynn%20Mind%20Stability%20Index",
+    "Elon%20Musk%20Mood%20Index",
+    "Founders%20Operations%20Index",
   ],
   [CategoryName.Other]: [],
 };
