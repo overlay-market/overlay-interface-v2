@@ -33,6 +33,8 @@ const Trade: React.FC = () => {
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { data: markets } = useActiveMarkets();
+  const prevMarketRef = useRef<string | undefined>();
+
   const shouldRenderGamblingTimeline = useMemo(() => {
     if (!currentMarket) {
       return false;
@@ -55,29 +57,34 @@ const Trade: React.FC = () => {
   useEffect(() => {
     if (!markets || !marketParam) return;
 
-    if (markets && marketParam) {
-      const normalizedMarketParam =
-        decodeURIComponent(marketParam).toLowerCase();
+    const normalized = decodeURIComponent(marketParam).toLowerCase();
 
-      const currentMarket = markets.find(
-        (market) => market.marketName.toLowerCase() === normalizedMarketParam
-      );
+    const selected = markets.find(
+      (m) => m.marketName.toLowerCase() === normalized
+    );
 
-      if (currentMarket) {
-        handleCurrentMarketSet(currentMarket);
-      } else {
-        const activeMarket = markets[0];
-        handleCurrentMarketSet(activeMarket);
-
-        const encodedMarket = encodeURIComponent(activeMarket.marketName);
-        navigate(`/trade?market=${encodedMarket}`, { replace: true });
-      }
+    if (selected) {
+      handleCurrentMarketSet(selected);
+      return;
     }
+
+    const fallback = markets[0];
+    handleCurrentMarketSet(fallback);
+    navigate(`/trade?market=${encodeURIComponent(fallback.marketName)}`, {
+      replace: true,
+    });
   }, [marketParam, markets]);
 
   useEffect(() => {
-    handleTradeStateReset();
-  }, [marketParam, chainId, handleTradeStateReset]);
+    if (!currentMarket) return;
+
+    const name = currentMarket.marketName;
+    if (prevMarketRef.current !== name) {
+      handleTradeStateReset();
+    }
+
+    prevMarketRef.current = name;
+  }, [currentMarket, chainId]);
 
   return (
     <TradeContainer direction="column" width={"100%"} mb="100px">
@@ -93,11 +100,7 @@ const Trade: React.FC = () => {
         >
           {currentMarket ? (
             <>
-              {shouldRenderGamblingTimeline ? (
-                <GamblingTimeline />
-              ) : (
-                <Chart />
-              )}
+              {shouldRenderGamblingTimeline ? <GamblingTimeline /> : <Chart />}
               <TradeWidget />
             </>
           ) : (
