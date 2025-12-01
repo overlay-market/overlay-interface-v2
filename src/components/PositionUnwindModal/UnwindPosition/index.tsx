@@ -23,7 +23,6 @@ type UnwindPositionProps = {
   unwindPercentage: number;
   setUnwindPercentage: (unwindPercentage: number) => void;
   handleDismiss: () => void;
-  hasLoan?: boolean
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({
