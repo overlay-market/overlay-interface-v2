@@ -27,7 +27,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
         <StyledCell>{position.size} OVL</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
-            {positionLeverage}
+            {positionLeverage && Number(positionLeverage.slice(0, -1))}x
             <Text
               weight={"medium"}
               style={{ color: isLong ? theme.color.green1 : theme.color.red1 }}

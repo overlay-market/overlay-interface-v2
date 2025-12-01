@@ -29,6 +29,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
     : [undefined, undefined];
+  
+  console.log({positionLeverage, positionSide, raw: position.positionSide})
   const isLong = positionSide === "Long";
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
   const isFundingPositive = Number(position.parsedFunding) > 0;
@@ -95,7 +97,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
         <StyledCell>{collateralAmount}</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
-            {positionLeverage}
+            {positionLeverage && Number(positionLeverage.slice(0, -1))}x
             <Text
               weight={"medium"}
               style={{ color: isLong ? theme.color.green1 : theme.color.red1 }}
