@@ -130,7 +130,7 @@ const ConfirmTradeContent: React.FC<ConfirmTradeContentProps> = ({
           }}
         >
           <Text size="2" style={{ color: theme.color.yellow1 }}>
-            Note: Positions built with USDT must be fully unwound (100%)
+            Note: USDT-collateral positions do not support partial unwinds yet.
           </Text>
         </Flex>
       )}

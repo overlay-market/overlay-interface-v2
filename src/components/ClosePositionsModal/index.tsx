@@ -34,17 +34,11 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
 
-  // Filter out LBSC positions (positions with loans)
-  const positionsWithLoans = selectedPositions.filter(pos => pos.loan);
-  const positionsWithoutLoans = selectedPositions.filter(pos => !pos.loan);
-  const hasLBSCPositions = positionsWithLoans.length > 0;
-
   const multipleUnwind = async () => {
     try {
       setIsUnwinding(true);
-      // Only unwind positions without loans (non-LBSC positions)
       const transactions = await sdk.market.unwindMultiple({
-        positions: positionsWithoutLoans.map((pos) => ({
+        positions: selectedPositions.map((pos) => ({
           marketAddress: pos.marketAddress,
           positionId: pos.positionId,
         })),
@@ -127,37 +121,13 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
     <Dialog.Root open={open} onOpenChange={handleDismiss}>
       <Dialog.Content style={{ backgroundColor: theme.color.background }}>
         <Dialog.Title>Close Selected Positions</Dialog.Title>
-
-        {hasLBSCPositions ? (
-          <Flex direction="column" gap="3">
-            <Text size="2">
-              You are about to close {positionsWithoutLoans.length} position
-              {positionsWithoutLoans.length !== 1 ? "s" : ""}.
-            </Text>
-
-            <Flex
-              p="12px"
-              style={{
-                background: 'rgba(255, 193, 7, 0.1)',
-                borderRadius: '8px',
-                border: `1px solid ${theme.color.yellow1}`,
-              }}
-            >
-              <Text size="2" style={{ color: theme.color.yellow1 }}>
-                {positionsWithLoans.length} USDT-collateralized position
-                {positionsWithLoans.length !== 1 ? "s" : ""} will be skipped.
-                These positions must be closed individually at 100% in the position details.
-              </Text>
-            </Flex>
-          </Flex>
-        ) : (
-          <Text size="2" mb="4">
-            You are about to close {selectedCount} selected position
-            {selectedCount !== 1 ? "s" : ""}. This action cannot be undone.
-          </Text>
-        )}
+        <Text size="2" mb="4">
+          You are about to close {selectedCount} selected position
+          {selectedCount !== 1 ? "s" : ""}. This action cannot be undone.
+        </Text>
 
         <Flex gap="3" justify="end" mt={"4"}>
+          {" "}
           <ColorButton
             onClick={handleDismiss}
             width="140px"
@@ -170,7 +140,7 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
           <ColorButton
             onClick={multipleUnwind}
             width="140px"
-            disabled={isUnwinding || positionsWithoutLoans.length === 0}
+            disabled={isUnwinding}
           >
             {isUnwinding ? "Pending..." : "Confirm"}
           </ColorButton>

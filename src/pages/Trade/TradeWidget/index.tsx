@@ -45,6 +45,8 @@ const TradeWidget: React.FC = () => {
     undefined
   );
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
+  const [ovlPreview, setOvlPreview] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const debouncedTypedValue = useDebounce(typedValue, 500);
   const [leverageInputValue, setLeverageInputValue] = useState<string | null>(
@@ -55,11 +57,64 @@ const TradeWidget: React.FC = () => {
 
   const sdkRef = useRef(sdk);
   const isGambling = isGamblingMarket(market?.marketName);
-  const { data: stableTokenInfo } = useStableTokenInfo();
+  const {
+    data: stableTokenInfo,
+    refetch: refetchStableTokenInfo,
+    isRefetching,
+  } = useStableTokenInfo({
+    includeOraclePrice: true,
+  });
 
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
+
+  useEffect(() => {
+    if (
+      collateralType !== "USDT" ||
+      !debouncedTypedValue ||
+      Number(debouncedTypedValue) === 0 ||
+      !stableTokenInfo
+    ) {
+      setOvlPreview(null);
+      setPreviewLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const fetchPreview = async () => {
+      setPreviewLoading(true);
+      try {
+        const stableAmount = parseUnits(
+          debouncedTypedValue,
+          stableTokenInfo.decimals
+        );
+        const ovlAmount = await sdkRef.current?.lbsc.previewBorrow(
+          stableAmount
+        );
+        if (isCancelled) return;
+        const formattedOvl = ovlAmount
+          ? formatWeiToParsedNumber(ovlAmount, 18, 4)
+          : null;
+        setOvlPreview(formattedOvl?.toString() ?? null);
+      } catch {
+        if (!isCancelled) {
+          setOvlPreview(null);
+        }
+      } finally {
+        if (!isCancelled) {
+          setPreviewLoading(false);
+        }
+      }
+    };
+
+    fetchPreview();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [collateralType, debouncedTypedValue, stableTokenInfo]);
 
   // Check if LBSC is available on current chain
   useEffect(() => {
@@ -205,7 +260,6 @@ const TradeWidget: React.FC = () => {
 
     fetchCapLeverage();
     // Run when market changes or wallet connects/disconnects
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [market?.id, address]);
 
   const handleLeverageInput = (newValue: number[]) => {
@@ -284,6 +338,54 @@ const TradeWidget: React.FC = () => {
                   Use OVL as collateral (cross-chain)
                 </Text>
               </label>
+            )}
+            {collateralType === "USDT" && (
+              <Flex direction="column" gap="8px">
+                <Flex justify="between">
+                  <Text size="1" style={{ color: theme.color.grey3 }}>
+                    OVL Collateral
+                  </Text>
+                  <Text size="1" style={{ color: theme.color.blue1 }}>
+                    {previewLoading
+                      ? "Calculating..."
+                      : ovlPreview
+                      ? `~${ovlPreview} OVL`
+                      : "-"}
+                  </Text>
+                </Flex>
+                <Flex justify="between">
+                  <Flex align="center" gap="1">
+                    <Text size="1" style={{ color: theme.color.grey3 }}>
+                      Borrow Price
+                    </Text>
+                    <Text
+                      size="1"
+                      onClick={() => refetchStableTokenInfo()}
+                      style={{
+                        color: theme.color.blue1,
+                        cursor: "pointer",
+                        userSelect: "none",
+                        opacity: isRefetching ? 0.5 : 1,
+                        transition: "opacity 0.2s",
+                      }}
+                      title="Refresh oracle price"
+                    >
+                      {isRefetching ? "⟳" : "↻"}
+                    </Text>
+                  </Flex>
+                  <Text size="1" style={{ color: theme.color.grey2 }}>
+                    {stableTokenInfo?.oraclePrice
+                      ? `1 OVL = $${
+                          formatWeiToParsedNumber(
+                            stableTokenInfo.oraclePrice,
+                            18,
+                            4
+                          )?.toFixed(4) ?? "0.0000"
+                        }`
+                      : "-"}
+                  </Text>
+                </Flex>
+              </Flex>
             )}
           </Flex>
 

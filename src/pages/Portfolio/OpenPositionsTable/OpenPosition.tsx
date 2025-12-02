@@ -29,6 +29,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
     : [undefined, undefined];
+  
+  console.log({positionLeverage, positionSide, raw: position.positionSide})
   const isLong = positionSide === "Long";
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
   const isFundingPositive = Number(position.parsedFunding) > 0;
@@ -36,6 +38,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
 
   // Format collateral amount
   // Testnet mock USDT has 18 decimals, mainnet USDT has 6 decimals
+  // TODO move this to sdk (and fix decimals)
   const stableDecimals = chainId === SUPPORTED_CHAINID.BSC_TESTNET ? 18 : 6;
   const collateralAmount = hasLoan && position.loan
     ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
@@ -68,42 +71,17 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
               justifyContent: "center",
             }}
           >
-            {hasLoan ? (
-              <Tooltip
-                content="USDT positions cannot be batch-closed. Close individually at 100%."
-                style={{ background: theme.tooltip.background, borderRadius: theme.tooltip.borderRadius, padding: theme.tooltip.padding }}
-              >
-                <Checkbox
-                  checked={false}
-                  disabled={true}
-                  size="3"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{ cursor: 'not-allowed' }}
-                />
-              </Tooltip>
-            ) : (
-              <Checkbox
-                checked={isChecked}
-                onCheckedChange={handleCheckboxChange}
-                size="3"
-                onClick={(e) => e.stopPropagation()}
-              />
-            )}
+            <Checkbox
+              checked={isChecked}
+              onCheckedChange={handleCheckboxChange}
+              size="3"
+              onClick={(e) => e.stopPropagation()}
+            />
           </StyledCell>
         )}
         <StyledCell>
           <Flex gap="6px" align="center">
             {position.marketName}
-            {hasLoan && (
-              <Tooltip
-                content="Position built with USDT collateral. Must be fully unwound (100%) individually."
-                style={{ background: theme.tooltip.background, borderRadius: theme.tooltip.borderRadius, padding: theme.tooltip.padding }}
-              >
-                <Badge size="1" style={{ cursor: "help", backgroundColor: 'rgba(255, 193, 7, 0.2)', color: theme.color.yellow1, border: `1px solid ${theme.color.yellow1}` }}>
-                  USDT
-                </Badge>
-              </Tooltip>
-            )}
             {position.deprecated && (
               <Tooltip
                 content="This position was built on a deprecated version of the market. You can still unwind it."
@@ -119,7 +97,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
         <StyledCell>{collateralAmount}</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
-            {positionLeverage}
+            {positionLeverage && Number(positionLeverage.slice(0, -1))}x
             <Text
               weight={"medium"}
               style={{ color: isLong ? theme.color.green1 : theme.color.red1 }}
