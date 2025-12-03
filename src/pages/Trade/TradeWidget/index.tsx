@@ -188,10 +188,6 @@ const TradeWidget: React.FC = () => {
             collateralType
           );
           if (!isCancelled && tradeState) {
-            // TODO undo this after fixing SDK
-            if (tradeState.tradeState === TradeState.AmountExceedsMaxInput && collateralType === 'USDT') {
-              tradeState.tradeState = TradeState.Trade
-            }
             setTradeState(tradeState);
           }
         } catch (error) {
