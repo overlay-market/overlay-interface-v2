@@ -13,7 +13,7 @@ import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useRef, useState } from "react";
 import { Address, parseUnits } from "viem";
-import { formatWeiToParsedNumber, toWei, TradeState, TradeStateData } from "overlay-sdk";
+import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
