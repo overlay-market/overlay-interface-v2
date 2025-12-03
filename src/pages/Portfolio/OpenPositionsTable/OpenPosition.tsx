@@ -4,9 +4,8 @@ import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
 import { useState } from "react";
 import { OpenPositionData } from "overlay-sdk";
-import { useChainId } from "wagmi";
-import { SUPPORTED_CHAINID } from "../../../constants/chains";
 import { formatUnits } from "viem";
+import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -21,25 +20,37 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   onCheckboxChange,
   isChecked = false,
 }) => {
+  const { data: stableTokenInfo } = useStableTokenInfo();
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);
-  const chainId = useChainId();
 
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
     : [undefined, undefined];
-  
-  console.log({positionLeverage, positionSide, raw: position.positionSide})
   const isLong = positionSide === "Long";
-  const isPnLPositive = Number(position.unrealizedPnL) > 0;
-  const isFundingPositive = Number(position.parsedFunding) > 0;
   const hasLoan = Boolean(position.loan);
 
-  // Format collateral amount
-  // Testnet mock USDT has 18 decimals, mainnet USDT has 6 decimals
-  // TODO move this to sdk (and fix decimals)
-  const stableDecimals = chainId === SUPPORTED_CHAINID.BSC_TESTNET ? 18 : 6;
+  // For LBSC positions with stable values calculated:
+  // Display stable values for losses, OVL values for gains
+  const pnlValue = position.stableValues && Number(position.unrealizedPnL) < 0
+    ? position.stableValues.unrealizedPnL
+    : position.unrealizedPnL;
+  const pnlToken = position.stableValues && Number(position.unrealizedPnL) < 0
+    ? 'USDT'
+    : 'OVL';
+  const isPnLPositive = Number(position.unrealizedPnL) > 0;
+
+  const fundingValue = position.stableValues && Number(position.parsedFunding) < 0
+    ? position.stableValues.funding
+    : position.parsedFunding;
+  const fundingToken = position.stableValues && Number(position.parsedFunding) < 0
+    ? 'USDT'
+    : 'OVL';
+  const isFundingPositive = Number(position.parsedFunding) > 0;
+
+  // Format collateral amount with correct decimals
+  const stableDecimals = stableTokenInfo?.decimals ?? 18;
   const collateralAmount = hasLoan && position.loan
     ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
     : `${position.size} OVL`;
@@ -116,7 +127,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
               color: isPnLPositive ? theme.color.green1 : theme.color.red1,
             }}
           >
-            {position.unrealizedPnL} OVL
+            {pnlValue} {pnlToken}
           </Text>
         </StyledCell>
         <StyledCell>
@@ -125,7 +136,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
               color: isFundingPositive ? theme.color.green1 : theme.color.red1,
             }}
           >
-            {position.parsedFunding} OVL
+            {fundingValue} {fundingToken}
           </Text>
         </StyledCell>
       </StyledRow>

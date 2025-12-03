@@ -21,6 +21,15 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     ? position.positionSide.split(" ")
     : [undefined, undefined];
   const isLong = positionSide === "Long";
+
+  // For LBSC positions with stable values calculated:
+  // Display stable values for losses, OVL values for gains
+  const pnlValue = position.stableValues && Number(position.unrealizedPnL) < 0
+    ? position.stableValues.unrealizedPnL
+    : position.unrealizedPnL;
+  const pnlToken = position.stableValues && Number(position.unrealizedPnL) < 0
+    ? 'USDT'
+    : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
 
   // Format collateral amount with correct decimals
@@ -73,7 +82,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
               color: isPnLPositive ? theme.color.green1 : theme.color.red1,
             }}
           >
-            {position.unrealizedPnL} OVL
+            {pnlValue} {pnlToken}
           </Text>
         </StyledCell>
       </StyledRow>
