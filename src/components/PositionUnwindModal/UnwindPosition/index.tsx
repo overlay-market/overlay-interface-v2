@@ -223,6 +223,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           priceLimit={unwindState.priceLimit}
           unwindBtnState={unwindBtnState}
           isPendingTime={isPendingTime}
+          unwindStable={true} // TODO handle toggle
           handleDismiss={handleDismiss}
         />
       </Flex>
