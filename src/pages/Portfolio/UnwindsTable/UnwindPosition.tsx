@@ -4,16 +4,12 @@ import theme from "../../../theme";
 import { useState } from "react";
 import ClosedPositionModal from "./ClosedPositionModal";
 import { UnwindPositionData } from "overlay-sdk";
-import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
-import { formatUnits } from "viem";
-
 type UnwindPositionProps = {
   position: UnwindPositionData;
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
   const [showModal, setShowModal] = useState(false);
-  const { data: stableTokenInfo } = useStableTokenInfo();
 
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
@@ -22,9 +18,8 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
   const isPnLPositive = Number(position.pnl) > 0;
 
   // Format collateral amount with correct decimals
-  const stableDecimals = stableTokenInfo?.decimals ?? 18;
   const collateralAmount = position.stableValues?.size
-    ? `${Number(formatUnits(BigInt(position.stableValues.size), stableDecimals)).toFixed(2)} USDT`
+    ? `${position.stableValues.size} USDT`
     : `${position.size} OVL`;
 
   // For PnL - show USDT if loss, OVL if gain
