@@ -23,12 +23,9 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
     : `${position.size} OVL`;
 
   // For PnL - show USDT if loss, OVL if gain
-  const pnlValue = position.stableValues && Number(position.pnl) < 0
-    ? position.stableValues.pnl
-    : position.pnl;
-  const pnlToken = position.stableValues && Number(position.pnl) < 0
-    ? 'USDT'
-    : 'OVL';
+  const pnl = position.stableValues
+    ? `${position.stableValues.pnl} USDT`
+    : `${position.pnl} OVL`
 
   return (
     <>
@@ -59,7 +56,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
               color: isPnLPositive ? theme.color.green1 : theme.color.red1,
             }}
           >
-            {pnlValue} {pnlToken}
+            {pnl}
           </Text>
         </StyledCell>
       </StyledRow>
