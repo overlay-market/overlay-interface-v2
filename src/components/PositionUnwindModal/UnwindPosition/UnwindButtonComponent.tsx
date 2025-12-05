@@ -10,7 +10,7 @@ import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
-import { useTradeActionHandlers } from "../../../state/trade/hooks";
+import { useTradeActionHandlers, useTradeState } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
 import { trackEvent } from "../../../analytics/trackEvent";
@@ -22,6 +22,7 @@ type UnwindButtonComponentProps = {
   unwindPercentage: number;
   priceLimit: bigint;
   isPendingTime: boolean;
+  unwindStable?: boolean;
   handleDismiss: () => void;
 };
 
@@ -32,12 +33,14 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   unwindPercentage,
   priceLimit,
   isPendingTime,
+  unwindStable,
   handleDismiss,
 }) => {
   const sdk = useSDK();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
+  const { slippageValue } = useTradeState();
   const { address } = useAccount();
   const publicClient = usePublicClient();
 
@@ -79,12 +82,26 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     setAttemptingUnwind(true);
 
     try {
-      const result = await sdk.market.unwind({
+      const parsedSlippage = Number(slippageValue);
+      const slippage =
+        Number.isFinite(parsedSlippage) && parsedSlippage > 0
+          ? parsedSlippage
+          : 1;
+
+      const unwindParams = {
         marketAddress: position.marketAddress as Address,
         positionId: BigInt(position.positionId),
         fraction: toWei(unwindPercentage),
         priceLimit,
-      });
+      };
+
+      const result = unwindStable
+        ? await sdk.shiva.unwindStable({
+            ...unwindParams,
+            account: address as Address,
+            slippage,
+          })
+        : await sdk.market.unwind(unwindParams);
 
       let receipt = result.receipt;
 
