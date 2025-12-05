@@ -4,15 +4,12 @@ import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useState } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
-import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
-import { formatUnits } from "viem";
 
 type OpenPositionProps = {
   position: OpenPositionData;
 };
 
 const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
-  const { data: stableTokenInfo } = useStableTokenInfo();
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);
@@ -32,10 +29,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
 
-  // Format collateral amount with correct decimals
-  const stableDecimals = stableTokenInfo?.decimals ?? 18;
-  const collateralAmount = position.loan
-    ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
+  const collateralAmount = position.stableValues
+    ? `${position.stableValues?.size} USDT`
     : `${position.size} OVL`;
 
   const handleItemClick = () => {

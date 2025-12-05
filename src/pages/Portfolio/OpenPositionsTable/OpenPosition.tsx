@@ -4,8 +4,6 @@ import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
 import { useState } from "react";
 import { OpenPositionData } from "overlay-sdk";
-import { formatUnits } from "viem";
-import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -20,7 +18,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   onCheckboxChange,
   isChecked = false,
 }) => {
-  const { data: stableTokenInfo } = useStableTokenInfo();
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);
@@ -29,7 +26,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     ? position.positionSide.split(" ")
     : [undefined, undefined];
   const isLong = positionSide === "Long";
-  const hasLoan = Boolean(position.loan);
 
   // For LBSC positions with stable values calculated:
   // Display stable values for losses, OVL values for gains
@@ -49,10 +45,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     : 'OVL';
   const isFundingPositive = Number(position.parsedFunding) > 0;
 
-  // Format collateral amount with correct decimals
-  const stableDecimals = stableTokenInfo?.decimals ?? 18;
-  const collateralAmount = hasLoan && position.loan
-    ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
+  const collateralAmount = position.stableValues
+    ? `${position.stableValues?.size} USDT`
     : `${position.size} OVL`;
 
   const handleItemClick = (event: React.MouseEvent) => {
