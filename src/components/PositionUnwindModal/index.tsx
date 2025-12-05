@@ -39,6 +39,9 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
   );
   const [inputValue, setInputValue] = useState<string>("");
   const [unwindPercentage, setUnwindPercentage] = useState<number>(0);
+  const [stableQuote, setStableQuote] = useState<{ minOut: bigint; expectedOut: bigint } | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteFailed, setQuoteFailed] = useState(false);
 
   useEffect(() => {
     setInputValue("");
@@ -77,6 +80,63 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
       isCancelled = true;
     };
   }, [position, account, open, slippageValue, unwindPercentage]);
+
+  // Fetch USDT quote once when modal opens for LBSC positions with positive PnL
+  useEffect(() => {
+    // Only fetch when modal opens
+    if (!open) {
+      setStableQuote(null);
+      return;
+    }
+
+    // Only fetch for LBSC positions (with loan) and positive unrealized PnL
+    if (!position?.loan || !unwindState || !account) {
+      setStableQuote(null);
+      return;
+    }
+
+    // Check if PnL is positive
+    if (isUnwindStateSuccess(unwindState) && Number(unwindState.pnl) <= 0) {
+      setStableQuote(null);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const fetchStableQuote = async () => {
+      setQuoteLoading(true);
+      setQuoteFailed(false);
+
+      try {
+        const quote = await sdk.shiva.getUnwindStableQuote({
+          account,
+          marketAddress: position.marketAddress,
+          positionId: BigInt(position.positionId),
+          fraction: BigInt(1e18),  // Always 100% for LBSC positions
+          slippage: Number(slippageValue),
+        });
+
+        if (!isCancelled) {
+          setStableQuote(quote);
+        }
+      } catch (error) {
+        console.error('Failed to fetch stable quote:', error);
+        if (!isCancelled) {
+          setQuoteFailed(true);
+        }
+      } finally {
+        if (!isCancelled) {
+          setQuoteLoading(false);
+        }
+      }
+    };
+
+    fetchStableQuote();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [open]);
 
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
@@ -117,6 +177,9 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
           unwindPercentage={unwindPercentage}
           setUnwindPercentage={setUnwindPercentage}
           handleDismiss={handleDismiss}
+          stableQuote={stableQuote}
+          quoteLoading={quoteLoading}
+          quoteFailed={quoteFailed}
         />
       )}
 

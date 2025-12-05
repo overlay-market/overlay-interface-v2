@@ -23,6 +23,9 @@ type UnwindPositionProps = {
   unwindPercentage: number;
   setUnwindPercentage: (unwindPercentage: number) => void;
   handleDismiss: () => void;
+  stableQuote: { minOut: bigint; expectedOut: bigint } | null;
+  quoteLoading: boolean;
+  quoteFailed: boolean;
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({
@@ -33,6 +36,9 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   unwindPercentage,
   setUnwindPercentage,
   handleDismiss,
+  stableQuote,
+  quoteLoading,
+  quoteFailed,
 }) => {
   const [percentageValue, setPercentageValue] = useState<string>("");
   const [selectedPercent, setSelectedPercent] = useState<number>(0);
@@ -228,7 +234,13 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         />
       </Flex>
 
-      <UnwindPositionDetails position={position} unwindState={unwindState} />
+      <UnwindPositionDetails
+        position={position}
+        unwindState={unwindState}
+        stableQuote={stableQuote}
+        quoteLoading={quoteLoading}
+        quoteFailed={quoteFailed}
+      />
     </>
   );
 };
