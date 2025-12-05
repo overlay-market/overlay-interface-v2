@@ -46,34 +46,48 @@ const Analytics: React.FC = () => {
   );
 
   useEffect(() => {
+    let cancelled = false;
+    const requestedMarketId = currentMarket?.marketId;
+
     const fetchData = async () => {
-      if (currentMarket) {
-        try {
-          // Get all market details for this chain (including deprecated) with caching
-          const marketsDetailsMap = await sdk.markets.getAllMarketsDetails();
+      if (!currentMarket) return;
 
-          // Filter to get all deployment addresses for the same marketId
-          const marketAddresses = Array.from(marketsDetailsMap.values())
-            .filter((market) => market.marketId === currentMarket.marketId)
-            .map((market) => market.id.toLowerCase());
+      try {
+        // Get all market details for this chain (including deprecated) with caching
+        const marketsDetailsMap = await sdk.markets.getAllMarketsDetails();
 
-          // If no addresses found, fallback to current market only
-          const addressesToQuery = marketAddresses.length > 0
+        // Filter to get all deployment addresses for the same marketId
+        const marketAddresses = Array.from(marketsDetailsMap.values())
+          .filter((market) => market.marketId === requestedMarketId)
+          .map((market) => market.id.toLowerCase());
+
+        // If no addresses found, fallback to current market only (normalized)
+        const addressesToQuery =
+          marketAddresses.length > 0
             ? marketAddresses
-            : [currentMarket.id];
+            : [currentMarket.id.toLowerCase()];
 
-          // Query subgraph for all market addresses
-          const data: AnalyticsData = await request(subgraphUrl, document, {
-            marketIds: addressesToQuery,
-          });
-          setAnalyticsData(data);
-        } catch (error) {
+        // Query subgraph for all market addresses
+        const data: AnalyticsData = await request(subgraphUrl, document, {
+          marketIds: addressesToQuery,
+        });
+
+        if (cancelled) return;
+        if (currentMarket?.marketId !== requestedMarketId) return;
+
+        setAnalyticsData(data);
+      } catch (error) {
+        if (!cancelled) {
           console.error("Error fetching analytics data:", error);
         }
       }
     };
 
     fetchData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [subgraphUrl, currentMarket, sdk]);
 
   const formatAndTransform = (value: string) => {
@@ -105,9 +119,12 @@ const Analytics: React.FC = () => {
   const totalTokensLocked = useMemo(() => {
     if (analyticsData && analyticsData.tokenPositions.length > 0) {
       // Sum balance across all token positions
-      const summedBalance = analyticsData.tokenPositions.reduce((acc, position) => {
-        return acc + BigInt(position.balance);
-      }, BigInt(0));
+      const summedBalance = analyticsData.tokenPositions.reduce(
+        (acc, position) => {
+          return acc + BigInt(position.balance);
+        },
+        BigInt(0)
+      );
       return formatAndTransform(summedBalance.toString());
     } else {
       return " ";
@@ -118,10 +135,12 @@ const Analytics: React.FC = () => {
     if (analyticsData?.markets && analyticsData.markets.length > 0) {
       // Sum transactions across all markets
       const summedTransactions = analyticsData.markets.reduce((acc, market) => {
-        return acc +
+        return (
+          acc +
           BigInt(market.numberOfBuilds) +
           BigInt(market.numberOfLiquidates) +
-          BigInt(market.numberOfUnwinds);
+          BigInt(market.numberOfUnwinds)
+        );
       }, BigInt(0));
       return summedTransactions
         .toLocaleString("en-US", {
