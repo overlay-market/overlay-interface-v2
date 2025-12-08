@@ -23,11 +23,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
   const isLong = positionSide === "Long";
 
   // For LBSC positions with stable values calculated:
-  // Display stable values for losses, OVL values for gains
-  const pnlValue = position.stableValues && Number(position.unrealizedPnL) < 0
+  // Display stable values in USDT (both positive and negative PnL)
+  const pnlValue = position.stableValues
     ? position.stableValues.unrealizedPnL
     : position.unrealizedPnL;
-  const pnlToken = position.stableValues && Number(position.unrealizedPnL) < 0
+  const pnlToken = position.stableValues
     ? 'USDT'
     : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;

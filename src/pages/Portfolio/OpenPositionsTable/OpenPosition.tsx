@@ -32,19 +32,20 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   const hasLoan = Boolean(position.loan);
 
   // For LBSC positions with stable values calculated:
-  // Display stable values for losses, OVL values for gains
-  const pnlValue = position.stableValues && Number(position.unrealizedPnL) < 0
+  // Display stable values in USDT (both positive and negative PnL)
+  const pnlValue = position.stableValues
     ? position.stableValues.unrealizedPnL
     : position.unrealizedPnL;
-  const pnlToken = position.stableValues && Number(position.unrealizedPnL) < 0
+  const pnlToken = position.stableValues
     ? 'USDT'
     : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
 
-  const fundingValue = position.stableValues && Number(position.parsedFunding) < 0
+  const fundingRawValue = position.stableValues
     ? position.stableValues.funding
     : position.parsedFunding;
-  const fundingToken = position.stableValues && Number(position.parsedFunding) < 0
+  const fundingValue = Number(fundingRawValue).toFixed(2);
+  const fundingToken = position.stableValues
     ? 'USDT'
     : 'OVL';
   const isFundingPositive = Number(position.parsedFunding) > 0;

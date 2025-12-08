@@ -2,8 +2,6 @@ import { Flex, Text } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { LiquidatedPositionData } from "overlay-sdk";
-import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
-import { formatUnits } from "viem";
 
 type LiquidatedPositionProps = {
   position: LiquidatedPositionData;
@@ -12,18 +10,14 @@ type LiquidatedPositionProps = {
 const LiquidatedPosition: React.FC<LiquidatedPositionProps> = ({
   position,
 }) => {
-  const { data: stableTokenInfo } = useStableTokenInfo();
-  const hasLoan = Boolean(position.loan);
-
   const [positionLeverage, positionSide] = position.position
     ? position.position.split(" ")
     : [undefined, undefined];
   const isLong = positionSide === "Long";
 
-  // Format collateral amount with correct decimals
-  const stableDecimals = stableTokenInfo?.decimals ?? 18;
-  const collateralAmount = hasLoan && position.loan
-    ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
+  // Format size amount - use stable values if available (for LBSC positions)
+  const collateralAmount = position.stableValues?.size
+    ? `${position.stableValues.size} USDT`
     : `${position.size} OVL`;
 
   return (
