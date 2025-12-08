@@ -108,19 +108,29 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
       setQuoteFailed(false);
 
       try {
-        const quote = await sdk.shiva.getUnwindStableQuote({
-          account,
-          marketAddress: position.marketAddress,
-          positionId: BigInt(position.positionId),
-          fraction: BigInt(1e18),  // Always 100% for LBSC positions
-          slippage: Number(slippageValue),
-        });
+        // For LBSC positions, calculate quote using oracle price instead of simulation
+        // This matches the approach used for detail values
+        const oraclePrice = await sdk.lbsc.getOraclePrice();
+
+        // Get the position value in wei from unwindState
+        const positionValueStr = isUnwindStateSuccess(unwindState) ? unwindState.value : '0';
+        const positionValueWei = BigInt(Math.floor(Number(positionValueStr) * 1e18));
+
+        // Calculate expected USDT output: (OVL value * oracle price) / WAD
+        const WAD = BigInt(1e18);
+        const expectedOut = (positionValueWei * oraclePrice) / WAD;
+
+        // Calculate minimum output with slippage: expectedOut * (100 - slippage) / 100
+        const slippagePercent = Number(slippageValue);
+        const minOut = (expectedOut * BigInt(100 - slippagePercent)) / BigInt(100);
+
+        const quote = { minOut, expectedOut };
 
         if (!isCancelled) {
           setStableQuote(quote);
         }
       } catch (error) {
-        console.error('Failed to fetch stable quote:', error);
+        console.error('Failed to calculate stable quote:', error);
         if (!isCancelled) {
           setQuoteFailed(true);
         }
@@ -136,7 +146,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [open]);
+  }, [open, position?.loan, unwindState, account, slippageValue, sdk, isUnwindStateSuccess]);
 
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>

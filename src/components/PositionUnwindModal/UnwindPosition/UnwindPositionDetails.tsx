@@ -34,6 +34,7 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
     minReceivedDisplay,
     side,
     value,
+    valueUnit,
     oi,
     leverage,
     debt,
@@ -103,30 +104,51 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
       pnlUnit = UNIT;
     }
     const side = unwindState.side ?? undefined;
-    const value = unwindState.value
+
+    // Use stable values for LBSC positions, OVL values otherwise
+    const hasStableValues = !!unwindState.stableValues;
+    const valueUnit = hasStableValues ? 'USDT' : UNIT;
+
+    const value = hasStableValues && unwindState.stableValues?.value
+      ? unwindState.stableValues.value
+      : unwindState.value
       ? Number(unwindState.value).toString()
       : undefined;
     const oi = unwindState.oi ? Number(unwindState.oi).toString() : undefined;
     const leverage = unwindState.leverage ?? undefined;
-    const debt = unwindState.debt
+    const debt = hasStableValues && unwindState.stableValues?.debt
+      ? unwindState.stableValues.debt
+      : unwindState.debt
       ? Number(unwindState.debt).toString()
       : undefined;
-    const cost = unwindState.cost
-      ? Number(unwindState.cost).toString()
+    const cost = hasStableValues && unwindState.stableValues?.cost
+      ? unwindState.stableValues.cost
+      : unwindState.cost
+      ? unwindState.cost.toString()
       : undefined;
-    const currentCollateral = unwindState.currentCollateral
+    const currentCollateral = hasStableValues && unwindState.stableValues?.currentCollateral
+      ? unwindState.stableValues.currentCollateral
+      : unwindState.currentCollateral
       ? Number(unwindState.currentCollateral).toString()
       : undefined;
-    const currentNotional = unwindState.currentNotional
+    const currentNotional = hasStableValues && unwindState.stableValues?.currentNotional
+      ? unwindState.stableValues.currentNotional
+      : unwindState.currentNotional
       ? Number(unwindState.currentNotional).toString()
       : undefined;
-    const initialCollateral = unwindState.initialCollateral
+    const initialCollateral = hasStableValues && unwindState.stableValues?.initialCollateral
+      ? unwindState.stableValues.initialCollateral
+      : unwindState.initialCollateral
       ? Number(unwindState.initialCollateral).toString()
       : undefined;
-    const initialNotional = unwindState.initialNotional
+    const initialNotional = hasStableValues && unwindState.stableValues?.initialNotional
+      ? unwindState.stableValues.initialNotional
+      : unwindState.initialNotional
       ? Number(unwindState.initialNotional).toString()
       : undefined;
-    const maintenanceMargin = unwindState.maintenanceMargin
+    const maintenanceMargin = hasStableValues && unwindState.stableValues?.maintenanceMargin
+      ? unwindState.stableValues.maintenanceMargin
+      : unwindState.maintenanceMargin
       ? Number(unwindState.maintenanceMargin).toString()
       : undefined;
     const entryPrice = unwindState.entryPrice
@@ -165,6 +187,7 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
       minReceivedDisplay,
       side,
       value,
+      valueUnit,
       oi,
       leverage,
       debt,
@@ -234,30 +257,30 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
             />
           </Flex>
           <Flex direction={"column"} width={"100%"} mt={"30px"}>
-            <DetailRow detail={"Value"} value={`${value} ${UNIT}`} />
+            <DetailRow detail={"Value"} value={`${value} ${valueUnit}`} />
             <DetailRow detail={"Open Interest"} value={oi} />
             <DetailRow detail={"Leverage"} value={`${leverage}x`} />
-            <DetailRow detail={"Debt"} value={`${debt} ${UNIT}`} />
-            <DetailRow detail={"Cost"} value={`${cost} ${UNIT}`} />
+            <DetailRow detail={"Debt"} value={`${debt} ${valueUnit}`} />
+            <DetailRow detail={"Cost"} value={`${cost} ${valueUnit}`} />
             <DetailRow
               detail={"Current Collateral"}
-              value={`${currentCollateral} ${UNIT}`}
+              value={`${currentCollateral} ${valueUnit}`}
             />
             <DetailRow
               detail={"Current Notional"}
-              value={`${currentNotional} ${UNIT}`}
+              value={`${currentNotional} ${valueUnit}`}
             />
             <DetailRow
               detail={"Initial Collateral"}
-              value={`${initialCollateral} ${UNIT}`}
+              value={`${initialCollateral} ${valueUnit}`}
             />
             <DetailRow
               detail={"Initial Notional"}
-              value={`${initialNotional} ${UNIT}`}
+              value={`${initialNotional} ${valueUnit}`}
             />
             <DetailRow
               detail={"Maintenance"}
-              value={`${maintenanceMargin} ${UNIT}`}
+              value={`${maintenanceMargin} ${valueUnit}`}
             />
           </Flex>
           <Flex direction={"column"} width={"100%"} mt={"30px"}>
