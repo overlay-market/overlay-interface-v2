@@ -1,15 +1,12 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
-import { useState } from "react";
-import ClosedPositionModal from "./ClosedPositionModal";
 import { UnwindPositionData } from "overlay-sdk";
 type UnwindPositionProps = {
   position: UnwindPositionData;
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
-  const [showModal, setShowModal] = useState(false);
 
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
@@ -28,11 +25,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
     : `${position.pnl} OVL`
 
   return (
-    <>
-      <StyledRow
-        style={{ fontSize: "12px" }}
-        onClick={() => setShowModal(true)}
-      >
+    <StyledRow style={{ fontSize: "12px" }}>
         <StyledCell>{position.marketName}</StyledCell>
         <StyledCell>{collateralAmount}</StyledCell>
         <StyledCell>
@@ -59,14 +52,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
             {pnl}
           </Text>
         </StyledCell>
-      </StyledRow>
-
-      <ClosedPositionModal
-        open={showModal}
-        position={position}
-        handleDismiss={() => setShowModal(false)}
-      />
-    </>
+    </StyledRow>
   );
 };
 
