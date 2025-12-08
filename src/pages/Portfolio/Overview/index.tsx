@@ -66,7 +66,7 @@ const Overview: React.FC = () => {
             <MainOverviewCard
               title={"Locked Sum + uPnL"}
               value={overviewData?.lockedPlusUnrealized}
-              unit={UNIT}
+              unit="USDT"
             />
           </MainCardsGrid>
 
@@ -79,20 +79,40 @@ const Overview: React.FC = () => {
             <OverviewCard
               title="Locked Sum"
               value={overviewData?.totalValueLocked}
-              unit={UNIT}
+              unit="USDT"
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
 
             <OverviewCard
               title="Realized"
-              value={overviewData?.realizedPnl}
-              unit={UNIT}
+              isMultiValue={true}
+              value={
+                overviewData ? (
+                  <Flex direction="column" gap="1" style={{ lineHeight: "1.2" }}>
+                    {parseFloat(overviewData.realizedPnlUsdt) !== 0 && (
+                      <>
+                        <Text size="3" weight="bold">{overviewData.realizedPnlUsdt}</Text>
+                        <Text style={{ fontSize: "14px" }}>USDT</Text>
+                      </>
+                    )}
+                    {parseFloat(overviewData.realizedPnlOvl) !== 0 && (
+                      <>
+                        <Text size="3" weight="bold">{overviewData.realizedPnlOvl}</Text>
+                        <Text style={{ fontSize: "14px" }}>OVL</Text>
+                      </>
+                    )}
+                    {parseFloat(overviewData.realizedPnlUsdt) === 0 && parseFloat(overviewData.realizedPnlOvl) === 0 && (
+                      <Text size="3" weight="bold">0</Text>
+                    )}
+                  </Flex>
+                ) : undefined
+              }
             />
 
             <OverviewCard
               title="Unrealized"
               value={overviewData?.unrealizedPnL}
-              unit={UNIT}
+              unit="USDT"
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
           </InfoCardsGrid>
