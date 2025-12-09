@@ -121,21 +121,6 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
       : unwindState.debt
       ? Number(unwindState.debt).toString()
       : undefined;
-    const cost = hasStableValues && unwindState.stableValues?.cost
-      ? unwindState.stableValues.cost
-      : unwindState.cost
-      ? unwindState.cost.toString()
-      : undefined;
-    const currentCollateral = hasStableValues && unwindState.stableValues?.currentCollateral
-      ? unwindState.stableValues.currentCollateral
-      : unwindState.currentCollateral
-      ? Number(unwindState.currentCollateral).toString()
-      : undefined;
-    const currentNotional = hasStableValues && unwindState.stableValues?.currentNotional
-      ? unwindState.stableValues.currentNotional
-      : unwindState.currentNotional
-      ? Number(unwindState.currentNotional).toString()
-      : undefined;
     const initialCollateral = hasStableValues && unwindState.stableValues?.initialCollateral
       ? unwindState.stableValues.initialCollateral
       : unwindState.initialCollateral
@@ -191,9 +176,6 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
       oi,
       leverage,
       debt,
-      cost,
-      currentCollateral,
-      currentNotional,
       initialCollateral,
       initialNotional,
       maintenanceMargin,
@@ -261,15 +243,6 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
             <DetailRow detail={"Open Interest"} value={oi} />
             <DetailRow detail={"Leverage"} value={`${leverage}x`} />
             <DetailRow detail={"Debt"} value={`${debt} ${valueUnit}`} />
-            <DetailRow detail={"Cost"} value={`${cost} ${valueUnit}`} />
-            <DetailRow
-              detail={"Current Collateral"}
-              value={`${currentCollateral} ${valueUnit}`}
-            />
-            <DetailRow
-              detail={"Current Notional"}
-              value={`${currentNotional} ${valueUnit}`}
-            />
             <DetailRow
               detail={"Initial Collateral"}
               value={`${initialCollateral} ${valueUnit}`}
