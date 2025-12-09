@@ -32,10 +32,9 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
 
-  // Format collateral amount with correct decimals
-  const stableDecimals = stableTokenInfo?.decimals ?? 18;
-  const collateralAmount = position.loan
-    ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
+  // Format value (initial collateral + PnL) with correct decimals
+  const valueAmount = position.stableValues?.size
+    ? `${position.stableValues.size} USDT`
     : `${position.size} OVL`;
 
   const handleItemClick = () => {
@@ -50,7 +49,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
       <StyledRow onClick={handleItemClick}>
         <StyledCell>
           <Flex gap="6px" align="center">
-            {collateralAmount}
+            {valueAmount}
             {position.deprecated && (
               <Tooltip
                 content="This position was built on a deprecated version of the market. You can still unwind it."

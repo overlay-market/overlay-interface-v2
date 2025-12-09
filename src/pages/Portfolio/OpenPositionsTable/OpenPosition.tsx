@@ -50,10 +50,10 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     : 'OVL';
   const isFundingPositive = Number(position.parsedFunding) > 0;
 
-  // Format collateral amount with correct decimals
+  // Format value (initial collateral + PnL) with correct decimals
   const stableDecimals = stableTokenInfo?.decimals ?? 18;
-  const collateralAmount = hasLoan && position.loan
-    ? `${Number(formatUnits(BigInt(position.loan.stableAmount), stableDecimals)).toFixed(2)} USDT`
+  const valueAmount = position.stableValues?.size
+    ? `${position.stableValues.size} USDT`
     : `${position.size} OVL`;
 
   const handleItemClick = (event: React.MouseEvent) => {
@@ -106,7 +106,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             )}
           </Flex>
         </StyledCell>
-        <StyledCell>{collateralAmount}</StyledCell>
+        <StyledCell>{valueAmount}</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
             {positionLeverage && Number(positionLeverage.slice(0, -1))}x
