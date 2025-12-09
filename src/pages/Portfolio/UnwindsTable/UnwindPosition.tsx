@@ -25,7 +25,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
     : `${position.pnl} OVL`
 
   return (
-    <StyledRow style={{ fontSize: "12px" }}>
+    <StyledRow style={{ fontSize: "12px", cursor: "default" }}>
         <StyledCell>{position.marketName}</StyledCell>
         <StyledCell>{collateralAmount}</StyledCell>
         <StyledCell>
