@@ -4,15 +4,12 @@ import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useState } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
-import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
-import { formatUnits } from "viem";
 
 type OpenPositionProps = {
   position: OpenPositionData;
 };
 
 const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
-  const { data: stableTokenInfo } = useStableTokenInfo();
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);

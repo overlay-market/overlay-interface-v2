@@ -7,7 +7,6 @@ import useAccount from "../../../hooks/useAccount";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import MainOverviewCard from "./MainOverviewCard";
 import OverviewChart from "./OverviewChart";
-import { UNIT } from "../../../constants/applications";
 import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
