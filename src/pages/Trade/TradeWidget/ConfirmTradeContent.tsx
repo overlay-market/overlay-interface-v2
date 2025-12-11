@@ -100,12 +100,16 @@ const ConfirmTradeContent: React.FC<ConfirmTradeContentProps> = ({
 
       <Flex mt={"48px"} direction={"column"} width={"100%"}>
         <DetailRow
-          detail={"Estimated Collateral"}
-          value={
-            collateralType === 'USDT'
-              ? `${typedValue || '0'} USDT`
-              : `${formatNumberForDisplay(tradeState.estimatedCollateral)} OVL`
-          }
+          detail={"Initial Collateral"}
+          value={`${formatNumberForDisplay(tradeState.initialCollateral)} ${collateralType}`}
+        />
+        <DetailRow
+          detail={"Build Fee"}
+          value={`${formatNumberForDisplay(tradeState.buildFee)} ${collateralType}`}
+        />
+        <DetailRow
+          detail={"Total Cost"}
+          value={`${formatNumberForDisplay(tradeState.totalCost)} ${collateralType}`}
         />
         <DetailRow detail={"Estimated OI"} value={expectedOi} />
       </Flex>

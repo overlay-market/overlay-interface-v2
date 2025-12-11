@@ -320,7 +320,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       }
 
       // Parse stable amount with correct decimals
-      const stableAmount = parseUnits(typedValue, stableTokenInfo.decimals);
+      // Use totalCost from tradeState (user input + fees) instead of just user input
+      const stableAmount = parseUnits(tradeState.totalCost.toString(), stableTokenInfo.decimals);
 
       // Validate LBSC has sufficient liquidity and get preview
       const validation = await sdk.lbsc.getPreviewWithValidation(stableAmount);
