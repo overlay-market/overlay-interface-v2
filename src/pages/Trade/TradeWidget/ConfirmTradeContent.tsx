@@ -24,7 +24,7 @@ const ConfirmTradeContent: React.FC<ConfirmTradeContentProps> = ({
   handleTrade,
 }) => {
   const { currentMarket: market } = useCurrentMarketState();
-  const { slippageValue, isLong, selectedLeverage, typedValue } = useTradeState();
+  const { slippageValue, isLong, selectedLeverage } = useTradeState();
   const collateralType = useCollateralType();
 
   const price: string = useMemo(() => {

@@ -6,7 +6,6 @@ import DetailRow from "../../Modal/DetailRow";
 import { UNIT } from "../../../constants/applications";
 import { ScrollContentWrapper } from "./unwind-position-details-styles";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
-import { formatUnits } from "viem";
 import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
 type UnwindPositionDetailsProps = {
