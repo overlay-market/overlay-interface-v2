@@ -26,6 +26,7 @@ type UnwindPositionProps = {
   stableQuote: { minOut: bigint; expectedOut: bigint } | null;
   quoteLoading: boolean;
   quoteFailed: boolean;
+  slippageValue: string | number;
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({
@@ -39,6 +40,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   stableQuote,
   quoteLoading,
   quoteFailed,
+  slippageValue,
 }) => {
   const [percentageValue, setPercentageValue] = useState<string>("");
   const [selectedPercent, setSelectedPercent] = useState<number>(0);
@@ -240,6 +242,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         stableQuote={stableQuote}
         quoteLoading={quoteLoading}
         quoteFailed={quoteFailed}
+        slippageValue={slippageValue}
       />
     </>
   );

@@ -109,18 +109,18 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
 
       try {
         // For LBSC positions, calculate quote using oracle price instead of simulation
-        // This matches the approach used for detail values
+        // Calculate PnL in USDT, not full position value
         const oraclePrice = await sdk.lbsc.getOraclePrice();
 
-        // Get the position value in wei from unwindState
-        const positionValueStr = isUnwindStateSuccess(unwindState) ? unwindState.value : '0';
-        const positionValueWei = BigInt(Math.floor(Number(positionValueStr) * 1e18));
+        // Get the PnL value in wei from unwindState (not the full position value)
+        const pnlStr = isUnwindStateSuccess(unwindState) ? unwindState.pnl : '0';
+        const pnlWei = BigInt(Math.floor(Number(pnlStr) * 1e18));
 
-        // Calculate expected USDT output: (OVL value * oracle price) / WAD
+        // Calculate expected USDT PnL: (OVL PnL * oracle price) / WAD
         const WAD = BigInt(1e18);
-        const expectedOut = (positionValueWei * oraclePrice) / WAD;
+        const expectedOut = (pnlWei * oraclePrice) / WAD;
 
-        // Calculate minimum output with slippage: expectedOut * (100 - slippage) / 100
+        // Calculate minimum PnL with slippage: expectedOut * (100 - slippage) / 100
         const slippagePercent = Number(slippageValue);
         const minOut = (expectedOut * BigInt(100 - slippagePercent)) / BigInt(100);
 
@@ -190,6 +190,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
           stableQuote={stableQuote}
           quoteLoading={quoteLoading}
           quoteFailed={quoteFailed}
+          slippageValue={slippageValue}
         />
       )}
 

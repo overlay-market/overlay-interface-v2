@@ -15,6 +15,7 @@ type UnwindPositionDetailsProps = {
   stableQuote?: { minOut: bigint; expectedOut: bigint } | null;
   quoteLoading?: boolean;
   quoteFailed?: boolean;
+  slippageValue?: string | number;
 };
 
 const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
@@ -23,6 +24,7 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
   stableQuote,
   quoteLoading,
   quoteFailed,
+  slippageValue,
 }) => {
   const { data: stableTokenInfo } = useStableTokenInfo();
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
@@ -68,30 +70,22 @@ const UnwindPositionDetails: React.FC<UnwindPositionDetailsProps> = ({
         pnlUnit = UNIT;
       }
     } else if (pnlNumber > 0 && position.loan) {
-      // Positive PnL with loan: Try to use quote from simulation
-      if (quoteLoading) {
-        pnlDisplay = 'Calculating...';
-        pnlUnit = '';
-        minReceivedDisplay = '-';
-      } else if (stableQuote && stableTokenInfo) {
-        // Quote successful - show expected and minimum
-        const expectedAmount = formatUnits(stableQuote.expectedOut, stableTokenInfo.decimals);
-        const minAmount = formatUnits(stableQuote.minOut, stableTokenInfo.decimals);
-
-        pnlDisplay = Number(expectedAmount) < 1
-          ? Number(expectedAmount).toFixed(6)
-          : Number(expectedAmount).toFixed(2);
+      // Positive PnL with loan: Use pre-calculated stableValues from SDK
+      if (position.stableValues?.unrealizedPnL && stableTokenInfo) {
+        // Use SDK's pre-calculated USDT PnL (matches Open Positions table)
+        pnlDisplay = position.stableValues.unrealizedPnL;
         pnlUnit = 'USDT';
 
-        minReceivedDisplay = Number(minAmount) < 1
-          ? `${Number(minAmount).toFixed(6)} USDT`
-          : `${Number(minAmount).toFixed(2)} USDT`;
-      } else if (quoteFailed && position.stableValues?.unrealizedPnL) {
-        // Quote failed: Fall back to oracle price estimate
-        pnlDisplay = position.stableValues.unrealizedPnL;
-        pnlUnit = 'USDT (estimate)';
+        // Calculate minimum received by applying slippage to the PnL
+        const pnlNum = parseFloat(position.stableValues.unrealizedPnL);
+        const slippagePercent = typeof slippageValue === 'string' ? parseFloat(slippageValue) : (slippageValue || 0);
+        const minReceived = pnlNum * (100 - slippagePercent) / 100;
+
+        minReceivedDisplay = minReceived < 1
+          ? `${minReceived.toFixed(6)} USDT`
+          : `${minReceived.toFixed(2)} USDT`;
       } else {
-        // No quote available: show OVL
+        // No stable values available: show OVL
         pnlDisplay = pnl || '0';
         pnlUnit = UNIT;
       }
