@@ -44,6 +44,28 @@ const Analytics: React.FC = () => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
     null
   );
+  const [oraclePrice, setOraclePrice] = useState<bigint | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchOraclePrice = async () => {
+      try {
+        const price = await sdk.lbsc.getOraclePrice();
+        if (!cancelled) {
+          setOraclePrice(price);
+        }
+      } catch (error) {
+        console.error("Error fetching oracle price:", error);
+      }
+    };
+
+    fetchOraclePrice();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sdk]);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,12 +114,16 @@ const Analytics: React.FC = () => {
 
   const formatAndTransform = (value: string) => {
     if (value.trim() === "") return " ";
+    if (!oraclePrice) return " ";
 
     const bigIntValue = BigInt(value);
-    const divisor = BigInt(1e18);
-    const formattedValue = bigIntValue / divisor;
+    const WAD = BigInt(1e18);
 
-    return formattedValue
+    // Convert OVL to USDT: (ovlValue * oraclePrice) / WAD
+    const ovlValue = bigIntValue / WAD;
+    const usdtValue = (ovlValue * oraclePrice) / WAD;
+
+    return usdtValue
       .toLocaleString("en-US", {
         maximumFractionDigits: 0,
       })
@@ -114,7 +140,7 @@ const Analytics: React.FC = () => {
     } else {
       return " ";
     }
-  }, [analyticsData?.markets]);
+  }, [analyticsData?.markets, oraclePrice]);
 
   const totalTokensLocked = useMemo(() => {
     if (analyticsData && analyticsData.tokenPositions.length > 0) {
@@ -129,7 +155,7 @@ const Analytics: React.FC = () => {
     } else {
       return " ";
     }
-  }, [analyticsData?.tokenPositions]);
+  }, [analyticsData?.tokenPositions, oraclePrice]);
 
   const totalTransactions = useMemo(() => {
     if (analyticsData?.markets && analyticsData.markets.length > 0) {
