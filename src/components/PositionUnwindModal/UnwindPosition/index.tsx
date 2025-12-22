@@ -14,6 +14,7 @@ import UnwindButtonComponent from "./UnwindButtonComponent";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import useDebounce from "../../../hooks/useDebounce";
 import usePrevious from "../../../hooks/usePrevious";
+import { useUnwindPreference } from "../../../state/trade/hooks";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
@@ -47,6 +48,13 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   const debouncedSelectedPercent = useDebounce(selectedPercent, 500);
 
   const hasLoan = !!position.loan?.id;
+  const unwindPreference = useUnwindPreference();
+
+  // Only use stable unwind if:
+  // 1. User preference is 'stable'
+  // 2. Position has positive PnL (profitable)
+  const isPositionProfitable = unwindState && Number(unwindState.pnl) > 0;
+  const shouldUseStableUnwind = unwindPreference === 'stable' && isPositionProfitable;
 
   const { value, currentPrice, fractionValue, unwindBtnState } = useMemo(() => {
     const value = unwindState.value
@@ -81,8 +89,15 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
       Number(inputValue) === 0
     )
       return false;
+
+    // Don't block if user has entered a valid input value
+    // This prevents issues with stable unwind state refetching
+    if (inputValue && Number(inputValue) > 0) {
+      return false;
+    }
+
     return fractionValue === previousFractionValue && !hasLoan;
-  }, [fractionValue, previousFractionValue]);
+  }, [fractionValue, previousFractionValue, inputValue, hasLoan]);
 
   const maxAmount: number = useMemo(() => Number(value) ?? 0, [value]);
 
@@ -231,7 +246,7 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           priceLimit={unwindState.priceLimit}
           unwindBtnState={unwindBtnState}
           isPendingTime={isPendingTime}
-          unwindStable={true} // TODO handle toggle
+          unwindStable={shouldUseStableUnwind}
           handleDismiss={handleDismiss}
         />
       </Flex>

@@ -21,4 +21,7 @@ export const setTokenState = createAction<{
 export const setCollateralType = createAction<{
   collateralType: 'OVL' | 'USDT';
 }>('trade/setCollateralType');
+export const setUnwindPreference = createAction<{
+  unwindPreference: 'normal' | 'stable';
+}>('trade/setUnwindPreference');
 export const resetTradeState = createAction<void>('trade/resetTradeState');

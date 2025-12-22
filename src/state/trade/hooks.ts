@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setCollateralType, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setCollateralType, setSlippage, setTokenState, setUnwindPreference, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import {  TokenAmount } from "@lifi/sdk";
@@ -21,6 +21,10 @@ export function useTradeState(): AppState['trade'] {
 
 export function useCollateralType(): 'OVL' | 'USDT' {
   return useAppSelector((state) => state.trade.collateralType);
+}
+
+export function useUnwindPreference(): 'normal' | 'stable' {
+  return useAppSelector((state) => state.trade.unwindPreference);
 }
 
 export function useChainAndTokenState(): {
@@ -50,6 +54,7 @@ export const useTradeActionHandlers = (): {
   handleChainStateChange: (chainState: SelectState) => void;
   handleTokenStateChange: (tokenState: SelectState) => void;
   handleCollateralTypeChange: (collateralType: 'OVL' | 'USDT') => void;
+  handleUnwindPreferenceChange: (unwindPreference: 'normal' | 'stable') => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -132,6 +137,14 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   );
 
+  const handleUnwindPreferenceChange = useCallback(
+    (unwindPreference: 'normal' | 'stable') => {
+      dispatch(setUnwindPreference({ unwindPreference }));
+      localStorage.setItem('unwindPreference', unwindPreference);
+    },
+    [dispatch]
+  );
+
   const handleTxnHashUpdate =  useCallback(
     async (txnHash: string, txnBlockNumber: number) => {
       const checkSubgraphBlock = async () => {
@@ -167,6 +180,7 @@ export const useTradeActionHandlers = (): {
     handleChainStateChange,
     handleTokenStateChange,
     handleCollateralTypeChange,
+    handleUnwindPreferenceChange,
     handleTradeStateReset,
   }
 };

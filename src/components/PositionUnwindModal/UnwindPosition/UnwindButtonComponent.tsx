@@ -95,13 +95,59 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         priceLimit,
       };
 
-      const result = unwindStable
-        ? await sdk.shiva.unwindStable({
+      let result;
+
+      // Try stable unwind if preference is set
+      if (unwindStable) {
+        try {
+          result = await sdk.shiva.unwindStable({
             ...unwindParams,
             account: address as Address,
             slippage,
-          })
-        : await sdk.market.unwind(unwindParams);
+          });
+        } catch (stableError: any) {
+          // Check if user rejected the transaction
+          const isUserRejection =
+            stableError?.code === 4001 ||
+            stableError?.code === "ACTION_REJECTED" ||
+            stableError?.message?.toLowerCase().includes('user rejected') ||
+            stableError?.message?.toLowerCase().includes('user denied');
+
+          if (isUserRejection) {
+            // User rejected - don't fallback, just throw the error
+            throw stableError;
+          }
+
+          // Check if it's a swap/1inch related error (not user rejection)
+          const isSwapError =
+            stableError?.message?.includes('1Inch') ||
+            stableError?.message?.includes('swap') ||
+            stableError?.message?.includes('Failed to fetch swap data');
+
+          if (isSwapError) {
+            // Fallback to normal unwind only for swap errors
+            result = await sdk.market.unwind(unwindParams);
+
+            // Inform user about fallback
+            addPopup(
+              {
+                txn: {
+                  hash: currentTimeForId,
+                  success: null,
+                  message: "USDT conversion unavailable. Proceeding with OVL unwind.",
+                  type: TransactionType.UNWIND_OVL_POSITION,
+                },
+              },
+              currentTimeForId
+            );
+          } else {
+            // Unknown error - don't fallback, throw it
+            throw stableError;
+          }
+        }
+      } else {
+        result = await sdk.market.unwind(unwindParams);
+      }
 
       let receipt = result.receipt;
 

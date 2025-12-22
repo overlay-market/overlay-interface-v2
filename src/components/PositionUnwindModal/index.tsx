@@ -14,7 +14,7 @@ import Loader from "../Loader";
 import UnwindPosition from "./UnwindPosition";
 import PositionNotFound from "./PositionNotFound";
 import WithdrawOVL from "./WithdrawOVL";
-import { useTradeState } from "../../state/trade/hooks";
+import { useTradeState, useUnwindPreference } from "../../state/trade/hooks";
 import useSDK from "../../providers/SDKProvider/useSDK";
 
 type PositionUnwindModalProps = {
@@ -33,6 +33,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
   const isUnwindStateSuccess = useTypeGuard<UnwindStateSuccess>("pnl");
   const isUnwindStateError = useTypeGuard<UnwindStateError>("error");
   const { slippageValue } = useTradeState();
+  const unwindPreference = useUnwindPreference();
 
   const [unwindState, setUnwindState] = useState<UnwindStateData | undefined>(
     undefined
@@ -81,7 +82,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     };
   }, [position, account, open, slippageValue, unwindPercentage]);
 
-  // Fetch USDT quote once when modal opens for LBSC positions with positive PnL
+  // Fetch USDT quote when modal opens if preference is 'stable' and position has positive PnL
   useEffect(() => {
     // Only fetch when modal opens
     if (!open) {
@@ -89,13 +90,13 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
       return;
     }
 
-    // Only fetch for LBSC positions (with loan) and positive unrealized PnL
-    if (!position?.loan || !unwindState || !account) {
+    // Fetch based on preference setting (for all positions when stable is preferred)
+    if (unwindPreference !== 'stable' || !unwindState || !account) {
       setStableQuote(null);
       return;
     }
 
-    // Check if PnL is positive
+    // Check if PnL is positive (only fetch for profitable positions)
     if (isUnwindStateSuccess(unwindState) && Number(unwindState.pnl) <= 0) {
       setStableQuote(null);
       return;
@@ -146,7 +147,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     return () => {
       isCancelled = true;
     };
-  }, [open, position?.loan, unwindState, account, slippageValue, sdk, isUnwindStateSuccess]);
+  }, [open, unwindPreference, unwindState, account, slippageValue, sdk, isUnwindStateSuccess]);
 
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
