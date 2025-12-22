@@ -4,6 +4,7 @@ import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
 import { useState } from "react";
 import { OpenPositionData } from "overlay-sdk";
+import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -46,10 +47,12 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     : 'OVL';
   const isFundingPositive = Number(position.parsedFunding) > 0;
 
-  // Format value (initial collateral + PnL) with correct decimals
-  const valueAmount = position.stableValues?.size
-    ? `${position.stableValues.size} USDT`
-    : `${position.size} OVL`;
+  const currentSize = positionLeverage && 
+    (
+      position.stableValues?.initialCollateral
+        ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
+        : formatNumberWithCommas((Number(position.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' OVL'
+    );
 
   const handleItemClick = (event: React.MouseEvent) => {
     if (position.size === "0") return;
@@ -101,7 +104,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             )}
           </Flex>
         </StyledCell>
-        <StyledCell>{valueAmount}</StyledCell>
+        <StyledCell>{currentSize}</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
             {positionLeverage && Number(positionLeverage.slice(0, -1))}x
