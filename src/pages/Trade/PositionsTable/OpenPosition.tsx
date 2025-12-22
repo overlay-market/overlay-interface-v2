@@ -4,6 +4,7 @@ import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useState } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
+import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -29,10 +30,12 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
 
-  // Format value (initial collateral + PnL) with correct decimals
-  const valueAmount = position.stableValues?.size
-    ? `${position.stableValues.size} USDT`
-    : `${position.size} OVL`;
+  const currentSize = positionLeverage && 
+    (
+      position.stableValues?.initialCollateral
+        ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
+        : formatNumberWithCommas((Number(position.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' OVL'
+    );
 
   const handleItemClick = () => {
     if (position.size === "0") return;
@@ -46,7 +49,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
       <StyledRow onClick={handleItemClick}>
         <StyledCell>
           <Flex gap="6px" align="center">
-            {valueAmount}
+            {currentSize}
             {position.deprecated && (
               <Tooltip
                 content="This position was built on a deprecated version of the market. You can still unwind it."
