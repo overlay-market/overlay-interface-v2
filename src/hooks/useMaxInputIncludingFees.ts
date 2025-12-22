@@ -84,9 +84,14 @@ export const useMaxInputIncludingFees = ({
             args: [address],
           });
 
-          // Format based on actual token decimals
-          const formatted = Number(balance) / Math.pow(10, decimals);
-          return Number(formatted.toFixed(6));
+          // Use SDK method to calculate max input accounting for fees
+          // This method works with any balance (OVL or USDT)
+          return await sdk.trade.getMaxInputIncludingFeesFromBalance(
+            marketId,
+            balance,  // Pass USDT balance
+            toWei(selectedLeverage),
+            Number(decimals)  // Ensure decimals is a number
+          );
         } catch (error) {
           console.error('Error fetching USDT balance:', error);
           return 0;
