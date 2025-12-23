@@ -86,12 +86,16 @@ export const useMaxInputIncludingFees = ({
 
           // Use SDK method to calculate max input accounting for fees
           // This method works with any balance (OVL or USDT)
-          return await sdk.trade.getMaxInputIncludingFeesFromBalance(
+          const maxInputIncludingFees = await sdk.trade.getMaxInputIncludingFeesFromBalance(
             marketId,
             balance,  // Pass USDT balance
             toWei(selectedLeverage),
             Number(decimals)  // Ensure decimals is a number
           );
+
+          // round maxInputIncludingFees to avoid precision issues
+          const roundedMaxInputIncludingFees = Math.floor(Number(maxInputIncludingFees) * 10 ** (2)) / (10 ** 2);
+          return roundedMaxInputIncludingFees;
         } catch (error) {
           console.error('Error fetching USDT balance:', error);
           return 0;
