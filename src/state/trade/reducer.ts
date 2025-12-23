@@ -11,7 +11,8 @@ import {
   selectToken,
   setChainState,
   setTokenState,
-  setCollateralType
+  setCollateralType,
+  setUnwindPreference
 } from "./actions";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { getFromLocalStorage } from "../../utils/getFromLocalStorage";
@@ -31,6 +32,7 @@ export interface TradeState {
   readonly chainState: SelectState;
   readonly tokenState: SelectState;
   readonly collateralType: 'OVL' | 'USDT';
+  readonly unwindPreference: 'normal' | 'stable';
 }
 
 export const initialState: TradeState = {
@@ -49,6 +51,7 @@ export const initialState: TradeState = {
   chainState: SelectState.LOADING,
   tokenState: SelectState.LOADING,
   collateralType: getFromLocalStorage('collateralType', 'USDT') as 'OVL' | 'USDT',
+  unwindPreference: getFromLocalStorage('unwindPreference', 'stable') as 'normal' | 'stable',
 };
 
 export default createReducer<TradeState>(initialState, (builder) =>
@@ -83,6 +86,9 @@ export default createReducer<TradeState>(initialState, (builder) =>
     })
     .addCase(setCollateralType, (state, action) => {
       state.collateralType = action.payload.collateralType;
+    })
+    .addCase(setUnwindPreference, (state, action) => {
+      state.unwindPreference = action.payload.unwindPreference;
     })
     .addCase(resetTradeState, (state) => {
       state.typedValue = initialState.typedValue;

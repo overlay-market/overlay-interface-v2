@@ -36,7 +36,7 @@ const CollateralInputComponent: React.FC = () => {
   const handleMaxInput = useCallback(() => {
     if (maxInputIncludingFees > 0) {
       setIsMaxSelected(true);
-      handleUserInput(maxInputIncludingFees.toFixed(6));
+      handleUserInput(maxInputIncludingFees.toString());
     }
   }, [maxInputIncludingFees, handleUserInput]);
 
@@ -68,7 +68,7 @@ const CollateralInputComponent: React.FC = () => {
               opacity: isLoading ? 0.6 : 1,
             }}
           >
-            {isLoading ? "Loading..." : `Max: ${maxInputIncludingFees} ${collateralType}`}
+            {isLoading ? "Loading..." : `Max: ${maxInputIncludingFees.toFixed(6).replace(/\.?0+$/, '')} ${collateralType}`}
           </Text>
           {error && (
             <Text size="1" style={{ color: theme.color.red1 }}>
