@@ -9,6 +9,7 @@ import {
 } from "../../../state/trade/hooks";
 import { useSearchParams } from "react-router-dom";
 import { useMaxInputIncludingFees } from "../../../hooks/useMaxInputIncludingFees";
+import LiFiModal from "../../../components/LiFiModal";
 
 const CollateralInputComponent: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -21,6 +22,7 @@ const CollateralInputComponent: React.FC = () => {
   });
 
   const [isMaxSelected, setIsMaxSelected] = useState<boolean>(false);
+  const [showLiFiModal, setShowLiFiModal] = useState<boolean>(false);
 
   const handleUserInput = useCallback(
     (input: string) => {
@@ -77,16 +79,41 @@ const CollateralInputComponent: React.FC = () => {
           )}
         </Flex>
 
-        <Flex justify="between">
+        <Flex justify="between" align="center">
           <NumericalInput
             value={typedValue}
             handleUserInput={handleUserInput}
           />
-          <Text size="3" weight={"bold"} style={{ color: theme.color.blue1 }}>
-            {collateralType}
-          </Text>
+          <Flex align="center" gap="8px">
+            <Text size="3" weight={"bold"} style={{ color: theme.color.blue1 }}>
+              {collateralType}
+            </Text>
+            {collateralType === "USDT" && (
+              <Flex
+                align="center"
+                gap="4px"
+                style={{
+                  cursor: "pointer",
+                  color: theme.color.blue3,
+                  background: 'rgba(18, 180, 255, 0.1)',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  border: `1px solid ${theme.color.blue3}`
+                }}
+                onClick={() => setShowLiFiModal(true)}
+              >
+                <Text size="1" weight="bold">GET</Text>
+                <img
+                  src="https://zengo.com/wp-content/uploads/USDT-BEP20-1.png"
+                  alt="USDT"
+                  style={{ width: '16px', height: '16px' }}
+                />
+              </Flex>
+            )}
+          </Flex>
         </Flex>
       </Flex>
+      <LiFiModal open={showLiFiModal} handleClose={() => setShowLiFiModal(false)} />
     </Box>
   );
 };
