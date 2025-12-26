@@ -45,7 +45,7 @@ const App = () => {
                 <Routes>
                   <Route path="/" element={<Navigate to="/markets" />} />
                   <Route path="/markets" element={<Markets />} />
-                  <Route path="/trade" element={<Trade />} />
+                  <Route path="/trade/*" element={<Trade />} />
                   <Route path="/portfolio" element={<Portfolio />} />
                   <Route path="/leaderboard" element={<Leaderboard />} />
                   <Route
