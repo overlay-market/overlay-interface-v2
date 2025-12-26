@@ -92,7 +92,6 @@ const Trade: React.FC = () => {
 
       <Flex direction="column">
         <StyledFlex
-          height={{ initial: "auto", sm: "561px" }}
           width={"100%"}
           direction={{ initial: "column", sm: "row" }}
           align={{ initial: "center", sm: "start" }}

@@ -392,7 +392,7 @@ const TimelineContainer = styled.div`
     min-height: 561px;
   }
 
-  @media (min-width: ${theme.breakpoints.xxl}) {
+  @media (min-width: 1536px) {
     min-height: 643px;
   }
 `;
