@@ -3,8 +3,14 @@ import styled from "styled-components";
 import theme from "../../theme";
 
 export const StyledFlex = styled(Flex)`
-  @media (min-width: ${theme.breakpoints.xxl}) {
-    height: 643px;
+  min-height: auto;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-height: 561px;
+  }
+
+  @media (min-width: 1536px) {
+    min-height: 643px;
   }
 `;
 

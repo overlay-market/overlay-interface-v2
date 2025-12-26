@@ -92,7 +92,6 @@ export default createReducer<TradeState>(initialState, (builder) =>
     })
     .addCase(resetTradeState, (state) => {
       state.typedValue = initialState.typedValue;
-      state.selectedLeverage = initialState.selectedLeverage;
       state.isLong = initialState.isLong;
     })
 );
