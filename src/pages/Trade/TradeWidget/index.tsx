@@ -129,6 +129,12 @@ const TradeWidget: React.FC = () => {
   }, [selectedLeverage]);
 
   useEffect(() => {
+    if (marketId && !isGambling) {
+      handleLeverageSelect("5");
+    }
+  }, [marketId, isGambling, handleLeverageSelect]);
+
+  useEffect(() => {
     if (!isGambling) {
       return;
     }
@@ -345,8 +351,8 @@ const TradeWidget: React.FC = () => {
                     {previewLoading
                       ? "Calculating..."
                       : ovlPreview
-                      ? `~${ovlPreview} OVL`
-                      : "-"}
+                        ? `~${ovlPreview} OVL`
+                        : "-"}
                   </Text>
                 </Flex>
                 <Flex justify="between">
@@ -371,13 +377,12 @@ const TradeWidget: React.FC = () => {
                   </Flex>
                   <Text size="1" style={{ color: theme.color.grey2 }}>
                     {stableTokenInfo?.oraclePrice
-                      ? `1 OVL = $${
-                          formatWeiToParsedNumber(
-                            stableTokenInfo.oraclePrice,
-                            18,
-                            4
-                          )?.toFixed(4) ?? "0.0000"
-                        }`
+                      ? `1 OVL = $${formatWeiToParsedNumber(
+                        stableTokenInfo.oraclePrice,
+                        18,
+                        4
+                      )?.toFixed(4) ?? "0.0000"
+                      }`
                       : "-"}
                   </Text>
                 </Flex>
