@@ -2,9 +2,10 @@ import { Flex, Text, Badge, Tooltip } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
 import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -30,7 +31,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
 
-  const currentSize = positionLeverage && 
+  const currentSize = positionLeverage &&
     (
       position.stableValues?.initialCollateral
         ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
@@ -43,6 +44,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     setSelectedPosition(position);
     setShowModal(true);
   };
+
+  const isDoubleOrNothing = useMemo(
+    () => isGamblingMarket(position.marketName),
+    [position.marketName]
+  );
 
   return (
     <>
@@ -73,8 +79,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
             </Text>
           </Flex>
         </StyledCell>
-        <StyledCell>{position.entryPrice}</StyledCell>
-        <StyledCell>{position.liquidatePrice}</StyledCell>
+        <StyledCell>{isDoubleOrNothing ? "-" : position.entryPrice}</StyledCell>
+        <StyledCell>{isDoubleOrNothing ? "-" : position.liquidatePrice}</StyledCell>
         <StyledCell>
           <Text
             style={{
