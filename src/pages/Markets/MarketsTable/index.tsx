@@ -53,11 +53,6 @@ export default function MarketsTable({
 
   const isMobile = useMediaQuery("(max-width: 767px)");
 
-  const categoryOptions = React.useMemo<(CategoryName | "All")[]>(
-    () => ["All", ...(Object.keys(MARKET_CATEGORIES) as CategoryName[])],
-    []
-  );
-
   const { categoryIdsMap, categorizedIds } = React.useMemo(() => {
     const allIds = new Set<string>();
     const map = new Map<CategoryName, Set<string>>();
@@ -72,6 +67,30 @@ export default function MarketsTable({
 
     return { categoryIdsMap: map, categorizedIds: allIds };
   }, []);
+
+  const isLoadingMarkets =
+    marketsData.length === 0 && otherChainMarketsData.length === 0;
+
+  const categoryOptions = React.useMemo<(CategoryName | "All")[]>(() => {
+    if (isLoadingMarkets) return [];
+
+    const allMarketsId = new Set(marketsData.map((m) => m.marketId));
+
+    const liveCategories = (Object.keys(MARKET_CATEGORIES) as CategoryName[]).filter(
+      (category) => {
+        if (category === CategoryName.Other) {
+          return (
+            marketsData.some((m) => !categorizedIds.has(m.marketId)) ||
+            otherChainMarketsData.some((m) => !categorizedIds.has(m.marketId))
+          );
+        }
+        const idsInCategory = MARKET_CATEGORIES[category];
+        return idsInCategory.some((id) => allMarketsId.has(id));
+      }
+    );
+
+    return ["All", ...liveCategories];
+  }, [isLoadingMarkets, marketsData, otherChainMarketsData, categorizedIds]);
 
   const filteredMarketsData = React.useMemo(() => {
     if (selectedCategory === "All") return marketsData;
@@ -220,22 +239,28 @@ export default function MarketsTable({
           <ChevronDownIcon style={{ transform: "rotate(90deg)" }} />
         </ScrollIndicator>
         <CategoriesBar ref={scrollRef}>
-          {categoryOptions.map((category) => {
-            const isNew = NEW_CATEGORIES.includes(category as CategoryName);
-
-            return (
-              <CategoryButton
-                key={category}
-                type="button"
-                $active={selectedCategory === category}
-                aria-pressed={selectedCategory === category}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category === "All" ? "All" : category}
-                {isNew && <NewBadge>New</NewBadge>}
+          {isLoadingMarkets
+            ? Array.from({ length: 8 }).map((_, i) => (
+              <CategoryButton key={i} type="button" $active={false} style={{ pointerEvents: 'none' }}>
+                <Skeleton width="60px" height="20px" />
               </CategoryButton>
-            );
-          })}
+            ))
+            : categoryOptions.map((category) => {
+              const isNew = NEW_CATEGORIES.includes(category as CategoryName);
+
+              return (
+                <CategoryButton
+                  key={category}
+                  type="button"
+                  $active={selectedCategory === category}
+                  aria-pressed={selectedCategory === category}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category === "All" ? "All" : category}
+                  {isNew && <NewBadge>New</NewBadge>}
+                </CategoryButton>
+              );
+            })}
         </CategoriesBar>
         <ScrollIndicator
           $visible={showScrollRight}
