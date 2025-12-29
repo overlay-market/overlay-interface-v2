@@ -189,7 +189,7 @@ export enum CategoryName {
   Chess = "Chess",
   Artists = "Artists",
   Bera = "Bera",
-  Fansly = "Fansly",
+  Fansly = "Adult Content Creators",
   Other = "Other",
   YouTube = "YouTube",
   Twitter = "Twitter",
@@ -266,6 +266,9 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Indices]: [
     "Strategic%20Reserve%20Index",
     "Made%20In%20USA%20Index",
+    "SOL%20Index",
+    "Binance%20Alpha%20Index",
+    "AI%20Index",
     "AI%20Agents%20Index",
   ],
   [CategoryName.Majors]: [
