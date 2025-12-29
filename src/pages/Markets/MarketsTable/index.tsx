@@ -68,8 +68,7 @@ export default function MarketsTable({
     return { categoryIdsMap: map, categorizedIds: allIds };
   }, []);
 
-  const isLoadingMarkets =
-    marketsData.length === 0 && otherChainMarketsData.length === 0;
+  const isLoadingMarkets = marketsData.length === 0;
 
   const categoryOptions = React.useMemo<(CategoryName | "All")[]>(() => {
     if (isLoadingMarkets) return [];
@@ -79,10 +78,7 @@ export default function MarketsTable({
     const liveCategories = (Object.keys(MARKET_CATEGORIES) as CategoryName[]).filter(
       (category) => {
         if (category === CategoryName.Other) {
-          return (
-            marketsData.some((m) => !categorizedIds.has(m.marketId)) ||
-            otherChainMarketsData.some((m) => !categorizedIds.has(m.marketId))
-          );
+          return marketsData.some((m) => !categorizedIds.has(m.marketId));
         }
         const idsInCategory = MARKET_CATEGORIES[category];
         return idsInCategory.some((id) => allMarketsId.has(id));
@@ -90,7 +86,7 @@ export default function MarketsTable({
     );
 
     return ["All", ...liveCategories];
-  }, [isLoadingMarkets, marketsData, otherChainMarketsData, categorizedIds]);
+  }, [isLoadingMarkets, marketsData, categorizedIds]);
 
   const filteredMarketsData = React.useMemo(() => {
     if (selectedCategory === "All") return marketsData;
