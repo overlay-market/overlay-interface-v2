@@ -2,8 +2,9 @@ import { Flex, Text, Badge, Tooltip } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -26,6 +27,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     setSelectedPosition(position);
     setShowModal(true);
   };
+
+  const isDoubleOrNothing = useMemo(
+    () => isGamblingMarket(position.marketName),
+    [position.marketName]
+  );
 
   return (
     <>
@@ -56,8 +62,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
             </Text>
           </Flex>
         </StyledCell>
-        <StyledCell>{position.entryPrice}</StyledCell>
-        <StyledCell>{position.liquidatePrice}</StyledCell>
+        <StyledCell>{isDoubleOrNothing ? "-" : position.entryPrice}</StyledCell>
+        <StyledCell>{isDoubleOrNothing ? "-" : position.liquidatePrice}</StyledCell>
         <StyledCell>
           <Text
             style={{
