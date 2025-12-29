@@ -2,8 +2,9 @@ import { Flex, Text, Checkbox, Badge, Tooltip } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { OpenPositionData } from "overlay-sdk";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 type OpenPositionProps = {
   position: OpenPositionData;
@@ -28,6 +29,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   const isLong = positionSide === "Long";
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
   const isFundingPositive = Number(position.parsedFunding) > 0;
+
+  const isDoubleOrNothing = useMemo(
+    () => isGamblingMarket(position.marketName),
+    [position.marketName]
+  );
 
   const handleItemClick = (event: React.MouseEvent) => {
     if (position.size === "0") return;
@@ -91,9 +97,9 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             </Text>
           </Flex>
         </StyledCell>
-        <StyledCell>{position.entryPrice}</StyledCell>
-        <StyledCell>{position.currentPrice}</StyledCell>
-        <StyledCell>{position.liquidatePrice}</StyledCell>
+        <StyledCell>{isDoubleOrNothing ? "-" : position.entryPrice}</StyledCell>
+        <StyledCell>{isDoubleOrNothing ? "-" : position.currentPrice}</StyledCell>
+        <StyledCell>{isDoubleOrNothing ? "-" : position.liquidatePrice}</StyledCell>
         <StyledCell>{position.parsedCreatedTimestamp}</StyledCell>
         <StyledCell>
           <Text
