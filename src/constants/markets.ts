@@ -253,3 +253,8 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   ],
   [CategoryName.Other]: [],
 };
+
+export const NEW_CATEGORIES = [
+  CategoryName.YouTube,
+  CategoryName.Twitter,
+];

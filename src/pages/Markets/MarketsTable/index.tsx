@@ -1,7 +1,6 @@
-import { Box, Flex, Skeleton, Table, Text } from "@radix-ui/themes";
+import { Flex, Skeleton, Table, Text } from "@radix-ui/themes";
 import { LineChart, Line, YAxis } from "recharts";
 import theme from "../../../theme";
-import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { TransformedMarketData } from "overlay-sdk";
 import ProgressBar from "../../../components/ProgressBar";
@@ -10,11 +9,23 @@ import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
 import { useState } from "react";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
-import { MarketsLogos } from "./markets-table-styles";
+import {
+  CategoriesBar,
+  CategoryBarWrapper,
+  CategoryButton,
+  MarketsLogos,
+  NewBadge,
+  ScrollIndicator,
+} from "./markets-table-styles";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import * as React from "react";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
 import { isGamblingMarket } from "../../../utils/marketGuards";
+import {
+  CategoryName,
+  MARKET_CATEGORIES,
+  NEW_CATEGORIES,
+} from "../../../constants/markets";
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
@@ -31,26 +42,81 @@ export default function MarketsTable({
   marketsData,
   otherChainMarketsData = [],
 }: MarketsTableProps): JSX.Element {
-  const defaultMarketIds = new Set(marketsData.map((m) => m.marketId));
-  const uniqueOtherChainMarkets = otherChainMarketsData.filter(
-    (market) => !defaultMarketIds.has(market.marketId)
-  );
-  const allMarketsData = [...marketsData, ...uniqueOtherChainMarkets];
-
-  const marketIds = allMarketsData.map((market) => market.marketId);
-  const markets7d = useMarkets7d(marketIds);
   const redirectToTradePage = useRedirectToTradePage();
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<{
     key: SortableKeys;
     direction: "ascending" | "descending";
   } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<
+    CategoryName | "All"
+  >("All");
 
   const isMobile = useMediaQuery("(max-width: 767px)");
 
+  const categoryOptions = React.useMemo<(CategoryName | "All")[]>(
+    () => ["All", ...(Object.keys(MARKET_CATEGORIES) as CategoryName[])],
+    []
+  );
+
+  const { categoryIdsMap, categorizedIds } = React.useMemo(() => {
+    const allIds = new Set<string>();
+    const map = new Map<CategoryName, Set<string>>();
+
+    (Object.entries(MARKET_CATEGORIES) as [CategoryName, string[]][]).forEach(
+      ([category, marketIds]) => {
+        const idsSet = new Set(marketIds);
+        map.set(category, idsSet);
+        marketIds.forEach((marketId) => allIds.add(marketId));
+      }
+    );
+
+    return { categoryIdsMap: map, categorizedIds: allIds };
+  }, []);
+
+  const filteredMarketsData = React.useMemo(() => {
+    if (selectedCategory === "All") return marketsData;
+    if (selectedCategory === CategoryName.Other) {
+      return marketsData.filter(
+        (market) => !categorizedIds.has(market.marketId)
+      );
+    }
+    const categorySet = categoryIdsMap.get(selectedCategory);
+    if (!categorySet || categorySet.size === 0) return marketsData;
+    return marketsData.filter((market) => categorySet.has(market.marketId));
+  }, [categorizedIds, categoryIdsMap, marketsData, selectedCategory]);
+
+  const filteredOtherChainMarketsData = React.useMemo(() => {
+    if (selectedCategory === "All") return otherChainMarketsData;
+    if (selectedCategory === CategoryName.Other) {
+      return otherChainMarketsData.filter(
+        (market) => !categorizedIds.has(market.marketId)
+      );
+    }
+    const categorySet = categoryIdsMap.get(selectedCategory);
+    if (!categorySet || categorySet.size === 0) return otherChainMarketsData;
+    return otherChainMarketsData.filter((market) =>
+      categorySet.has(market.marketId)
+    );
+  }, [
+    categorizedIds,
+    categoryIdsMap,
+    otherChainMarketsData,
+    selectedCategory,
+  ]);
+
+  const defaultMarketIds = new Set(
+    filteredMarketsData.map((market) => market.marketId)
+  );
+  const uniqueOtherChainMarkets = filteredOtherChainMarketsData.filter(
+    (market) => !defaultMarketIds.has(market.marketId)
+  );
+  const allMarketsData = [...filteredMarketsData, ...uniqueOtherChainMarkets];
+
+  const marketIds = allMarketsData.map((market) => market.marketId);
+  const markets7d = useMarkets7d(marketIds);
+
   const sortedData = React.useMemo(() => {
-    const sortableItems = [...marketsData];
+    const sortableItems = [...filteredMarketsData];
     if (sortConfig?.key) {
       sortableItems.sort((a, b) => {
         let aValue = 0,
@@ -86,14 +152,14 @@ export default function MarketsTable({
             ? 1
             : -1
           : aValue > bValue
-          ? sortConfig.direction === "ascending"
-            ? -1
-            : 1
-          : 0;
+            ? sortConfig.direction === "ascending"
+              ? -1
+              : 1
+            : 0;
       });
     }
     return [...sortableItems, ...uniqueOtherChainMarkets];
-  }, [allMarketsData, markets7d, sortConfig]);
+  }, [filteredMarketsData, markets7d, sortConfig, uniqueOtherChainMarkets]);
 
   const requestSort = (key: SortableKeys) => {
     let direction: "ascending" | "descending";
@@ -108,15 +174,90 @@ export default function MarketsTable({
     setSortConfig({ key, direction });
   };
 
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [showScrollLeft, setShowScrollLeft] = useState(false);
+  const [showScrollRight, setShowScrollRight] = useState(false);
+
+  const checkScroll = React.useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setShowScrollLeft(scrollLeft > 5);
+      setShowScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      checkScroll();
+      el.addEventListener("scroll", checkScroll);
+      window.addEventListener("resize", checkScroll);
+      // Also check on a small delay to ensure rendering is complete
+      const timeoutId = setTimeout(checkScroll, 100);
+
+      return () => {
+        el.removeEventListener("scroll", checkScroll);
+        window.removeEventListener("resize", checkScroll);
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [checkScroll, categoryOptions]);
+
   return (
     <Theme>
+      <CategoryBarWrapper mt="5" mb="3">
+        <ScrollIndicator
+          $visible={showScrollLeft}
+          $side="left"
+          type="button"
+          aria-label="Scroll categories left"
+          onClick={() => {
+            if (scrollRef.current) {
+              scrollRef.current.scrollBy({ left: -150, behavior: "smooth" });
+            }
+          }}
+        >
+          <ChevronDownIcon style={{ transform: "rotate(90deg)" }} />
+        </ScrollIndicator>
+        <CategoriesBar ref={scrollRef}>
+          {categoryOptions.map((category) => {
+            const isNew = NEW_CATEGORIES.includes(category as CategoryName);
+
+            return (
+              <CategoryButton
+                key={category}
+                type="button"
+                $active={selectedCategory === category}
+                aria-pressed={selectedCategory === category}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category === "All" ? "All" : category}
+                {isNew && <NewBadge>New</NewBadge>}
+              </CategoryButton>
+            );
+          })}
+        </CategoriesBar>
+        <ScrollIndicator
+          $visible={showScrollRight}
+          $side="right"
+          type="button"
+          aria-label="Scroll categories right"
+          onClick={() => {
+            if (scrollRef.current) {
+              scrollRef.current.scrollBy({ left: 150, behavior: "smooth" });
+            }
+          }}
+        >
+          <ChevronDownIcon style={{ transform: "rotate(-90deg)" }} />
+        </ScrollIndicator>
+      </CategoryBarWrapper>
       <Table.Root
         variant="surface"
         ml={{ xs: "16px" }}
         style={{
           background: `${theme.color.background}`,
           border: "none",
-          marginTop: 24,
+          marginTop: 0,
           marginBottom: `${isMobile ? "90px" : "30px"}`,
         }}
       >
@@ -124,95 +265,7 @@ export default function MarketsTable({
           <Table.Row>
             <Table.ColumnHeaderCell>
               <Flex align="center" gap="2">
-                <Text style={{ color: theme.color.grey3 }}>ALL</Text>
-                <Box display={"none"}>
-                  <Select.Root
-                    onValueChange={(value) => setSelectedItem(value)}
-                  >
-                    <Select.Trigger
-                      style={{
-                        backgroundColor: theme.color.grey4,
-                        borderRadius: 16,
-                        padding: "4px 15px",
-                        minHeight: 35,
-                        boxShadow: "0 2px 10px var(--black-a7)",
-                        border: "none",
-                        color: theme.color.white,
-                        marginLeft: 10,
-                        minWidth: 95,
-                        outline: "none",
-                        cursor: "pointer",
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: "10px",
-                      }}
-                    >
-                      <Select.Value placeholder="Filter" />
-                      <Select.Icon>
-                        <ChevronDownIcon />
-                      </Select.Icon>
-                    </Select.Trigger>
-
-                    <Select.Portal>
-                      <Select.Content
-                        position="popper"
-                        sideOffset={5}
-                        style={{
-                          width: "var(--radix-select-trigger-width)",
-                          maxHeight:
-                            "var(--radix-select-content-available-height)",
-                          backgroundColor: theme.color.grey4,
-                          borderRadius: "6px",
-                          padding: "5px",
-                          boxShadow:
-                            "0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2)",
-
-                          cursor: "pointer",
-                          outline: "none",
-                        }}
-                      >
-                        <Select.Viewport>
-                          <Select.Group>
-                            {["All", "Crypto", "Forex", "Stocks"].map(
-                              (item) => (
-                                <Select.Item
-                                  key={item}
-                                  value={item.toLowerCase()}
-                                  onMouseEnter={() => setHoveredItem(item)}
-                                  onMouseLeave={() => setHoveredItem(null)}
-                                  style={{
-                                    fontSize: 13,
-                                    lineHeight: "1",
-                                    color: theme.color.white,
-                                    borderRadius: "3px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    height: "25px",
-                                    padding: "0 35px 0 10px",
-                                    position: "relative",
-                                    userSelect: "none",
-                                    backgroundColor:
-                                      selectedItem === item.toLowerCase()
-                                        ? "rgba(255, 255, 255, 0.2)"
-                                        : hoveredItem === item
-                                        ? "rgba(255, 255, 255, 0.1)"
-                                        : "transparent",
-                                    cursor: "pointer",
-                                    outline: "none",
-                                  }}
-                                >
-                                  <Select.ItemText>{item}</Select.ItemText>
-                                </Select.Item>
-                              )
-                            )}
-                          </Select.Group>
-                        </Select.Viewport>
-                      </Select.Content>
-                    </Select.Portal>
-                  </Select.Root>
-                </Box>
+                Market
               </Flex>
             </Table.ColumnHeaderCell>
             <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
@@ -354,11 +407,11 @@ export default function MarketsTable({
 
               const lineColor =
                 market7d &&
-                market7d.sevenDaysChartData &&
-                market7d.sevenDaysChartData.length > 0
+                  market7d.sevenDaysChartData &&
+                  market7d.sevenDaysChartData.length > 0
                   ? market7d.sevenDaysChartData[
-                      market7d.sevenDaysChartData.length - 1
-                    ] > market7d.sevenDaysChartData[0]
+                    market7d.sevenDaysChartData.length - 1
+                  ] > market7d.sevenDaysChartData[0]
                     ? theme.color.green2
                     : theme.color.red2
                   : theme.color.grey3;
@@ -425,11 +478,11 @@ export default function MarketsTable({
                         }}
                       >
                         {isMobile &&
-                        decodeURIComponent(market.marketId).length > 28
+                          decodeURIComponent(market.marketId).length > 28
                           ? `${decodeURIComponent(market.marketId).slice(
-                              0,
-                              28
-                            )}...`
+                            0,
+                            28
+                          )}...`
                           : decodeURIComponent(market.marketId)}
                       </span>
                     </Flex>
@@ -441,9 +494,9 @@ export default function MarketsTable({
                   >
                     {!isGambling
                       ? formatPriceWithCurrency(
-                          market.price ?? 0,
-                          market.priceCurrency
-                        )
+                        market.price ?? 0,
+                        market.priceCurrency
+                      )
                       : "-"}
                   </Table.Cell>
                   {!isMobile && (
@@ -453,8 +506,8 @@ export default function MarketsTable({
                           color: isComingSoon || isGambling
                             ? "#8B8B8B"
                             : (market7d?.oneHourChange ?? 0) >= 0
-                            ? theme.color.green2
-                            : theme.color.red2,
+                              ? theme.color.green2
+                              : theme.color.red2,
                         }}
                       >
                         {isGambling ? (
@@ -470,8 +523,8 @@ export default function MarketsTable({
                           color: isComingSoon || isGambling
                             ? "#8B8B8B"
                             : (market7d?.twentyFourHourChange ?? 0) >= 0
-                            ? theme.color.green2
-                            : theme.color.red2,
+                              ? theme.color.green2
+                              : theme.color.red2,
                         }}
                       >
                         {isGambling ? (
@@ -487,8 +540,8 @@ export default function MarketsTable({
                           color: isComingSoon || isGambling
                             ? "#8B8B8B"
                             : (market7d?.sevenDayChange ?? 0) >= 0
-                            ? theme.color.green2
-                            : theme.color.red2,
+                              ? theme.color.green2
+                              : theme.color.red2,
                         }}
                       >
                         {isGambling ? (
@@ -515,8 +568,8 @@ export default function MarketsTable({
                               color: isComingSoon
                                 ? "#8B8B8B"
                                 : market.funding && Number(market.funding) < 0
-                                ? theme.color.red2
-                                : theme.color.green2,
+                                  ? theme.color.red2
+                                  : theme.color.green2,
                             }}
                           >
                             {market.funding && Number(market.funding) < 0
