@@ -1,4 +1,6 @@
 import { ColumnDef, Ranking } from "../types";
+import { formatUnits } from "viem";
+import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 // import MostTradedMarketLogo from "./MostTradedMarketLogo";
 
 export const RANKING_BY: Ranking = Ranking.ByVolume;
@@ -36,12 +38,18 @@ export const leaderboardColumns: ColumnDef[] = [
   },
   {
     value: "fees",
-    label: "Fees OVL",
-    render: (data) => data.totalFeesOVL,
+    label: "Fees USD",
+    render: (data) => {
+      const value = Number(formatUnits(BigInt(data.totalFeesUSD), 18));
+      return `$${formatNumberWithCommas(value)}`;
+    },
   },
   {
     value: "volume",
-    label: "Volume OVL",
-    render: (data) => data.totalVolumeOVL,
+    label: "Volume USD",
+    render: (data) => {
+      const value = Number(formatUnits(BigInt(data.totalVolumeUSD), 18));
+      return `$${formatNumberWithCommas(value)}`;
+    },
   },
 ];
