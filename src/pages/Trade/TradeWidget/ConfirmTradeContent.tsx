@@ -2,7 +2,7 @@ import { Flex, Text } from "@radix-ui/themes";
 import { useMemo } from "react";
 import { limitDigitsInDecimals, TradeStateData } from "overlay-sdk";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { useTradeState } from "../../../state/trade/hooks";
+import { useTradeState, useCollateralType } from "../../../state/trade/hooks";
 import theme from "../../../theme";
 import DetailRow from "../../../components/Modal/DetailRow";
 import {
@@ -25,6 +25,7 @@ const ConfirmTradeContent: React.FC<ConfirmTradeContentProps> = ({
 }) => {
   const { currentMarket: market } = useCurrentMarketState();
   const { slippageValue, isLong, selectedLeverage } = useTradeState();
+  const collateralType = useCollateralType();
 
   const price: string = useMemo(() => {
     if (!market) return "-";
@@ -99,10 +100,16 @@ const ConfirmTradeContent: React.FC<ConfirmTradeContentProps> = ({
 
       <Flex mt={"48px"} direction={"column"} width={"100%"}>
         <DetailRow
-          detail={"Estimated Collateral"}
-          value={`${formatNumberForDisplay(
-            tradeState.estimatedCollateral
-          )} OVL`}
+          detail={"Initial Collateral"}
+          value={`${formatNumberForDisplay(tradeState.initialCollateral)} ${collateralType}`}
+        />
+        <DetailRow
+          detail={"Build Fee"}
+          value={`${formatNumberForDisplay(tradeState.buildFee)} ${collateralType}`}
+        />
+        <DetailRow
+          detail={"Total Cost"}
+          value={`${formatNumberForDisplay(tradeState.totalCost)} ${collateralType}`}
         />
         <DetailRow detail={"Estimated OI"} value={expectedOi} />
       </Flex>
@@ -114,6 +121,23 @@ const ConfirmTradeContent: React.FC<ConfirmTradeContentProps> = ({
           } ${minPrice} or the transaction will revert.`}
         </Text>
       </Flex>
+
+      {collateralType === 'USDT' && (
+        <Flex
+          width="100%"
+          p="12px"
+          mb="16px"
+          style={{
+            background: 'rgba(255, 193, 7, 0.1)',
+            borderRadius: '8px',
+            border: `1px solid ${theme.color.yellow1}`,
+          }}
+        >
+          <Text size="2" style={{ color: theme.color.yellow1 }}>
+            Note: USDT-collateral positions do not support partial unwinds yet.
+          </Text>
+        </Flex>
+      )}
 
       {attemptingTransaction ? (
         <GradientLoaderButton

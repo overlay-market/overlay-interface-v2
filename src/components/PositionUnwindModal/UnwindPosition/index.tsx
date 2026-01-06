@@ -14,6 +14,7 @@ import UnwindButtonComponent from "./UnwindButtonComponent";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import useDebounce from "../../../hooks/useDebounce";
 import usePrevious from "../../../hooks/usePrevious";
+import { useUnwindPreference } from "../../../state/trade/hooks";
 
 type UnwindPositionProps = {
   position: OpenPositionData;
@@ -23,6 +24,10 @@ type UnwindPositionProps = {
   unwindPercentage: number;
   setUnwindPercentage: (unwindPercentage: number) => void;
   handleDismiss: () => void;
+  stableQuote: { minOut: bigint; expectedOut: bigint } | null;
+  quoteLoading: boolean;
+  quoteFailed: boolean;
+  slippageValue: string | number;
 };
 
 const UnwindPosition: React.FC<UnwindPositionProps> = ({
@@ -33,10 +38,23 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   unwindPercentage,
   setUnwindPercentage,
   handleDismiss,
+  stableQuote,
+  quoteLoading,
+  quoteFailed,
+  slippageValue,
 }) => {
   const [percentageValue, setPercentageValue] = useState<string>("");
   const [selectedPercent, setSelectedPercent] = useState<number>(0);
   const debouncedSelectedPercent = useDebounce(selectedPercent, 500);
+
+  const hasLoan = !!position.loan?.id;
+  const unwindPreference = useUnwindPreference();
+
+  // Only use stable unwind if:
+  // 1. User preference is 'stable'
+  // 2. Position has positive PnL (profitable)
+  const isPositionProfitable = unwindState && Number(unwindState.pnl) > 0;
+  const shouldUseStableUnwind = unwindPreference === 'stable' && isPositionProfitable;
 
   const { value, currentPrice, fractionValue, unwindBtnState } = useMemo(() => {
     const value = unwindState.value
@@ -71,10 +89,26 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
       Number(inputValue) === 0
     )
       return false;
-    return fractionValue === previousFractionValue;
-  }, [fractionValue, previousFractionValue]);
+
+    // Don't block if user has entered a valid input value
+    // This prevents issues with stable unwind state refetching
+    if (inputValue && Number(inputValue) > 0) {
+      return false;
+    }
+
+    return fractionValue === previousFractionValue && !hasLoan;
+  }, [fractionValue, previousFractionValue, inputValue, hasLoan]);
 
   const maxAmount: number = useMemo(() => Number(value) ?? 0, [value]);
+
+  // Force 100% unwind when position has a loan
+  useEffect(() => {
+    if (hasLoan && maxAmount > 0) {
+      setPercentageValue("100");
+      setSelectedPercent(1);
+      setInputValue(maxAmount.toString());
+    }
+  }, [hasLoan, maxAmount, setInputValue]);
 
   const handleQuickInput = (percentage: number) => {
     if (percentage < 0 || percentage > 100) {
@@ -157,32 +191,53 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
         </Text>
       </Flex>
 
-      <UnwindAmountContainer handleQuickInput={handleQuickInput} />
+      {hasLoan && (
+        <Flex
+          width="100%"
+          p="8px"
+          my="8px"
+          style={{
+            background: 'rgba(255, 193, 7, 0.1)',
+            borderRadius: '4px',
+            border: `1px solid ${theme.color.yellow1}`,
+          }}
+        >
+          <Text size="1" style={{ color: theme.color.yellow1 }}>
+            This position was built with USDT and must be fully unwound (100%)
+          </Text>
+        </Flex>
+      )}
 
-      <NumericalInputContainer
-        inputValue={inputValue}
-        handleUserInput={handleUserInput}
-      />
+      {!hasLoan && <UnwindAmountContainer handleQuickInput={handleQuickInput} />}
+
+      {!hasLoan && (
+        <NumericalInputContainer
+          inputValue={inputValue}
+          handleUserInput={handleUserInput}
+        />
+      )}
 
       <Flex width={"100%"} direction={"column"} py={"10px"} gap={"36px"}>
-        <Slider
-          title={" "}
-          min={0}
-          max={100}
-          step={1}
-          value={
-            Number(percentageValue) >= 0.01
-              ? Number(Number(percentageValue).toFixed(2))
-              : 0
-          }
-          valueUnit={"%"}
-          prefixSign={
-            Number(percentageValue) <= 0.01 && Boolean(percentageValue)
-              ? "~"
-              : ""
-          }
-          handleChange={(input: number[]) => handlePercentageInput(input)}
-        />
+        {!hasLoan && (
+          <Slider
+            title={" "}
+            min={0}
+            max={100}
+            step={1}
+            value={
+              Number(percentageValue) >= 0.01
+                ? Number(Number(percentageValue).toFixed(2))
+                : 0
+            }
+            valueUnit={"%"}
+            prefixSign={
+              Number(percentageValue) <= 0.01 && Boolean(percentageValue)
+                ? "~"
+                : ""
+            }
+            handleChange={(input: number[]) => handlePercentageInput(input)}
+          />
+        )}
 
         <UnwindButtonComponent
           position={position}
@@ -191,11 +246,19 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
           priceLimit={unwindState.priceLimit}
           unwindBtnState={unwindBtnState}
           isPendingTime={isPendingTime}
+          unwindStable={shouldUseStableUnwind}
           handleDismiss={handleDismiss}
         />
       </Flex>
 
-      <UnwindPositionDetails position={position} unwindState={unwindState} />
+      <UnwindPositionDetails
+        position={position}
+        unwindState={unwindState}
+        stableQuote={stableQuote}
+        quoteLoading={quoteLoading}
+        quoteFailed={quoteFailed}
+        slippageValue={slippageValue}
+      />
     </>
   );
 };

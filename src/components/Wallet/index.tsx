@@ -4,6 +4,7 @@ import { Box, Flex } from "@radix-ui/themes";
 import { GradientOutlineButton } from "../Button";
 import ChainSwitch from "./ChainSwitch";
 import ConnectWalletModal from "../ConnectWalletModal";
+import SettingsDropdown from "./SettingsDropdown";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { OVL_ADDRESS } from "overlay-sdk";
 
@@ -47,6 +48,7 @@ const Wallet: React.FC = () => {
         />
 
         <ChainSwitch />
+        <SettingsDropdown />
         <ConnectWalletModal />
       </Flex>
     </Box>

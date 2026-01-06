@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setCollateralType, setSlippage, setTokenState, setUnwindPreference, typeInput, updateTxnHash } from "./actions";
 import usePrevious from "../../hooks/usePrevious";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import {  TokenAmount } from "@lifi/sdk";
+import { TokenAmount } from "@lifi/sdk";
 import { deserializeWithBigInt, serializeWithBigInt } from "../../utils/serializeWithBigInt";
 import { SelectState } from "../../types/selectChainAndTokenTypes";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
@@ -17,6 +17,14 @@ export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
 export function useTradeState(): AppState['trade'] {
   return useAppSelector((state) => state.trade);
+}
+
+export function useCollateralType(): 'OVL' | 'USDT' {
+  return useAppSelector((state) => state.trade.collateralType);
+}
+
+export function useUnwindPreference(): 'normal' | 'stable' {
+  return useAppSelector((state) => state.trade.unwindPreference);
 }
 
 export function useChainAndTokenState(): {
@@ -45,6 +53,8 @@ export const useTradeActionHandlers = (): {
   handleTokenSelect: (selectedToken: TokenAmount) => void;
   handleChainStateChange: (chainState: SelectState) => void;
   handleTokenStateChange: (tokenState: SelectState) => void;
+  handleCollateralTypeChange: (collateralType: 'OVL' | 'USDT') => void;
+  handleUnwindPreferenceChange: (unwindPreference: 'normal' | 'stable') => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -74,12 +84,12 @@ export const useTradeActionHandlers = (): {
   const handleSlippageSet = useCallback(
     (slippageValue: DefaultTxnSettings | string) => {
       if (Number(slippageValue) < MINIMUM_SLIPPAGE_VALUE && slippageValue.length > 3) {
-        dispatch(setSlippage({slippageValue: MINIMUM_SLIPPAGE_VALUE.toString()}))
+        dispatch(setSlippage({ slippageValue: MINIMUM_SLIPPAGE_VALUE.toString() }))
       }
-      if(slippageValue === '.') {
+      if (slippageValue === '.') {
         dispatch(setSlippage({ slippageValue }))
       }
-      if(slippageRegex.test(slippageValue)) {
+      if (slippageRegex.test(slippageValue)) {
         dispatch(setSlippage({ slippageValue }))
       }
 
@@ -97,13 +107,13 @@ export const useTradeActionHandlers = (): {
   );
 
   const handleTokenSelect = useCallback(
-  (selectedToken: TokenAmount) => {
-    const serializedToken = serializeWithBigInt(selectedToken);
-    dispatch(selectToken({ selectedToken: serializedToken }));
-    localStorage.setItem('lifiSelectedToken', serializedToken);
-  },
-  [dispatch]
-);
+    (selectedToken: TokenAmount) => {
+      const serializedToken = serializeWithBigInt(selectedToken);
+      dispatch(selectToken({ selectedToken: serializedToken }));
+      localStorage.setItem('lifiSelectedToken', serializedToken);
+    },
+    [dispatch]
+  );
 
   const handleChainStateChange = useCallback(
     (chainState: SelectState) => {
@@ -119,7 +129,23 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   );
 
-  const handleTxnHashUpdate =  useCallback(
+  const handleCollateralTypeChange = useCallback(
+    (collateralType: 'OVL' | 'USDT') => {
+      dispatch(setCollateralType({ collateralType }));
+      localStorage.setItem('collateralType', collateralType);
+    },
+    [dispatch]
+  );
+
+  const handleUnwindPreferenceChange = useCallback(
+    (unwindPreference: 'normal' | 'stable') => {
+      dispatch(setUnwindPreference({ unwindPreference }));
+      localStorage.setItem('unwindPreference', unwindPreference);
+    },
+    [dispatch]
+  );
+
+  const handleTxnHashUpdate = useCallback(
     async (txnHash: string, txnBlockNumber: number) => {
       const checkSubgraphBlock = async () => {
         const lastSubgraphBlock = await sdk.core.getLastSubgraphProcessedBlock();
@@ -130,8 +156,8 @@ export const useTradeActionHandlers = (): {
           setTimeout(checkSubgraphBlock, 1000);
         }
       };
-  
-      checkSubgraphBlock();          
+
+      checkSubgraphBlock();
     },
     [dispatch]
   );
@@ -153,6 +179,8 @@ export const useTradeActionHandlers = (): {
     handleTxnHashUpdate,
     handleChainStateChange,
     handleTokenStateChange,
+    handleCollateralTypeChange,
+    handleUnwindPreferenceChange,
     handleTradeStateReset,
   }
 };
@@ -171,20 +199,20 @@ export const useIsNewTxnHash = (): boolean => {
 
 export const useSelectStateManager = () => {
   const dispatch = useAppDispatch();
-  const {selectedChainId, chainState,  selectedToken} = useChainAndTokenState();
+  const { selectedChainId, chainState, selectedToken } = useChainAndTokenState();
   const { ovlBalance, isLoading } = useOvlTokenBalance();
   const { loadingChain } = useSelectedChain();
   const { address: account } = useAccount();
   const { handleTokenSelect } = useTradeActionHandlers();
-  
+
   // Effect to manage chain state
   useEffect(() => {
-    if ( isLoading || loadingChain) return;
+    if (isLoading || loadingChain) return;
 
     if (account === undefined) {
       dispatch(setChainState({ chainState: SelectState.EMPTY }));
       return;
-    }  
+    }
 
     if (selectedChainId === DEFAULT_CHAINID && selectedToken.address === DEFAULT_TOKEN.address) {
       dispatch(setChainState({ chainState: SelectState.DEFAULT }));
@@ -195,7 +223,7 @@ export const useSelectStateManager = () => {
 
   // Effect to manage token state
   useEffect(() => {
-    if ( isLoading || loadingChain) return;
+    if (isLoading || loadingChain) return;
 
     if (account === undefined) {
       dispatch(setTokenState({ tokenState: SelectState.EMPTY }));
@@ -220,7 +248,7 @@ export const useSelectStateManager = () => {
       handleTokenSelect(DEFAULT_TOKEN);
       dispatch(setChainState({ chainState: SelectState.DEFAULT }));
       dispatch(setTokenState({ tokenState: SelectState.DEFAULT }));
-     
+
     }
   }, [selectedChainId, ovlBalance, isLoading, loadingChain, selectedToken]);
 };

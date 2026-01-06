@@ -4,9 +4,10 @@ import Loader from "../../../components/Loader";
 
 type OverviewCardProps = {
   title: string;
-  value?: string | number;
+  value?: string | number | React.ReactNode;
   unit?: string;
   isOver1000OpenPositions?: boolean;
+  isMultiValue?: boolean;
 };
 
 const OverviewCard: React.FC<OverviewCardProps> = ({
@@ -14,15 +15,18 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
   value,
   unit,
   isOver1000OpenPositions,
+  isMultiValue = false,
 }) => (
   <Flex
     direction={"column"}
-    justify={"between"}
+    justify={isMultiValue ? "start" : "between"}
     py={"20px"}
     px={"24px"}
+    gap={isMultiValue ? "12px" : undefined}
     style={{
       backgroundColor: theme.color.grey4,
       borderRadius: "8px",
+      minHeight: "140px",
     }}
   >
     <Text size="2" style={{ color: theme.color.grey3 }}>
@@ -40,17 +44,24 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
       </Flex>
     )}
 
-    <Box py={"12px"}>
+    <Box py={isMultiValue ? "0" : "12px"}>
       {value !== undefined ? (
-        <Text size="3" weight={"bold"}>
-          {value}
-        </Text>
+        typeof value === 'string' || typeof value === 'number' ? (
+          <Flex direction={"column"} gap="4px">
+            <Text size="3" weight={"bold"}>
+              {value}
+            </Text>
+            {unit && <Text size="1">{unit}</Text>}
+          </Flex>
+        ) : (
+          value
+        )
       ) : (
         <Loader />
       )}
     </Box>
 
-    {unit && value !== undefined ? <Text>{unit}</Text> : <Box m={"10px"}></Box>}
+    {!isMultiValue && value !== undefined && <Box m={"10px"}></Box>}
   </Flex>
 );
 

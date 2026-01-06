@@ -132,7 +132,7 @@ const OverviewChart: React.FC<OverviewChartProps> = ({
           style={{ background: theme.tooltip.background, borderRadius: theme.tooltip.borderRadius }}
         >
           <Text>{rangeLabel}</Text>
-          <Flex align="center">
+          <Flex align="center" gap="4px">
             <Text>Realized PnL: </Text>
             <Text
               style={{
@@ -146,6 +146,7 @@ const OverviewChart: React.FC<OverviewChartProps> = ({
                 ? +payload[0].value.toFixed(6)
                 : +payload[0].value.toFixed(2)}
             </Text>
+            <Text>USDT</Text>
           </Flex>
         </Box>
       );

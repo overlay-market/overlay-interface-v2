@@ -9,9 +9,11 @@ import {
   useChainAndTokenState,
   useTradeActionHandlers,
   useTradeState,
+  useCollateralType,
 } from "../../../state/trade/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toWei, TradeState, TradeStateData } from "overlay-sdk";
+import { toWei, TradeState, TradeStateData, formatWeiToParsedNumber } from "overlay-sdk";
+import { parseUnits } from "viem";
 import ConfirmTxnModal from "./ConfirmTxnModal";
 import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
@@ -24,6 +26,7 @@ import { useRiskParamsQuery } from "../../../hooks/useRiskParamsQuery";
 import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
 import { useLiFiBridge } from "../../../hooks/lifi/useLiFiBridge";
 import { GetBNBModal } from "../../../components/GetBNBModal";
+import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
@@ -46,8 +49,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
-  const { typedValue, selectedLeverage, isLong } = useTradeState();
+  const { typedValue, selectedLeverage, isLong, slippageValue } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
+  const collateralType = useCollateralType();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const [{ showConfirm, attemptingTransaction }, setTradeConfig] = useState<{
@@ -68,6 +72,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { data: riskParamsData } = useRiskParamsQuery({
     marketId: market?.id,
   });
+
+  const { data: stableTokenInfo } = useStableTokenInfo();
 
   const {
     executeBridge,
@@ -169,12 +175,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleTrade = async () => {
     if (!sdk || !publicClient || !address) {
-      console.error("Missing required dependencies for trade operation");
       return;
     }
 
     if (!market || !tradeState || !typedValue || !selectedLeverage) {
-      console.error("Missing required parameters for trade operation");
       return;
     }
 
@@ -200,7 +204,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
-            console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
               {
@@ -253,7 +256,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           handleTradeStateReset();
         }
       } else {
-        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
@@ -267,7 +269,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
       }
     } catch (error) {
-      console.error("Trade operation failed:", error);
 
       const { errorCode, errorMessage } = handleError(error as Error);
 
@@ -288,6 +289,161 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         wallet_address: address,
         market_name: market.marketName,
         trade_type: "direct",
+        timestamp: new Date().toISOString(),
+      });
+    } finally {
+      setTradeConfig({
+        showConfirm: false,
+        attemptingTransaction: false,
+      });
+    }
+  };
+
+  const handleTradeStable = async () => {
+    if (!sdk || !publicClient || !address) {
+      return;
+    }
+
+    if (!market || !tradeState || !typedValue || !selectedLeverage) {
+      return;
+    }
+
+    setTradeConfig({
+      showConfirm,
+      attemptingTransaction: true,
+    });
+
+    try {
+      // Use stable token info from hook
+      if (!stableTokenInfo) {
+        throw new Error("Stable token information not available");
+      }
+
+      // Parse stable amount with correct decimals
+      // Use totalCost from tradeState (user input + fees) instead of just user input
+      const stableAmount = parseUnits(tradeState.totalCost.toString(), stableTokenInfo.decimals);
+
+      // Validate LBSC has sufficient liquidity and get preview
+      const validation = await sdk.lbsc.getPreviewWithValidation(stableAmount);
+
+      if (!validation.canBorrow) {
+        const availableFormatted = formatWeiToParsedNumber(validation.availableLiquidity, 18, 2);
+        const requiredFormatted = formatWeiToParsedNumber(validation.ovlAmount, 18, 2);
+        throw new Error(
+          `Insufficient LBSC liquidity.\nAvailable: ${availableFormatted} OVL\nRequired: ${requiredFormatted} OVL`
+        );
+      }
+
+      // Apply slippage to minOvl (e.g., 1% slippage = 99% of preview)
+      const slippageMultiplier = BigInt(Math.floor((100 - Number(slippageValue)) * 100));
+      const minOvl = (validation.ovlAmount * slippageMultiplier) / 10000n;
+
+      const buildParams = {
+        marketAddress: market.id as Address,
+        stableCollateral: stableAmount,
+        leverage: toWei(selectedLeverage),
+        isLong,
+        priceLimit: toWei(tradeState.priceInfo.minPrice as string),
+        minOvl,
+      };
+
+      const result = await sdk.shiva.buildStable({
+        account: address,
+        params: buildParams,
+      });
+
+      let receipt = result.receipt;
+
+      if (!receipt) {
+        try {
+          receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
+        } catch (waitError: any) {
+          if (waitError.message === "TRANSACTION_TIMEOUT") {
+
+            addPopup(
+              {
+                txn: {
+                  hash: result.hash,
+                  success: null,
+                  message:
+                    "Transaction is taking longer than expected. It may still confirm.",
+                  type: TransactionType.BUILD_OVL_POSITION,
+                },
+              },
+              result.hash
+            );
+            return;
+          } else {
+            throw waitError;
+          }
+        }
+      }
+
+      if (receipt) {
+        const isSuccess = receipt.status === "success";
+
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: isSuccess,
+              message: "",
+              type: TransactionType.BUILD_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+
+        if (receipt.blockNumber) {
+          handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
+        }
+
+        if (isSuccess) {
+          trackEvent("build_ovl_position_success", {
+            transaction_hash: `hash_${result.hash}`,
+            wallet_address: address,
+            market_name: market.marketName,
+            initial_collateral: typedValue,
+            trade_type: "stable",
+            timestamp: new Date().toISOString(),
+          });
+
+          handleTradeStateReset();
+        }
+      } else {
+        addPopup(
+          {
+            txn: {
+              hash: result.hash,
+              success: false,
+              message: "Transaction status unknown. Please check your wallet.",
+              type: TransactionType.BUILD_OVL_POSITION,
+            },
+          },
+          result.hash
+        );
+      }
+    } catch (error) {
+
+      const { errorCode, errorMessage } = handleError(error as Error);
+
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: errorMessage,
+            type: errorCode,
+          },
+        },
+        currentTimeForId
+      );
+
+      trackEvent("build_ovl_position_failed", {
+        error_message: errorMessage,
+        wallet_address: address,
+        market_name: market.marketName,
+        trade_type: "stable",
         timestamp: new Date().toISOString(),
       });
     } finally {
@@ -332,35 +488,29 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             : BigInt(currentBalanceRaw.toString());
 
         if (currentBalance >= expectedAmount) {
-          console.log("✅ Sufficient balance confirmed");
           return true;
         }
 
         await new Promise((resolve) => setTimeout(resolve, checkInterval));
       } catch (error) {
-        console.error("Error checking balance:", error);
       }
     }
 
-    console.warn("⚠️ Timeout waiting for balance update");
     return false;
   };
 
   const handleApprove = async () => {
     if (!sdk || !publicClient || !address) {
-      console.error("Missing required dependencies for approval operation");
       return;
     }
 
     if (!typedValue) {
-      console.error("Missing typed value for approval operation");
       return;
     }
 
     // For non-Shiva approvals, validate market exists
     const useShiva = sdk.core.usingShiva();
     if (!useShiva && !market?.id) {
-      console.error("Missing market for approval operation");
       return;
     }
 
@@ -370,15 +520,25 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     });
 
     try {
-      const result = useShiva
-        ? await sdk.shiva.approveShiva({
-            account: address,
-            amount: maxUint256,
-          })
-        : await sdk.ovl.approve({
-            to: market?.id as Address,
-            amount: maxUint256,
-          });
+      let result;
+
+      if (collateralType === 'USDT') {
+        // For USDT collateral, approve USDT to LBSC
+        result = await sdk.lbsc.approveStable({
+          account: address,
+          amount: maxUint256,
+        });
+      } else if (useShiva) {
+        result = await sdk.shiva.approveShiva({
+          account: address,
+          amount: maxUint256,
+        });
+      } else {
+        result = await sdk.ovl.approve({
+          to: market?.id as Address,
+          amount: maxUint256,
+        });
+      }
 
       let receipt = result.receipt;
 
@@ -387,7 +547,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
-            console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
               {
@@ -436,7 +595,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           setIsApprovalPending(isUpdated);
         }
       } else {
-        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
@@ -450,7 +608,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
       }
     } catch (error) {
-      console.error("Approval operation failed:", error);
 
       const { errorCode, errorMessage } = handleError(error as Error);
 
@@ -493,7 +650,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
       return { errorCode, errorMessage };
     } catch (parseError) {
-      console.error("Error parsing error object:", parseError);
       return {
         errorCode: "PARSE_ERROR",
         errorMessage: error.message || "An unknown error occurred",
@@ -510,13 +666,11 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleLiFiGetBridgeQuote = async () => {
     if (!address || !market || !tradeState || !typedValue) {
-      console.error("Missing required parameters for cross-chain trade");
       return;
     }
 
     // Check if we're resuming from a needs_gas state
     if (bridgeStage.stage === "needs_gas") {
-      console.log("🔋 Resuming from needs_gas stage, reopening gas modal");
       setShowGasModal(true);
       return;
     }
@@ -561,7 +715,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleBridge = async () => {
     if (!address || !market || !tradeState || !typedValue || !bridgeQuote) {
-      console.error("Missing required parameters for bridge");
       return;
     }
 
@@ -589,12 +742,10 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const handleLiFiTrade = async () => {
     if (!address || !market || !tradeState || !bridgedAmount) {
-      console.error("Missing required parameters for position opening");
       return;
     }
 
     if (!sdk || !publicClient) {
-      console.error("Missing required dependencies for trade operation");
       return;
     }
 
@@ -625,7 +776,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
     // Check if approval is needed before building position
     if (tradeState.tradeState === TradeState.NeedsApproval) {
-      console.log("🔒 Approval needed for Shiva contract after bridge");
 
       setTradeConfig({
         showConfirm,
@@ -654,7 +804,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             );
           } catch (waitError: any) {
             if (waitError.message === "TRANSACTION_TIMEOUT") {
-              console.warn("Approval confirmation timeout:", waitError);
 
               addPopup(
                 {
@@ -695,7 +844,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
         }
 
-        console.log("✅ Approval confirmed, proceeding with position build");
       } catch (error) {
         const { errorCode, errorMessage } = handleError(error as Error);
         addPopup(
@@ -752,16 +900,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       return;
     }
 
-    console.log("🏗️ Building position with:", {
-      bridgedAmount: bridgedAmount,
-      bridgedAmountReadable: (Number(bridgedAmount) / 1e18).toFixed(6),
-      collateralAmount: collateralAmount.toString(),
-      collateralReadable: (Number(collateralAmount) / 1e18).toFixed(6),
-      leverage: selectedLeverage,
-      dataType: typeof bridgedAmount,
-      minCollateralRequired: minCollateral,
-    });
-
     try {
       const result = await sdk.market.build({
         account: address,
@@ -779,7 +917,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           receipt = await waitForReceiptWithTimeout(publicClient, result.hash);
         } catch (waitError: any) {
           if (waitError.message === "TRANSACTION_TIMEOUT") {
-            console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
               {
@@ -837,7 +974,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           resetBridge();
         }
       } else {
-        console.error("No receipt received after successful wait");
         addPopup(
           {
             txn: {
@@ -851,7 +987,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         );
       }
     } catch (error) {
-      console.error("Trade operation failed:", error);
 
       const { errorCode, errorMessage } = handleError(error as Error);
 
@@ -883,7 +1018,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   };
 
   const handleGasModalClose = useCallback(() => {
-    console.log("🔋 Gas modal closed by user");
     setShowGasModal(false);
   }, []);
 
@@ -893,7 +1027,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       !showConfirm &&
       !hasShownTradeModal
     ) {
-      console.log("🎯 Bridge success, showing trade confirmation modal");
       setTradeConfig({
         showConfirm: true,
         attemptingTransaction: false,
@@ -904,9 +1037,6 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
       !showGasModal &&
       !hasShownGasModal
     ) {
-      console.log(
-        "🔋 Bridge completed but needs gas, closing confirmation modal and showing gas modal"
-      );
       setTradeConfig({
         showConfirm: false, // Close the confirmation modal
         attemptingTransaction: false,
@@ -966,7 +1096,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           <GradientLoaderButton title={"Pending confirmation..."} />
         ) : (
           <GradientOutlineButton
-            title={"Approve OVL"}
+            title={collateralType === 'USDT' ? "Approve USDT" : "Approve OVL"}
             width={"100%"}
             handleClick={handleApprove}
           />
@@ -980,7 +1110,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             tradeState={tradeState}
             attemptingTransaction={attemptingTransaction}
             handleDismiss={handleDismiss}
-            handleTrade={handleTrade}
+            handleTrade={collateralType === 'USDT' ? handleTradeStable : handleTrade}
           />
         )}
     </>
@@ -1023,9 +1153,9 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   return (
     <>
-      {isDefaultState && renderDefaultState()}
-      {isSelectedState && renderSelectedState()}
-      {!isDefaultState && !isSelectedState && (
+      {(isDefaultState || collateralType === 'USDT') && renderDefaultState()}
+      {isSelectedState && collateralType === 'OVL' && renderSelectedState()}
+      {!isDefaultState && !isSelectedState && collateralType === 'OVL' && (
         <>
           {loading && <GradientLoaderButton title={"Trade"} />}
 

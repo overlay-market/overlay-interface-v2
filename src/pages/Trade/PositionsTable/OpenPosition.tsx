@@ -4,6 +4,7 @@ import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMemo, useState } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
+import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 
 type OpenPositionProps = {
@@ -19,7 +20,23 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     ? position.positionSide.split(" ")
     : [undefined, undefined];
   const isLong = positionSide === "Long";
+
+  // For LBSC positions with stable values calculated:
+  // Display stable values in USDT (both positive and negative PnL)
+  const pnlValue = position.stableValues
+    ? position.stableValues.unrealizedPnL
+    : position.unrealizedPnL;
+  const pnlToken = position.stableValues
+    ? 'USDT'
+    : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
+
+  const currentSize = positionLeverage &&
+    (
+      position.stableValues?.initialCollateral
+        ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
+        : formatNumberWithCommas((Number(position.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' OVL'
+    );
 
   const handleItemClick = () => {
     if (position.size === "0") return;
@@ -38,7 +55,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
       <StyledRow onClick={handleItemClick}>
         <StyledCell>
           <Flex gap="6px" align="center">
-            {position.size} OVL
+            {currentSize}
             {position.deprecated && (
               <Tooltip
                 content="This position was built on a deprecated version of the market. You can still unwind it."
@@ -53,7 +70,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
         </StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
-            {positionLeverage}
+            {positionLeverage && Number(positionLeverage.slice(0, -1))}x
             <Text
               weight={"medium"}
               style={{ color: isLong ? theme.color.green1 : theme.color.red1 }}
@@ -70,7 +87,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
               color: isPnLPositive ? theme.color.green1 : theme.color.red1,
             }}
           >
-            {position.unrealizedPnL} OVL
+            {pnlValue} {pnlToken}
           </Text>
         </StyledCell>
       </StyledRow>

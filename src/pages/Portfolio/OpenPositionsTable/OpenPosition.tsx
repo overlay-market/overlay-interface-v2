@@ -4,6 +4,7 @@ import theme from "../../../theme";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
 import { useMemo, useState } from "react";
 import { OpenPositionData } from "overlay-sdk";
+import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 
 type OpenPositionProps = {
@@ -27,8 +28,32 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     ? position.positionSide.split(" ")
     : [undefined, undefined];
   const isLong = positionSide === "Long";
+
+  // For LBSC positions with stable values calculated:
+  // Display stable values in USDT (both positive and negative PnL)
+  const pnlValue = position.stableValues
+    ? position.stableValues.unrealizedPnL
+    : position.unrealizedPnL;
+  const pnlToken = position.stableValues
+    ? 'USDT'
+    : 'OVL';
   const isPnLPositive = Number(position.unrealizedPnL) > 0;
+
+  const fundingRawValue = position.stableValues
+    ? position.stableValues.funding
+    : position.parsedFunding;
+  const fundingValue = Number(fundingRawValue).toFixed(2);
+  const fundingToken = position.stableValues
+    ? 'USDT'
+    : 'OVL';
   const isFundingPositive = Number(position.parsedFunding) > 0;
+
+  const currentSize = positionLeverage &&
+    (
+      position.stableValues?.initialCollateral
+        ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
+        : formatNumberWithCommas((Number(position.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' OVL'
+    );
 
   const isDoubleOrNothing = useMemo(
     () => isGamblingMarket(position.marketName),
@@ -85,10 +110,10 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             )}
           </Flex>
         </StyledCell>
-        <StyledCell>{position.size} OVL</StyledCell>
+        <StyledCell>{currentSize}</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
-            {positionLeverage}
+            {positionLeverage && Number(positionLeverage.slice(0, -1))}x
             <Text
               weight={"medium"}
               style={{ color: isLong ? theme.color.green1 : theme.color.red1 }}
@@ -107,7 +132,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
               color: isPnLPositive ? theme.color.green1 : theme.color.red1,
             }}
           >
-            {position.unrealizedPnL} OVL
+            {pnlValue} {pnlToken}
           </Text>
         </StyledCell>
         <StyledCell>
@@ -116,7 +141,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
               color: isFundingPositive ? theme.color.green1 : theme.color.red1,
             }}
           >
-            {position.parsedFunding} OVL
+            {fundingValue} {fundingToken}
           </Text>
         </StyledCell>
       </StyledRow>

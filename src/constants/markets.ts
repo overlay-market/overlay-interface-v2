@@ -140,6 +140,7 @@ export const MARKETSORDER = [
   "BNB%20%2F%20USD",
   "Jessicanigri%20vs%20Monalita",
   "Made%20In%20USA%20Index",
+  "GOLD%20%2F%20USD",
   "SOL%2FUSD",
   "HENLO%20%2F%20USD",
   "BTC%20Dominance",
@@ -188,10 +189,13 @@ export enum CategoryName {
   Chess = "Chess",
   Artists = "Artists",
   Bera = "Bera",
-  Fansly = "Fansly",
+  Fansly = "Adult Content Creators",
   Other = "Other",
   YouTube = "YouTube",
   Twitter = "Twitter",
+  Gambling = "Gambling",
+  Indices = "Indices",
+  Majors = "Majors",
 }
 
 export type MarketCategoryMap = {
@@ -227,6 +231,10 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "BTC%20Dominance",
     "ETH%20Dominance",
     "ASTER%20vs%20MYX",
+    "BNB%20%2F%20USD",
+    "SOL%20Index",
+    "SOL%2FUSD",
+    "Binance%20Alpha%20Index",
     "AI%20Index",
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",
@@ -236,6 +244,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   ],
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
+    "The%20Weeknd%20Index",
     "Mr%20Beast%20Popularity%20Index",
   ],
   [CategoryName.Fansly]: [
@@ -251,5 +260,27 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "Elon%20Musk%20Mood%20Index",
     "Founders%20Operations%20Index",
   ],
+  [CategoryName.Gambling]: [
+    "Double%20or%20Nothing",
+  ],
+  [CategoryName.Indices]: [
+    "Strategic%20Reserve%20Index",
+    "Made%20In%20USA%20Index",
+    "SOL%20Index",
+    "Binance%20Alpha%20Index",
+    "AI%20Index",
+    "AI%20Agents%20Index",
+  ],
+  [CategoryName.Majors]: [
+    "ETH%20%2F%20USD",
+    "BTC%20%2F%20USD",
+    "GOLD%20%2F%20USD",
+  ],
   [CategoryName.Other]: [],
 };
+
+export const NEW_CATEGORIES = [
+  CategoryName.YouTube,
+  CategoryName.Twitter,
+  CategoryName.Gambling,
+];

@@ -14,7 +14,7 @@ import Loader from "../Loader";
 import UnwindPosition from "./UnwindPosition";
 import PositionNotFound from "./PositionNotFound";
 import WithdrawOVL from "./WithdrawOVL";
-import { useTradeState } from "../../state/trade/hooks";
+import { useTradeState, useUnwindPreference } from "../../state/trade/hooks";
 import useSDK from "../../providers/SDKProvider/useSDK";
 
 type PositionUnwindModalProps = {
@@ -33,12 +33,16 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
   const isUnwindStateSuccess = useTypeGuard<UnwindStateSuccess>("pnl");
   const isUnwindStateError = useTypeGuard<UnwindStateError>("error");
   const { slippageValue } = useTradeState();
+  const unwindPreference = useUnwindPreference();
 
   const [unwindState, setUnwindState] = useState<UnwindStateData | undefined>(
     undefined
   );
   const [inputValue, setInputValue] = useState<string>("");
   const [unwindPercentage, setUnwindPercentage] = useState<number>(0);
+  const [stableQuote, setStableQuote] = useState<{ minOut: bigint; expectedOut: bigint } | null>(null);
+  const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteFailed, setQuoteFailed] = useState(false);
 
   useEffect(() => {
     setInputValue("");
@@ -77,6 +81,73 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
       isCancelled = true;
     };
   }, [position, account, open, slippageValue, unwindPercentage]);
+
+  // Fetch USDT quote when modal opens if preference is 'stable' and position has positive PnL
+  useEffect(() => {
+    // Only fetch when modal opens
+    if (!open) {
+      setStableQuote(null);
+      return;
+    }
+
+    // Fetch based on preference setting (for all positions when stable is preferred)
+    if (unwindPreference !== 'stable' || !unwindState || !account) {
+      setStableQuote(null);
+      return;
+    }
+
+    // Check if PnL is positive (only fetch for profitable positions)
+    if (isUnwindStateSuccess(unwindState) && Number(unwindState.pnl) <= 0) {
+      setStableQuote(null);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const fetchStableQuote = async () => {
+      setQuoteLoading(true);
+      setQuoteFailed(false);
+
+      try {
+        // For LBSC positions, calculate quote using oracle price instead of simulation
+        // Calculate PnL in USDT, not full position value
+        const oraclePrice = await sdk.lbsc.getOraclePrice();
+
+        // Get the PnL value in wei from unwindState (not the full position value)
+        const pnlStr = isUnwindStateSuccess(unwindState) ? unwindState.pnl : '0';
+        const pnlWei = BigInt(Math.floor(Number(pnlStr) * 1e18));
+
+        // Calculate expected USDT PnL: (OVL PnL * oracle price) / WAD
+        const WAD = BigInt(1e18);
+        const expectedOut = (pnlWei * oraclePrice) / WAD;
+
+        // Calculate minimum PnL with slippage: expectedOut * (100 - slippage) / 100
+        const slippagePercent = Number(slippageValue);
+        const minOut = (expectedOut * BigInt(100 - slippagePercent)) / BigInt(100);
+
+        const quote = { minOut, expectedOut };
+
+        if (!isCancelled) {
+          setStableQuote(quote);
+        }
+      } catch (error) {
+        console.error('Failed to calculate stable quote:', error);
+        if (!isCancelled) {
+          setQuoteFailed(true);
+        }
+      } finally {
+        if (!isCancelled) {
+          setQuoteLoading(false);
+        }
+      }
+    };
+
+    fetchStableQuote();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [open, unwindPreference, unwindState, account, slippageValue, sdk, isUnwindStateSuccess]);
 
   return (
     <Modal triggerElement={null} open={open} handleClose={handleDismiss}>
@@ -117,6 +188,10 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
           unwindPercentage={unwindPercentage}
           setUnwindPercentage={setUnwindPercentage}
           handleDismiss={handleDismiss}
+          stableQuote={stableQuote}
+          quoteLoading={quoteLoading}
+          quoteFailed={quoteFailed}
+          slippageValue={slippageValue}
         />
       )}
 

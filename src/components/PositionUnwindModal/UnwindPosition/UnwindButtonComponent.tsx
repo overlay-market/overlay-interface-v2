@@ -10,7 +10,7 @@ import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
-import { useTradeActionHandlers } from "../../../state/trade/hooks";
+import { useTradeActionHandlers, useTradeState } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
 import { usePublicClient } from "wagmi";
 import { trackEvent } from "../../../analytics/trackEvent";
@@ -22,6 +22,7 @@ type UnwindButtonComponentProps = {
   unwindPercentage: number;
   priceLimit: bigint;
   isPendingTime: boolean;
+  unwindStable?: boolean;
   handleDismiss: () => void;
 };
 
@@ -32,12 +33,14 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   unwindPercentage,
   priceLimit,
   isPendingTime,
+  unwindStable,
   handleDismiss,
 }) => {
   const sdk = useSDK();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
+  const { slippageValue } = useTradeState();
   const { address } = useAccount();
   const publicClient = usePublicClient();
 
@@ -79,12 +82,72 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
     setAttemptingUnwind(true);
 
     try {
-      const result = await sdk.market.unwind({
+      const parsedSlippage = Number(slippageValue);
+      const slippage =
+        Number.isFinite(parsedSlippage) && parsedSlippage > 0
+          ? parsedSlippage
+          : 1;
+
+      const unwindParams = {
         marketAddress: position.marketAddress as Address,
         positionId: BigInt(position.positionId),
         fraction: toWei(unwindPercentage),
         priceLimit,
-      });
+      };
+
+      let result;
+
+      // Try stable unwind if preference is set
+      if (unwindStable) {
+        try {
+          result = await sdk.shiva.unwindStable({
+            ...unwindParams,
+            account: address as Address,
+            slippage,
+          });
+        } catch (stableError: any) {
+          // Check if user rejected the transaction
+          const isUserRejection =
+            stableError?.code === 4001 ||
+            stableError?.code === "ACTION_REJECTED" ||
+            stableError?.message?.toLowerCase().includes('user rejected') ||
+            stableError?.message?.toLowerCase().includes('user denied');
+
+          if (isUserRejection) {
+            // User rejected - don't fallback, just throw the error
+            throw stableError;
+          }
+
+          // Check if it's a swap/1inch related error (not user rejection)
+          const isSwapError =
+            stableError?.message?.includes('1Inch') ||
+            stableError?.message?.includes('swap') ||
+            stableError?.message?.includes('Failed to fetch swap data');
+
+          if (isSwapError) {
+            // Fallback to normal unwind only for swap errors
+            result = await sdk.market.unwind(unwindParams);
+
+            // Inform user about fallback
+            addPopup(
+              {
+                txn: {
+                  hash: currentTimeForId,
+                  success: null,
+                  message: "USDT conversion unavailable. Proceeding with OVL unwind.",
+                  type: TransactionType.UNWIND_OVL_POSITION,
+                },
+              },
+              currentTimeForId
+            );
+          } else {
+            // Unknown error - don't fallback, throw it
+            throw stableError;
+          }
+        }
+      } else {
+        result = await sdk.market.unwind(unwindParams);
+      }
 
       let receipt = result.receipt;
 

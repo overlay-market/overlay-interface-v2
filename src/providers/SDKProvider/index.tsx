@@ -19,6 +19,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       },
       web3Provider: walletClient as any,
       useShiva: true,
+      oneInchApiBaseUrl: import.meta.env.VITE_ONE_INCH_BASE_URL,
     });
   }, [chainId, walletClient]);
 
