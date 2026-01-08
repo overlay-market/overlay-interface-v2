@@ -1,5 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { SelectState } from '../../types/selectChainAndTokenTypes';
+import { OptimisticPosition } from './reducer';
 
 export enum DefaultTxnSettings {
   DEFAULT_SLIPPAGE = '1',
@@ -25,3 +26,6 @@ export const setUnwindPreference = createAction<{
   unwindPreference: 'normal' | 'stable';
 }>('trade/setUnwindPreference');
 export const resetTradeState = createAction<void>('trade/resetTradeState');
+export const addOptimisticPosition = createAction<OptimisticPosition>('trade/addOptimisticPosition');
+export const removeOptimisticPosition = createAction<{ txHash: string }>('trade/removeOptimisticPosition');
+export const clearOptimisticPositions = createAction<void>('trade/clearOptimisticPositions');

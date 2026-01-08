@@ -12,13 +12,31 @@ import {
   setChainState,
   setTokenState,
   setCollateralType,
-  setUnwindPreference
+  setUnwindPreference,
+  addOptimisticPosition,
+  removeOptimisticPosition,
+  clearOptimisticPositions
 } from "./actions";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { getFromLocalStorage } from "../../utils/getFromLocalStorage";
 import { deserializeWithBigInt, serializeWithBigInt } from "../../utils/serializeWithBigInt";
 import { DEFAULT_TOKEN } from "../../constants/applications";
 import { SelectState } from "../../types/selectChainAndTokenTypes";
+import { Address } from "viem";
+
+export interface OptimisticPosition {
+  txHash: string;
+  marketAddress: Address;
+  marketName: string;
+  isLong: boolean;
+  leverage: string;
+  collateral: string;
+  estimatedEntryPrice: string;
+  estimatedLiquidationPrice: string;
+  createdAt: number;
+  collateralType: 'OVL' | 'USDT';
+  priceCurrency?: string;
+}
 
 export interface TradeState {
   readonly typedValue: string;
@@ -33,6 +51,7 @@ export interface TradeState {
   readonly tokenState: SelectState;
   readonly collateralType: 'OVL' | 'USDT';
   readonly unwindPreference: 'normal' | 'stable';
+  readonly optimisticPositions: OptimisticPosition[];
 }
 
 export const initialState: TradeState = {
@@ -52,6 +71,7 @@ export const initialState: TradeState = {
   tokenState: SelectState.LOADING,
   collateralType: getFromLocalStorage('collateralType', 'USDT') as 'OVL' | 'USDT',
   unwindPreference: getFromLocalStorage('unwindPreference', 'stable') as 'normal' | 'stable',
+  optimisticPositions: [],
 };
 
 export default createReducer<TradeState>(initialState, (builder) =>
@@ -93,5 +113,16 @@ export default createReducer<TradeState>(initialState, (builder) =>
     .addCase(resetTradeState, (state) => {
       state.typedValue = initialState.typedValue;
       state.isLong = initialState.isLong;
+    })
+    .addCase(addOptimisticPosition, (state, action) => {
+      state.optimisticPositions = [action.payload, ...state.optimisticPositions];
+    })
+    .addCase(removeOptimisticPosition, (state, action) => {
+      state.optimisticPositions = state.optimisticPositions.filter(
+        p => p.txHash !== action.payload.txHash
+      );
+    })
+    .addCase(clearOptimisticPositions, (state) => {
+      state.optimisticPositions = [];
     })
 );

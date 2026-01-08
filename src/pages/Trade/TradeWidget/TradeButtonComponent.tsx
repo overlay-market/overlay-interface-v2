@@ -10,7 +10,9 @@ import {
   useTradeActionHandlers,
   useTradeState,
   useCollateralType,
+  useOptimisticPositionHandlers,
 } from "../../../state/trade/hooks";
+import { OptimisticPosition } from "../../../state/trade/reducer";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toWei, TradeState, TradeStateData, formatWeiToParsedNumber } from "overlay-sdk";
 import { parseUnits } from "viem";
@@ -49,6 +51,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { currentMarket: market } = useCurrentMarketState();
   const { handleTradeStateReset, handleTxnHashUpdate } =
     useTradeActionHandlers();
+  const { handleAddOptimisticPosition, handleRemoveOptimisticPosition } =
+    useOptimisticPositionHandlers();
   const { typedValue, selectedLeverage, isLong, slippageValue } = useTradeState();
   const { chainState, tokenState } = useChainAndTokenState();
   const collateralType = useCollateralType();
@@ -244,6 +248,29 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         }
 
         if (isSuccess) {
+          // Create optimistic position
+          const optimisticPosition: OptimisticPosition = {
+            txHash: result.hash,
+            marketAddress: market.id as Address,
+            marketName: market.marketName,
+            isLong,
+            leverage: selectedLeverage,
+            collateral: typedValue,
+            estimatedEntryPrice: tradeState.priceInfo.minPrice as string,
+            estimatedLiquidationPrice: tradeState.liquidationPriceEstimate as string,
+            createdAt: Date.now(),
+            collateralType,
+            priceCurrency: market.priceCurrency,
+          };
+
+          handleAddOptimisticPosition(optimisticPosition);
+
+          // Remove after delay to allow subgraph sync (fallback if smart detection doesn't trigger)
+          // Extended to 2 minutes to account for subgraph lag
+          setTimeout(() => {
+            handleRemoveOptimisticPosition(result.hash);
+          }, 120_000);
+
           trackEvent("build_ovl_position_success", {
             transaction_hash: `hash_${result.hash}`,
             wallet_address: address,
@@ -399,6 +426,29 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         }
 
         if (isSuccess) {
+          // Create optimistic position
+          const optimisticPosition: OptimisticPosition = {
+            txHash: result.hash,
+            marketAddress: market.id as Address,
+            marketName: market.marketName,
+            isLong,
+            leverage: selectedLeverage,
+            collateral: typedValue,
+            estimatedEntryPrice: tradeState.priceInfo.minPrice as string,
+            estimatedLiquidationPrice: tradeState.liquidationPriceEstimate as string,
+            createdAt: Date.now(),
+            collateralType,
+            priceCurrency: market.priceCurrency,
+          };
+
+          handleAddOptimisticPosition(optimisticPosition);
+
+          // Remove after delay to allow subgraph sync (fallback if smart detection doesn't trigger)
+          // Extended to 2 minutes to account for subgraph lag
+          setTimeout(() => {
+            handleRemoveOptimisticPosition(result.hash);
+          }, 120_000);
+
           trackEvent("build_ovl_position_success", {
             transaction_hash: `hash_${result.hash}`,
             wallet_address: address,
@@ -961,6 +1011,29 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         }
 
         if (isSuccess) {
+          // Create optimistic position
+          const optimisticPosition: OptimisticPosition = {
+            txHash: result.hash,
+            marketAddress: market.id as Address,
+            marketName: market.marketName,
+            isLong,
+            leverage: selectedLeverage,
+            collateral: (formatWeiToParsedNumber(collateralAmount!, 18, 6) || "0").toString(),
+            estimatedEntryPrice: tradeState.priceInfo.minPrice as string,
+            estimatedLiquidationPrice: tradeState.liquidationPriceEstimate as string,
+            createdAt: Date.now(),
+            collateralType: 'OVL',
+            priceCurrency: market.priceCurrency,
+          };
+
+          handleAddOptimisticPosition(optimisticPosition);
+
+          // Remove after delay to allow subgraph sync (fallback if smart detection doesn't trigger)
+          // Extended to 2 minutes to account for subgraph lag
+          setTimeout(() => {
+            handleRemoveOptimisticPosition(result.hash);
+          }, 120_000);
+
           trackEvent("build_ovl_position_success", {
             transaction_hash: `hash_${result.hash}`,
             wallet_address: address,

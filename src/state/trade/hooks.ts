@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setCollateralType, setSlippage, setTokenState, setUnwindPreference, typeInput, updateTxnHash } from "./actions";
-import usePrevious from "../../hooks/usePrevious";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setCollateralType, setSlippage, setTokenState, setUnwindPreference, typeInput, updateTxnHash, addOptimisticPosition, removeOptimisticPosition } from "./actions";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import { TokenAmount } from "@lifi/sdk";
 import { deserializeWithBigInt, serializeWithBigInt } from "../../utils/serializeWithBigInt";
@@ -12,6 +11,7 @@ import { DEFAULT_CHAINID } from "../../constants/chains";
 import { useSelectedChain } from "../../hooks/lifi/useSelectedChain";
 import { DEFAULT_TOKEN } from "../../constants/applications";
 import useAccount from "../../hooks/useAccount";
+import { OptimisticPosition } from "./reducer";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
@@ -25,6 +25,10 @@ export function useCollateralType(): 'OVL' | 'USDT' {
 
 export function useUnwindPreference(): 'normal' | 'stable' {
   return useAppSelector((state) => state.trade.unwindPreference);
+}
+
+export function useOptimisticPositions(): OptimisticPosition[] {
+  return useAppSelector((state) => state.trade.optimisticPositions);
 }
 
 export function useChainAndTokenState(): {
@@ -147,19 +151,36 @@ export const useTradeActionHandlers = (): {
 
   const handleTxnHashUpdate = useCallback(
     async (txnHash: string, txnBlockNumber: number) => {
+      // Dispatch immediately to trigger polling
+      console.log('[handleTxnHashUpdate] Dispatching txnHash immediately:', txnHash);
+      dispatch(updateTxnHash({ txnHash }));
+
+      // Also start checking subgraph for additional refreshes
+      let checkCount = 0;
+      const maxChecks = 30; // Check for up to 30 seconds
       const checkSubgraphBlock = async () => {
+        checkCount++;
         const lastSubgraphBlock = await sdk.core.getLastSubgraphProcessedBlock();
 
+        console.log(`[handleTxnHashUpdate] Subgraph check ${checkCount}/${maxChecks}:`, {
+          lastSubgraphBlock,
+          txnBlockNumber,
+          synced: lastSubgraphBlock > txnBlockNumber,
+        });
+
         if (lastSubgraphBlock > txnBlockNumber) {
-          dispatch(updateTxnHash({ txnHash }));
-        } else {
+          console.log('[handleTxnHashUpdate] Subgraph synced!');
+          // Don't dispatch again - polling mechanism will handle refreshes
+        } else if (checkCount < maxChecks) {
           setTimeout(checkSubgraphBlock, 1000);
+        } else {
+          console.log('[handleTxnHashUpdate] Subgraph check timeout');
         }
       };
 
       checkSubgraphBlock();
     },
-    [dispatch]
+    [dispatch, sdk]
   );
 
   const handleTradeStateReset = useCallback(
@@ -185,16 +206,54 @@ export const useTradeActionHandlers = (): {
   }
 };
 
+export const useOptimisticPositionHandlers = () => {
+  const dispatch = useAppDispatch();
+
+  const handleAddOptimisticPosition = useCallback((position: OptimisticPosition) => {
+    dispatch(addOptimisticPosition(position));
+  }, [dispatch]);
+
+  const handleRemoveOptimisticPosition = useCallback((txHash: string) => {
+    dispatch(removeOptimisticPosition({ txHash }));
+  }, [dispatch]);
+
+  return {
+    handleAddOptimisticPosition,
+    handleRemoveOptimisticPosition,
+  };
+};
+
 export const useIsNewTxnHash = (): boolean => {
   const txnHash = useAppSelector((state) => state.trade.txnHash);
   const [hasInitialized, setHasInitialized] = useState(false);
-  const previousTxnHash = usePrevious(txnHash)
+  const [lastTxnHash, setLastTxnHash] = useState('');
+  const [txnHashTimestamp, setTxnHashTimestamp] = useState(0);
 
   useEffect(() => {
     setHasInitialized(true);
   }, []);
 
-  return hasInitialized && txnHash !== '' && txnHash !== previousTxnHash;
+  useEffect(() => {
+    // When txnHash changes to a new non-empty value, record the timestamp
+    if (txnHash !== '' && txnHash !== lastTxnHash && !txnHash.endsWith('-synced')) {
+      console.log('[useIsNewTxnHash] New txnHash detected:', txnHash);
+      setLastTxnHash(txnHash);
+      setTxnHashTimestamp(Date.now());
+    }
+  }, [txnHash, lastTxnHash]);
+
+  // Stay true for 10 seconds after a new txnHash is detected
+  // This gives polling enough time to start and run
+  const timeSinceLastTxn = Date.now() - txnHashTimestamp;
+  const isRecent = txnHashTimestamp > 0 && timeSinceLastTxn < 10_000;
+
+  const result = hasInitialized && txnHash !== '' && isRecent;
+
+  if (result) {
+    console.log('[useIsNewTxnHash] Returning true - timeSinceLastTxn:', timeSinceLastTxn);
+  }
+
+  return result;
 }
 
 export const useSelectStateManager = () => {
