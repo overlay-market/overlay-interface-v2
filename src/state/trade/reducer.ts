@@ -28,6 +28,8 @@ export interface OptimisticPosition {
   txHash: string;
   marketAddress: Address;
   marketName: string;
+  account: Address;
+  chainId: number;
   isLong: boolean;
   leverage: string;
   collateral: string;

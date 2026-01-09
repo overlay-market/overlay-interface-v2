@@ -60,9 +60,11 @@ const PositionsTable: React.FC = () => {
     currentPositionCountRef.current = positionsTotalNumber;
   }, [positionsTotalNumber]);
 
-  // Debug: Log when isNewTxnHash changes
+  // Debug: Log when isNewTxnHash changes to true (transaction detected)
   useEffect(() => {
-    console.log('[PositionsTable] isNewTxnHash changed:', isNewTxnHash);
+    if (isNewTxnHash) {
+      console.log('[PositionsTable] New transaction detected, isNewTxnHash = true');
+    }
   }, [isNewTxnHash]);
 
   // Poll for new positions after transaction until we find it or timeout
@@ -108,8 +110,8 @@ const PositionsTable: React.FC = () => {
   useEffect(() => {
     if (optimisticPositions.length === 0) return;
 
-    // Get the newest optimistic position
-    const newestOptimistic = optimisticPositions[optimisticPositions.length - 1];
+    // Get the newest optimistic position (newest is at index 0)
+    const newestOptimistic = optimisticPositions[0];
     const timeSinceCreation = Date.now() - newestOptimistic.createdAt;
 
     // If position was just created (within 2 seconds), trigger a refresh
@@ -133,19 +135,17 @@ const PositionsTable: React.FC = () => {
         setLoading(true);
         console.log('[PositionsTable] Fetching positions:', {
           marketId,
-          decodedMarketId: decodeURIComponent(marketId),
           refreshData,
           isNewTxnHash,
           forceRefresh,
         });
         try {
-          // Decode market ID before passing to SDK (URL may have encoded spaces)
-          const decodedMarketId = decodeURIComponent(marketId);
+          // marketId from useSearchParams() is already decoded
           const positions =
             await sdkRef.current.openPositions.transformOpenPositions(
               currentPage,
               itemsPerPage,
-              decodedMarketId,
+              marketId,
               account as Address,
               refreshData
             );
@@ -180,13 +180,14 @@ const PositionsTable: React.FC = () => {
 
   // Merge optimistic positions with real positions
   const mergedPositions = useMemo(() => {
-    // Decode URL-encoded marketId (e.g., "Counter-Strike%202%20Skins" -> "Counter-Strike 2 Skins")
-    const decodedMarketId = marketId ? decodeURIComponent(marketId) : null;
-
-    // Filter optimistic positions for current market
-    // Note: marketId from URL is the market NAME, not address
+    // marketId from useSearchParams() is already decoded
+    // Filter optimistic positions for current market AND current account
     const relevantOptimistic = optimisticPositions
-      .filter(op => op.marketName === decodedMarketId)
+      .filter(op =>
+        op.marketName === marketId &&
+        op.account === account &&
+        op.chainId === chainId
+      )
       .map(op => convertToOpenPositionData(op));
 
     // If no real positions yet, just return optimistic ones (or undefined if none)
@@ -196,31 +197,15 @@ const PositionsTable: React.FC = () => {
 
     // Prepend optimistic positions (show at top)
     return [...relevantOptimistic, ...positions];
-  }, [positions, optimisticPositions, marketId]);
+  }, [positions, optimisticPositions, marketId, account, chainId]);
 
   // Smart detection: Remove optimistic positions when matching real position appears
   // This runs whenever positions change OR during polling period
   useEffect(() => {
     if (!positions || optimisticPositions.length === 0) return;
 
-    const decodedMarketId = marketId ? decodeURIComponent(marketId) : null;
-
-    console.log('[Smart Detection] Running check with', {
-      positionCount: positions.length,
-      optimisticCount: optimisticPositions.length,
-      forceRefresh,
-    });
-
     // Check each optimistic position for a matching real position
     optimisticPositions.forEach(optimistic => {
-      console.log('[Smart Detection] Checking optimistic position:', {
-        market: optimistic.marketName,
-        side: optimistic.isLong ? 'Long' : 'Short',
-        collateral: optimistic.collateral,
-        leverage: optimistic.leverage,
-        txHash: optimistic.txHash,
-        createdAt: new Date(optimistic.createdAt).toISOString(),
-      });
 
       // Find matching real position by market, side, leverage
       // Sort positions by creation time (newest first) to prioritize recent positions
@@ -232,15 +217,22 @@ const PositionsTable: React.FC = () => {
 
       // First try: Match by timestamp (within 2 minutes)
       let matchingReal = sortedPositions.find(real => {
-        const sameMarket = real.marketName === decodedMarketId;
-        const sameSide = real.positionSide?.includes(optimistic.isLong ? 'Long' : 'Short');
+        // Defensive checks for undefined values
+        if (!real.marketName || !real.positionSide || !marketId) return false;
+
+        const sameMarket = real.marketName === marketId;
+        const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
 
         // Extract leverage from real position (e.g., "13.10000000000000000120018702277545x Short" -> 13.1)
-        const realLeverageMatch = real.positionSide?.match(/^([\d.]+)x/);
+        const realLeverageMatch = real.positionSide.match(/^([\d.]+)x/);
         const realLeverage = realLeverageMatch ? parseFloat(realLeverageMatch[1]) : null;
         const optimisticLeverageNum = parseFloat(optimistic.leverage);
+
+        // Defensive check for NaN
+        if (realLeverage === null || isNaN(optimisticLeverageNum)) return false;
+
         // Match if leverage is within 0.01 tolerance (handles precision differences)
-        const sameLeverage = realLeverage !== null && Math.abs(realLeverage - optimisticLeverageNum) < 0.01;
+        const sameLeverage = Math.abs(realLeverage - optimisticLeverageNum) < 0.01;
 
         // Check if real position was created recently (within 2 minutes of optimistic for safety)
         const realTimestamp = real.parsedCreatedTimestamp
@@ -250,67 +242,60 @@ const PositionsTable: React.FC = () => {
         const timeDiff = Math.abs(realTimestamp - optimisticTimestamp);
         const isRecent = realTimestamp > 0 && timeDiff < 120_000; // 2 minute window (extended for subgraph lag)
 
-        console.log('[Smart Detection] Comparing with real position (timestamp match):', {
-          realMarket: real.marketName,
-          expectedMarket: decodedMarketId,
-          sameMarket,
-          realSide: real.positionSide,
-          expectedSide: optimistic.isLong ? 'Long' : 'Short',
-          sameSide,
-          realLeverage,
-          optimisticLeverage: optimisticLeverageNum,
-          leverageDiff: realLeverage ? Math.abs(realLeverage - optimisticLeverageNum) : null,
-          sameLeverage,
-          realTimestamp: new Date(realTimestamp).toISOString(),
-          optimisticTimestamp: new Date(optimisticTimestamp).toISOString(),
-          timeDiff: `${(timeDiff / 1000).toFixed(1)}s`,
-          isRecent,
-          positionId: real.positionId,
-          MATCH: sameMarket && sameSide && sameLeverage && isRecent,
-        });
+        const isMatch = sameMarket && sameSide && sameLeverage && isRecent;
 
-        return sameMarket && sameSide && sameLeverage && isRecent;
+        // Only log when we find a match (reduce spam)
+        if (isMatch) {
+          console.log('[Smart Detection] ✅ Timestamp match found:', {
+            market: real.marketName,
+            side: real.positionSide,
+            positionId: real.positionId,
+          });
+        }
+
+        return isMatch;
       });
 
       // Fallback: If no timestamp match, match the FIRST (newest) position with same market/side/leverage
       // This handles cases where subgraph returns stale timestamps
       if (!matchingReal) {
-        console.log('[Smart Detection] No timestamp match, trying fallback match (newest position)');
         matchingReal = sortedPositions.find(real => {
-          const sameMarket = real.marketName === decodedMarketId;
-          const sameSide = real.positionSide?.includes(optimistic.isLong ? 'Long' : 'Short');
+          // Defensive checks for undefined values
+          if (!real.marketName || !real.positionSide || !marketId) return false;
+
+          const sameMarket = real.marketName === marketId;
+          const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
 
           // Extract leverage numerically (same as timestamp match above)
-          const realLeverageMatch = real.positionSide?.match(/^([\d.]+)x/);
+          const realLeverageMatch = real.positionSide.match(/^([\d.]+)x/);
           const realLeverage = realLeverageMatch ? parseFloat(realLeverageMatch[1]) : null;
           const optimisticLeverageNum = parseFloat(optimistic.leverage);
-          const sameLeverage = realLeverage !== null && Math.abs(realLeverage - optimisticLeverageNum) < 0.01;
 
-          console.log('[Smart Detection] Fallback match check:', {
-            realMarket: real.marketName,
-            expectedMarket: decodedMarketId,
-            sameMarket,
-            realSide: real.positionSide,
-            sameSide,
-            realLeverage,
-            optimisticLeverage: optimisticLeverageNum,
-            leverageDiff: realLeverage ? Math.abs(realLeverage - optimisticLeverageNum) : null,
-            sameLeverage,
-            positionId: real.positionId,
-            MATCH: sameMarket && sameSide && sameLeverage,
-          });
+          // Defensive check for NaN
+          if (realLeverage === null || isNaN(optimisticLeverageNum)) return false;
 
-          return sameMarket && sameSide && sameLeverage;
+          const sameLeverage = Math.abs(realLeverage - optimisticLeverageNum) < 0.01;
+          const isMatch = sameMarket && sameSide && sameLeverage;
+
+          // Only log when we find a match
+          if (isMatch) {
+            console.log('[Smart Detection] ✅ Fallback match found:', {
+              market: real.marketName,
+              side: real.positionSide,
+              positionId: real.positionId,
+            });
+          }
+
+          return isMatch;
         });
       }
 
       // If matching real position found, remove optimistic immediately
       if (matchingReal) {
-        console.log('[Smart Detection] ✅ MATCH FOUND! Removing optimistic position');
+        console.log('[Smart Detection] Removing optimistic position for', optimistic.marketName);
         handleRemoveOptimisticPosition(optimistic.txHash);
-      } else {
-        console.log('[Smart Detection] ❌ NO MATCH FOUND for optimistic position');
       }
+      // Silently continue if no match (reduces spam - it's expected during polling)
     });
   }, [positions, optimisticPositions, marketId, forceRefresh, handleRemoveOptimisticPosition]);
 
@@ -359,7 +344,11 @@ const PositionsTable: React.FC = () => {
         ) : account ? (
           mergedPositions &&
           positionsTotalNumber === 0 &&
-          optimisticPositions.filter(op => op.marketName === (marketId ? decodeURIComponent(marketId) : null)).length === 0 &&
+          optimisticPositions.filter(op =>
+            op.marketName === marketId &&
+            op.account === account &&
+            op.chainId === chainId
+          ).length === 0 &&
           <Text>No current positions</Text>
         ) : (
           <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>

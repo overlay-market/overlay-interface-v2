@@ -4,6 +4,7 @@ import {
 } from "../../../components/Button";
 import useAccount from "../../../hooks/useAccount";
 import useSDK from "../../../providers/SDKProvider/useSDK";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
   useChainAndTokenState,
@@ -29,6 +30,7 @@ import { formatFixedPoint18 } from "../../../utils/formatFixedPoint18";
 import { useLiFiBridge } from "../../../hooks/lifi/useLiFiBridge";
 import { GetBNBModal } from "../../../components/GetBNBModal";
 import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
+import { DEFAULT_CHAINID } from "../../../constants/chains";
 
 const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
@@ -45,6 +47,11 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   tradeState,
 }) => {
   const { address } = useAccount();
+  const { chainId: rawChainId } = useMultichainContext();
+  // Normalize chainId to number (handle Chain object or undefined)
+  const chainId = typeof rawChainId === 'object' && rawChainId !== null
+    ? rawChainId.id
+    : (rawChainId ?? DEFAULT_CHAINID);
   const sdk = useSDK();
   const { openModal } = useModalHelper();
   const publicClient = usePublicClient();
@@ -253,6 +260,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             txHash: result.hash,
             marketAddress: market.id as Address,
             marketName: market.marketName,
+            account: address as Address,
+            chainId,
             isLong,
             leverage: selectedLeverage,
             collateral: typedValue,
@@ -431,6 +440,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             txHash: result.hash,
             marketAddress: market.id as Address,
             marketName: market.marketName,
+            account: address as Address,
+            chainId,
             isLong,
             leverage: selectedLeverage,
             collateral: typedValue,
@@ -1016,6 +1027,8 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             txHash: result.hash,
             marketAddress: market.id as Address,
             marketName: market.marketName,
+            account: address as Address,
+            chainId,
             isLong,
             leverage: selectedLeverage,
             collateral: (formatWeiToParsedNumber(collateralAmount!, 18, 6) || "0").toString(),

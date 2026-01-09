@@ -242,16 +242,12 @@ export const useIsNewTxnHash = (): boolean => {
     }
   }, [txnHash, lastTxnHash]);
 
-  // Stay true for 10 seconds after a new txnHash is detected
-  // This gives polling enough time to start and run
+  // Stay true for 70 seconds after a new txnHash is detected
+  // This gives polling enough time to complete its full 60 second cycle
   const timeSinceLastTxn = Date.now() - txnHashTimestamp;
-  const isRecent = txnHashTimestamp > 0 && timeSinceLastTxn < 10_000;
+  const isRecent = txnHashTimestamp > 0 && timeSinceLastTxn < 70_000;
 
   const result = hasInitialized && txnHash !== '' && isRecent;
-
-  if (result) {
-    console.log('[useIsNewTxnHash] Returning true - timeSinceLastTxn:', timeSinceLastTxn);
-  }
 
   return result;
 }
