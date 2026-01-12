@@ -1,4 +1,4 @@
-import { useAccount } from "wagmi";
+import useAccount from "./useAccount";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../providers/SDKProvider/useSDK";
 import { useChainAndTokenState, useTradeState, useCollateralType } from "../state/trade/hooks";
@@ -26,7 +26,7 @@ export const useMaxInputIncludingFees = ({
   const { chainState, tokenState } = useChainAndTokenState();
   const collateralType = useCollateralType();
   const { data: selectedToken } = useSelectedTokenBalance();
-   const { data: ovlPrice } = useOvlPrice();
+  const { data: ovlPrice } = useOvlPrice();
 
   const isDefaultState = chainState === SelectState.DEFAULT && tokenState === SelectState.DEFAULT;
   const isSelectedState = chainState === SelectState.SELECTED && tokenState === SelectState.SELECTED;
@@ -115,27 +115,27 @@ export const useMaxInputIncludingFees = ({
 
       if (isSelectedState && selectedToken) {
         const ovlAmount = calculateOvlAmountFromToken(selectedToken, ovlPrice);
-        
+
         // Check if it's a native token (0x0000... address)
         const isNativeToken = selectedToken.address.toLowerCase().startsWith('0x0000');
-        
+
         let safeOvlAmount: bigint;
-        
+
         if (isNativeToken) {
           // For native tokens, use minimum gas reserve of ~$1.50
           const minGasInUSD = 1.5;
           const gasReserveInOvl = parseUnits((minGasInUSD / ovlPrice).toFixed(18), OVL_DECIMALS);
-          
+
           // Use larger of 20% or minimum gas reserve
           const percentReserve = (ovlAmount * 20n) / 100n;
           const actualReserve = gasReserveInOvl > percentReserve ? gasReserveInOvl : percentReserve;
-          
+
           safeOvlAmount = ovlAmount > actualReserve ? ovlAmount - actualReserve : 0n;
         } else {
           // ERC20 tokens: just 5% buffer for safety
           safeOvlAmount = (ovlAmount * 95n) / 100n;
         }
-        
+
         return await sdk.trade.getMaxInputIncludingFeesFromBalance(
           marketId,
           safeOvlAmount,

@@ -1,4 +1,4 @@
-import { useAccount } from "wagmi";
+import useAccount from '../useAccount';
 import { useChainAndTokenState } from "../../state/trade/hooks";
 import { useQuery } from "@tanstack/react-query";
 import { getTokenBalance } from "@lifi/sdk";
@@ -17,7 +17,7 @@ export const useSelectedTokenBalance = () => {
     },
     enabled: !!address && !!selectedToken && chainState === SelectState.SELECTED &&
       tokenState === SelectState.SELECTED,
-    staleTime: 60_000, 
-    refetchInterval: 60_000, 
+    staleTime: 60_000,
+    refetchInterval: 60_000,
   });
 }

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
+import useAccount from "./useAccount";
 import { useEffect } from "react";
 import useSDK from "../providers/SDKProvider/useSDK";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
@@ -51,11 +51,11 @@ export const useStableTokenBalance = () => {
     queryFn: () =>
       account && chainId && sdk && stableTokenInfo
         ? fetchStableTokenBalance(
-            sdk,
-            account,
-            stableTokenInfo.address,
-            stableTokenInfo.decimals,
-          )
+          sdk,
+          account,
+          stableTokenInfo.address,
+          stableTokenInfo.decimals,
+        )
         : undefined,
     enabled: Boolean(account && chainId && sdk && stableTokenInfo),
     refetchOnWindowFocus: true,

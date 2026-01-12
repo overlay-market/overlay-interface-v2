@@ -4,6 +4,8 @@ import BscTestnetLogo from "../assets/images/bsc-testnet-logo.webp";
 
 export const isTestnetMode = import.meta.env.VITE_TESTNET_MODE === 'true';
 
+export const CHAIN_ID_LOCAL_STORAGE_KEY = 'selectedChainId';
+
 export enum SUPPORTED_CHAINID {
   BSC_MAINNET = 56,
   BSC_TESTNET = 97
@@ -15,13 +17,13 @@ export const DEFAULT_CHAIN_LOGO = BscTestnetLogo;
 
 export const WORKING_CHAINS = isTestnetMode
   ?
-    [
-      SUPPORTED_CHAINID[SUPPORTED_CHAINID.BSC_TESTNET]
-    ]
+  [
+    SUPPORTED_CHAINID[SUPPORTED_CHAINID.BSC_TESTNET]
+  ]
   :
-    [
-      SUPPORTED_CHAINID[SUPPORTED_CHAINID.BSC_MAINNET],
-    ]
+  [
+    SUPPORTED_CHAINID[SUPPORTED_CHAINID.BSC_MAINNET],
+  ]
 
 export const VIEM_CHAINS: { [key: number]: Chain } = {
   [SUPPORTED_CHAINID.BSC_MAINNET]: bsc,
