@@ -1,21 +1,32 @@
 import { useMemo } from 'react'
 import { useAccount as useAccountWagmi } from 'wagmi'
 import { useSupportedChainId } from './useSupportedChainId';
-import { CHAIN_ID_LOCAL_STORAGE_KEY } from '../components/Wallet/ChainSwitch';
-import { DEFAULT_CHAINID } from '../constants/chains';
+import { DEFAULT_CHAINID, CHAIN_ID_LOCAL_STORAGE_KEY } from '../constants/chains';
+import { useAvatarTrading } from './useZodiacRoles';
 
 const useAccount = () => {
-  const { chainId, ...rest } = useAccountWagmi()
+  const { chainId, address: signerAddress, ...rest } = useAccountWagmi()
   const storedChainId = localStorage.getItem(CHAIN_ID_LOCAL_STORAGE_KEY);
+  const { isAvatarTradingActive, activeAvatar } = useAvatarTrading();
 
   const supportedChainId = useSupportedChainId(chainId ?? (storedChainId ? parseInt(storedChainId, 10) : DEFAULT_CHAINID))
+
+  const address = useMemo(() => {
+    if (isAvatarTradingActive && activeAvatar) {
+      return activeAvatar.avatar as `0x${string}`;
+    }
+    return signerAddress;
+  }, [isAvatarTradingActive, activeAvatar, signerAddress]);
 
   return useMemo(
     () => ({
       ...rest,
+      address,
+      signerAddress,
       chainId: supportedChainId,
+      isAvatarTradingActive,
     }),
-    [ rest, supportedChainId],
+    [rest, address, signerAddress, supportedChainId, isAvatarTradingActive],
   )
 }
 

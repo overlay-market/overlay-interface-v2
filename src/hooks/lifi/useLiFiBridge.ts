@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Address } from 'viem';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useWalletClient } from 'wagmi';
+import useAccount from '../useAccount';
 import { OVL_ADDRESS } from 'overlay-sdk';
 import { useChainAndTokenState, useTradeState } from '../../state/trade/hooks';
 import { convertQuoteToRoute, executeRoute, ExecutionOptions, getContractCallsQuote } from '@lifi/sdk';
@@ -119,7 +120,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
         toChain: DEFAULT_CHAINID as number,
         toToken: OVL_ADDRESS[DEFAULT_CHAINID as number],
         toAmount: adjustedOvlAmount.toString(),
-        contractCalls: [], 
+        contractCalls: [],
         slippage: BRIDGE_SLIPPAGE,
       }).catch((err) => {
         console.error("❌ Failed to get bridge quote:", err);
@@ -133,14 +134,14 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
       // Contract calls quote has different structure than regular quote
       const finalRequiredInput = quote.action?.fromAmount || '0';
       const finalExpectedOvl = adjustedOvlAmount.toString(); // We requested adjusted amount
-      const guaranteedOvlAmount = quote.estimate?.toAmountMin || adjustedOvlAmount.toString(); 
+      const guaranteedOvlAmount = quote.estimate?.toAmountMin || adjustedOvlAmount.toString();
       const approvalAddress = quote.estimate?.approvalAddress;
-      
+
       // Calculate exchange rate and fees for display
       const inputAmountReadable = Number(finalRequiredInput) / Math.pow(10, selectedToken.decimals);
       const expectedOvlReadable = Number(finalExpectedOvl) / 1e18;
       const exchangeRate = (inputAmountReadable / expectedOvlReadable).toFixed(6);
-      
+
       console.log("🎯 Contract calls quote details (adjusted amount):", {
         requestedOVL: (Number(adjustedOvlAmount) / 1e18).toFixed(6),
         expectedOVL: expectedOvlReadable.toFixed(6),
@@ -149,7 +150,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
         exchangeRate: `1 OVL = ${exchangeRate} ${selectedToken.symbol}`,
         adjustedMatch: expectedOvlReadable === (Number(adjustedOvlAmount) / 1e18) ? "✅ Perfect match!" : "❌ Mismatch"
       });
-      
+
       // Store quote info for potential modal display
       setBridgeQuote({
         expectedOvlAmount: finalExpectedOvl,
@@ -163,13 +164,13 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
       if (!switchSuccess) {
         throw new Error(`Failed to switch to source chain ${selectedChainId}`);
       }
-      
+
       // Refetch wallet client to get updated chain context after switch
       const { data: freshWalletClient } = await refetchWalletClient();
       if (!freshWalletClient) {
         throw new Error('Failed to get updated wallet client after chain switch');
       }
-      
+
       console.log("✅ Successfully switched to source chain for approval:", {
         targetChainId: selectedChainId,
         tokenChainId: selectedToken.chainId,
@@ -294,7 +295,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
     } catch (error: unknown) {
       console.error('Bridge error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Bridge failed';
-      
+
       // Reset to idle state so user can retry immediately
       setBridgeStage({ stage: 'idle' });
 
