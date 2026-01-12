@@ -176,6 +176,8 @@ export const CardDetailValue = styled(Text)`
 // Carousel Section
 export const CarouselSection = styled(Box)`
   padding: 24px 0 32px;
+  display: flex;
+  justify-content: flex-start;
 
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 32px 0 48px;
@@ -183,6 +185,10 @@ export const CarouselSection = styled(Box)`
 
   @media (min-width: ${theme.breakpoints.md}) {
     padding: 40px 0 56px;
+  }
+
+  @media (min-width: 1900px) {
+    justify-content: center;
   }
 `;
 
@@ -209,6 +215,16 @@ export const CarouselWrapper = styled(Box)`
   }
 `;
 
+export const CarouselContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  @media (min-width: 1900px) {
+    width: auto;
+  }
+`;
+
 export const SectionTitle = styled(Text)`
   font-size: 12px;
   font-weight: 600;
@@ -221,13 +237,11 @@ export const SectionTitle = styled(Text)`
   @media (min-width: ${theme.breakpoints.sm}) {
     font-size: 14px;
     margin-bottom: 16px;
-    padding: 0 32px;
   }
 
   @media (min-width: ${theme.breakpoints.md}) {
     font-size: 16px;
     margin-bottom: 20px;
-    padding: 0 48px;
   }
 `;
 
