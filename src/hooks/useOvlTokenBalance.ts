@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
+import useAccount from "./useAccount";
 import useSDK from "../providers/SDKProvider/useSDK";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import { useIsNewTxnHash } from "../state/trade/hooks";
@@ -32,7 +32,7 @@ export const useOvlTokenBalance = () => {
       account && chainId && sdk ? fetchTokenBalance(sdk, account) : undefined,
     enabled: Boolean(account && chainId && sdk),
     refetchOnWindowFocus: true,
-    refetchOnReconnect: true,  
+    refetchOnReconnect: true,
   });
 
   useEffect(() => {

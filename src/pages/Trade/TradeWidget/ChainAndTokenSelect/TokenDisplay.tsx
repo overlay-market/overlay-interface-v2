@@ -3,7 +3,7 @@ import theme from "../../../../theme";
 import { useChainAndTokenState } from "../../../../state/trade/hooks";
 import { SelectState } from "../../../../types/selectChainAndTokenTypes";
 import { DEFAULT_TOKEN } from "../../../../constants/applications";
-import { useAccount } from "wagmi";
+import useAccount from "../../../../hooks/useAccount";
 
 interface TokenDisplayProps {
   onClick: () => void;
