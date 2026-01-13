@@ -122,4 +122,4 @@ export const PROGRAM_TIERS: ProgramTier[] = [
 ];
 
 export const IMPORTANT_NOTICE =
-  'Double-or-Nothing market is excluded from the funded trader program - Trades at this market will not be counted.';
+  'Double-or-Nothing market is excluded from the funded trader program - Trades at this market will not be counted.\n\nAfter passing, inactivity for 14 consecutive days will result in loss of access to the funds.';

@@ -49,7 +49,7 @@ const FundedTrader: React.FC = () => {
           <Text size="2" weight="medium" style={{ color: theme.color.white }}>
             ⚠️ Important
           </Text>
-          <Text size="2" style={{ color: theme.color.grey3 }}>
+          <Text size="2" style={{ color: theme.color.grey3, whiteSpace: "pre-line" }}>
             {IMPORTANT_NOTICE}
           </Text>
         </NoticeBox>
