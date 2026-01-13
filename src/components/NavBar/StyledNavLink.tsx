@@ -34,8 +34,11 @@ const StyledNavLink: React.FC<StyledNavLinkProps> = ({ link, mode }) => {
                   align="center"
                   gap="4px"
                   height={"100%"}
+                  style={{ textAlign: "center" }}
                 >
-                  <ActiveIcon size={size} />
+                  <div style={{ flexShrink: 0 }}>
+                    <ActiveIcon size={size} />
+                  </div>
                   {isActive ? (
                     <ActiveLabel>{link.label}</ActiveLabel>
                   ) : (

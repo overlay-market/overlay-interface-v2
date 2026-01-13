@@ -16,6 +16,7 @@ import ScrollToTop from "./utils/scrollToTop";
 import Leaderboard from "./pages/Leaderboard";
 import { LiFiProvider } from "./providers/LiFiProvider";
 import Airdrops from "./pages/Airdrops";
+import FundedTrader from "./pages/FundedTrader";
 import ExchangeLiFi from "./pages/ExchangeLiFi";
 import AnalyticsListener from "./analytics/AnalyticsListener";
 import WalletTracker from "./analytics/WalletTracker";
@@ -53,6 +54,7 @@ const App = () => {
                     element={<Leaderboard />}
                   />
                   <Route path="/airdrops" element={<Airdrops />} />
+                  <Route path="/funded-trader" element={<FundedTrader />} />
                   <Route path="/exchange/*" element={<ExchangeLiFi />} />
                   {/* <Route path="/faucet" element={<Faucet />} /> */}
                   {/* <Route path="/bridge" element={<Bridge />} /> */}
