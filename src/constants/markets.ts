@@ -55,6 +55,7 @@ import DoNLogo from '../assets/images/markets-full-logos/DoN.jpg';
 import JamesWynnLogo from '../assets/images/markets-full-logos/JamesWynnLogo.jpg';
 import ElonMuskIndexLogo from '../assets/images/markets-full-logos/ElonMuskIndex.jpg';
 import FoundersOperationsLogo from '../assets/images/markets-full-logos/FoundersOperationsLogo.jpg';
+import CZClarityLogo from '../assets/images/markets-full-logos/cz.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -114,6 +115,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "James%20Wynn%20Mind%20Stability%20Index": JamesWynnLogo,
   "Elon%20Musk%20Mood%20Index": ElonMuskIndexLogo,
   "Founders%20Operations%20Index": FoundersOperationsLogo,
+  "CZ%20Signals%20Clarity%20Index": CZClarityLogo
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -122,6 +124,7 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 
 export const MARKETSORDER = [
   "Elon%20Musk%20Mood%20Index",
+  "CZ%20Signals%20Clarity%20Index",
   "MrBeast%20Index",
   "Double%20or%20Nothing",
   "Amouranth%20vs%20peachJars",
@@ -259,6 +262,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "James%20Wynn%20Mind%20Stability%20Index",
     "Elon%20Musk%20Mood%20Index",
     "Founders%20Operations%20Index",
+    "CZ%20Signals%20Clarity%20Index",
   ],
   [CategoryName.Gambling]: [
     "Double%20or%20Nothing",
