@@ -126,7 +126,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
 
           if (isSwapError) {
             // Fallback to normal unwind only for swap errors
-            result = await sdk.market.unwind(unwindParams);
+            result = await sdk.market.unwind({ ...unwindParams, account: address as Address });
 
             // Inform user about fallback
             addPopup(
@@ -146,7 +146,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           }
         }
       } else {
-        result = await sdk.market.unwind(unwindParams);
+        result = await sdk.market.unwind({ ...unwindParams, account: address as Address });
       }
 
       let receipt = result.receipt;

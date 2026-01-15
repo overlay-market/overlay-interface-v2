@@ -90,9 +90,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             if (typeof originalValue === "function") {
               const resultPromise = originalValue.apply(target, [args]);
               if (args.method === "eth_call" || args.method === "eth_estimateGas") {
-                resultPromise.then((res: any) => {
-                  // console.log(`Zodiac Proxy: ${args.method} result:`, res);
-                }).catch((err: any) => {
+                resultPromise.catch((err: any) => {
                   console.error(`Zodiac Proxy: ${args.method} FAILED:`, err);
                 });
               }
