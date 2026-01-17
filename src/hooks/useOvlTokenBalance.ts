@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
 import useSDK from "../providers/SDKProvider/useSDK";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import { useIsNewTxnHash } from "../state/trade/hooks";
 import { useEffect } from "react";
+import useAccount from "./useAccount";
 
 const fetchTokenBalance = async (
   sdk: ReturnType<typeof useSDK>,

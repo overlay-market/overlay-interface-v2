@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { useAccount, useBalance, useGasPrice } from 'wagmi';
+import { useBalance, useGasPrice } from 'wagmi';
 import { formatUnits } from 'viem';
 import { DEFAULT_CHAINID } from '../constants/chains';
+import useAccount from './useAccount';
 
 // Estimated gas units for building a position (typical range: 400k-800k)
 const ESTIMATED_BUILD_GAS_UNITS = 600_000n;
