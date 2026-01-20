@@ -63,7 +63,13 @@ export const getLeaderboardColumns = (seasonId?: string): ColumnDef[] => {
       label: "Volume USD",
       render: (data) => {
         const value = Number(formatUnits(BigInt(data.totalVolumeUSD), 18));
-        return `$${formatNumberWithCommas(value)}`;
+        if (value >= 1_000_000) {
+          return `$${(value / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 2 })} M`;
+        }
+        if (value >= 100) {
+          return `$${Math.round(value).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+        }
+        return `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
       },
     }
   );
