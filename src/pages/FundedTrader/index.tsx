@@ -41,7 +41,7 @@ const FundedTrader: React.FC = () => {
             Pass the Test · Get Funded · Keep 80% of the Profits
           </HeroSubtitle>
           <JoinWaitingListButton
-            href="https://docs.google.com/forms/d/e/1FAIpQLSfu9kBX39OrgCOUGGmaZG9p3zTOOjo6VV67zzVH67NlFO0fSQ/viewform"
+            href="https://docs.google.com/forms/d/e/1FAIpQLScrPiVgDfh_jxeFWX16tCDaWAlCfIYVNKk_zTBKWJ5rQ5Q4Vg/viewform"
             target="_blank"
             rel="noopener noreferrer"
           >
