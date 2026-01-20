@@ -54,7 +54,10 @@ export const getLeaderboardColumns = (seasonId?: string): ColumnDef[] => {
       value: "fees",
       label: "Fees USD",
       render: (data) => {
-        const value = Number(formatUnits(BigInt(data.totalFeesUSD), 18));
+        const rawValue = typeof data.totalFeesUSD === 'string'
+          ? parseFloat(data.totalFeesUSD)
+          : data.totalFeesUSD;
+        const value = Number(formatUnits(BigInt(Math.floor(rawValue)), 18));
         return `$${formatNumberWithCommas(value)}`;
       },
     },
@@ -62,7 +65,10 @@ export const getLeaderboardColumns = (seasonId?: string): ColumnDef[] => {
       value: "volume",
       label: "Volume USD",
       render: (data) => {
-        const value = Number(formatUnits(BigInt(data.totalVolumeUSD), 18));
+        const rawValue = typeof data.totalVolumeUSD === 'string'
+          ? parseFloat(data.totalVolumeUSD)
+          : data.totalVolumeUSD;
+        const value = Number(formatUnits(BigInt(Math.floor(rawValue)), 18));
         if (value >= 1_000_000) {
           return `$${(value / 1_000_000).toLocaleString("en-US", { maximumFractionDigits: 2 })} M`;
         }
