@@ -5,6 +5,7 @@ import {
   HeroSection,
   HeroTitle,
   HeroSubtitle,
+  JoinWaitingListButton,
   NoticeBox,
 } from "./funded-trader-styles";
 import { LineSeparator } from "../../styles/shared-styles";
@@ -39,6 +40,13 @@ const FundedTrader: React.FC = () => {
           <HeroSubtitle>
             Pass the Test · Get Funded · Keep 80% of the Profits
           </HeroSubtitle>
+          <JoinWaitingListButton
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfu9kBX39OrgCOUGGmaZG9p3zTOOjo6VV67zzVH67NlFO0fSQ/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Join Waiting List
+          </JoinWaitingListButton>
         </HeroSection>
 
         {/* Program Carousel */}
