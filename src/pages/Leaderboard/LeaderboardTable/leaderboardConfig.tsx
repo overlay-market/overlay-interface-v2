@@ -37,6 +37,11 @@ export const leaderboardColumns: ColumnDef[] = [
     render: (data) => data.winRate,
   },
   {
+    value: "tradingDays",
+    label: "Trading Days",
+    render: (data) => data.tradingDays ?? 0,
+  },
+  {
     value: "fees",
     label: "Fees USD",
     render: (data) => {
