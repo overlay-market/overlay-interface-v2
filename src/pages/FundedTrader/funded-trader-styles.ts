@@ -245,6 +245,46 @@ export const SectionTitle = styled(Text)`
   }
 `;
 
+// Join Waiting List Button
+export const JoinWaitingListButton = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  color: ${theme.color.white};
+  text-decoration: none;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
+    linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+
+  &:hover {
+    box-shadow: 0px 0px 20px 4px #ffc95560;
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 16px 40px;
+    font-size: 18px;
+    margin-top: 12px;
+  }
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    padding: 18px 48px;
+    font-size: 20px;
+    margin-top: 16px;
+  }
+`;
+
 // Important Notice
 export const NoticeBox = styled(Flex)`
   margin: 24px 16px 32px;
