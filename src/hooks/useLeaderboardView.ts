@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useActiveMarkets from "./useActiveMarkets";
 import { ColumnDef, ColumnKey, DisplayUserData, ExtendedUserData } from "../pages/Leaderboard/types";
 import { formatPriceWithCurrency } from "../utils/formatPriceWithCurrency";
@@ -67,10 +67,27 @@ export const useLeaderboardView = ({
 
   const activeColumns = columns ?? leaderboardColumns;
 
-  const [selectedColumn, setSelectedColumn] = useState<ColumnKey>(activeColumns[activeColumns.length - 1].value);
+  const defaultColumn = activeColumns.length > 0
+    ? activeColumns[activeColumns.length - 1].value
+    : ("volume" as ColumnKey); // Fallback to a known column
+
+  const [internalSelectedColumn, setInternalSelectedColumn] = useState<ColumnKey>(defaultColumn);
+
+  // Derive the effective column - if selected is invalid, use default
+  const selectedColumn = useMemo(() => {
+    const isValid = activeColumns.some(col => col.value === internalSelectedColumn);
+    return isValid ? internalSelectedColumn : defaultColumn;
+  }, [activeColumns, internalSelectedColumn, defaultColumn]);
+
+  // Update internal state when it becomes invalid (for consistency)
+  useEffect(() => {
+    if (selectedColumn !== internalSelectedColumn) {
+      setInternalSelectedColumn(selectedColumn);
+    }
+  }, [selectedColumn, internalSelectedColumn]);
 
   const selectedLabel = useMemo(
-    () => activeColumns.find(opt => opt.value === selectedColumn)?.label ?? activeColumns[activeColumns.length - 1].label,
+    () => activeColumns.find(opt => opt.value === selectedColumn)?.label ?? "",
     [selectedColumn, activeColumns]
   );
 
@@ -84,5 +101,5 @@ export const useLeaderboardView = ({
     [ranks, markets]
   );
 
-  return { selectedColumn, setSelectedColumn, selectedLabel,  formattedUserdata, formattedRanks };
+  return { selectedColumn, setSelectedColumn: setInternalSelectedColumn, selectedLabel,  formattedUserdata, formattedRanks };
 };
