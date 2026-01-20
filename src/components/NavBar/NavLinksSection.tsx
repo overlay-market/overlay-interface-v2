@@ -104,7 +104,7 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       label: "Airdrops",
       icon: AirdropsIcon,
       activeIcon: AirdropsActiveIcon,
-      showOnMobile: true,
+      showOnMobile: !isMobile,
     },
     {
       to: "/funded-trader",
