@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import useActiveMarkets from "./useActiveMarkets";
-import { ColumnKey, DisplayUserData, ExtendedUserData } from "../pages/Leaderboard/types";
+import { ColumnDef, ColumnKey, DisplayUserData, ExtendedUserData } from "../pages/Leaderboard/types";
 import { formatPriceWithCurrency } from "../utils/formatPriceWithCurrency";
 import { leaderboardColumns } from "../pages/Leaderboard/LeaderboardTable/leaderboardConfig";
 import { MarketDataParsed } from "../types/marketTypes";
@@ -16,6 +16,7 @@ type Return = {
 type Params = {
   ranks?: ExtendedUserData[];
   currentUser?: ExtendedUserData;
+  columns?: ColumnDef[];
 };
 
 const formatToSigDigits = (value: number, digits: number = 2) => {
@@ -59,15 +60,18 @@ const formatUserData = (user: ExtendedUserData, markets: MarketDataParsed[] | un
 
 export const useLeaderboardView = ({
   ranks,
-  currentUser,  
+  currentUser,
+  columns,
 }: Params): Return => {
   const { data: markets } = useActiveMarkets();
 
-  const [selectedColumn, setSelectedColumn] = useState<ColumnKey>(leaderboardColumns[leaderboardColumns.length - 1].value);
+  const activeColumns = columns ?? leaderboardColumns;
+
+  const [selectedColumn, setSelectedColumn] = useState<ColumnKey>(activeColumns[activeColumns.length - 1].value);
 
   const selectedLabel = useMemo(
-    () => leaderboardColumns.find(opt => opt.value === selectedColumn)?.label ?? leaderboardColumns[leaderboardColumns.length - 1].label,
-    [selectedColumn]
+    () => activeColumns.find(opt => opt.value === selectedColumn)?.label ?? activeColumns[activeColumns.length - 1].label,
+    [selectedColumn, activeColumns]
   );
 
   const formattedUserdata = useMemo(

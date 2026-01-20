@@ -8,19 +8,27 @@ import CurrentUserRow from "./CurrentUserRow";
 import LeaderboardRows from "./LeaderboardRows";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import theme from "../../../theme";
-import { leaderboardColumns } from "./leaderboardConfig";
+import { getLeaderboardColumns } from "./leaderboardConfig";
+import { useMemo } from "react";
 
 type LeaderboardTableProps = {
   ranks?: ExtendedUserData[];
   currentUserData?: ExtendedUserData;
+  seasonId?: string;
 };
 
 const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
   ranks,
   currentUserData,
+  seasonId,
 }) => {
   const isMobile = useMediaQuery("(max-width: 1150px)");
   const ensProfiles = useResolveENSProfilesBatched(ranks);
+
+  const leaderboardColumns = useMemo(
+    () => getLeaderboardColumns(seasonId),
+    [seasonId]
+  );
 
   const {
     selectedColumn,
@@ -28,7 +36,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
     selectedLabel,
     formattedUserdata,
     formattedRanks,
-  } = useLeaderboardView({ ranks, currentUser: currentUserData });
+  } = useLeaderboardView({ ranks, currentUser: currentUserData, columns: leaderboardColumns });
 
   const selectedColumnDef = leaderboardColumns.find(
     (col) => col.value === selectedColumn
@@ -75,6 +83,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
               <ColumnSelector
                 selectedLabel={selectedLabel}
                 setSelectedColumn={setSelectedColumn}
+                columns={leaderboardColumns}
               />
             </StyledHeader>
           )}
@@ -85,6 +94,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
         formattedUserdata={formattedUserdata}
         isMobile={isMobile}
         getColumnValue={(data) => selectedColumnDef?.render(data)}
+        columns={leaderboardColumns}
       />
 
       <tbody>
@@ -93,6 +103,7 @@ const LeaderboardTable: React.FC<LeaderboardTableProps> = ({
           ensProfiles={ensProfiles}
           isMobile={isMobile}
           getColumnValue={(data) => selectedColumnDef?.render(data)}
+          columns={leaderboardColumns}
         />
       </tbody>
     </Table>

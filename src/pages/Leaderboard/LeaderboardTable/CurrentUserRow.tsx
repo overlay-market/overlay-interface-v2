@@ -7,21 +7,23 @@ import {
 } from "./current-user-row-styles";
 import theme from "../../../theme";
 import { shortenAddress } from "../../../utils/web3";
-import { DisplayUserData, ExtendedUserData, Ranking } from "../types";
+import { ColumnDef, DisplayUserData, ExtendedUserData, Ranking } from "../types";
 import useAccount from "../../../hooks/useAccount";
 import UserDetails from "./UserDetails";
-import { leaderboardColumns, RANKING_BY } from "./leaderboardConfig";
+import { RANKING_BY } from "./leaderboardConfig";
 
 interface CurrentUserRowProps {
   formattedUserdata: DisplayUserData | undefined;
   isMobile: boolean;
   getColumnValue: (user: ExtendedUserData) => React.ReactNode;
+  columns: ColumnDef[];
 }
 
 const CurrentUserRow = ({
   formattedUserdata,
   isMobile,
   getColumnValue,
+  columns,
 }: CurrentUserRowProps) => {
   const { address: account } = useAccount();
 
@@ -49,13 +51,13 @@ const CurrentUserRow = ({
                 {formattedUserdata?.username ?? shortenAddress(account)}
               </Text>
             </Flex>
-            {isMobile && <UserDetails currentUser={formattedUserdata} />}
+            {isMobile && <UserDetails currentUser={formattedUserdata} columns={columns} />}
           </Flex>
         </StyledCell>
 
         {!isMobile ? (
           <>
-            {leaderboardColumns.map((column) => (
+            {columns.map((column) => (
               <StyledCell key={column.value} textalign="right">
                 {column.render(formattedUserdata)}
               </StyledCell>

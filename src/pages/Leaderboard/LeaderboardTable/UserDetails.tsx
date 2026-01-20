@@ -1,7 +1,7 @@
 import { DropdownMenu, Flex } from "@radix-ui/themes";
 import { useState } from "react";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import { DisplayUserData } from "../types";
+import { ColumnDef, DisplayUserData } from "../types";
 import {
   DropdownButton,
   DropdownContent,
@@ -10,21 +10,21 @@ import {
   TextLabel,
   TextValue,
 } from "./user-details-styles";
-import { leaderboardColumns } from "./leaderboardConfig";
 
 type UserDetailsProps = {
   currentUser: DisplayUserData;
+  columns: ColumnDef[];
 };
 
-const UserDetails: React.FC<UserDetailsProps> = ({ currentUser }) => {
+const UserDetails: React.FC<UserDetailsProps> = ({ currentUser, columns }) => {
   const isMobile = useMediaQuery("(max-width: 450px)");
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
-  const filteredColumns = leaderboardColumns.filter(
+  const filteredColumns = columns.filter(
     (col) => col.value !== "mostTradedMarket"
   );
 
-  const isMostTradedMarketColumn = leaderboardColumns.some(
+  const isMostTradedMarketColumn = columns.some(
     (col) => col.value === "mostTradedMarket"
   );
 
