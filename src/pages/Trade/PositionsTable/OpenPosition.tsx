@@ -1,4 +1,4 @@
-import { Flex, Text, Badge, Tooltip } from "@radix-ui/themes";
+import { Flex, Text, Badge, Tooltip, Skeleton } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
@@ -21,6 +21,9 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     : [undefined, undefined];
   const isLong = positionSide === "Long";
 
+  // Detect if this is an optimistic position (not yet confirmed by subgraph)
+  const isOptimistic = position.positionId === -1;
+
   // For LBSC positions with stable values calculated:
   // Display stable values in USDT (both positive and negative PnL)
   const pnlValue = position.stableValues
@@ -39,7 +42,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
     );
 
   const handleItemClick = () => {
-    if (position.size === "0") return;
+    // Prevent clicking on zero-sized or optimistic positions
+    if (position.size === "0" || position.positionId === -1) return;
 
     setSelectedPosition(position);
     setShowModal(true);
@@ -79,16 +83,22 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position }) => {
             </Text>
           </Flex>
         </StyledCell>
-        <StyledCell>{isDoubleOrNothing ? "-" : position.entryPrice}</StyledCell>
-        <StyledCell>{isDoubleOrNothing ? "-" : position.liquidatePrice}</StyledCell>
         <StyledCell>
-          <Text
-            style={{
-              color: isPnLPositive ? theme.color.green1 : theme.color.red1,
-            }}
-          >
-            {pnlValue} {pnlToken}
-          </Text>
+          {isDoubleOrNothing ? "-" : position.entryPrice}
+        </StyledCell>
+        <StyledCell>
+          {isDoubleOrNothing ? "-" : position.liquidatePrice}
+        </StyledCell>
+        <StyledCell>
+          <Skeleton loading={isOptimistic}>
+            <Text
+              style={{
+                color: isPnLPositive ? theme.color.green1 : theme.color.red1,
+              }}
+            >
+              {pnlValue} {pnlToken}
+            </Text>
+          </Skeleton>
         </StyledCell>
       </StyledRow>
 

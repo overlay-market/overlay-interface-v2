@@ -32,9 +32,9 @@ export const StyledCell = styled.td`
   text-align: left;
 `;
 
-export const PaginationButton = styled(Button)<{ active?: string, navbutton: string }>`
-  background-color: ${({ navbutton }) => (navbutton === 'true' ? theme.color.grey4 : theme.color.background)};
-  border: ${({ active }) => (active === 'true' ? `1px solid ${theme.color.grey3}` : '')};
+export const PaginationButton = styled(Button)<{ $active?: string, $navbutton: string }>`
+  background-color: ${({ $navbutton }) => ($navbutton === 'true' ? theme.color.grey4 : theme.color.background)};
+  border: ${({ $active }) => ($active === 'true' ? `1px solid ${theme.color.grey3}` : '')};
   border-radius: 4px;
   color: ${theme.color.grey2};
   width: 28px;
