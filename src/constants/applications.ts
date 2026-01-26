@@ -14,6 +14,10 @@ export const DEFAULT_MARKET = "BTC Dominance";
 
 export const TRADE_POLLING_INTERVAL = 30000;
 
+// Market data polling configuration for combined bid/ask + PnL updates
+export const MARKET_DATA_POLLING_INTERVAL = 10000; // 10 seconds
+export const MARKET_DATA_CACHE_TTL = 15000; // 15 seconds (1.5x polling interval)
+
 export const UNIT = "OVL";
 
 export enum NAVBAR_MODE {

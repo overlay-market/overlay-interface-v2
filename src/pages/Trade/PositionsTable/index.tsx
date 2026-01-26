@@ -2,7 +2,7 @@ import { Text } from "@radix-ui/themes";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   LineSeparator,
   PositionsTableContainer,
@@ -16,6 +16,7 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import usePositionsPnL from "../../../hooks/usePositionsPnL";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -25,7 +26,11 @@ const POSITIONS_COLUMNS = [
   "PnL",
 ];
 
-const PositionsTable: React.FC = () => {
+interface PositionsTableProps {
+  onPricesUpdate?: (prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => void;
+}
+
+const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
@@ -91,6 +96,27 @@ const PositionsTable: React.FC = () => {
     setItemsPerPage(10);
   }, [chainId, marketId]);
 
+  // Real-time PnL updates
+  const positionsList = useMemo(
+    () =>
+      positions?.map((p) => ({
+        marketAddress: p.marketAddress,
+        positionId: p.positionId,
+        router: p.router,
+        loan: p.loan,
+      })) ?? [],
+    [positions]
+  );
+
+  const { pnlData, prices } = usePositionsPnL(marketId, positionsList);
+
+  // Report prices to parent component for use in Chart and TradeWidget
+  useEffect(() => {
+    if (onPricesUpdate) {
+      onPricesUpdate(prices);
+    }
+  }, [prices, onPricesUpdate]);
+
   return (
     <>
       <LineSeparator />
@@ -111,9 +137,18 @@ const PositionsTable: React.FC = () => {
           setItemsPerPage={setItemsPerPage}
           body={
             positions &&
-            positions.map((position: OpenPositionData, index: number) => (
-              <OpenPosition position={position} key={index} />
-            ))
+            positions.map((position: OpenPositionData) => {
+              const pnlKey = `${position.marketAddress}-${position.positionId}`;
+              const realtimePnL = pnlData.get(pnlKey);
+
+              return (
+                <OpenPosition
+                  position={position}
+                  realtimePnL={realtimePnL}
+                  key={`${position.marketAddress}-${position.positionId}`}
+                />
+              );
+            })
           }
         />
 
