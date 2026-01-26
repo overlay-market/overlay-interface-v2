@@ -26,7 +26,11 @@ const POSITIONS_COLUMNS = [
   "PnL",
 ];
 
-const PositionsTable: React.FC = () => {
+interface PositionsTableProps {
+  onPricesUpdate?: (prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => void;
+}
+
+const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
@@ -104,7 +108,14 @@ const PositionsTable: React.FC = () => {
     [positions]
   );
 
-  const { pnlData } = usePositionsPnL(marketId, positionsList);
+  const { pnlData, prices } = usePositionsPnL(marketId, positionsList);
+
+  // Report prices to parent component for use in Chart and TradeWidget
+  useEffect(() => {
+    if (onPricesUpdate) {
+      onPricesUpdate(prices);
+    }
+  }, [prices, onPricesUpdate]);
 
   return (
     <>

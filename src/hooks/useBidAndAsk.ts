@@ -3,7 +3,10 @@ import useSDK from "../providers/SDKProvider/useSDK";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import { limitDigitsInDecimals } from "overlay-sdk";
 
-const useBidAndAsk = (marketId: string | null): { bid: number | undefined; ask: number | undefined } => {
+const useBidAndAsk = (
+  marketId: string | null,
+  skip: boolean = false
+): { bid: number | undefined; ask: number | undefined } => {
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
 
@@ -23,7 +26,7 @@ const useBidAndAsk = (marketId: string | null): { bid: number | undefined; ask: 
           : undefined,
       };
     },
-    enabled: Boolean(marketId && sdk),
+    enabled: Boolean(marketId && sdk && !skip),
     staleTime: 10_000,        // 10 seconds
     refetchInterval: 10_000,  // Poll every 10s
     refetchIntervalInBackground: true,

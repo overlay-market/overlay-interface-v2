@@ -1,7 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -34,6 +34,14 @@ const Trade: React.FC = () => {
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { data: markets } = useActiveMarkets();
   const prevMarketRef = useRef<string | undefined>();
+
+  // Store prices from PositionsTable to pass to Chart and TradeWidget
+  // This eliminates duplicate bid/ask polling
+  const [marketPrices, setMarketPrices] = useState<{ bid: bigint; ask: bigint; mid: bigint } | undefined>(undefined);
+
+  const handlePricesUpdate = useCallback((prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => {
+    setMarketPrices(prices);
+  }, []);
 
   const shouldRenderGamblingTimeline = useMemo(() => {
     if (!currentMarket) {
@@ -99,8 +107,8 @@ const Trade: React.FC = () => {
         >
           {currentMarket ? (
             <>
-              {shouldRenderGamblingTimeline ? <GamblingTimeline /> : <Chart />}
-              <TradeWidget />
+              {shouldRenderGamblingTimeline ? <GamblingTimeline /> : <Chart prices={marketPrices} />}
+              <TradeWidget prices={marketPrices} />
             </>
           ) : (
             <Flex
@@ -113,7 +121,7 @@ const Trade: React.FC = () => {
             </Flex>
           )}
         </StyledFlex>
-        <PositionsTable />
+        <PositionsTable onPricesUpdate={handlePricesUpdate} />
         <InfoMarketSection />
         <SuggestedCards />
       </Flex>

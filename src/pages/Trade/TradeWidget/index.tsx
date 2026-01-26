@@ -26,7 +26,11 @@ import { Flex, Checkbox, Text } from "@radix-ui/themes";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
-const TradeWidget: React.FC = () => {
+interface TradeWidgetProps {
+  prices?: { bid: bigint; ask: bigint; mid: bigint };
+}
+
+const TradeWidget: React.FC<TradeWidgetProps> = ({ prices }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
@@ -281,7 +285,7 @@ const TradeWidget: React.FC = () => {
       pb={"20px"}
       flexShrink={"0"}
     >
-      <PositionSelectComponent />
+      <PositionSelectComponent prices={prices} />
 
       {!isGambling ? (
         <Slider

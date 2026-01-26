@@ -16,10 +16,33 @@ import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency"
 import useBidAndAsk from "../../../hooks/useBidAndAsk";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 
-const PositionSelectComponent: React.FC = () => {
+interface PositionSelectComponentProps {
+  prices?: { bid: bigint; ask: bigint; mid: bigint };
+}
+
+const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ prices: pricesFromPositions }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
-  const { bid, ask } = useBidAndAsk(marketId);
+
+  // Use prices from positions if available (eliminates duplicate polling)
+  // Skip useBidAndAsk when we have prices from positions
+  const skipBidAndAskHook = Boolean(pricesFromPositions);
+  const { bid: bidFromHook, ask: askFromHook } = useBidAndAsk(marketId, skipBidAndAskHook);
+
+  // Convert bigint prices to numbers, or use hook values
+  const bid = useMemo(() => {
+    if (pricesFromPositions?.bid) {
+      return Number(pricesFromPositions.bid) / 1e18;
+    }
+    return bidFromHook;
+  }, [pricesFromPositions, bidFromHook]);
+
+  const ask = useMemo(() => {
+    if (pricesFromPositions?.ask) {
+      return Number(pricesFromPositions.ask) / 1e18;
+    }
+    return askFromHook;
+  }, [pricesFromPositions, askFromHook]);
 
   const { currentMarket: market } = useCurrentMarketState();
   const { isLong } = useTradeState();
