@@ -50,11 +50,8 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({
   const hasLoan = !!position.loan?.id;
   const unwindPreference = useUnwindPreference();
 
-  // Only use stable unwind if:
-  // 1. User preference is 'stable'
-  // 2. Position has positive PnL (profitable)
-  const isPositionProfitable = unwindState && Number(unwindState.pnl) > 0;
-  const shouldUseStableUnwind = unwindPreference === 'stable' && isPositionProfitable;
+  // Use stable unwind if user preference is 'stable'
+  const shouldUseStableUnwind = unwindPreference === 'stable';
 
   const { value, currentPrice, fractionValue, unwindBtnState } = useMemo(() => {
     const value = unwindState.value

@@ -82,7 +82,7 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
     };
   }, [position, account, open, slippageValue, unwindPercentage]);
 
-  // Fetch USDT quote when modal opens if preference is 'stable' and position has positive PnL
+  // Fetch USDT quote when modal opens if preference is 'stable'
   useEffect(() => {
     // Only fetch when modal opens
     if (!open) {
@@ -96,8 +96,8 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
       return;
     }
 
-    // Check if PnL is positive (only fetch for profitable positions)
-    if (isUnwindStateSuccess(unwindState) && Number(unwindState.pnl) <= 0) {
+    // Skip if not a successful unwind state
+    if (!isUnwindStateSuccess(unwindState)) {
       setStableQuote(null);
       return;
     }
