@@ -4,8 +4,17 @@ import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ConnectKitProvider } from "connectkit";
 
+// Create QueryClient once outside component to prevent recreating on every render
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
 const Web3Provider: React.FC<PropsWithChildren> = ({ children }) => {
-  const queryClient = new QueryClient();
 
   return (
     <WagmiProvider config={wagmiConfig}>
