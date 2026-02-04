@@ -57,6 +57,7 @@ import ElonMuskIndexLogo from '../assets/images/markets-full-logos/ElonMuskIndex
 import FoundersOperationsLogo from '../assets/images/markets-full-logos/FoundersOperationsLogo.jpg';
 import CZClarityLogo from '../assets/images/markets-full-logos/cz.jpg';
 import SilverLogo from '../assets/images/markets-full-logos/silver-logo.jpg';
+import GoldSilverLogo from '../assets/images/markets-full-logos/gold-silver-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -68,6 +69,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "SILVER%20%2F%20USD": SilverLogo,
   "BTC%20Dominance": BTCDominance,
   "ETH%20Dominance": ETHDominance,
+  "GOLD%20%2F%20SILVER": GoldSilverLogo,
   "Bitcoin%20Frogs": BTCFrog,
   NodeMonkes: NodeMonkes,
   "Quantum%20Cats": QuantumCats,
@@ -129,13 +131,14 @@ export const MARKETSORDER = [
   "CZ%20Signals%20Clarity%20Index",
   "MrBeast%20Index",
   "Double%20or%20Nothing",
-  "SILVER%20%2F%20USD",
+  "GOLD%20%2F%20SILVER",
   "Amouranth%20vs%20peachJars",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
   "Counter-Strike%202%20Skins",
   "ASTER%20vs%20MYX",
+  "SILVER%20%2F%20USD",
   "ETH%20%2F%20USD",
   "BTC%20%2F%20USD",
   "The%20Weeknd%20Index",
@@ -282,6 +285,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "ETH%20%2F%20USD",
     "BTC%20%2F%20USD",
     "GOLD%20%2F%20USD",
+    "GOLD%20%2F%20SILVER",
     "SILVER%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
