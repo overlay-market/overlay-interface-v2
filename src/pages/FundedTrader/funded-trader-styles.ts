@@ -187,7 +187,7 @@ export const CarouselSection = styled(Box)`
     padding: 40px 0 56px;
   }
 
-  @media (min-width: 1900px) {
+  @media (min-width: 2200px) {
     justify-content: center;
   }
 `;
@@ -202,16 +202,24 @@ export const CarouselWrapper = styled(Box)`
     width: 100%;
   }
 
-  /* Center carousel when all 5 cards fit horizontally
-     Calculated: 5 cards × 340px + 4 gaps × 12px + padding ≈ 1780px
-     Using 1900px (below theme.breakpoints.xxl of 1920px) to provide buffer */
-  @media (min-width: 1900px) {
-    justify-content: center;
+  /* Hide carousel on desktop */
+  @media (min-width: ${theme.breakpoints.lg}) {
+    display: none;
+  }
+`;
 
-    .swiper {
-      width: auto;
-      max-width: fit-content;
-    }
+export const DesktopGrid = styled.div`
+  display: none;
+
+  /* Show grid on desktop - 2 rows of 3 cards */
+  @media (min-width: ${theme.breakpoints.lg}) {
+    display: grid;
+    grid-template-columns: repeat(3, 340px);
+    grid-template-rows: repeat(2, auto);
+    gap: 24px;
+    justify-content: center;
+    padding: 0 16px;
+    margin-top: 8px;
   }
 `;
 
@@ -219,10 +227,6 @@ export const CarouselContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-
-  @media (min-width: 1900px) {
-    width: auto;
-  }
 `;
 
 export const SectionTitle = styled(Text)`
@@ -242,6 +246,10 @@ export const SectionTitle = styled(Text)`
   @media (min-width: ${theme.breakpoints.md}) {
     font-size: 16px;
     margin-bottom: 20px;
+  }
+
+  @media (min-width: ${theme.breakpoints.lg}) {
+    text-align: center;
   }
 `;
 

@@ -11,6 +11,7 @@ import {
   CarouselWrapper,
   CarouselContainer,
   SectionTitle,
+  DesktopGrid,
 } from "./funded-trader-styles";
 
 const ProgramCarousel: React.FC = () => {
@@ -18,6 +19,8 @@ const ProgramCarousel: React.FC = () => {
     <CarouselSection>
       <CarouselContainer>
         <SectionTitle>CHOOSE YOUR TEST</SectionTitle>
+
+        {/* Mobile/Tablet Carousel */}
         <CarouselWrapper>
           <Swiper
             modules={[Navigation, Mousewheel, FreeMode]}
@@ -42,6 +45,13 @@ const ProgramCarousel: React.FC = () => {
             ))}
           </Swiper>
         </CarouselWrapper>
+
+        {/* Desktop Grid */}
+        <DesktopGrid>
+          {PROGRAM_TIERS.map((tier) => (
+            <ProgramCard key={tier.id} tier={tier} />
+          ))}
+        </DesktopGrid>
       </CarouselContainer>
     </CarouselSection>
   );
