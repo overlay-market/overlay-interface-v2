@@ -254,6 +254,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
     "The%20Weeknd%20Index",
+    "Billie%20Eilish%20Index",
     "Mr%20Beast%20Popularity%20Index",
   ],
   [CategoryName.Fansly]: [
