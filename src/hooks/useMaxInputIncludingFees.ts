@@ -1,4 +1,4 @@
-import { useAccount } from "wagmi";
+import useAccount from "./useAccount";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../providers/SDKProvider/useSDK";
 import { useChainAndTokenState, useTradeState, useCollateralType } from "../state/trade/hooks";

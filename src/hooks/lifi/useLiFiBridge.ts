@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Address } from 'viem';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useWalletClient } from 'wagmi';
 import { OVL_ADDRESS } from 'overlay-sdk';
 import { useChainAndTokenState, useTradeState } from '../../state/trade/hooks';
 import { convertQuoteToRoute, executeRoute, ExecutionOptions, getContractCallsQuote } from '@lifi/sdk';
@@ -11,6 +11,7 @@ import { useAddPopup } from '../../state/application/hooks';
 import { BRIDGE_FEE, BRIDGE_SLIPPAGE, DEFAULT_TRADING_FEE } from '../../constants/bridge';
 import { calculateAdjustedBridgeAmount } from '../../utils/lifi/calculateBridgeAmount';
 import { useGasCheck, GasCheckResult } from '../useGasCheck';
+import useAccount from '../useAccount';
 
 export interface BridgeStage {
   stage: 'idle' | 'quote' | 'approval' | 'bridging' | 'success' | 'needs_gas';
