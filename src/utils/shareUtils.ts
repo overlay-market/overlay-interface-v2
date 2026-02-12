@@ -38,7 +38,7 @@ export const captureShareCard = async (element: HTMLElement): Promise<string> =>
     const canvas = await html2canvas(element, {
       backgroundColor: null,
       useCORS: true,
-      allowTaint: true,
+      allowTaint: false,
       scale: 2, // Higher resolution
       // Let html2canvas determine size from the element automatically
       onclone: (clonedDoc) => {
@@ -187,6 +187,17 @@ export const formatProfitForSharing = (
 };
 
 /**
+ * Detects if the user is on iOS Safari
+ */
+export const isIOSSafari = (): boolean => {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|Chrome/.test(ua);
+  return isIOS && isSafari;
+};
+
+/**
  * Detects if the user is on a mobile device
  */
 export const isMobileDevice = (): boolean => {
@@ -213,11 +224,25 @@ export const isSharingSupported = (): boolean => {
 };
 
 /**
- * Converts a data URL to a File object
+ * Synchronously converts a data URL to a Blob (avoids async fetch hops
+ * that break iOS Safari gesture tokens)
  */
-export const dataUrlToFile = async (dataUrl: string, filename: string): Promise<File> => {
-  const response = await fetch(dataUrl);
-  const blob = await response.blob();
+const dataUrlToBlob = (dataUrl: string): Blob => {
+  const [header, base64] = dataUrl.split(',');
+  const mime = header.match(/:(.*?);/)?.[1] || 'image/png';
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: mime });
+};
+
+/**
+ * Converts a data URL to a File object (synchronous)
+ */
+export const dataUrlToFile = (dataUrl: string, filename: string): File => {
+  const blob = dataUrlToBlob(dataUrl);
   return new File([blob], filename, { type: 'image/png' });
 };
 
@@ -231,8 +256,7 @@ export const copyImageToClipboard = async (dataUrl: string): Promise<boolean> =>
       return false;
     }
 
-    const response = await fetch(dataUrl);
-    const blob = await response.blob();
+    const blob = dataUrlToBlob(dataUrl);
 
     await navigator.clipboard.write([
       new ClipboardItem({
@@ -269,13 +293,12 @@ export const shareToTwitterWithImage = async (
   // Try Web Share API first (prioritized for mobile)
   if (navigator.share) {
     try {
-      const imageFile = await dataUrlToFile(imageDataUrl, filename);
+      const imageFile = dataUrlToFile(imageDataUrl, filename);
 
-      const shareData = {
-        title: 'Overlay Trade',
-        text: text,
-        files: [imageFile]
-      };
+      // iOS Safari silently fails when files + text are combined
+      const shareData = isIOSSafari()
+        ? { files: [imageFile] }
+        : { title: 'Overlay Trade', text: text, files: [imageFile] };
 
       // Check if this data can be shared (if canShare is available)
       const canShare = navigator.canShare ? navigator.canShare(shareData) : true;
@@ -283,7 +306,8 @@ export const shareToTwitterWithImage = async (
       console.log('shareToTwitterWithImage: Attempting Web Share API with image', {
         canShare,
         fileSize: imageFile.size,
-        fileType: imageFile.type
+        fileType: imageFile.type,
+        isIOSSafari: isIOSSafari()
       });
 
       if (canShare) {

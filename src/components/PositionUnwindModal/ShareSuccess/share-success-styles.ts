@@ -85,24 +85,49 @@ export const ShareCardContainer = styled.div`
 `;
 
 // Top section with market image background
-export const HeroSection = styled.div<{ backgroundImage: string }>`
+export const HeroSection = styled.div`
   flex: 1;
-  background-image: linear-gradient(
-      135deg,
-      rgba(26, 26, 46, 0.85) 0%,
-      rgba(22, 33, 62, 0.8) 50%,
-      rgba(15, 52, 96, 0.75) 100%
-    ),
-    url(${props => props.backgroundImage});
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 20px;
   position: relative;
+  overflow: hidden;
+`;
+
+export const HeroBackgroundImage = styled.img`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+`;
+
+export const HeroGradientOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(26, 26, 46, 0.85) 0%,
+    rgba(22, 33, 62, 0.8) 50%,
+    rgba(15, 52, 96, 0.75) 100%
+  );
+  z-index: 1;
+`;
+
+export const HeroContent = styled.div`
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const LogoContainer = styled.div`

@@ -43,17 +43,38 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
   const [isCapturing, setIsCapturing] = useState(false);
   const [profitDisplayMode, setProfitDisplayMode] = useState<ProfitDisplayMode>('both');
   const [showClipboardSuccess, setShowClipboardSuccess] = useState(false);
+  const [preRenderedDataUrl, setPreRenderedDataUrl] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
   const shareCardRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  // Preload html2canvas when modal opens to avoid first-click delay
+  // Pre-render the share card when the modal opens (and when profitDisplayMode changes)
+  // so that navigator.share() can be called almost immediately after tap (preserving iOS gesture token)
   useEffect(() => {
     if (open) {
-      import("html2canvas");
-      // Reset clipboard success message when modal opens
       setShowClipboardSuccess(false);
+      setShareError(null);
+      // Small delay to allow the card to render in the DOM first
+      const timer = setTimeout(() => {
+        if (shareCardRef.current) {
+          captureShareCard(shareCardRef.current)
+            .then((dataUrl) => setPreRenderedDataUrl(dataUrl))
+            .catch((err) => console.warn('Pre-render failed, will capture on demand:', err));
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    } else {
+      setPreRenderedDataUrl(null);
     }
-  }, [open]);
+  }, [open, profitDisplayMode]);
+
+  // Auto-clear share error after 5 seconds
+  useEffect(() => {
+    if (shareError) {
+      const timer = setTimeout(() => setShareError(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [shareError]);
 
   // Fix SDK bug: SDK returns full position PnL instead of fractional PnL
   // Calculate the actual PnL for the unwound portion
@@ -77,8 +98,9 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
     if (!shareCardRef.current) return;
 
     setIsCapturing(true);
+    setShareError(null);
     try {
-      const dataUrl = await captureShareCard(shareCardRef.current);
+      const dataUrl = preRenderedDataUrl ?? await captureShareCard(shareCardRef.current);
       downloadImage(dataUrl, `overlay-trade-${position.marketName}-${Date.now()}.png`);
 
       // Track share card download event
@@ -90,6 +112,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
       });
     } catch (error) {
       console.error("Failed to capture and download image:", error);
+      setShareError("Failed to generate image. Please try again.");
     } finally {
       setIsCapturing(false);
     }
@@ -99,9 +122,10 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
     if (!shareCardRef.current) return;
 
     setIsCapturing(true);
+    setShareError(null);
     try {
-      // Capture the share card as image
-      const dataUrl = await captureShareCard(shareCardRef.current);
+      // Use pre-rendered image if available, otherwise capture on demand
+      const dataUrl = preRenderedDataUrl ?? await captureShareCard(shareCardRef.current);
 
       const tweetText = isProfit
         ? `Just made ${profitOVL.toFixed(2)} OVL (${profitPercentage.toFixed(1)}%) profit on ${position.marketName} 🚀\n\nTrade on overlay.market`
@@ -119,6 +143,10 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
         setShowClipboardSuccess(true);
       }
 
+      if (!result.success) {
+        setShareError("Sharing failed. Please try downloading the image instead.");
+      }
+
       // Track share event
       console.log("Share Card Shared", {
         marketName: position.marketName,
@@ -130,6 +158,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
       });
     } catch (error) {
       console.error("Failed to share:", error);
+      setShareError("Failed to share. Please try downloading the image instead.");
     } finally {
       setIsCapturing(false);
     }
@@ -236,6 +265,26 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
                 }}>
                   <CheckCircle size={16} color="#22c55e" />
                   <span>Image copied! Paste it in your tweet (Ctrl+V / Cmd+V)</span>
+                </div>
+              </div>
+            )}
+
+            {/* Share error message */}
+            {shareError && (
+              <div style={{ width: "100%", padding: "0 24px" }}>
+                <div style={{
+                  padding: "10px 12px",
+                  background: "rgba(220, 38, 38, 0.1)",
+                  border: "1px solid rgba(220, 38, 38, 0.3)",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  fontSize: "13px",
+                  color: "#ef4444"
+                }}>
+                  <XCircle size={16} color="#ef4444" />
+                  <span>{shareError}</span>
                 </div>
               </div>
             )}
@@ -354,6 +403,26 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
             }}>
               <CheckCircle size={16} color="#22c55e" />
               <span>Image copied! Paste it in your tweet (Ctrl+V / Cmd+V)</span>
+            </div>
+          </div>
+        )}
+
+        {/* Share error message */}
+        {shareError && (
+          <div style={{ width: "100%", padding: "0 24px" }}>
+            <div style={{
+              padding: "10px 12px",
+              background: "rgba(220, 38, 38, 0.1)",
+              border: "1px solid rgba(220, 38, 38, 0.3)",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              fontSize: "13px",
+              color: "#ef4444"
+            }}>
+              <XCircle size={16} color="#ef4444" />
+              <span>{shareError}</span>
             </div>
           </div>
         )}

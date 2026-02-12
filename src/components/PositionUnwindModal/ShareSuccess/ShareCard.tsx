@@ -3,10 +3,13 @@ import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import { getMarketImage } from "../../../utils/shareUtils";
 import { formatPriceByCurrency } from "../../../utils/formatPriceByCurrency";
 import { getDurationString } from "../../../utils/shareUtils";
-import OverlayLogo from "../../../assets/images/overlay-logo-only-no-background.webp";
+import OverlayLogo from "../../../assets/images/overlay-logo-only-no-background.png";
 import {
   ShareCardContainer,
   HeroSection,
+  HeroBackgroundImage,
+  HeroGradientOverlay,
+  HeroContent,
   LogoContainer,
   OverlayLogoImg,
   MarketSection,
@@ -70,43 +73,47 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     return (
       <ShareCardContainer ref={ref}>
         {/* Top section with market image as background */}
-        <HeroSection backgroundImage={marketImage}>
-          {/* Header with Overlay Logo */}
-          <LogoContainer>
-            <OverlayLogoImg src={OverlayLogo} alt="Overlay" />
-          </LogoContainer>
+        <HeroSection>
+          <HeroBackgroundImage src={marketImage} alt="" crossOrigin="anonymous" />
+          <HeroGradientOverlay />
+          <HeroContent>
+            {/* Header with Overlay Logo */}
+            <LogoContainer>
+              <OverlayLogoImg src={OverlayLogo} alt="Overlay" />
+            </LogoContainer>
 
-          {/* Market Name and Position Info */}
-          <MarketSection>
-            <MarketNameText>{position.marketName}</MarketNameText>
-            <PositionTypeText>
-              🎯 {positionSide?.toUpperCase()} {positionLeverage}
-            </PositionTypeText>
-          </MarketSection>
+            {/* Market Name and Position Info */}
+            <MarketSection>
+              <MarketNameText>{position.marketName}</MarketNameText>
+              <PositionTypeText>
+                🎯 {positionSide?.toUpperCase()} {positionLeverage}
+              </PositionTypeText>
+            </MarketSection>
 
-          {/* Profit Display */}
-          <ProfitSection>
-            {profitDisplayMode === 'absolute' && (
-              <ProfitMainText isProfit={isProfit}>
-                {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} OVL
-              </ProfitMainText>
-            )}
-            {profitDisplayMode === 'percentage' && (
-              <ProfitMainText isProfit={isProfit}>
-                {profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}% {isProfit ? "📈" : "📉"}
-              </ProfitMainText>
-            )}
-            {profitDisplayMode === 'both' && (
-              <>
+            {/* Profit Display */}
+            <ProfitSection>
+              {profitDisplayMode === 'absolute' && (
                 <ProfitMainText isProfit={isProfit}>
                   {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} OVL
                 </ProfitMainText>
-                <ProfitPercentageText isProfit={isProfit}>
+              )}
+              {profitDisplayMode === 'percentage' && (
+                <ProfitMainText isProfit={isProfit}>
                   {profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}% {isProfit ? "📈" : "📉"}
-                </ProfitPercentageText>
-              </>
-            )}
-          </ProfitSection>
+                </ProfitMainText>
+              )}
+              {profitDisplayMode === 'both' && (
+                <>
+                  <ProfitMainText isProfit={isProfit}>
+                    {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} OVL
+                  </ProfitMainText>
+                  <ProfitPercentageText isProfit={isProfit}>
+                    {profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}% {isProfit ? "📈" : "📉"}
+                  </ProfitPercentageText>
+                </>
+              )}
+            </ProfitSection>
+          </HeroContent>
         </HeroSection>
 
         {/* Bottom section with trade details */}
