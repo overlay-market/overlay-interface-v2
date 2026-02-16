@@ -38,6 +38,7 @@ type ShareCardProps = {
   positionLeverage?: string;
   profitDisplayMode?: ProfitDisplayMode;
   isProfit?: boolean;
+  tokenLabel?: string;
 };
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
@@ -51,6 +52,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
       positionLeverage,
       profitDisplayMode = 'both',
       isProfit = true,
+      tokenLabel = "OVL",
     },
     ref
   ) => {
@@ -94,7 +96,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             <ProfitSection>
               {profitDisplayMode === 'absolute' && (
                 <ProfitMainText isProfit={isProfit}>
-                  {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} OVL
+                  {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} {tokenLabel}
                 </ProfitMainText>
               )}
               {profitDisplayMode === 'percentage' && (
@@ -105,7 +107,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               {profitDisplayMode === 'both' && (
                 <>
                   <ProfitMainText isProfit={isProfit}>
-                    {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} OVL
+                    {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} {tokenLabel}
                   </ProfitMainText>
                   <ProfitPercentageText isProfit={isProfit}>
                     {profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}% {isProfit ? "📈" : "📉"}

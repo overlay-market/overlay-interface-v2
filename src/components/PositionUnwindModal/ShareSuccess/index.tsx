@@ -76,20 +76,42 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
     }
   }, [shareError]);
 
+  // Detect LBSC (USDT-collateralized) position
+  const isLbscPosition = !!position.loan?.id;
+  const tokenLabel = isLbscPosition ? "USDT" : "OVL";
+
   // Fix SDK bug: SDK returns full position PnL instead of fractional PnL
   // Calculate the actual PnL for the unwound portion
   const fullPnL = unwindState.pnl ? Number(unwindState.pnl) : 0;
   const fullValue = unwindState.value ? Number(unwindState.value) : 0;
   const fractionValue = unwindState.fractionValue ? Number(unwindState.fractionValue) : 0;
 
-  // Calculate fractional PnL: (fractionValue / fullValue) * fullPnL
+  // Calculate fractional PnL in OVL: (fractionValue / fullValue) * fullPnL
   const profitOVL = fullValue > 0 ? (fractionValue / fullValue) * fullPnL : fullPnL;
 
+  // For LBSC positions, use SDK-computed USDT PnL from position data.
+  // This uses the correct dual-formula: oracle price for gains, loan ratio for losses.
+  // We cannot derive it from unwindState.stableValues because value uses current oracle
+  // price while initialCollateral/debt use the original loan ratio (different conversion rates).
+  let profitAmount: number;
+  if (isLbscPosition && position.stableValues?.unrealizedPnL) {
+    profitAmount = Number(position.stableValues.unrealizedPnL);
+  } else {
+    profitAmount = profitOVL;
+  }
+
   // Calculate percentage return: (profit / initial_investment) * 100
-  // Initial investment for unwound portion = fraction_value - profit
-  const initialInvestment = fractionValue - profitOVL;
-  const profitPercentage = initialInvestment > 0 ? (profitOVL / initialInvestment) * 100 : 0;
-  const isProfit = profitOVL > 0;
+  // For LBSC positions, use USDT values since that's the user's actual investment.
+  // OVL-based percentage would be wrong because OVL/USDT rate changes over time.
+  let profitPercentage: number;
+  if (isLbscPosition && position.stableValues?.initialCollateral) {
+    const initialCollateralUSDT = Number(position.stableValues.initialCollateral);
+    profitPercentage = initialCollateralUSDT > 0 ? (profitAmount / initialCollateralUSDT) * 100 : 0;
+  } else {
+    const initialInvestment = fractionValue - profitOVL;
+    profitPercentage = initialInvestment > 0 ? (profitOVL / initialInvestment) * 100 : 0;
+  }
+  const isProfit = profitAmount > 0;
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
     : [undefined, undefined];
@@ -128,8 +150,8 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
       const dataUrl = preRenderedDataUrl ?? await captureShareCard(shareCardRef.current);
 
       const tweetText = isProfit
-        ? `Just made ${profitOVL.toFixed(2)} OVL (${profitPercentage.toFixed(1)}%) profit on ${position.marketName} 🚀\n\nTrade on overlay.market`
-        : `Diamond hands on ${position.marketName}! ${profitOVL.toFixed(2)} OVL (${profitPercentage.toFixed(1)}%) 💎🙌\n\nTrade on overlay.market`;
+        ? `Just made ${profitAmount.toFixed(2)} ${tokenLabel} (${profitPercentage.toFixed(1)}%) profit on ${position.marketName} 🚀\n\nTrade on overlay.market`
+        : `Diamond hands on ${position.marketName}! ${profitAmount.toFixed(2)} ${tokenLabel} (${profitPercentage.toFixed(1)}%) 💎🙌\n\nTrade on overlay.market`;
 
       // Share with image using Web Share API or clipboard
       const result = await shareToTwitterWithImage(
@@ -181,12 +203,13 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
               ref={shareCardRef}
               position={position}
               unwindState={unwindState}
-              profitOVL={profitOVL}
+              profitOVL={profitAmount}
               profitPercentage={profitPercentage}
               positionSide={positionSide}
               positionLeverage={positionLeverage}
               profitDisplayMode={profitDisplayMode}
               isProfit={isProfit}
+              tokenLabel={tokenLabel}
             />
           </ShareCardWrapper>
 
@@ -218,7 +241,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
                       textAlign: "center",
                     }}
                   >
-                    {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} OVL ({profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}%)
+                    {profitAmount >= 0 ? "+" : ""}{profitAmount.toFixed(2)} {tokenLabel} ({profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}%)
                   </Text>
                 </ProfitBadge>
               </Flex>
@@ -232,7 +255,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
                   isActive={profitDisplayMode === 'absolute'}
                   onClick={() => setProfitDisplayMode('absolute')}
                 >
-                  OVL
+                  {tokenLabel}
                 </ProfitDisplayOption>
                 <ProfitDisplayOption
                   isActive={profitDisplayMode === 'percentage'}
@@ -341,7 +364,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
                   textAlign: "center",
                 }}
               >
-                {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} OVL ({profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}%)
+                {profitAmount >= 0 ? "+" : ""}{profitAmount.toFixed(2)} {tokenLabel} ({profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}%)
               </Text>
             </ProfitBadge>
           </Flex>
@@ -353,12 +376,13 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
             ref={shareCardRef}
             position={position}
             unwindState={unwindState}
-            profitOVL={profitOVL}
+            profitOVL={profitAmount}
             profitPercentage={profitPercentage}
             positionSide={positionSide}
             positionLeverage={positionLeverage}
             profitDisplayMode={profitDisplayMode}
             isProfit={isProfit}
+            tokenLabel={tokenLabel}
           />
         </ShareCardWrapper>
 
@@ -370,7 +394,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
               isActive={profitDisplayMode === 'absolute'}
               onClick={() => setProfitDisplayMode('absolute')}
             >
-              OVL
+              {tokenLabel}
             </ProfitDisplayOption>
             <ProfitDisplayOption
               isActive={profitDisplayMode === 'percentage'}

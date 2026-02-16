@@ -178,12 +178,13 @@ export const getDurationString = (createdTimestamp: string): string => {
 export const formatProfitForSharing = (
   profitOVL: number,
   profitPercentage: number,
-  marketName: string
+  marketName: string,
+  tokenLabel: string = "OVL"
 ): string => {
   const formattedProfit = profitOVL.toFixed(2);
   const formattedPercentage = profitPercentage.toFixed(1);
 
-  return `Just made ${formattedProfit} OVL (${formattedPercentage}%) profit on ${marketName} 🚀\n\nTrade on overlay.market`;
+  return `Just made ${formattedProfit} ${tokenLabel} (${formattedPercentage}%) profit on ${marketName} 🚀\n\nTrade on overlay.market`;
 };
 
 /**
