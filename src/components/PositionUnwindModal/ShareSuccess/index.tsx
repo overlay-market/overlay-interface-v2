@@ -4,7 +4,7 @@ import { CheckCircle, X, XCircle } from "react-feather";
 import * as Dialog from "@radix-ui/react-dialog";
 import { GradientSolidButton } from "../../Button";
 import theme from "../../../theme";
-import ShareCard from "./ShareCard";
+import ShareCard, { ProfitDisplayMode } from "./ShareCard";
 import { captureShareCard, downloadImage, shareToTwitterWithImage } from "../../../utils/shareUtils";
 import { OpenPositionData, UnwindStateSuccess } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
@@ -20,8 +20,6 @@ import {
   ProfitDisplayOption,
   ProfitDisplayLabel,
 } from "./share-success-styles";
-
-type ProfitDisplayMode = 'absolute' | 'percentage' | 'both';
 
 type ShareSuccessProps = {
   open: boolean;
@@ -111,7 +109,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
     const initialInvestment = fractionValue - profitOVL;
     profitPercentage = initialInvestment > 0 ? (profitOVL / initialInvestment) * 100 : 0;
   }
-  const isProfit = profitAmount > 0;
+  const isProfit = profitAmount >= 0;
   const [positionLeverage, positionSide] = position.positionSide
     ? position.positionSide.split(" ")
     : [undefined, undefined];
@@ -203,7 +201,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
               ref={shareCardRef}
               position={position}
               unwindState={unwindState}
-              profitOVL={profitAmount}
+              profitAmount={profitAmount}
               profitPercentage={profitPercentage}
               positionSide={positionSide}
               positionLeverage={positionLeverage}
@@ -376,7 +374,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
             ref={shareCardRef}
             position={position}
             unwindState={unwindState}
-            profitOVL={profitAmount}
+            profitAmount={profitAmount}
             profitPercentage={profitPercentage}
             positionSide={positionSide}
             positionLeverage={positionLeverage}

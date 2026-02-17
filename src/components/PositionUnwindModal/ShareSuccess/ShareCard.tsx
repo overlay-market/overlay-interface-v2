@@ -27,12 +27,12 @@ import {
   PositionTypeText,
 } from "./share-success-styles";
 
-type ProfitDisplayMode = 'absolute' | 'percentage' | 'both';
+export type ProfitDisplayMode = 'absolute' | 'percentage' | 'both';
 
 type ShareCardProps = {
   position: OpenPositionData;
   unwindState: UnwindStateSuccess;
-  profitOVL: number;
+  profitAmount: number;
   profitPercentage: number;
   positionSide?: string;
   positionLeverage?: string;
@@ -46,7 +46,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
     {
       position,
       unwindState,
-      profitOVL,
+      profitAmount,
       profitPercentage,
       positionSide,
       positionLeverage,
@@ -96,7 +96,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
             <ProfitSection>
               {profitDisplayMode === 'absolute' && (
                 <ProfitMainText isProfit={isProfit}>
-                  {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} {tokenLabel}
+                  {profitAmount >= 0 ? "+" : ""}{profitAmount.toFixed(2)} {tokenLabel}
                 </ProfitMainText>
               )}
               {profitDisplayMode === 'percentage' && (
@@ -107,7 +107,7 @@ const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(
               {profitDisplayMode === 'both' && (
                 <>
                   <ProfitMainText isProfit={isProfit}>
-                    {profitOVL >= 0 ? "+" : ""}{profitOVL.toFixed(2)} {tokenLabel}
+                    {profitAmount >= 0 ? "+" : ""}{profitAmount.toFixed(2)} {tokenLabel}
                   </ProfitMainText>
                   <ProfitPercentageText isProfit={isProfit}>
                     {profitPercentage >= 0 ? "+" : ""}{profitPercentage.toFixed(1)}% {isProfit ? "📈" : "📉"}
