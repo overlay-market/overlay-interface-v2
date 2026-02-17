@@ -173,21 +173,6 @@ export const getDurationString = (createdTimestamp: string): string => {
 };
 
 /**
- * Utility function to format profit for social sharing
- */
-export const formatProfitForSharing = (
-  profitOVL: number,
-  profitPercentage: number,
-  marketName: string,
-  tokenLabel: string = "OVL"
-): string => {
-  const formattedProfit = profitOVL.toFixed(2);
-  const formattedPercentage = profitPercentage.toFixed(1);
-
-  return `Just made ${formattedProfit} ${tokenLabel} (${formattedPercentage}%) profit on ${marketName} 🚀\n\nTrade on overlay.market`;
-};
-
-/**
  * Detects if the user is on iOS Safari
  */
 export const isIOSSafari = (): boolean => {
@@ -317,8 +302,29 @@ export const shareToTwitterWithImage = async (
         return { method: 'web-share', success: true };
       } else {
         console.log('shareToTwitterWithImage: canShare returned false for data with files');
+        // File sharing unsupported — try text-only share on mobile
+        if (isMobile) {
+          try {
+            console.log('shareToTwitterWithImage: Attempting Web Share API with text only (canShare fallback)');
+            await navigator.share({ title: 'Overlay Trade', text: text });
+            console.log('shareToTwitterWithImage: Web Share API succeeded with text only');
+            return { method: 'web-share-text', success: true };
+          } catch (textShareError) {
+            console.log('shareToTwitterWithImage: Web Share API failed with text only', {
+              error: textShareError instanceof Error ? textShareError.message : String(textShareError)
+            });
+            return { method: 'web-share-text', success: false };
+          }
+        }
+        // Desktop: fall through to clipboard + Twitter intent below
       }
     } catch (error) {
+      // User explicitly cancelled the share sheet — don't retry
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        console.log('shareToTwitterWithImage: User cancelled share');
+        return { method: 'web-share', success: false };
+      }
+
       console.log('shareToTwitterWithImage: Web Share API failed with image', {
         error: error instanceof Error ? error.message : String(error),
         errorName: error instanceof Error ? error.name : 'Unknown'
