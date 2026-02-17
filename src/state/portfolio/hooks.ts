@@ -15,6 +15,15 @@ const POLLING_INTERVAL = 5000;
 const MAX_POLLING_TIME = 60000;
 const DISCONNECT_CLEAR_DELAY = 500;
 
+const areArraysEqual = <T extends Record<string, unknown>>(
+  arr1: T[] | undefined,
+  arr2: T[] | undefined
+): boolean => {
+  if (arr1 === arr2) return true;
+  if (!arr1 || !arr2 || arr1.length !== arr2.length) return false;
+  return JSON.stringify(arr1) === JSON.stringify(arr2);
+};
+
 export function useIsNewUnwindTxn(): boolean {
   const txnHash = useAppSelector((state) => state.trade.txnHash);
   const activePopups = useAppSelector((state) => state.application.popupList);
@@ -68,22 +77,6 @@ export function usePositionRefresh(
     }
   }, [account]);
 
-  const arePositionsEqual = (
-    arr1: OpenPositionData[] | undefined,
-    arr2: OpenPositionData[] | undefined
-  ): boolean => {
-    if (!arr1 || !arr2 || arr1.length !== arr2.length) return false;
-    if (arr1 === arr2) return true;
-
-    return arr1.every((pos1, i) => {
-      const pos2 = arr2[i];
-      if (!pos2) return false;
-
-      const keys1 = Object.keys(pos1) as (keyof OpenPositionData)[];
-      return keys1.every(key => pos1[key] === pos2[key]);
-    });
-  };
-
   const fetchPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
       if (!account) {
@@ -99,7 +92,7 @@ export function usePositionRefresh(
       }
 
       if (fetchingRef.current) {
-        return true;
+        return false;
       }
 
       fetchingRef.current = true;
@@ -129,9 +122,9 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData = !arePositionsEqual(validPositions, previousValidPositionsRef.current);
+        const hasNewData = !areArraysEqual(validPositions, previousValidPositionsRef.current);
 
-        if (hasNewData || !positions) {
+        if (hasNewData || !previousValidPositionsRef.current) {
           setPositions(validPositions);
           setPositionsTotalNumber(result.total);
           previousValidPositionsRef.current = validPositions;
@@ -161,7 +154,6 @@ export function usePositionRefresh(
       currentPage,
       itemsPerPage,
       isNewTxnHash,
-      positions,
     ]
   );
 
@@ -200,6 +192,7 @@ export function usePositionRefresh(
     } else {
       setPositions(undefined);
       setPositionsTotalNumber(0);
+      previousValidPositionsRef.current = undefined;
     }
   }, [account, currentPage, itemsPerPage, fetchPositions]);
 
@@ -242,6 +235,7 @@ export function useUnwindPositionRefresh(
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const fetchingRef = useRef(false);
+  const previousUnwindPositionsRef = useRef<UnwindPositionData[] | undefined>();
   const isNewUnwindTxn = useIsNewUnwindTxn();
 
   const sdkRef = useRef(sdk);
@@ -256,7 +250,7 @@ export function useUnwindPositionRefresh(
       }
 
       if (fetchingRef.current) {
-        return true;
+        return false;
       }
 
       fetchingRef.current = true;
@@ -284,10 +278,15 @@ export function useUnwindPositionRefresh(
           }
         );
 
-        setUnwindPositions(validUnwindPositions);
-        setUnwindPositionsTotalNumber(result.total);
+        const hasNewData = !areArraysEqual(validUnwindPositions, previousUnwindPositionsRef.current);
 
-        return true;
+        if (hasNewData || !previousUnwindPositionsRef.current) {
+          setUnwindPositions(validUnwindPositions);
+          setUnwindPositionsTotalNumber(result.total);
+          previousUnwindPositionsRef.current = validUnwindPositions;
+        }
+
+        return hasNewData;
       } catch (error) {
         console.error(
           `Error fetching unwind positions (attempt ${retryCount + 1}):`,
@@ -347,6 +346,7 @@ export function useUnwindPositionRefresh(
     } else {
       setUnwindPositions(undefined);
       setUnwindPositionsTotalNumber(0);
+      previousUnwindPositionsRef.current = undefined;
     }
   }, [account, currentPage, itemsPerPage, fetchUnwindPositions]);
 
