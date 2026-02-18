@@ -56,7 +56,7 @@ export function usePositionRefresh(
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const disconnectTimer = useRef<NodeJS.Timeout | null>(null);
-  const fetchingRef = useRef(false);
+  const fetchVersionRef = useRef(0);
   const previousValidPositionsRef = useRef<OpenPositionData[] | undefined>();
   const isNewUnwindTxn = useIsNewUnwindTxn();
 
@@ -91,11 +91,9 @@ export function usePositionRefresh(
         return false;
       }
 
-      if (fetchingRef.current) {
-        return false;
-      }
-
-      fetchingRef.current = true;
+      const thisVersion = retryCount === 0
+        ? ++fetchVersionRef.current
+        : fetchVersionRef.current;
 
       try {
         const result = await sdkRef.current.openPositions.transformOpenPositions(
@@ -105,6 +103,8 @@ export function usePositionRefresh(
           account as Address,
           isNewTxnHash
         );
+
+        if (thisVersion !== fetchVersionRef.current) return false;
 
         if (!result || !result.data) {
           throw new Error("No position data received");
@@ -124,14 +124,18 @@ export function usePositionRefresh(
 
         const hasNewData = !areArraysEqual(validPositions, previousValidPositionsRef.current);
 
+        // Always update total — it can change independently of current page rows
+        setPositionsTotalNumber(result.total);
+
         if (hasNewData || !previousValidPositionsRef.current) {
           setPositions(validPositions);
-          setPositionsTotalNumber(result.total);
           previousValidPositionsRef.current = validPositions;
         }
 
         return hasNewData;
       } catch (error) {
+        if (thisVersion !== fetchVersionRef.current) return false;
+
         console.error(
           `Error fetching positions (attempt ${retryCount + 1}):`,
           error
@@ -139,14 +143,13 @@ export function usePositionRefresh(
 
         if (retryCount < MAX_RETRIES) {
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+          if (thisVersion !== fetchVersionRef.current) return false;
           return fetchPositions(retryCount + 1);
         } else {
           setPositions((prev) => prev ?? []);
           setPositionsTotalNumber((prev) => prev ?? 0);
           return false;
         }
-      } finally {
-        fetchingRef.current = false;
       }
     },
     [
@@ -234,7 +237,7 @@ export function useUnwindPositionRefresh(
     useState(0);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const fetchingRef = useRef(false);
+  const fetchVersionRef = useRef(0);
   const previousUnwindPositionsRef = useRef<UnwindPositionData[] | undefined>();
   const isNewUnwindTxn = useIsNewUnwindTxn();
 
@@ -249,11 +252,9 @@ export function useUnwindPositionRefresh(
         return false;
       }
 
-      if (fetchingRef.current) {
-        return false;
-      }
-
-      fetchingRef.current = true;
+      const thisVersion = retryCount === 0
+        ? ++fetchVersionRef.current
+        : fetchVersionRef.current;
 
       try {
         const result = await sdkRef.current.unwindPositions.transformUnwindPositions(
@@ -263,6 +264,8 @@ export function useUnwindPositionRefresh(
           account as Address,
           isNewTxnHash
         );
+
+        if (thisVersion !== fetchVersionRef.current) return false;
 
         if (!result || !result.data) {
           throw new Error("No unwind position data received");
@@ -280,14 +283,18 @@ export function useUnwindPositionRefresh(
 
         const hasNewData = !areArraysEqual(validUnwindPositions, previousUnwindPositionsRef.current);
 
+        // Always update total — it can change independently of current page rows
+        setUnwindPositionsTotalNumber(result.total);
+
         if (hasNewData || !previousUnwindPositionsRef.current) {
           setUnwindPositions(validUnwindPositions);
-          setUnwindPositionsTotalNumber(result.total);
           previousUnwindPositionsRef.current = validUnwindPositions;
         }
 
         return hasNewData;
       } catch (error) {
+        if (thisVersion !== fetchVersionRef.current) return false;
+
         console.error(
           `Error fetching unwind positions (attempt ${retryCount + 1}):`,
           error
@@ -295,12 +302,11 @@ export function useUnwindPositionRefresh(
 
         if (retryCount < MAX_RETRIES) {
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+          if (thisVersion !== fetchVersionRef.current) return false;
           return fetchUnwindPositions(retryCount + 1);
         } else {
           return false;
         }
-      } finally {
-        fetchingRef.current = false;
       }
     },
     [

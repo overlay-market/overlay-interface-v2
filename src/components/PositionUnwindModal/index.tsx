@@ -163,9 +163,9 @@ const PositionUnwindModal: React.FC<PositionUnwindModalProps> = ({
         const WAD = BigInt(1e18);
         const expectedOut = (pnlWei * oraclePrice) / WAD;
 
-        // Calculate minimum PnL with slippage: expectedOut * (100 - slippage) / 100
-        const slippagePercent = Number(slippageValue);
-        const minOut = (expectedOut * BigInt(100 - slippagePercent)) / BigInt(100);
+        // Calculate minimum PnL with slippage using basis points to handle fractional percentages
+        const slippageBps = Math.round(Number(slippageValue) * 100);
+        const minOut = (expectedOut * BigInt(10000 - slippageBps)) / BigInt(10000);
 
         const quote = { minOut, expectedOut };
 
