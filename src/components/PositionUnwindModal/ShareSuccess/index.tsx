@@ -52,6 +52,7 @@ const ShareSuccess: React.FC<ShareSuccessProps> = ({
     if (open) {
       setShowClipboardSuccess(false);
       setShareError(null);
+      setPreRenderedDataUrl(null);
       // Small delay to allow the card to render in the DOM first
       const timer = setTimeout(() => {
         if (shareCardRef.current) {
