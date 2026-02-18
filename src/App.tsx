@@ -6,7 +6,7 @@ import Markets from "./pages/Markets";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
 import useMultichainContext from "./providers/MultichainContextProvider/useMultichainContext";
 import Wallet from "./components/Wallet";
-import { useRef } from "react";
+import { lazy, Suspense, useRef } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
 import Popups from "./components/Popups";
 import Portfolio from "./pages/Portfolio";
@@ -20,6 +20,11 @@ import FundedTrader from "./pages/FundedTrader";
 import ExchangeLiFi from "./pages/ExchangeLiFi";
 import AnalyticsListener from "./analytics/AnalyticsListener";
 import WalletTracker from "./analytics/WalletTracker";
+
+// Dev-only: lazy-loaded share card preview page (excluded from production builds)
+const DevShareCard = import.meta.env.DEV
+  ? lazy(() => import("./pages/DevShareCard"))
+  : null;
 
 // import Faucet from "./pages/Faucet";
 // import Bridge from "./pages/Bridge";
@@ -56,6 +61,10 @@ const App = () => {
                   <Route path="/airdrops" element={<Airdrops />} />
                   <Route path="/funded-trader" element={<FundedTrader />} />
                   <Route path="/exchange/*" element={<ExchangeLiFi />} />
+                  {/* Dev-only route: /dev/share-card — excluded from production builds */}
+                  {DevShareCard && (
+                    <Route path="/dev/share-card" element={<Suspense fallback={null}><DevShareCard /></Suspense>} />
+                  )}
                   {/* <Route path="/faucet" element={<Faucet />} /> */}
                   {/* <Route path="/bridge" element={<Bridge />} /> */}
                   <Route path="*" element={<Navigate to="/markets" />} />

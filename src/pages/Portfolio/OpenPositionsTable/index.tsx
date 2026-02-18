@@ -17,6 +17,23 @@ import {
 } from "../../../state/portfolio/hooks";
 import { triggerLoader } from "../UnwindsTable";
 
+import styled, { keyframes } from "styled-components";
+
+// Loading spinner animation
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const LoadingSpinner = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid ${theme.color.grey4};
+  border-top: 2px solid ${theme.color.green1};
+  border-radius: 50%;
+  animation: ${spin} 1s linear infinite;
+`;
+
 const POSITIONS_COLUMNS = [
   "Market",
   "Size",
@@ -103,9 +120,12 @@ const OpenPositionsTable: React.FC = () => {
       }}
     >
       <Flex align="center" justify="between" mb="4">
-        <Text weight={"bold"} size={"5"}>
-          Open Positions
-        </Text>
+        <Flex align="center" gap="2">
+          <Text weight={"bold"} size={"5"}>
+            Open Positions
+          </Text>
+          {loading && positions && <LoadingSpinner />}
+        </Flex>
         <Flex gap="2" style={{ display: isMobile ? "none" : "flex" }}>
           {showCheckboxes ? (
             <>
@@ -200,7 +220,6 @@ const OpenPositionsTable: React.FC = () => {
           )
         }
       />
-
       <ClosePositionsModal
         open={showCloseModal}
         handleDismiss={() => setShowCloseModal(false)}

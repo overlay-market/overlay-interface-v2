@@ -4,16 +4,17 @@ import {
   GradientSolidButton,
 } from "../../../components/Button";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useMemo, useState } from "react";
-import { OpenPositionData, toWei } from "overlay-sdk";
+import { useMemo, useState, useEffect } from "react";
+import { OpenPositionData, UnwindStateSuccess, toWei } from "overlay-sdk";
 import { Address } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
 import { useTradeActionHandlers, useTradeState } from "../../../state/trade/hooks";
 import useAccount from "../../../hooks/useAccount";
-import { usePublicClient } from "wagmi";
+import { usePublicClient, useConnectorClient } from "wagmi";
 import { trackEvent } from "../../../analytics/trackEvent";
+import { isMobileDevice } from "../../../utils/shareUtils";
 
 type UnwindButtonComponentProps = {
   position: OpenPositionData;
@@ -24,6 +25,14 @@ type UnwindButtonComponentProps = {
   isPendingTime: boolean;
   unwindStable?: boolean;
   handleDismiss: () => void;
+  unwindState: UnwindStateSuccess;
+  onUnwindSuccess?: (
+    unwindState: UnwindStateSuccess,
+    inputValue: string,
+    unwindPercentage: number,
+    transactionHash?: string,
+    blockNumber?: number
+  ) => void;
 };
 
 const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
@@ -35,6 +44,8 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   isPendingTime,
   unwindStable,
   handleDismiss,
+  unwindState,
+  onUnwindSuccess,
 }) => {
   const sdk = useSDK();
   const addPopup = useAddPopup();
@@ -43,8 +54,35 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const { slippageValue } = useTradeState();
   const { address } = useAccount();
   const publicClient = usePublicClient();
+  const { data: walletClient } = useConnectorClient();
 
   const [attemptingUnwind, setAttemptingUnwind] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState("Pending confirmation...");
+
+  const isMobile = isMobileDevice();
+
+  // Progressive message updates while waiting for wallet signature
+  useEffect(() => {
+    if (!attemptingUnwind) {
+      setPendingMessage("Pending confirmation...");
+      return;
+    }
+
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+
+      if (elapsed < 5) {
+        setPendingMessage("Waiting for wallet...");
+      } else if (elapsed < 15) {
+        setPendingMessage(isMobile ? "Please check your wallet app" : "Waiting for signature...");
+      } else {
+        setPendingMessage(isMobile ? "Open your wallet to sign" : "Check your wallet extension");
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [attemptingUnwind, isMobile]);
 
   const title: string | undefined = useMemo(() => {
     if (inputValue === "") return "Unwind";
@@ -74,12 +112,36 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
       return;
     }
 
+    if (!walletClient) {
+      console.error("Wallet client not available - wallet may be disconnected");
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: "Wallet disconnected. Please reconnect your wallet and try again.",
+            type: "WALLET_ERROR",
+          },
+        },
+        currentTimeForId
+      );
+      return;
+    }
+
     if (!position || !unwindPercentage || !inputValue || !priceLimit) {
       console.error("Missing required parameters for unwind operation");
       return;
     }
 
     setAttemptingUnwind(true);
+    let handledByCallback = false;
+
+    console.log("Starting unwind transaction", {
+      isMobile,
+      walletClientExists: !!walletClient,
+      marketAddress: position.marketAddress,
+      positionId: position.positionId,
+    });
 
     try {
       const parsedSlippage = Number(slippageValue);
@@ -95,59 +157,61 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         priceLimit,
       };
 
-      let result;
+      const executeUnwind = async () => {
+        // Try stable unwind if preference is set
+        if (unwindStable) {
+          try {
+            return await sdk.shiva.unwindStable({
+              ...unwindParams,
+              account: address as Address,
+              slippage,
+            });
+          } catch (stableError: any) {
+            // Check if user rejected the transaction
+            const isUserRejection =
+              stableError?.code === 4001 ||
+              stableError?.code === "ACTION_REJECTED" ||
+              stableError?.message?.toLowerCase().includes('user rejected') ||
+              stableError?.message?.toLowerCase().includes('user denied');
 
-      // Try stable unwind if preference is set
-      if (unwindStable) {
-        try {
-          result = await sdk.shiva.unwindStable({
-            ...unwindParams,
-            account: address as Address,
-            slippage,
-          });
-        } catch (stableError: any) {
-          // Check if user rejected the transaction
-          const isUserRejection =
-            stableError?.code === 4001 ||
-            stableError?.code === "ACTION_REJECTED" ||
-            stableError?.message?.toLowerCase().includes('user rejected') ||
-            stableError?.message?.toLowerCase().includes('user denied');
+            if (isUserRejection) {
+              throw stableError;
+            }
 
-          if (isUserRejection) {
-            // User rejected - don't fallback, just throw the error
-            throw stableError;
-          }
+            // Check if it's a swap/1inch related error (not user rejection)
+            const isSwapError =
+              stableError?.message?.includes('1Inch') ||
+              stableError?.message?.includes('swap') ||
+              stableError?.message?.includes('Failed to fetch swap data');
 
-          // Check if it's a swap/1inch related error (not user rejection)
-          const isSwapError =
-            stableError?.message?.includes('1Inch') ||
-            stableError?.message?.includes('swap') ||
-            stableError?.message?.includes('Failed to fetch swap data');
+            if (isSwapError) {
+              // Fallback to normal unwind only for swap errors
+              const fallbackResult = await sdk.market.unwind(unwindParams);
 
-          if (isSwapError) {
-            // Fallback to normal unwind only for swap errors
-            result = await sdk.market.unwind(unwindParams);
-
-            // Inform user about fallback
-            addPopup(
-              {
-                txn: {
-                  hash: currentTimeForId,
-                  success: null,
-                  message: "USDT conversion unavailable. Proceeding with OVL unwind.",
-                  type: TransactionType.UNWIND_OVL_POSITION,
+              // Inform user about fallback
+              addPopup(
+                {
+                  txn: {
+                    hash: currentTimeForId,
+                    success: null,
+                    message: "USDT conversion unavailable. Proceeding with OVL unwind.",
+                    type: TransactionType.UNWIND_OVL_POSITION,
+                  },
                 },
-              },
-              currentTimeForId
-            );
-          } else {
-            // Unknown error - don't fallback, throw it
-            throw stableError;
+                currentTimeForId
+              );
+
+              return fallbackResult;
+            } else {
+              throw stableError;
+            }
           }
+        } else {
+          return await sdk.market.unwind(unwindParams);
         }
-      } else {
-        result = await sdk.market.unwind(unwindParams);
-      }
+      };
+
+      const result = await executeUnwind();
 
       let receipt = result.receipt;
 
@@ -161,8 +225,8 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
             publicClient.waitForTransactionReceipt({ hash: result.hash }),
             timeoutPromise,
           ]);
-        } catch (waitError: any) {
-          if (waitError.message === "TRANSACTION_TIMEOUT") {
+        } catch (waitError: unknown) {
+          if (waitError instanceof Error && waitError.message === "TRANSACTION_TIMEOUT") {
             console.warn("Transaction confirmation timeout:", waitError);
 
             addPopup(
@@ -205,7 +269,20 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
           timestamp: new Date().toISOString(),
         });
 
-        if (receipt.blockNumber) {
+        // Handle successful unwind - call onUnwindSuccess if provided
+        if (isSuccess && onUnwindSuccess) {
+          handledByCallback = true;
+          onUnwindSuccess(
+            unwindState,
+            inputValue,
+            unwindPercentage,
+            result.hash,
+            receipt.blockNumber ? Number(receipt.blockNumber) : undefined
+          );
+          // Don't update transaction hash immediately - let the share modal handle it
+          // This prevents portfolio refresh while user is viewing/sharing
+        } else if (isSuccess && receipt.blockNumber) {
+          // Only update transaction hash if not showing share modal
           handleTxnHashUpdate(result.hash, Number(receipt.blockNumber));
         }
       } else {
@@ -246,7 +323,10 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
       });
     } finally {
       setAttemptingUnwind(false);
-      handleDismiss();
+      // Only dismiss if we haven't handled success via onUnwindSuccess callback
+      if (!handledByCallback) {
+        handleDismiss();
+      }
     }
   };
 
@@ -276,7 +356,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
         <GradientLoaderButton
           height={"46px"}
           size={"14px"}
-          title={"Pending confirmation..."}
+          title={pendingMessage}
         />
       )}
     </>

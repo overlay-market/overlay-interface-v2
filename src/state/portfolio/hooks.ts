@@ -7,13 +7,22 @@ import type {
 import type { Address } from "viem";
 import { useAppSelector } from "../hooks";
 import { TransactionType } from "../../constants/transaction";
-import usePrevious from "../../hooks/usePrevious";
+
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const POLLING_INTERVAL = 5000;
 const MAX_POLLING_TIME = 60000;
 const DISCONNECT_CLEAR_DELAY = 500;
+
+const areArraysEqual = <T extends Record<string, unknown>>(
+  arr1: T[] | undefined,
+  arr2: T[] | undefined
+): boolean => {
+  if (arr1 === arr2) return true;
+  if (!arr1 || !arr2 || arr1.length !== arr2.length) return false;
+  return JSON.stringify(arr1) === JSON.stringify(arr2);
+};
 
 export function useIsNewUnwindTxn(): boolean {
   const txnHash = useAppSelector((state) => state.trade.txnHash);
@@ -47,8 +56,9 @@ export function usePositionRefresh(
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const disconnectTimer = useRef<NodeJS.Timeout | null>(null);
+  const fetchVersionRef = useRef(0);
+  const previousValidPositionsRef = useRef<OpenPositionData[] | undefined>();
   const isNewUnwindTxn = useIsNewUnwindTxn();
-  const previousValidPositions = usePrevious(positions);
 
   useEffect(() => {
     sdkRef.current = sdk;
@@ -60,28 +70,12 @@ export function usePositionRefresh(
   useEffect(() => {
     accountRef.current = account;
 
-    // ✅ Clear disconnect timer when wallet reconnects
+    // Clear disconnect timer when wallet reconnects
     if (account && disconnectTimer.current) {
       clearTimeout(disconnectTimer.current);
       disconnectTimer.current = null;
     }
   }, [account]);
-
-  const arePositionsEqual = (
-    arr1: OpenPositionData[] | undefined,
-    arr2: OpenPositionData[] | undefined
-  ): boolean => {
-    if (!arr1 || !arr2 || arr1.length !== arr2.length) return false;
-    if (arr1 === arr2) return true;
-  
-    return arr1.every((pos1, i) => {
-      const pos2 = arr2[i];
-      if (!pos2) return false;
-  
-      const keys1 = Object.keys(pos1) as (keyof OpenPositionData)[];
-      return keys1.every(key => pos1[key] === pos2[key]);
-    });
-  };
 
   const fetchPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
@@ -97,6 +91,10 @@ export function usePositionRefresh(
         return false;
       }
 
+      const thisVersion = retryCount === 0
+        ? ++fetchVersionRef.current
+        : fetchVersionRef.current;
+
       try {
         const result = await sdkRef.current.openPositions.transformOpenPositions(
           currentPage,
@@ -105,6 +103,8 @@ export function usePositionRefresh(
           account as Address,
           isNewTxnHash
         );
+
+        if (thisVersion !== fetchVersionRef.current) return false;
 
         if (!result || !result.data) {
           throw new Error("No position data received");
@@ -122,15 +122,20 @@ export function usePositionRefresh(
           );
         });
 
-        const hasNewData = !arePositionsEqual(validPositions, previousValidPositions);
+        const hasNewData = !areArraysEqual(validPositions, previousValidPositionsRef.current);
 
-        if (hasNewData || !positions) {
+        // Always update total — it can change independently of current page rows
+        setPositionsTotalNumber(result.total);
+
+        if (hasNewData || !previousValidPositionsRef.current) {
           setPositions(validPositions);
-          setPositionsTotalNumber(result.total);
+          previousValidPositionsRef.current = validPositions;
         }
 
         return hasNewData;
       } catch (error) {
+        if (thisVersion !== fetchVersionRef.current) return false;
+
         console.error(
           `Error fetching positions (attempt ${retryCount + 1}):`,
           error
@@ -138,6 +143,7 @@ export function usePositionRefresh(
 
         if (retryCount < MAX_RETRIES) {
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+          if (thisVersion !== fetchVersionRef.current) return false;
           return fetchPositions(retryCount + 1);
         } else {
           setPositions((prev) => prev ?? []);
@@ -148,10 +154,9 @@ export function usePositionRefresh(
     },
     [
       account,
-      isNewTxnHash,
-      isNewUnwindTxn,
       currentPage,
-      itemsPerPage,  
+      itemsPerPage,
+      isNewTxnHash,
     ]
   );
 
@@ -177,14 +182,22 @@ export function usePositionRefresh(
   }, [fetchPositions]);
 
   useEffect(() => {
-    const refresh = async () => {
-      setLoading(true);
-      await fetchPositions();
-      setLoading(false);
-    };
-
-    refresh();
-  }, [fetchPositions]);
+    if (account) {
+      const initialFetch = async () => {
+        setLoading(true);
+        try {
+          await fetchPositions();
+        } finally {
+          setLoading(false);
+        }
+      };
+      initialFetch();
+    } else {
+      setPositions(undefined);
+      setPositionsTotalNumber(0);
+      previousValidPositionsRef.current = undefined;
+    }
+  }, [account, currentPage, itemsPerPage, fetchPositions]);
 
   useEffect(() => {
     if (isNewTxnHash || isNewUnwindTxn) {
@@ -224,25 +237,35 @@ export function useUnwindPositionRefresh(
     useState(0);
   const pollingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const fetchVersionRef = useRef(0);
+  const previousUnwindPositionsRef = useRef<UnwindPositionData[] | undefined>();
   const isNewUnwindTxn = useIsNewUnwindTxn();
-  const previousTotalRef = useRef(0);
+
+  const sdkRef = useRef(sdk);
+  useEffect(() => {
+    sdkRef.current = sdk;
+  }, [sdk]);
 
   const fetchUnwindPositions = useCallback(
     async (retryCount = 0): Promise<boolean> => {
       if (!account) {
-        setUnwindPositions(undefined);
-        setUnwindPositionsTotalNumber(0);
         return false;
       }
 
+      const thisVersion = retryCount === 0
+        ? ++fetchVersionRef.current
+        : fetchVersionRef.current;
+
       try {
-        const result = await sdk.unwindPositions.transformUnwindPositions(
+        const result = await sdkRef.current.unwindPositions.transformUnwindPositions(
           currentPage,
           itemsPerPage,
           undefined,
           account as Address,
           isNewTxnHash
         );
+
+        if (thisVersion !== fetchVersionRef.current) return false;
 
         if (!result || !result.data) {
           throw new Error("No unwind position data received");
@@ -253,25 +276,25 @@ export function useUnwindPositionRefresh(
             return (
               pos &&
               pos.marketName &&
-              pos.size &&
-              pos.positionSide &&
-              pos.entryPrice &&
-              pos.exitPrice &&
-              pos.parsedCreatedTimestamp &&
-              pos.parsedClosedTimestamp &&
-              pos.pnl
+              pos.positionSide
             );
           }
         );
 
-        const hasNewData = result.total !== previousTotalRef.current;
+        const hasNewData = !areArraysEqual(validUnwindPositions, previousUnwindPositionsRef.current);
 
-        setUnwindPositions(validUnwindPositions);
+        // Always update total — it can change independently of current page rows
         setUnwindPositionsTotalNumber(result.total);
-        previousTotalRef.current = result.total;
+
+        if (hasNewData || !previousUnwindPositionsRef.current) {
+          setUnwindPositions(validUnwindPositions);
+          previousUnwindPositionsRef.current = validUnwindPositions;
+        }
 
         return hasNewData;
       } catch (error) {
+        if (thisVersion !== fetchVersionRef.current) return false;
+
         console.error(
           `Error fetching unwind positions (attempt ${retryCount + 1}):`,
           error
@@ -279,21 +302,18 @@ export function useUnwindPositionRefresh(
 
         if (retryCount < MAX_RETRIES) {
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+          if (thisVersion !== fetchVersionRef.current) return false;
           return fetchUnwindPositions(retryCount + 1);
         } else {
-          setUnwindPositions(undefined);
-          setUnwindPositionsTotalNumber(0);
           return false;
         }
       }
     },
     [
-      sdk,
       account,
-      isNewTxnHash,
-      isNewUnwindTxn,
       currentPage,
       itemsPerPage,
+      isNewTxnHash,
     ]
   );
 
@@ -319,14 +339,22 @@ export function useUnwindPositionRefresh(
   }, [fetchUnwindPositions]);
 
   useEffect(() => {
-    const refresh = async () => {
-      setLoading(true);
-      await fetchUnwindPositions();
-      setLoading(false);
-    };
-
-    refresh();
-  }, [fetchUnwindPositions]);
+    if (account) {
+      const initialFetch = async () => {
+        setLoading(true);
+        try {
+          await fetchUnwindPositions();
+        } finally {
+          setLoading(false);
+        }
+      };
+      initialFetch();
+    } else {
+      setUnwindPositions(undefined);
+      setUnwindPositionsTotalNumber(0);
+      previousUnwindPositionsRef.current = undefined;
+    }
+  }, [account, currentPage, itemsPerPage, fetchUnwindPositions]);
 
   useEffect(() => {
     if (isNewTxnHash || isNewUnwindTxn) {
