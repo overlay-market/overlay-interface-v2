@@ -58,6 +58,7 @@ import FoundersOperationsLogo from '../assets/images/markets-full-logos/Founders
 import CZClarityLogo from '../assets/images/markets-full-logos/cz.jpg';
 import SilverLogo from '../assets/images/markets-full-logos/silver-logo.jpg';
 import GoldSilverLogo from '../assets/images/markets-full-logos/gold-silver-logo.jpg';
+import BadBunnyLogo from '../assets/images/markets-full-logos/badbunny-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -108,6 +109,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "SOL%2FUSD": SolUsd,
   "The%20Weeknd%20Index": TheWeekend,
   "Billie%20Eilish%20Index": BillieEilish,
+  "Bad%20Bunny": BadBunnyLogo,
   "Strategic%20Reserve%20Index": StrategicReverseIndex,
   "ETH%20%2F%20USD": EthUsdLogo,
   "BTC%20%2F%20USD": BtcUsdLogo,
@@ -132,6 +134,7 @@ export const MARKETSORDER = [
   "MrBeast%20Index",
   "Double%20or%20Nothing",
   "GOLD%20%2F%20SILVER",
+  "Bad%20Bunny",
   "Amouranth%20vs%20peachJars",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
@@ -255,6 +258,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "Lana%20Del%20Rey",
     "The%20Weeknd%20Index",
     "Billie%20Eilish%20Index",
+    "Bad%20Bunny",
     "Mr%20Beast%20Popularity%20Index",
   ],
   [CategoryName.Fansly]: [
