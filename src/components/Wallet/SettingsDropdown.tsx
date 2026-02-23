@@ -53,38 +53,42 @@ const SettingsDropdown: React.FC = () => {
         }}
       >
         <Flex direction="column" gap="8px" p="4px">
-          <Text size="2" weight="medium" style={{ color: theme.color.grey1 }}>
-            Unwind Settings
-          </Text>
-          <label
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "8px",
-              cursor: "pointer",
-              padding: "4px",
-            }}
-          >
-            <Checkbox
-              checked={unwindPreference === "stable"}
-              onCheckedChange={(checked) =>
-                handleUnwindPreferenceChange(checked ? "stable" : "normal")
-              }
-              style={{ marginTop: "2px" }}
-            />
-            <Flex direction="column" gap="4px">
-              <Text size="2" style={{ color: theme.color.grey1 }}>
-                Convert profits to USDT when unwinding
+          {!isAvatarTradingActive && (
+            <>
+              <Text size="2" weight="medium" style={{ color: theme.color.grey1 }}>
+                Unwind Settings
               </Text>
-              <Text size="1" style={{ color: theme.color.grey3 }}>
-                Uses 1inch to swap OVL profits to USDT
-              </Text>
-            </Flex>
-          </label>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "8px",
+                  cursor: "pointer",
+                  padding: "4px",
+                }}
+              >
+                <Checkbox
+                  checked={unwindPreference === "stable"}
+                  onCheckedChange={(checked) =>
+                    handleUnwindPreferenceChange(checked ? "stable" : "normal")
+                  }
+                  style={{ marginTop: "2px" }}
+                />
+                <Flex direction="column" gap="4px">
+                  <Text size="2" style={{ color: theme.color.grey1 }}>
+                    Convert profits to USDT when unwinding
+                  </Text>
+                  <Text size="1" style={{ color: theme.color.grey3 }}>
+                    Uses 1inch to swap OVL profits to USDT
+                  </Text>
+                </Flex>
+              </label>
+            </>
+          )}
 
           {(hasMemberships || isAvatarTradingActive) && (
             <>
-              <div style={{ height: '1px', backgroundColor: theme.color.darkBlue, margin: '8px 0' }} />
+              {!isAvatarTradingActive && <div style={{ height: '1px', backgroundColor: theme.color.darkBlue, margin: '8px 0' }} />}
               <Text size="2" weight="medium" style={{ color: theme.color.grey1 }}>
                 Funded Trader
               </Text>

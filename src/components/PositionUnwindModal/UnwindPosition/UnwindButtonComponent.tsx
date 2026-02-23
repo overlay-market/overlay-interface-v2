@@ -52,7 +52,7 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
   const { slippageValue } = useTradeState();
-  const { address } = useAccount();
+  const { address, isAvatarTradingActive } = useAccount();
   const publicClient = usePublicClient();
   const { data: walletClient } = useConnectorClient();
 
@@ -158,8 +158,10 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
       };
 
       const executeUnwind = async () => {
-        // Try stable unwind if preference is set
-        if (unwindStable) {
+        // Funded trading (avatar) must always use unwindStable — Safe is only allowed this method
+        const useStableUnwind = isAvatarTradingActive || unwindStable;
+
+        if (useStableUnwind) {
           try {
             return await sdk.shiva.unwindStable({
               ...unwindParams,
@@ -175,6 +177,11 @@ const UnwindButtonComponent: React.FC<UnwindButtonComponentProps> = ({
               stableError?.message?.toLowerCase().includes('user denied');
 
             if (isUserRejection) {
+              throw stableError;
+            }
+
+            // No fallback to normal unwind for funded trading — Safe can only call unwindStable
+            if (isAvatarTradingActive) {
               throw stableError;
             }
 
