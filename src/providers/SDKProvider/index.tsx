@@ -5,7 +5,7 @@ import { useConnectorClient } from "wagmi";
 import { DEFAULT_CHAINID, SUPPORTED_CHAINID } from "../../constants/chains";
 import useMultichainContext from "../MultichainContextProvider/useMultichainContext";
 import { SDKContext } from "./types";
-import { useAvatarTrading } from "../../hooks/useZodiacRoles";
+import { useAvatarTrading } from "../../hooks/useAvatarTrading";
 import { encodeFunctionData } from "viem";
 import { ROLES_MODIFIER_ABI } from "../../constants/abis/rolesModifier";
 import { TRADE_ROLE_KEY } from "../../constants/zodiac";
@@ -83,7 +83,7 @@ const SDKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               const isModifierCall = txn?.to?.toLowerCase() === activeAvatar.address.toLowerCase();
               if (txn && txn.from && walletClient.account && txn.from.toLowerCase() === walletClient.account.address.toLowerCase() && !isModifierCall) {
                 console.warn(`Zodiac Proxy: overriding ${args.method} from EOA to Avatar: ${activeAvatar.avatar} for target: ${txn.to}`);
-                txn.from = activeAvatar.avatar;
+                args = { ...args, params: [{ ...txn, from: activeAvatar.avatar }, ...args.params.slice(1)] };
               }
             }
 

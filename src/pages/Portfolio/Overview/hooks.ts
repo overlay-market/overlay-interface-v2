@@ -27,6 +27,7 @@ export function useOverviewDataRefresh(
   const previousOverviewData = usePrevious(overviewData);
 
   const sdkRef = useRef(sdk);
+  const fetchVersionRef = useRef(0);
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
@@ -52,12 +53,19 @@ export function useOverviewDataRefresh(
       if (!account) {
         return false;
       }
+
+      const thisVersion = retryCount === 0
+        ? ++fetchVersionRef.current
+        : fetchVersionRef.current;
+
       try {
         const result = await sdkRef.current.accountDetails.getOverview(
           selectedInterval,
           account as Address,
           refreshData
         );
+
+        if (thisVersion !== fetchVersionRef.current) return false;
 
         if (!result) {
           throw new Error("No overview data received");
@@ -67,6 +75,8 @@ export function useOverviewDataRefresh(
         setOverviewData(result);
         return hasNewData;
       } catch (error) {
+        if (thisVersion !== fetchVersionRef.current) return false;
+
         console.error(
           `Error fetching overview data(attempt ${retryCount + 1}):`,
           error
@@ -74,9 +84,10 @@ export function useOverviewDataRefresh(
 
         if (retryCount < MAX_RETRIES) {
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+          if (thisVersion !== fetchVersionRef.current) return false;
           return fetchOverviewDetails(retryCount + 1);
         } else {
-          console.warn("Max retries reached. Keeping previous overviewData.");          
+          console.warn("Max retries reached. Keeping previous overviewData.");
           return false;
         }
       }
@@ -85,7 +96,7 @@ export function useOverviewDataRefresh(
       account,
       refreshData,
       isNewUnwindTxn,
-      selectedInterval  
+      selectedInterval
     ]
   );
 

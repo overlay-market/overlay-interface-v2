@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useAccount as useAccountWagmi } from 'wagmi'
 import { useSupportedChainId } from './useSupportedChainId';
 import { DEFAULT_CHAINID, CHAIN_ID_LOCAL_STORAGE_KEY } from '../constants/chains';
-import { useAvatarTrading } from './useZodiacRoles';
+import { useAvatarTrading } from './useAvatarTrading';
 
 const useAccount = () => {
   const { chainId, address: signerAddress, ...rest } = useAccountWagmi()

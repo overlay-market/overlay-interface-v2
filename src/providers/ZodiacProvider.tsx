@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useMemo, useState, useCallback } from 'react';
 import { useAccount as useAccountWagmi } from 'wagmi';
 import { RolesModifier, useZodiacRoles } from '../hooks/useZodiacRoles';
 
@@ -22,24 +22,26 @@ export const ZodiacProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     const [status, setStatusState] = useState<'active' | 'inactive' | null>(null);
     const [activeAvatar, setActiveAvatarState] = useState<RolesModifier | null>(null);
+    const [prevStorageKey, setPrevStorageKey] = useState<string | null>(null);
+    const [prevAvatarKey, setPrevAvatarKey] = useState<string | null>(null);
 
-    // Initial load
-    useEffect(() => {
-        if (!storageKey) {
-            setStatusState(null);
-            return;
-        }
-        setStatusState(localStorage.getItem(storageKey) as 'active' | 'inactive' | null);
-    }, [storageKey]);
-
-    useEffect(() => {
-        if (!activeAvatarStorageKey) {
+    // Synchronously restore from localStorage when keys change.
+    // React re-renders this component with updated state before rendering
+    // children, so downstream hooks never see the intermediate EOA address.
+    if (storageKey !== prevStorageKey) {
+        setPrevStorageKey(storageKey);
+        const raw = storageKey ? localStorage.getItem(storageKey) : null;
+        setStatusState(raw === 'active' || raw === 'inactive' ? raw : null);
+    }
+    if (activeAvatarStorageKey !== prevAvatarKey) {
+        setPrevAvatarKey(activeAvatarStorageKey);
+        if (activeAvatarStorageKey) {
+            const stored = localStorage.getItem(activeAvatarStorageKey);
+            try { setActiveAvatarState(stored ? JSON.parse(stored) : null); } catch { setActiveAvatarState(null); }
+        } else {
             setActiveAvatarState(null);
-            return;
         }
-        const stored = localStorage.getItem(activeAvatarStorageKey);
-        try { setActiveAvatarState(stored ? JSON.parse(stored) : null); } catch { setActiveAvatarState(null); }
-    }, [activeAvatarStorageKey]);
+    }
 
     const setStatus = useCallback((newStatus: 'active' | 'inactive' | null) => {
         if (!storageKey) return;

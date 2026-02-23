@@ -1,7 +1,6 @@
 import { Flex, Text } from "@radix-ui/themes";
-import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
 import { Address } from "viem";
@@ -21,7 +20,6 @@ const LIQUIDATED_POSITIONS_COLUMNS = [
 ];
 
 const LiquidatesTable: React.FC = () => {
-  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
 
@@ -32,63 +30,67 @@ const LiquidatesTable: React.FC = () => {
   const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
+  const sdkRef = useRef(sdk);
+  const fetchVersionRef = useRef(0);
   useEffect(() => {
-    const fetchLiquidatePositions = async () => {
-      if (!account) {
+    sdkRef.current = sdk;
+  }, [sdk]);
+
+  const fetchLiquidatePositions = useCallback(async () => {
+    if (!account) {
+      setLiquidatePositions(undefined);
+      setPositionsTotalNumber(0);
+      return;
+    }
+
+    const thisVersion = ++fetchVersionRef.current;
+    setLoading(true);
+
+    try {
+      const liquidates =
+        await sdkRef.current.liquidatedPositions.transformLiquidatedPositions(
+          currentPage,
+          itemsPerPage,
+          undefined,
+          account as Address
+        );
+
+      if (thisVersion !== fetchVersionRef.current) return;
+
+      const validLiquidates = liquidates.data.filter(
+        (pos: LiquidatedPositionData) => {
+          return (
+            pos &&
+            pos.marketName &&
+            pos.size &&
+            pos.position &&
+            pos.entryPrice &&
+            pos.exitPrice &&
+            pos.created &&
+            pos.liquidated
+          );
+        }
+      );
+
+      validLiquidates && setLiquidatePositions(validLiquidates);
+      liquidates && setPositionsTotalNumber(liquidates.total);
+      if (!liquidates) {
         setLiquidatePositions(undefined);
         setPositionsTotalNumber(0);
       }
-
-      if (account) {
-        setLoading(true);
-        try {
-          const liquidates =
-            await sdk.liquidatedPositions.transformLiquidatedPositions(
-              currentPage,
-              itemsPerPage,
-              undefined,
-              account as Address
-            );
-
-          const validLiquidates = liquidates.data.filter(
-            (pos: LiquidatedPositionData) => {
-              return (
-                pos &&
-                pos.marketName &&
-                pos.size &&
-                pos.position &&
-                pos.entryPrice &&
-                pos.exitPrice &&
-                pos.created &&
-                pos.liquidated
-              );
-            }
-          );
-
-          validLiquidates && setLiquidatePositions(validLiquidates);
-          liquidates && setPositionsTotalNumber(liquidates.total);
-          if (!liquidates) {
-            setLiquidatePositions(undefined);
-            setPositionsTotalNumber(0);
-          }
-        } catch (error) {
-          console.error("Error fetching liquidated positions:", error);
-        } finally {
-          setLoading(false);
-        }
+    } catch (error) {
+      if (thisVersion !== fetchVersionRef.current) return;
+      console.error("Error fetching liquidated positions:", error);
+    } finally {
+      if (thisVersion === fetchVersionRef.current) {
+        setLoading(false);
       }
-    };
+    }
+  }, [account, currentPage, itemsPerPage]);
 
+  useEffect(() => {
     fetchLiquidatePositions();
-  }, [
-    chainId,
-    account,
-    currentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    setCurrentPage,
-  ]);
+  }, [fetchLiquidatePositions]);
 
   return (
     <Flex

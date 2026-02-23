@@ -3,7 +3,8 @@ import { GearIcon } from "@radix-ui/react-icons";
 import theme from "../../theme";
 import { useUnwindPreference, useTradeActionHandlers } from "../../state/trade/hooks";
 import useAccount from "../../hooks/useAccount";
-import { useAvatarTrading, useZodiacRoles } from "../../hooks/useZodiacRoles";
+import { useZodiacRoles } from "../../hooks/useZodiacRoles";
+import { useAvatarTrading } from "../../hooks/useAvatarTrading";
 import { CopyIcon, CheckIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
 import { useState } from "react";
 import { getExplorerLink, ExplorerDataType } from "../../utils/getExplorerLink";
@@ -85,7 +86,7 @@ const SettingsDropdown: React.FC = () => {
             <>
               <div style={{ height: '1px', backgroundColor: theme.color.darkBlue, margin: '8px 0' }} />
               <Text size="2" weight="medium" style={{ color: theme.color.grey1 }}>
-                Safe Trading (Zodiac Roles)
+                Funded Trader
               </Text>
               <label
                 style={{
@@ -112,12 +113,12 @@ const SettingsDropdown: React.FC = () => {
                 />
                 <Flex direction="column" gap="4px" width="100%">
                   <Text size="2" style={{ color: theme.color.grey1 }}>
-                    Trade on behalf of Safe
+                    Use funded account
                   </Text>
                   {isAvatarTradingActive && activeAvatar && (
                     <Flex direction="column" gap="4px" style={{ backgroundColor: theme.color.grey9, padding: '8px', borderRadius: '4px', marginTop: '4px' }}>
                       <Flex align="center" justify="between" gap="8px">
-                        <Text size="1" style={{ color: theme.color.grey3 }}>Avatar (Safe):</Text>
+                        <Text size="1" style={{ color: theme.color.grey3 }}>Funded Account:</Text>
                         <Flex gap="8px">
                           <IconButton size="1" variant="ghost" onClick={() => handleCopy(activeAvatar.avatar)}>
                             {copied ? <CheckIcon color={theme.color.green2} /> : <CopyIcon color={theme.color.grey3} />}

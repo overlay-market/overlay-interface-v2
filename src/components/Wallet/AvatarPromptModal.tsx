@@ -21,24 +21,24 @@ const AvatarPromptModal: React.FC<AvatarPromptModalProps> = ({
         <Modal
             open={isOpen}
             handleClose={onClose}
-            title="Safe Multisig Detected"
+            title="Funded Trader Account Detected"
             triggerElement={<></>}
             width="400px"
         >
             <Flex direction="column" gap="20px" p="40px" align="center">
                 <Text align="center" style={{ color: theme.color.grey1 }}>
-                    We detected that your wallet is a member of a Safe multisig via Zodiac Roles.
+                    Your wallet has been granted access to a Funded Trader account. You can trade using the funded account and keep 80% of the profits.
                 </Text>
                 <Flex direction="column" gap="4px" align="center">
                     <Text size="1" style={{ color: theme.color.grey3 }}>
-                        Avatar (Safe):
+                        Funded Account:
                     </Text>
-                    <Text size="2" weight="bold" style={{ color: theme.color.green2 }}>
+                    <Text size="2" weight="bold" style={{ color: theme.color.green2, wordBreak: "break-all", textAlign: "center" }}>
                         {avatar.avatar}
                     </Text>
                 </Flex>
                 <Text align="center" style={{ color: theme.color.grey1 }}>
-                    Would you like to trade on behalf of this Safe?
+                    Would you like to switch to your funded account?
                 </Text>
                 <Flex gap="12px" width="100%">
                     <Button
@@ -46,7 +46,7 @@ const AvatarPromptModal: React.FC<AvatarPromptModalProps> = ({
                         onClick={onClose}
                         style={{ flex: 1, cursor: "pointer" }}
                     >
-                        No, keep EOA
+                        No, use my wallet
                     </Button>
                     <Button
                         onClick={() => onConfirm(avatar)}
@@ -57,7 +57,7 @@ const AvatarPromptModal: React.FC<AvatarPromptModalProps> = ({
                             color: theme.color.background,
                         }}
                     >
-                        Yes, trade as Safe
+                        Start Trading
                     </Button>
                 </Flex>
             </Flex>

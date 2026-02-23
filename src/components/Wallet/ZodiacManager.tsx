@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import useAccount from "../../hooks/useAccount";
-import { useZodiacRoles, useAvatarTrading, RolesModifier } from "../../hooks/useZodiacRoles";
+import { useZodiacRoles, RolesModifier } from "../../hooks/useZodiacRoles";
+import { useAvatarTrading } from "../../hooks/useAvatarTrading";
 import AvatarPromptModal from "./AvatarPromptModal";
 
 const ZodiacManager: React.FC = () => {

@@ -53,16 +53,3 @@ export const useZodiacRoles = (address?: string) => {
     });
 };
 
-import { useZodiacContext } from '../providers/ZodiacProvider';
-
-// ... (keep MEMBER_OF_QUERY and interfaces)
-
-export const useAvatarTrading = () => {
-    const context = useZodiacContext();
-    return {
-        isAvatarTradingActive: context.isAvatarTradingActive,
-        activeAvatar: context.activeAvatar,
-        setStatus: context.setStatus,
-        setActiveAvatar: context.setActiveAvatar,
-    };
-};
