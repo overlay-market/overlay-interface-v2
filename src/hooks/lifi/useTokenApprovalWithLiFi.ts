@@ -12,7 +12,7 @@ import { BridgeStage } from './useLiFiBridge';
 
 export const useTokenApprovalWithLiFi = ({ setTradeStage }: { setTradeStage: (stage: BridgeStage) => void; }) => {
   const { data: walletClient } = useWalletClient();
-  const { address: ownerAddress } = useAccount();
+  const { signerAddress: ownerAddress } = useAccount();
   const addPopup = useAddPopup();
 
   const approveIfNeeded = useCallback(

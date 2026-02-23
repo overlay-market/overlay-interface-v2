@@ -35,7 +35,7 @@ export const useLiFiBridge = (tradingFeeRate?: string) => {
   const [bridgeStage, setBridgeStage] = useState<BridgeStage>({ stage: 'idle' });
   const [bridgedAmount, setBridgedAmount] = useState<string>('0');
   const [bridgeQuote, setBridgeQuote] = useState<BridgeQuoteInfo | null>(null);
-  const { address: account } = useAccount();
+  const { signerAddress: account } = useAccount();
   const { data: walletClient, refetch: refetchWalletClient } = useWalletClient();
   const { typedValue, selectedLeverage } = useTradeState();
   const { selectedChainId, selectedToken } = useChainAndTokenState();

@@ -6,7 +6,7 @@ import { SelectState } from "../../types/selectChainAndTokenTypes";
 import { serializeWithBigInt } from "../../utils/serializeWithBigInt";
 
 export const useSelectedTokenBalance = () => {
-  const { address } = useAccount();
+  const { signerAddress: address } = useAccount();
   const { selectedToken, chainState, tokenState } = useChainAndTokenState();
 
   return useQuery({

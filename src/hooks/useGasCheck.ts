@@ -19,7 +19,7 @@ export interface GasCheckResult {
 }
 
 export const useGasCheck = () => {
-  const { address: account, chainId } = useAccount();
+  const { signerAddress: account, chainId } = useAccount();
   const isDebugMode = import.meta.env.VITE_LIFI_DEBUG === 'true';
 
   // Get BNB balance on BSC
