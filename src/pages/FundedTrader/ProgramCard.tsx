@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Text } from "@radix-ui/themes";
 import { ProgramTier } from "./types";
-import { TIER_COLORS } from "../../constants/funded-trader";
+import { FUNDED_TRADER_DOCS_URL, TIER_COLORS } from "../../constants/funded-trader";
 import { GradientOutlineButton } from "../../components/Button";
 import theme from "../../theme";
 import {
@@ -102,10 +102,10 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ tier }) => {
 
         {/* Button */}
         <GradientOutlineButton
-          title="Coming Soon"
+          title="Apply Now"
           width="100%"
           height="44px"
-          isDisabled={true}
+          handleClick={() => window.open(FUNDED_TRADER_DOCS_URL, "_blank", "noopener,noreferrer")}
         />
       </Flex>
     </ProgramCardContainer>

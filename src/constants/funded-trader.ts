@@ -1,5 +1,8 @@
 import { ProgramTier, TierColor, TierColorScheme } from '../pages/FundedTrader/types';
 
+export const FUNDED_TRADER_DOCS_URL =
+  'https://docs.overlay.market/Funded%20Trader%20Program/Start-Evaluation';
+
 export const TIER_COLORS: Record<TierColor, TierColorScheme> = {
   blue: {
     primary: '#12B4FF',
