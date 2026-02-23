@@ -5,7 +5,7 @@ import NavBar from "./components/NavBar";
 import Markets from "./pages/Markets";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
 import Wallet from "./components/Wallet";
-import { lazy, Suspense, useRef } from "react";
+import { lazy, Suspense, useRef, useMemo } from "react";
 import useSyncChainQuery from "./hooks/useSyncChainQuery";
 import Popups from "./components/Popups";
 import Portfolio from "./pages/Portfolio";
@@ -21,6 +21,7 @@ import AnalyticsListener from "./analytics/AnalyticsListener";
 import WalletTracker from "./analytics/WalletTracker";
 import ZodiacManager from "./components/Wallet/ZodiacManager";
 import { ZodiacProvider } from "./providers/ZodiacProvider";
+import useAccount from "./hooks/useAccount";
 
 // Dev-only: lazy-loaded share card preview page (excluded from production builds)
 const DevShareCard = import.meta.env.DEV
@@ -30,6 +31,12 @@ const DevShareCard = import.meta.env.DEV
 const AppContent = () => {
   const chainIdRef = useRef<number | undefined>(undefined);
   useSyncChainQuery(chainIdRef);
+  const { isAvatarTradingActive } = useAccount();
+
+  const exchangeElement = useMemo(
+    () => isAvatarTradingActive ? <Navigate to="/markets" /> : <ExchangeLiFi />,
+    [isAvatarTradingActive]
+  );
 
   return (
     <Theme>
@@ -54,7 +61,7 @@ const AppContent = () => {
             />
             <Route path="/airdrops" element={<Airdrops />} />
             <Route path="/funded-trader" element={<FundedTrader />} />
-            <Route path="/exchange/*" element={<ExchangeLiFi />} />
+            <Route path="/exchange/*" element={exchangeElement} />
             {DevShareCard && (
               <Route path="/dev/share-card" element={<Suspense fallback={null}><DevShareCard /></Suspense>} />
             )}

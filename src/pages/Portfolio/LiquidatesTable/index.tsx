@@ -1,4 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
+import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useAccount from "../../../hooks/useAccount";
@@ -20,6 +21,7 @@ const LIQUIDATED_POSITIONS_COLUMNS = [
 ];
 
 const LiquidatesTable: React.FC = () => {
+  const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
 
@@ -86,7 +88,7 @@ const LiquidatesTable: React.FC = () => {
         setLoading(false);
       }
     }
-  }, [account, currentPage, itemsPerPage]);
+  }, [account, chainId, currentPage, itemsPerPage]);
 
   useEffect(() => {
     fetchLiquidatePositions();
