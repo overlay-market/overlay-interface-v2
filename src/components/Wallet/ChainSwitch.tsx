@@ -3,6 +3,7 @@ import {
   CHAIN_LIST,
   CHAIN_LIST_ORDER,
   NETWORK_ICONS,
+  CHAIN_ID_LOCAL_STORAGE_KEY,
 } from "../../constants/chains";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
 import { DropdownMenu, Flex } from "@radix-ui/themes";
@@ -13,7 +14,7 @@ import {
   DropdownItem,
 } from "./chain-switch-styles";
 
-export const CHAIN_ID_LOCAL_STORAGE_KEY = 'selectedChainId';
+export { CHAIN_ID_LOCAL_STORAGE_KEY };
 
 const ChainSwitch = () => {
   const { chainId, setSelectedChainId } = useMultichainContext();
@@ -44,7 +45,7 @@ const ChainSwitch = () => {
         <div>⚠️</div>
       )}
     </Flex>
-    : 
+    :
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <DropdownMenu.Trigger>
         <Flex align={"center"} style={{ cursor: "pointer" }}>
