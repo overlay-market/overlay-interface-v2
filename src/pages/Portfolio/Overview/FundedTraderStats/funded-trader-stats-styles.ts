@@ -1,29 +1,6 @@
 import styled from "styled-components";
 import theme from "../../../../theme";
 
-export const StatsSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 24px;
-  background-color: ${theme.color.grey4};
-  border-radius: 8px;
-`;
-
-export const StatsHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-`;
-
-export const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
 export const PhaseBadge = styled.span<{ phase: "funded" | "evaluation" }>`
   display: inline-flex;
   align-items: center;
@@ -82,20 +59,4 @@ export const CheckMark = styled.span`
   color: ${theme.color.green1};
   font-weight: 700;
   margin-left: 6px;
-`;
-
-export const ReadyBanner = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: linear-gradient(
-    135deg,
-    ${theme.color.green1} 0%,
-    #4ade80 100%
-  );
-  color: ${theme.color.black};
-  font-weight: 700;
-  font-size: 14px;
 `;

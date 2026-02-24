@@ -16,7 +16,11 @@ export const useFundedTraderStats = (
         `Failed to fetch funded trader stats: ${response.statusText}`
       );
     }
-    return response.json();
+    const data = await response.json();
+    if (!data || (data.phase !== "funded" && data.phase !== "evaluation")) {
+      throw new Error("Unexpected funded trader stats response shape");
+    }
+    return data as FundedTraderStatsData;
   };
 
   return useQuery({

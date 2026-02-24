@@ -1,5 +1,4 @@
 import { formatUnits } from "viem";
-import { EvaluationTargets } from "./types";
 
 export const formatUsdt = (value: string, decimals = 2): string => {
   const formatted = formatUnits(BigInt(value), 18);
@@ -19,15 +18,4 @@ export const getHealthColor = (
   if (healthFill <= 60) return "#eab308";
   if (healthFill <= 80) return "#a3d9a5";
   return "#86cfb0";
-};
-
-export const isAllTargetsMet = (targets: EvaluationTargets): boolean => {
-  const profitMet =
-    targets.profitTarget.currentPercent >= targets.profitTarget.targetPercent;
-  const volumeMet =
-    BigInt(targets.volumeTarget.currentUsdt) >=
-    BigInt(targets.volumeTarget.targetUsdt);
-  const daysMet =
-    targets.minTradingDays.current >= targets.minTradingDays.target;
-  return profitMet && volumeMet && daysMet;
 };

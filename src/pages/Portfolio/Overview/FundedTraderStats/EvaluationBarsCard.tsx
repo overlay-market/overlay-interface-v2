@@ -1,56 +1,59 @@
 import React from "react";
 import { Flex, Text } from "@radix-ui/themes";
+import { formatUnits } from "viem";
 import theme from "../../../../theme";
 import { EvaluationPhaseStats } from "./types";
-import { formatUsdt, isAllTargetsMet } from "./utils";
-import {
-  StatsSection,
-  StatsHeader,
-  HeaderLeft,
-  PhaseBadge,
-  ReadyBanner,
-} from "./funded-trader-stats-styles";
+import { formatUsdt } from "./utils";
 import TargetProgressBar from "./TargetProgressBar";
+import { PhaseBadge } from "./funded-trader-stats-styles";
 
-type EvaluationPhaseOverviewProps = {
+type EvaluationBarsCardProps = {
   data: EvaluationPhaseStats;
 };
 
-const EvaluationPhaseOverview: React.FC<EvaluationPhaseOverviewProps> = ({
-  data,
-}) => {
+const EvaluationBarsCard: React.FC<EvaluationBarsCardProps> = ({ data }) => {
   const { targets, tradingDays, planName, currentValueUsdt } = data;
-  const allMet = isAllTargetsMet(targets);
 
-  const volumeCurrent = formatUsdt(targets.volumeTarget.currentUsdt, 0);
-  const volumeTarget = formatUsdt(targets.volumeTarget.targetUsdt, 0);
+  const volumeCurrentNum = Number(formatUnits(BigInt(targets.volumeTarget.currentUsdt), 18));
+  const volumeTargetNum = Number(formatUnits(BigInt(targets.volumeTarget.targetUsdt), 18));
 
   return (
-    <StatsSection>
-      <StatsHeader>
-        <HeaderLeft>
+    <Flex
+      direction="column"
+      justify="between"
+      py="20px"
+      px="24px"
+      gap="12px"
+      style={{
+        backgroundColor: theme.color.grey4,
+        borderRadius: "8px",
+        width: "100%",
+      }}
+    >
+      <Flex justify="between" align="center" wrap="wrap" gap="8px">
+        <Flex align="center" gap="8px">
           <PhaseBadge phase="evaluation">Evaluation</PhaseBadge>
           {planName && (
-            <Text size="2" weight="medium" style={{ color: theme.color.white }}>
+            <Text size="1" style={{ color: theme.color.grey3 }}>
               {planName}
             </Text>
           )}
-        </HeaderLeft>
-        <Text size="2" style={{ color: theme.color.grey3 }}>
-          {tradingDays} trading day{tradingDays !== 1 ? "s" : ""}
+        </Flex>
+        <Text size="1" style={{ color: theme.color.grey3 }}>
+          {tradingDays} day{tradingDays !== 1 ? "s" : ""}
         </Text>
-      </StatsHeader>
+      </Flex>
 
-      <Flex direction="column" gap="4px">
+      <Flex direction="column" gap="2px">
         <Text size="1" style={{ color: theme.color.grey3 }}>
           Account Value
         </Text>
-        <Flex align="baseline" gap="8px">
-          <Text size="5" weight="bold">
+        <Flex align="baseline" gap="6px">
+          <Text size="4" weight="bold">
             ${formatUsdt(currentValueUsdt)}
           </Text>
           <Text
-            size="2"
+            size="1"
             weight="medium"
             style={{
               color:
@@ -65,7 +68,7 @@ const EvaluationPhaseOverview: React.FC<EvaluationPhaseOverviewProps> = ({
         </Flex>
       </Flex>
 
-      <Flex direction="column" gap="12px">
+      <Flex direction="column" gap="12px" style={{ flex: 1, justifyContent: "center" }}>
         <TargetProgressBar
           label="Profit Target"
           current={targets.profitTarget.currentPercent}
@@ -75,23 +78,22 @@ const EvaluationPhaseOverview: React.FC<EvaluationPhaseOverviewProps> = ({
         />
 
         <TargetProgressBar
-          label="Volume Target"
-          current={Number(volumeCurrent.replace(/,/g, ""))}
-          target={Number(volumeTarget.replace(/,/g, ""))}
+          label="Volume"
+          current={volumeCurrentNum}
+          target={volumeTargetNum}
           unit="USDT"
         />
 
         <TargetProgressBar
-          label="Min Trading Days"
+          label="Trading Days"
           current={targets.minTradingDays.current}
           target={targets.minTradingDays.target}
           unit="days"
         />
       </Flex>
 
-      {allMet && <ReadyBanner>Ready for Funding</ReadyBanner>}
-    </StatsSection>
+    </Flex>
   );
 };
 
-export default EvaluationPhaseOverview;
+export default EvaluationBarsCard;

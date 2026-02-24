@@ -24,7 +24,7 @@ const LimitProgressBar: React.FC<LimitProgressBarProps> = ({
   // healthPct: 100% = untouched, 0% = killed. Matches the bar fill exactly.
   const healthPct = isInProfit
     ? 100
-    : ((thresholdPercent - currentLossPercent) / thresholdPercent) * 100;
+    : Math.max(((thresholdPercent - currentLossPercent) / thresholdPercent) * 100, 0);
   const color = getHealthColor(healthPct, isInProfit);
 
   return (
