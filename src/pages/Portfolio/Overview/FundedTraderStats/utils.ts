@@ -1,5 +1,4 @@
 import { formatUnits } from "viem";
-import theme from "../../../../theme";
 import { EvaluationTargets } from "./types";
 
 export const formatUsdt = (value: string, decimals = 2): string => {
