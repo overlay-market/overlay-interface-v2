@@ -123,7 +123,7 @@ const SettingsDropdown: React.FC = () => {
                     <Flex direction="column" gap="4px" style={{ backgroundColor: theme.color.grey9, padding: '8px', borderRadius: '4px', marginTop: '4px' }}>
                       <Flex align="center" justify="between" gap="8px">
                         <Text size="1" style={{ color: theme.color.grey3 }}>Funded Account:</Text>
-                        <Flex gap="8px">
+                        <Flex gap="8px" onClick={(e) => e.preventDefault()}>
                           <IconButton size="1" variant="ghost" onClick={() => handleCopy(activeAvatar.avatar)}>
                             {copied ? <CheckIcon color={theme.color.green2} /> : <CopyIcon color={theme.color.grey3} />}
                           </IconButton>
