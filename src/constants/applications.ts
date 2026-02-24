@@ -31,6 +31,8 @@ export const PERMANENT_LEADERBOARD_API = LEADERBOARD_API + 'permanent/'
 
 export const FAUCET_API = 'https://api.overlay.market/faucet/'
 
+export const FUNDED_TRADER_API = 'http://localhost:3000'
+
 export type AddressMap = { [chainId: number]: Address };
 
 export const SHIVA_ADDRESS: AddressMap = {

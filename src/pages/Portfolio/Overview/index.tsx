@@ -11,12 +11,22 @@ import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
 import { useOverviewDataRefresh } from "./hooks";
+import FundedTraderStats from "./FundedTraderStats";
+import { useFundedTraderStats } from "../../../hooks/useFundedTraderStats";
+import LimitBarsCard from "./FundedTraderStats/LimitBarsCard";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
-  const { address: account } = useAccount();
+  const { address: account, isAvatarTradingActive } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
   const isNewUnwindTxn = useIsNewUnwindTxn();
+
+  const { data: fundedStats } = useFundedTraderStats(
+    account,
+    isAvatarTradingActive
+  );
+  const showLimitBars =
+    isAvatarTradingActive && fundedStats?.phase === "funded";
 
   const [selectedInterval, setSelectedInterval] = useState<IntervalType>("1M");
   const previousSelectedInterval = usePrevious(selectedInterval);
@@ -53,6 +63,8 @@ const Overview: React.FC = () => {
         </Text>
       </Box>
 
+      <FundedTraderStats />
+
       {account && (
         <>
           <MainCardsGrid>
@@ -62,14 +74,18 @@ const Overview: React.FC = () => {
               chartData={overviewData?.dataByPeriod}
             />
 
-            <MainOverviewCard
-              title={"Locked Sum + uPnL"}
-              value={overviewData?.lockedPlusUnrealized}
-              unit="USDT"
-            />
+            {showLimitBars ? (
+              <LimitBarsCard data={fundedStats} />
+            ) : (
+              <MainOverviewCard
+                title={"Locked Sum + uPnL"}
+                value={overviewData?.lockedPlusUnrealized}
+                unit="USDT"
+              />
+            )}
           </MainCardsGrid>
 
-          <InfoCardsGrid>
+          <InfoCardsGrid $columns={showLimitBars ? 5 : 4}>
             <OverviewCard
               title="Open Positions"
               value={overviewData?.numberOfOpenPositions}
@@ -114,6 +130,14 @@ const Overview: React.FC = () => {
               unit="USDT"
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
+
+            {showLimitBars && (
+              <OverviewCard
+                title="Locked Sum + uPnL"
+                value={overviewData?.lockedPlusUnrealized}
+                unit="USDT"
+              />
+            )}
           </InfoCardsGrid>
         </>
       )}
