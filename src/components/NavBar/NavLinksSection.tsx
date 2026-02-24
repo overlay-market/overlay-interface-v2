@@ -40,6 +40,7 @@ import {
   FundedTraderIcon,
   FundedTraderActiveIcon,
 } from "../../assets/icons/navBar-icons/funded-trader";
+import { useAvatarTrading } from "../../hooks/useAvatarTrading";
 
 export interface NavLinkAsset {
   to: string;
@@ -57,6 +58,7 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
   mode = NAVBAR_MODE.DEFAULT,
 }) => {
   const { currentMarket } = useCurrentMarketState();
+  const { isAvatarTradingActive } = useAvatarTrading();
 
   const activeMarket = currentMarket?.marketName ?? DEFAULT_MARKET;
   const encodedMarket = encodeURIComponent(activeMarket);
@@ -106,14 +108,20 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: AirdropsActiveIcon,
       showOnMobile: !isMobile,
     },
-    {
-      to: "/funded-trader",
-      label:
-        isMobile && mode === NAVBAR_MODE.DEFAULT ? "Funded" : "Funded Trader",
-      icon: FundedTraderIcon,
-      activeIcon: FundedTraderActiveIcon,
-      showOnMobile: true,
-    },
+    ...(!isAvatarTradingActive
+      ? [
+          {
+            to: "/funded-trader",
+            label:
+              isMobile && mode === NAVBAR_MODE.DEFAULT
+                ? "Funded"
+                : "Funded Trader",
+            icon: FundedTraderIcon,
+            activeIcon: FundedTraderActiveIcon,
+            showOnMobile: true,
+          },
+        ]
+      : []),
     // {
     //   to: "/faucet",
     //   label: "Faucet",

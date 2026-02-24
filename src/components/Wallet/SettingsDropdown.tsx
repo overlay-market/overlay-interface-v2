@@ -115,34 +115,32 @@ const SettingsDropdown: React.FC = () => {
                   }}
                   style={{ marginTop: "2px" }}
                 />
-                <Flex direction="column" gap="4px" width="100%">
-                  <Text size="2" style={{ color: theme.color.grey1 }}>
-                    Use funded account
-                  </Text>
-                  {isAvatarTradingActive && activeAvatar && (
-                    <Flex direction="column" gap="4px" style={{ backgroundColor: theme.color.grey9, padding: '8px', borderRadius: '4px', marginTop: '4px' }}>
-                      <Flex align="center" justify="between" gap="8px">
-                        <Text size="1" style={{ color: theme.color.grey3 }}>Funded Account:</Text>
-                        <Flex gap="8px">
-                          <IconButton size="1" variant="ghost" onClick={() => handleCopy(activeAvatar.avatar)}>
-                            {copied ? <CheckIcon color={theme.color.green2} /> : <CopyIcon color={theme.color.grey3} />}
-                          </IconButton>
-                          <a
-                            href={getExplorerLink(Number(chainId) || SUPPORTED_CHAINID.BSC_MAINNET, activeAvatar.avatar, ExplorerDataType.ADDRESS)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLinkIcon color={theme.color.grey3} width="14" height="14" />
-                          </a>
-                        </Flex>
-                      </Flex>
-                      <Text size="1" style={{ color: theme.color.white, wordBreak: 'break-all' }}>
-                        {activeAvatar.avatar}
-                      </Text>
-                    </Flex>
-                  )}
-                </Flex>
+                <Text size="2" style={{ color: theme.color.grey1 }}>
+                  Use funded account
+                </Text>
               </label>
+              {isAvatarTradingActive && activeAvatar && (
+                <Flex direction="column" gap="4px" style={{ backgroundColor: theme.color.grey9, padding: '8px', borderRadius: '4px', marginLeft: '4px' }}>
+                  <Flex align="center" justify="between" gap="8px">
+                    <Text size="1" style={{ color: theme.color.grey3 }}>Funded Account:</Text>
+                    <Flex gap="8px">
+                      <IconButton size="1" variant="ghost" onClick={() => handleCopy(activeAvatar.avatar)}>
+                        {copied ? <CheckIcon color={theme.color.green2} /> : <CopyIcon color={theme.color.grey3} />}
+                      </IconButton>
+                      <a
+                        href={getExplorerLink(Number(chainId) || SUPPORTED_CHAINID.BSC_MAINNET, activeAvatar.avatar, ExplorerDataType.ADDRESS)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLinkIcon color={theme.color.grey3} width="14" height="14" />
+                      </a>
+                    </Flex>
+                  </Flex>
+                  <Text size="1" style={{ color: theme.color.white, wordBreak: 'break-all' }}>
+                    {activeAvatar.avatar}
+                  </Text>
+                </Flex>
+              )}
             </>
           )}
         </Flex>
