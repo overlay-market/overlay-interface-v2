@@ -34,6 +34,12 @@ const TargetProgressBar: React.FC<TargetProgressBarProps> = ({
       : theme.color.white;
 
   const suffix = unit ? ` ${unit}` : "";
+  const decimals = unit === "%" ? 1 : unit === "days" ? 0 : 0;
+  const fmt = (n: number) =>
+    n.toLocaleString(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
 
   return (
     <ProgressBarContainer>
@@ -43,8 +49,8 @@ const TargetProgressBar: React.FC<TargetProgressBarProps> = ({
           {isMet && <CheckMark>&#10003;</CheckMark>}
         </span>
         <ProgressValue style={{ color: valueColor }}>
-          {current}
-          {suffix} / {target}
+          {fmt(current)}
+          {suffix} / {fmt(target)}
           {suffix}
         </ProgressValue>
       </ProgressBarLabel>
