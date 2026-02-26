@@ -59,6 +59,9 @@ import CZClarityLogo from '../assets/images/markets-full-logos/cz.jpg';
 import SilverLogo from '../assets/images/markets-full-logos/silver-logo.jpg';
 import GoldSilverLogo from '../assets/images/markets-full-logos/gold-silver-logo.jpg';
 import BadBunnyLogo from '../assets/images/markets-full-logos/badbunny-logo.jpg';
+import GoogleAiLogo from '../assets/images/markets-full-logos/googleai.jpg';
+import OpenAiLogo from '../assets/images/markets-full-logos/openailogo.jpg';
+import AnthropicAiLogo from '../assets/images/markets-full-logos/anthropicai.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -121,7 +124,10 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "James%20Wynn%20Mind%20Stability%20Index": JamesWynnLogo,
   "Elon%20Musk%20Mood%20Index": ElonMuskIndexLogo,
   "Founders%20Operations%20Index": FoundersOperationsLogo,
-  "CZ%20Signals%20Clarity%20Index": CZClarityLogo
+  "CZ%20Signals%20Clarity%20Index": CZClarityLogo,
+  "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March": GoogleAiLogo,
+  "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March": OpenAiLogo,
+  "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March": AnthropicAiLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -130,9 +136,11 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 
 export const MARKETSORDER = [
   "Elon%20Musk%20Mood%20Index",
-  "CZ%20Signals%20Clarity%20Index",
-  "MrBeast%20Index",
+  "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
+  "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
+  "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
   "Double%20or%20Nothing",
+  "MrBeast%20Index",
   "GOLD%20%2F%20SILVER",
   "Bad%20Bunny",
   "Amouranth%20vs%20peachJars",
@@ -140,6 +148,7 @@ export const MARKETSORDER = [
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
   "Counter-Strike%202%20Skins",
+  "CZ%20Signals%20Clarity%20Index",
   "ASTER%20vs%20MYX",
   "SILVER%20%2F%20USD",
   "ETH%20%2F%20USD",
@@ -208,6 +217,7 @@ export enum CategoryName {
   Gambling = "Gambling",
   Indices = "Indices",
   Majors = "Majors",
+  Prediction = "Prediction Markets",
 }
 
 export type MarketCategoryMap = {
@@ -293,11 +303,16 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "GOLD%20%2F%20SILVER",
     "SILVER%20%2F%20USD",
   ],
+  [CategoryName.Prediction]: [
+    "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
+    "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
+    "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
+  ],
   [CategoryName.Other]: [],
 };
 
 export const NEW_CATEGORIES = [
   CategoryName.YouTube,
   CategoryName.Twitter,
-  CategoryName.Gambling,
+  CategoryName.Prediction,
 ];
