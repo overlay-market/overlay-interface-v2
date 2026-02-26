@@ -26,7 +26,8 @@ const Overview: React.FC = () => {
     isAvatarTradingActive
   );
   const showFundedCard =
-    isAvatarTradingActive && !!fundedStats && !isFundedStatsError;
+    isAvatarTradingActive && !!fundedStats && !isFundedStatsError
+    && fundedStats.phase !== "terminated";
 
   const [selectedInterval, setSelectedInterval] = useState<IntervalType>("1M");
   const previousSelectedInterval = usePrevious(selectedInterval);
