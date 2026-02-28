@@ -14,7 +14,7 @@ export interface UserData {
   rank: number;
   rankByVolume: number | null;
   rankByFees: number | null;
-  lastUpdated: string; 
+  lastUpdated: string;
   totalFeesOVL: number | string;
   totalFeesUSD: number | string;
   totalPositions: number;
@@ -23,6 +23,7 @@ export interface UserData {
   totalVolumeOVL: number | string;
   totalVolumeUSD: number | string;
   winRate: number | string;
+  tradingDays?: number;
 }
 export interface ExtendedUserData extends UserData {
   username?: string
@@ -56,7 +57,8 @@ export type ColumnKey =
   | "mostTradedMarket"
   | "winRate"
   | "volume"
-  | "fees";
+  | "fees"
+  | "tradingDays";
 
 export type DisplayUserData = ExtendedUserData & {
   marketId?: string;

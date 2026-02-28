@@ -4,8 +4,7 @@ import { shortenAddress } from "../../../utils/web3";
 import { StyledCell, StyledRow } from "./leaderboard-table-styles";
 import Avatar from "boring-avatars";
 import { getRandomColors, getRandomName } from "../../../utils/boringAvatars";
-import { DisplayUserData, ExtendedUserData } from "../types";
-import { leaderboardColumns } from "./leaderboardConfig";
+import { ColumnDef, DisplayUserData, ExtendedUserData } from "../types";
 
 interface ENSProfile {
   username?: string;
@@ -17,6 +16,7 @@ interface LeaderboardRowsProps {
   ensProfiles: Record<string, ENSProfile>;
   isMobile: boolean;
   getColumnValue: (user: ExtendedUserData) => React.ReactNode;
+  columns: ColumnDef[];
 }
 
 const LeaderboardRows = ({
@@ -24,6 +24,7 @@ const LeaderboardRows = ({
   ensProfiles,
   isMobile,
   getColumnValue,
+  columns,
 }: LeaderboardRowsProps) => {
   if (!ranks) {
     return (
@@ -74,7 +75,7 @@ const LeaderboardRows = ({
 
         {!isMobile ? (
           <>
-            {leaderboardColumns.map((column) => (
+            {columns.map((column) => (
               <StyledCell key={column.value} textalign="right">
                 {column.render(rank)}
               </StyledCell>

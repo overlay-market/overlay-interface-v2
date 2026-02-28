@@ -7,9 +7,11 @@ import ConnectWalletModal from "../ConnectWalletModal";
 import SettingsDropdown from "./SettingsDropdown";
 import { DEFAULT_CHAINID } from "../../constants/chains";
 import { OVL_ADDRESS } from "overlay-sdk";
+import useAccount from "../../hooks/useAccount";
 
 const Wallet: React.FC = () => {
   const navigate = useNavigate();
+  const { isAvatarTradingActive } = useAccount();
 
   const toggleWidget = () => {
     // Navigate to exchange with OVL pre-selected as target token
@@ -39,13 +41,15 @@ const Wallet: React.FC = () => {
         justify="end"
         pr={{ initial: "15px", sm: "20px" }}
       >
-        <GradientOutlineButton
-          title="Buy OVL"
-          width="84px"
-          height="29px"
-          size="12px"
-          handleClick={toggleWidget}
-        />
+        {!isAvatarTradingActive && (
+          <GradientOutlineButton
+            title="Buy OVL"
+            width="84px"
+            height="29px"
+            size="12px"
+            handleClick={toggleWidget}
+          />
+        )}
 
         <ChainSwitch />
         <SettingsDropdown />

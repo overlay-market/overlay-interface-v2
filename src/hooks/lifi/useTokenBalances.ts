@@ -9,7 +9,7 @@ const defaultRefetchInterval = 32_000
 
 const useTokenBalances = () => {
   const { selectedChainId } = useChainAndTokenState();
-  const {address} = useAccount();
+  const {signerAddress: address} = useAccount();
 
   const { tokens, chain, isLoading } = useTokensByChain();
 

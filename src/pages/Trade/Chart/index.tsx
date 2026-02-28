@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
@@ -23,15 +23,37 @@ const TVChartContainer = styled.div`
   }
 `;
 
-const Chart: React.FC = () => {
+interface ChartProps {
+  prices?: { bid: bigint; ask: bigint; mid: bigint };
+}
+
+const Chart: React.FC<ChartProps> = ({ prices: pricesFromPositions }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
 
   const { chainId } = useMultichainContext();
   const { currentMarket: market } = useCurrentMarketState();
 
-  const { bid, ask } = useBidAndAsk(marketId);
+  // Use prices from positions if available (eliminates duplicate polling)
+  // Skip useBidAndAsk when we have prices from positions
+  const skipBidAndAskHook = Boolean(pricesFromPositions);
+  const { bid: bidFromHook, ask: askFromHook } = useBidAndAsk(marketId, skipBidAndAskHook);
   const isMobile = useMediaQuery("(max-width: 768px)");
+
+  // Convert bigint prices to numbers, or use hook values
+  const bid = useMemo(() => {
+    if (pricesFromPositions?.bid) {
+      return Number(pricesFromPositions.bid) / 1e18;
+    }
+    return bidFromHook;
+  }, [pricesFromPositions, bidFromHook]);
+
+  const ask = useMemo(() => {
+    if (pricesFromPositions?.ask) {
+      return Number(pricesFromPositions.ask) / 1e18;
+    }
+    return askFromHook;
+  }, [pricesFromPositions, askFromHook]);
 
   const containerRef =  useRef<HTMLDivElement>() as React.MutableRefObject<HTMLInputElement>;
   const tvWidgetRef = useRef<IChartingLibraryWidget  | null>(null);

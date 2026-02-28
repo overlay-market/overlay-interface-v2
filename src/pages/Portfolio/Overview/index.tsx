@@ -11,12 +11,22 @@ import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
 import { useOverviewDataRefresh } from "./hooks";
+import { useFundedTraderStats } from "../../../hooks/useFundedTraderStats";
+import LimitBarsCard from "./FundedTraderStats/LimitBarsCard";
+import EvaluationBarsCard from "./FundedTraderStats/EvaluationBarsCard";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
-  const { address: account } = useAccount();
+  const { address: account, isAvatarTradingActive } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
   const isNewUnwindTxn = useIsNewUnwindTxn();
+
+  const { data: fundedStats, isError: isFundedStatsError } = useFundedTraderStats(
+    account,
+    isAvatarTradingActive
+  );
+  const showFundedCard =
+    isAvatarTradingActive && !!fundedStats && !isFundedStatsError;
 
   const [selectedInterval, setSelectedInterval] = useState<IntervalType>("1M");
   const previousSelectedInterval = usePrevious(selectedInterval);
@@ -38,7 +48,8 @@ const Overview: React.FC = () => {
   }, [account, overviewData, isNewTxnHash, isNewUnwindTxn]);
 
   useEffect(() => {
-    setTimeout(refreshOverviewData, 1000);
+    const id = setTimeout(refreshOverviewData, 1000);
+    return () => clearTimeout(id);
   }, [isNewTxnHash, isNewUnwindTxn, isNewSelectedInterval]);
 
   return (
@@ -62,14 +73,20 @@ const Overview: React.FC = () => {
               chartData={overviewData?.dataByPeriod}
             />
 
-            <MainOverviewCard
-              title={"Locked Sum + uPnL"}
-              value={overviewData?.lockedPlusUnrealized}
-              unit="USDT"
-            />
+            {!showFundedCard ? (
+              <MainOverviewCard
+                title={"Locked Sum + uPnL"}
+                value={overviewData?.lockedPlusUnrealized}
+                unit="USDT"
+              />
+            ) : fundedStats.phase === "funded" ? (
+              <LimitBarsCard data={fundedStats} />
+            ) : fundedStats.phase === "evaluation" ? (
+              <EvaluationBarsCard data={fundedStats} />
+            ) : null}
           </MainCardsGrid>
 
-          <InfoCardsGrid>
+          <InfoCardsGrid $columns={showFundedCard ? 5 : 4}>
             <OverviewCard
               title="Open Positions"
               value={overviewData?.numberOfOpenPositions}
@@ -114,6 +131,14 @@ const Overview: React.FC = () => {
               unit="USDT"
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
+
+            {showFundedCard && (
+              <OverviewCard
+                title="Locked Sum + uPnL"
+                value={overviewData?.lockedPlusUnrealized}
+                unit="USDT"
+              />
+            )}
           </InfoCardsGrid>
         </>
       )}

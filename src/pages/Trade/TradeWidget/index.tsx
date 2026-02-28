@@ -26,11 +26,15 @@ import { Flex, Checkbox, Text } from "@radix-ui/themes";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
-const TradeWidget: React.FC = () => {
+interface TradeWidgetProps {
+  prices?: { bid: bigint; ask: bigint; mid: bigint };
+}
+
+const TradeWidget: React.FC<TradeWidgetProps> = ({ prices }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
-  const { address } = useAccount();
+  const { address, isAvatarTradingActive } = useAccount();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
   const isNewTxnHash = useIsNewTxnHash();
@@ -115,6 +119,13 @@ const TradeWidget: React.FC = () => {
       isCancelled = true;
     };
   }, [collateralType, debouncedTypedValue, stableTokenInfo]);
+
+  // Reset to USDT collateral when funded trading is active (LiFi not available)
+  useEffect(() => {
+    if (isAvatarTradingActive && collateralType === 'OVL') {
+      handleCollateralTypeChange('USDT');
+    }
+  }, [isAvatarTradingActive, collateralType, handleCollateralTypeChange]);
 
   // Check if LBSC is available on current chain
   useEffect(() => {
@@ -281,7 +292,7 @@ const TradeWidget: React.FC = () => {
       pb={"20px"}
       flexShrink={"0"}
     >
-      <PositionSelectComponent />
+      <PositionSelectComponent prices={prices} />
 
       {!isGambling ? (
         <Slider
@@ -295,7 +306,7 @@ const TradeWidget: React.FC = () => {
         />
       ) : null}
 
-      {collateralType === 'OVL' && <ChainAndTokenSelect />}
+      {collateralType === 'OVL' && !isAvatarTradingActive && <ChainAndTokenSelect />}
       <CollateralInputComponent />
       <TradeButtonComponent loading={loading} tradeState={tradeState} />
       <button
@@ -330,7 +341,7 @@ const TradeWidget: React.FC = () => {
           gap="16px"
         >
           <Flex direction="column" gap="12px" p="8px">
-            {isLbscAvailable && (
+            {isLbscAvailable && !isAvatarTradingActive && (
               <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
                 <Checkbox
                   checked={collateralType === 'OVL'}

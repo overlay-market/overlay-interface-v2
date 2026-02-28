@@ -10,6 +10,26 @@ import theme from "../../../theme";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
 
+const URL_REGEX = /(https?:\/\/[^\s)]+)(?=[\s)]|$)/g;
+
+function renderWithLinks(text: string): React.ReactNode[] {
+  const parts = text.split(URL_REGEX);
+
+  return parts.map((part, i) => {
+    const isUrl = part.startsWith("http://") || part.startsWith("https://");
+
+    if (!isUrl) return <React.Fragment key={i}>{part}</React.Fragment>;
+
+    return (
+      <Text asChild key={i} style={{ textDecoration: "underline" }}>
+        <a href={part} target="_blank" rel="noopener noreferrer">
+          {part}
+        </a>
+      </Text>
+    );
+  });
+}
+
 const Description: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
 
@@ -33,7 +53,7 @@ const Description: React.FC = () => {
       if (textRef.current) {
         setShowToggle(
           textRef.current.scrollHeight > textRef.current.offsetHeight ||
-            !isTruncated
+          !isTruncated
         );
       }
     };
@@ -110,7 +130,7 @@ const Description: React.FC = () => {
           <TruncatedText ref={textRef} istruncated={isTruncated.toString()}>
             {restOfAbstracts?.map((abstract, index) => (
               <React.Fragment key={index}>
-                <Text style={{ color: theme.color.grey3 }}>{abstract}</Text>
+                <Text style={{ color: theme.color.grey3 }}>{renderWithLinks(abstract)}</Text>
                 <br />
               </React.Fragment>
             ))}

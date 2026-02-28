@@ -46,7 +46,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   loading,
   tradeState,
 }) => {
-  const { address } = useAccount();
+  const { address, isAvatarTradingActive } = useAccount();
   const { chainId: rawChainId } = useMultichainContext();
   // Normalize chainId to number (handle Chain object or undefined)
   const chainId = typeof rawChainId === 'object' && rawChainId !== null
@@ -119,13 +119,13 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
     const isDisabledTradeButton =
       typedValue &&
-      !loading &&
-      tradeState &&
-      [
-        TradeState.Trade,
-        TradeState.NeedsApproval,
-        TradeState.TradeHighPriceImpact,
-      ].includes(tradeState.tradeState)
+        !loading &&
+        tradeState &&
+        [
+          TradeState.Trade,
+          TradeState.NeedsApproval,
+          TradeState.TradeHighPriceImpact,
+        ].includes(tradeState.tradeState)
         ? false
         : true;
 
@@ -143,31 +143,31 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     const title: string = amountExceedsMaxInput
       ? "Amount Exceeds Max Input"
       : amountBelowMinCollateral
-      ? "Amount Below Min Collateral"
-      : tradeState &&
+        ? "Amount Below Min Collateral"
+        : tradeState &&
+          [
+            TradeState.ExceedsCircuitBreakerOICap,
+            TradeState.ExceedsOICap,
+            TradeState.PositionUnderwater,
+            TradeState.TradeHighPriceImpact,
+          ].includes(tradeState.tradeState)
+          ? tradeState.tradeState
+          : TRADE_WITH_LIFI;
+
+    const isDisabledTradeButton =
+      !typedValue ||
+        loading ||
+        bridgeStage.stage === "bridging" ||
+        bridgeStage.stage === "quote" ||
+        bridgeStage.stage === "approval" ||
+        amountExceedsMaxInput ||
+        amountBelowMinCollateral ||
         [
           TradeState.ExceedsCircuitBreakerOICap,
           TradeState.ExceedsOICap,
           TradeState.PositionUnderwater,
           TradeState.TradeHighPriceImpact,
-        ].includes(tradeState.tradeState)
-      ? tradeState.tradeState
-      : TRADE_WITH_LIFI;
-
-    const isDisabledTradeButton =
-      !typedValue ||
-      loading ||
-      bridgeStage.stage === "bridging" ||
-      bridgeStage.stage === "quote" ||
-      bridgeStage.stage === "approval" ||
-      amountExceedsMaxInput ||
-      amountBelowMinCollateral ||
-      [
-        TradeState.ExceedsCircuitBreakerOICap,
-        TradeState.ExceedsOICap,
-        TradeState.PositionUnderwater,
-        TradeState.TradeHighPriceImpact,
-      ].includes(title as TradeState)
+        ].includes(title as TradeState)
         ? true
         : false;
 
@@ -383,8 +383,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         minOvl,
       };
 
-      const result = await sdk.shiva.buildStable({
+      console.log("TradeButton: calling buildStable", {
         account: address,
+        params: buildParams,
+        isAvatarTradingActive
+      });
+
+      const result = await sdk.shiva.buildStable({
+        account: address as Address,
         params: buildParams,
       });
 
@@ -847,13 +853,13 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
         const useShiva = sdk.core.usingShiva();
         const result = useShiva
           ? await sdk.shiva.approveShiva({
-              account: address,
-              amount: maxUint256,
-            })
+            account: address,
+            amount: maxUint256,
+          })
           : await sdk.ovl.approve({
-              to: market?.id as Address,
-              amount: maxUint256,
-            });
+            to: market?.id as Address,
+            amount: maxUint256,
+          });
 
         let receipt = result.receipt;
 

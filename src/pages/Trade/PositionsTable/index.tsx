@@ -17,6 +17,7 @@ import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { convertToOpenPositionData } from "../../../utils/convertOptimisticPosition";
+import usePositionsPnL from "../../../hooks/usePositionsPnL";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -26,7 +27,11 @@ const POSITIONS_COLUMNS = [
   "PnL",
 ];
 
-const PositionsTable: React.FC = () => {
+interface PositionsTableProps {
+  onPricesUpdate?: (prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => void;
+}
+
+const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
@@ -313,6 +318,27 @@ const PositionsTable: React.FC = () => {
     return () => clearInterval(cleanup);
   }, [optimisticPositions, handleRemoveOptimisticPosition]);
 
+  // Real-time PnL updates
+  const positionsList = useMemo(
+    () =>
+      positions?.map((p) => ({
+        marketAddress: p.marketAddress,
+        positionId: p.positionId,
+        router: p.router,
+        loan: p.loan,
+      })) ?? [],
+    [positions]
+  );
+
+  const { pnlData, prices } = usePositionsPnL(marketId, positionsList);
+
+  // Report prices to parent component for use in Chart and TradeWidget
+  useEffect(() => {
+    if (onPricesUpdate) {
+      onPricesUpdate(prices);
+    }
+  }, [prices, onPricesUpdate]);
+
   return (
     <>
       <LineSeparator />
@@ -333,9 +359,18 @@ const PositionsTable: React.FC = () => {
           setItemsPerPage={setItemsPerPage}
           body={
             mergedPositions &&
-            mergedPositions.map((position: OpenPositionData, index: number) => (
-              <OpenPosition position={position} key={index} />
-            ))
+            mergedPositions.map((position: OpenPositionData, index: number) => {
+              const pnlKey = `${position.marketAddress}-${position.positionId}`;
+              const realtimePnL = pnlData.get(pnlKey);
+
+              return (
+                <OpenPosition
+                  position={position}
+                  realtimePnL={realtimePnL}
+                  key={`${position.marketAddress}-${position.positionId}-${index}`}
+                />
+              );
+            })
           }
         />
 
