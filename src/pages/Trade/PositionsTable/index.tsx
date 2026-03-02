@@ -171,6 +171,10 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
           console.error("Error fetching open positions:", error);
         } finally {
           setLoading(false);
+          // Reset forceRefresh after fetch so it doesn't permanently bypass cache
+          if (forceRefresh > 0) {
+            setForceRefresh(0);
+          }
         }
       }
     };
