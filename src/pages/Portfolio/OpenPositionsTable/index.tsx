@@ -15,6 +15,7 @@ import {
   useIsNewUnwindTxn,
   usePositionRefresh,
 } from "../../../state/portfolio/hooks";
+import useMultiMarketPositionsPnL from "../../../hooks/useMultiMarketPositionsPnL";
 import { triggerLoader } from "../UnwindsTable";
 
 import styled, { keyframes } from "styled-components";
@@ -74,6 +75,10 @@ const OpenPositionsTable: React.FC = () => {
       currentPage,
       itemsPerPage
     );
+
+  const { pnlData, marketPrices } = useMultiMarketPositionsPnL(positions, {
+    isRefreshing: loading,
+  });
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
@@ -179,6 +184,12 @@ const OpenPositionsTable: React.FC = () => {
                   <OpenPosition
                     key={key}
                     position={pos}
+                    realtimePnL={pnlData.get(
+                      `${pos.marketAddress}-${pos.positionId}`
+                    )}
+                    realtimeMarketPrices={marketPrices.get(
+                      pos.marketAddress.toLowerCase()
+                    )}
                     showCheckbox={showCheckboxes}
                     onCheckboxChange={(checked) =>
                       handlePositionSelect(pos, checked)
