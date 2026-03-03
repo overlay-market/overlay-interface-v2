@@ -97,11 +97,17 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
       )
     );
 
-    // Filter to only positions where we got a successful unwind state
+    // Split into valid unwind states and failures
     const validPairs: { pos: OpenPositionData; state: UnwindStateSuccess }[] = [];
+    const stateFailures: PromiseSettledResult<TransactionResult>[] = [];
     unwindStates.forEach((result, i) => {
       if (result.status === "fulfilled" && "priceLimit" in result.value) {
         validPairs.push({ pos: selectedPositions[i], state: result.value as UnwindStateSuccess });
+      } else {
+        const reason = result.status === "rejected"
+          ? result.reason
+          : new Error(`Failed to get unwind state for position ${selectedPositions[i].positionId}`);
+        stateFailures.push({ status: "rejected", reason } as PromiseRejectedResult);
       }
     });
 
@@ -118,7 +124,7 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
       )
     );
 
-    return transactions;
+    return [...stateFailures, ...transactions];
   };
 
   const multipleUnwindNormal = async () => {
