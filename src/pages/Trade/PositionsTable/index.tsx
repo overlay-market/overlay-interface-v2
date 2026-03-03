@@ -18,6 +18,7 @@ import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { convertToOpenPositionData } from "../../../utils/convertOptimisticPosition";
 import usePositionsPnL from "../../../hooks/usePositionsPnL";
+import { DEFAULT_CHAINID } from "../../../constants/chains";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -33,8 +34,12 @@ interface PositionsTableProps {
 
 const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const [searchParams] = useSearchParams();
-  const marketId = searchParams.get("market");
-  const { chainId } = useMultichainContext();
+  const rawMarketId = searchParams.get("market");
+  const marketId = rawMarketId ? decodeURIComponent(rawMarketId) : null;
+  const { chainId: rawChainId } = useMultichainContext();
+  const chainId = typeof rawChainId === 'object' && rawChainId !== null
+    ? rawChainId.id
+    : (rawChainId ?? DEFAULT_CHAINID);
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
@@ -52,6 +57,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const [forceRefresh, setForceRefresh] = useState(0); // Counter to force refresh
   const previousPositionCountRef = useRef<number>(0); // Track position count before transaction
   const currentPositionCountRef = useRef<number>(0); // Track current position count (for polling)
+  const knownPositionIdsRef = useRef<Set<number>>(new Set()); // Track position IDs that existed before trade
 
   const isTablet = useMediaQuery("(max-width: 1279px)");
 
@@ -65,20 +71,25 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
     currentPositionCountRef.current = positionsTotalNumber;
   }, [positionsTotalNumber]);
 
-  // Debug: Log when isNewTxnHash changes to true (transaction detected)
+  // Snapshot known position IDs when no optimistic positions exist (baseline)
   useEffect(() => {
-    if (isNewTxnHash) {
-      console.log('[PositionsTable] New transaction detected, isNewTxnHash = true');
+    if (positions && optimisticPositions.length === 0) {
+      knownPositionIdsRef.current = new Set(positions.map(p => p.positionId));
     }
-  }, [isNewTxnHash]);
+  }, [positions, optimisticPositions.length]);
+
+  // Reset forceRefresh when the post-transaction window closes
+  useEffect(() => {
+    if (!isNewTxnHash && forceRefresh > 0) {
+      setForceRefresh(0);
+    }
+  }, [isNewTxnHash, forceRefresh]);
 
   // Poll for new positions after transaction until we find it or timeout
   useEffect(() => {
     if (!isNewTxnHash) return;
 
     console.log('[PositionsTable] New transaction detected, starting position polling');
-    // Store current position count to detect when it increases
-    previousPositionCountRef.current = currentPositionCountRef.current;
 
     let pollCount = 0;
     const maxPolls = 20; // Poll every 3 seconds for 60 seconds total
@@ -86,11 +97,17 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
     const pollInterval = setInterval(() => {
       pollCount++;
 
+      // Set baseline on first tick (after the initial fetch has had time to complete)
+      // This avoids the 0 → N false positive when the component just mounted
+      if (pollCount === 1) {
+        previousPositionCountRef.current = currentPositionCountRef.current;
+      }
+
       // Check if we found the new position (count increased) - using ref to avoid stale closure
       const currentCount = currentPositionCountRef.current;
       const previousCount = previousPositionCountRef.current;
 
-      if (currentCount > previousCount) {
+      if (previousCount > 0 && currentCount > previousCount) {
         console.log('[PositionsTable] ✅ New position detected! Position count increased from', previousCount, 'to', currentCount);
         clearInterval(pollInterval);
         return;
@@ -145,7 +162,6 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
           forceRefresh,
         });
         try {
-          // marketId from useSearchParams() is already decoded
           const positions =
             await sdkRef.current.openPositions.transformOpenPositions(
               currentPage,
@@ -171,10 +187,6 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
           console.error("Error fetching open positions:", error);
         } finally {
           setLoading(false);
-          // Reset forceRefresh after fetch so it doesn't permanently bypass cache
-          if (forceRefresh > 0) {
-            setForceRefresh(0);
-          }
         }
       }
     };
@@ -189,7 +201,6 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
 
   // Merge optimistic positions with real positions
   const mergedPositions = useMemo(() => {
-    // marketId from useSearchParams() is already decoded
     // Filter optimistic positions for current market AND current account
     const relevantOptimistic = optimisticPositions
       .filter(op =>
@@ -265,10 +276,13 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
         return isMatch;
       });
 
-      // Fallback: If no timestamp match, match the FIRST (newest) position with same market/side/leverage
-      // This handles cases where subgraph returns stale timestamps
+      // Fallback: If no timestamp match, match a NEW position (not in pre-trade snapshot)
+      // with same market/side/leverage. This handles stale subgraph timestamps.
       if (!matchingReal) {
         matchingReal = sortedPositions.find(real => {
+          // Only match positions that appeared AFTER the trade
+          if (knownPositionIdsRef.current.has(real.positionId)) return false;
+
           // Defensive checks for undefined values
           if (!real.marketName || !real.positionSide || !marketId) return false;
 
@@ -288,7 +302,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
 
           // Only log when we find a match
           if (isMatch) {
-            console.log('[Smart Detection] ✅ Fallback match found:', {
+            console.log('[Smart Detection] ✅ Fallback match found (new position):', {
               market: real.marketName,
               side: real.positionSide,
               positionId: real.positionId,
@@ -306,7 +320,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
       }
       // Silently continue if no match (reduces spam - it's expected during polling)
     });
-  }, [positions, optimisticPositions, marketId, forceRefresh, handleRemoveOptimisticPosition]);
+  }, [positions, optimisticPositions, marketId, handleRemoveOptimisticPosition]);
 
   // Cleanup stale optimistic positions (older than 2 minutes)
   useEffect(() => {
