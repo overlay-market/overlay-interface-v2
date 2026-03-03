@@ -22,6 +22,7 @@ import WalletTracker from "./analytics/WalletTracker";
 import ZodiacManager from "./components/Wallet/ZodiacManager";
 import { ZodiacProvider } from "./providers/ZodiacProvider";
 import useAccount from "./hooks/useAccount";
+import TerminationGuard from "./components/TerminationGuard";
 
 // Dev-only: lazy-loaded share card preview page (excluded from production builds)
 const DevShareCard = import.meta.env.DEV
@@ -46,6 +47,7 @@ const AppContent = () => {
         <ZodiacManager />
         <ScrollToTop />
         <Popups />
+        <TerminationGuard />
         <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
           <NavBar />
           <Wallet />

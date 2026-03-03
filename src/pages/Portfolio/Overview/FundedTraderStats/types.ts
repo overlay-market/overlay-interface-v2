@@ -51,4 +51,13 @@ export interface EvaluationPhaseStats {
   tradingDays: number;
 }
 
-export type FundedTraderStatsData = FundedPhaseStats | EvaluationPhaseStats;
+export interface TerminatedStats {
+  phase: "terminated";
+  safeAddress: string;
+  planName?: string;
+  terminatedAt: string;
+  transactionHash: string;
+  breachReasons: string[];
+}
+
+export type FundedTraderStatsData = FundedPhaseStats | EvaluationPhaseStats | TerminatedStats;

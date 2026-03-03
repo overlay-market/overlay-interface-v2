@@ -17,7 +17,7 @@ export const useFundedTraderStats = (
       );
     }
     const data = await response.json();
-    if (!data || (data.phase !== "funded" && data.phase !== "evaluation")) {
+    if (!data || !["funded", "evaluation", "terminated"].includes(data.phase)) {
       throw new Error("Unexpected funded trader stats response shape");
     }
     return data as FundedTraderStatsData;
