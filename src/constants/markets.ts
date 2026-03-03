@@ -62,6 +62,7 @@ import BadBunnyLogo from '../assets/images/markets-full-logos/badbunny-logo.jpg'
 import GoogleAiLogo from '../assets/images/markets-full-logos/googleai.jpg';
 import OpenAiLogo from '../assets/images/markets-full-logos/openailogo.jpg';
 import AnthropicAiLogo from '../assets/images/markets-full-logos/anthropicai.jpg';
+import UsIranLogo from '../assets/images/markets-full-logos/us-iran-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -128,6 +129,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March": GoogleAiLogo,
   "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March": OpenAiLogo,
   "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March": AnthropicAiLogo,
+  "US%20x%20Iran%20ceasefire%20by%20May%2031": UsIranLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -139,6 +141,7 @@ export const MARKETSORDER = [
   "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
   "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
   "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
+  "US%20x%20Iran%20ceasefire%20by%20May%2031",
   "Double%20or%20Nothing",
   "MrBeast%20Index",
   "GOLD%20%2F%20SILVER",
@@ -307,6 +310,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
     "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
     "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
+    "US%20x%20Iran%20ceasefire%20by%20May%2031",
   ],
   [CategoryName.Other]: [],
 };
