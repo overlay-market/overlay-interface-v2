@@ -1,4 +1,4 @@
-import { Flex, Text, Badge, Tooltip } from "@radix-ui/themes";
+import { Flex, Text, Badge, Tooltip, Skeleton } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
@@ -22,6 +22,9 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL }) =>
     ? position.positionSide.split(" ")
     : [undefined, undefined];
   const isLong = positionSide === "Long";
+
+  // Detect if this is an optimistic position (not yet confirmed by subgraph)
+  const isOptimistic = position.positionId === -1;
 
   // Use real-time PnL if available
   // For LBSC positions, use the converted USDT value from realtime updates
@@ -52,7 +55,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL }) =>
     );
 
   const handleItemClick = () => {
-    if (position.size === "0") return;
+    // Prevent clicking on zero-sized or optimistic positions
+    if (position.size === "0" || position.positionId === -1) return;
 
     setSelectedPosition(position);
     setShowModal(true);
@@ -116,27 +120,33 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL }) =>
             </Text>
           </Flex>
         </StyledCell>
-        <StyledCell>{isDoubleOrNothing ? "-" : position.entryPrice}</StyledCell>
-        <StyledCell>{isDoubleOrNothing ? "-" : position.liquidatePrice}</StyledCell>
         <StyledCell>
-          <Flex gap="4px" align="center">
-            <Text
-              style={{
-                color: isPnLPositive ? theme.color.green1 : theme.color.red1,
-                transition: "text-shadow 0.15s ease-out",
-                textShadow: flashColor === "green"
-                  ? `0 0 4px ${theme.color.green1}, 0 0 4px ${theme.color.green1}`
-                  : flashColor === "red"
-                  ? `0 0 4px ${theme.color.red1}, 0 0 4px ${theme.color.red1}`
-                  : "none",
-              }}
-            >
-              {pnlValue}
-            </Text>
-            <Text style={{ color: isPnLPositive ? theme.color.green1 : theme.color.red1 }}>
-              {pnlToken}
-            </Text>
-          </Flex>
+          {isDoubleOrNothing ? "-" : position.entryPrice}
+        </StyledCell>
+        <StyledCell>
+          {isDoubleOrNothing ? "-" : position.liquidatePrice}
+        </StyledCell>
+        <StyledCell>
+          <Skeleton loading={isOptimistic}>
+            <Flex gap="4px" align="center">
+              <Text
+                style={{
+                  color: isPnLPositive ? theme.color.green1 : theme.color.red1,
+                  transition: "text-shadow 0.15s ease-out",
+                  textShadow: flashColor === "green"
+                    ? `0 0 4px ${theme.color.green1}, 0 0 4px ${theme.color.green1}`
+                    : flashColor === "red"
+                    ? `0 0 4px ${theme.color.red1}, 0 0 4px ${theme.color.red1}`
+                    : "none",
+                }}
+              >
+                {pnlValue}
+              </Text>
+              <Text style={{ color: isPnLPositive ? theme.color.green1 : theme.color.red1 }}>
+                {pnlToken}
+              </Text>
+            </Flex>
+          </Skeleton>
         </StyledCell>
       </StyledRow>
 
