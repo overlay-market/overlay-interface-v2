@@ -1,7 +1,7 @@
 import { Flex } from "@radix-ui/themes";
 import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import Chart from "./Chart";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -18,6 +18,8 @@ import { StyledFlex, TradeContainer } from "./trade-styles";
 import SuggestedCards from "./SuggestedCards";
 import { DEFAULT_MARKET } from "../../constants/applications";
 import useActiveMarkets from "../../hooks/useActiveMarkets";
+import GamblingTimeline from "./Chart/GamblingTimeline";
+import { isGamblingMarket } from "../../utils/marketGuards";
 
 const Trade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,6 +33,23 @@ const Trade: React.FC = () => {
   const { handleTradeStateReset } = useTradeActionHandlers();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { data: markets } = useActiveMarkets();
+  const prevMarketRef = useRef<string | undefined>();
+
+  // Store prices from PositionsTable to pass to Chart and TradeWidget
+  // This eliminates duplicate bid/ask polling
+  const [marketPrices, setMarketPrices] = useState<{ bid: bigint; ask: bigint; mid: bigint } | undefined>(undefined);
+
+  const handlePricesUpdate = useCallback((prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => {
+    setMarketPrices(prices);
+  }, []);
+
+  const shouldRenderGamblingTimeline = useMemo(() => {
+    if (!currentMarket) {
+      return false;
+    }
+
+    return isGamblingMarket(currentMarket.marketName);
+  }, [currentMarket]);
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -46,29 +65,34 @@ const Trade: React.FC = () => {
   useEffect(() => {
     if (!markets || !marketParam) return;
 
-    if (markets && marketParam) {
-      const normalizedMarketParam =
-        decodeURIComponent(marketParam).toLowerCase();
+    const normalized = decodeURIComponent(marketParam).toLowerCase();
 
-      const currentMarket = markets.find(
-        (market) => market.marketName.toLowerCase() === normalizedMarketParam
-      );
+    const selected = markets.find(
+      (m) => m.marketName.toLowerCase() === normalized
+    );
 
-      if (currentMarket) {
-        handleCurrentMarketSet(currentMarket);
-      } else {
-        const activeMarket = markets[0];
-        handleCurrentMarketSet(activeMarket);
-
-        const encodedMarket = encodeURIComponent(activeMarket.marketName);
-        navigate(`/trade?market=${encodedMarket}`, { replace: true });
-      }
+    if (selected) {
+      handleCurrentMarketSet(selected);
+      return;
     }
+
+    const fallback = markets[0];
+    handleCurrentMarketSet(fallback);
+    navigate(`/trade?market=${encodeURIComponent(fallback.marketName)}`, {
+      replace: true,
+    });
   }, [marketParam, markets]);
 
   useEffect(() => {
-    handleTradeStateReset();
-  }, [marketParam, chainId, handleTradeStateReset]);
+    if (!currentMarket) return;
+
+    const name = currentMarket.marketName;
+    if (prevMarketRef.current !== name) {
+      handleTradeStateReset();
+    }
+
+    prevMarketRef.current = name;
+  }, [currentMarket, chainId]);
 
   return (
     <TradeContainer direction="column" width={"100%"} mb="100px">
@@ -76,7 +100,6 @@ const Trade: React.FC = () => {
 
       <Flex direction="column">
         <StyledFlex
-          height={{ initial: "auto", sm: "561px" }}
           width={"100%"}
           direction={{ initial: "column", sm: "row" }}
           align={{ initial: "center", sm: "start" }}
@@ -84,8 +107,8 @@ const Trade: React.FC = () => {
         >
           {currentMarket ? (
             <>
-              <Chart />
-              <TradeWidget />
+              {shouldRenderGamblingTimeline ? <GamblingTimeline /> : <Chart prices={marketPrices} />}
+              <TradeWidget prices={marketPrices} />
             </>
           ) : (
             <Flex
@@ -98,7 +121,7 @@ const Trade: React.FC = () => {
             </Flex>
           )}
         </StyledFlex>
-        <PositionsTable />
+        <PositionsTable onPricesUpdate={handlePricesUpdate} />
         <InfoMarketSection />
         <SuggestedCards />
       </Flex>

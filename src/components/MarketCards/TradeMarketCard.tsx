@@ -8,8 +8,9 @@ import {
 } from "./trade-market-card-styles";
 import theme from "../../theme";
 import PercentWithSign from "./PercentWithSign";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { getMarketLogo } from "../../utils/getMarketLogo";
+import { isGamblingMarket } from "../../utils/marketGuards";
 
 interface TradeMarketCardProps {
   priceWithCurrency: string;
@@ -32,6 +33,11 @@ const TradeMarketCard = ({
 
   const titleRef = useRef<HTMLElement | null>(null);
   const [isLongTitle, setIsLongTitle] = useState(false);
+
+  const isDoubleOrNothing = useMemo(
+    () => isGamblingMarket(title),
+    [title]
+  );
 
   useLayoutEffect(() => {
     const titleElement = titleRef.current;
@@ -61,7 +67,7 @@ const TradeMarketCard = ({
             size={"1"}
             style={{ color: theme.color.green2 }}
           >
-            {priceWithCurrency}
+            {!isDoubleOrNothing ? priceWithCurrency : "-"}
           </Text>
           <MarketTitle weight={"medium"} size={"3"} ref={titleRef}>
             {title}
@@ -83,7 +89,7 @@ const TradeMarketCard = ({
                 color: h24 >= 0 ? theme.color.green3 : theme.color.red1,
               }}
             >
-              <PercentWithSign value={h24} />
+              <PercentWithSign value={!isDoubleOrNothing ? h24 : "-"} />
             </Text>
           </Flex>
           <Flex justify={"between"}>
@@ -98,7 +104,7 @@ const TradeMarketCard = ({
                   Number(funding) >= 0 ? theme.color.green3 : theme.color.red1,
               }}
             >
-              <PercentWithSign value={funding} />
+              <PercentWithSign value={!isDoubleOrNothing ? funding : "-"} />
             </Text>
           </Flex>
         </Flex>

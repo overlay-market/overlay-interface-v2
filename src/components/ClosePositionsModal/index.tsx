@@ -1,6 +1,7 @@
 import { Dialog, Flex, Text } from "@radix-ui/themes";
 import { useState } from "react";
-import { OpenPositionData, SDKError } from "overlay-sdk";
+import { OpenPositionData, SDKError, toWei, UnwindStateSuccess } from "overlay-sdk";
+import { Address } from "viem";
 import useAccount from "../../hooks/useAccount";
 import theme from "../../theme";
 import { ColorButton } from "../Button/ColorButton";
@@ -10,6 +11,7 @@ import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
 import { TransactionResult } from "overlay-sdk/dist/core/types";
 import useSDK from "../../providers/SDKProvider/useSDK";
+import { trackEvent } from "../../analytics/trackEvent";
 
 type ClosePositionsModalProps = {
   open: boolean;
@@ -28,57 +30,124 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
 }) => {
   const sdk = useSDK();
   const [isUnwinding, setIsUnwinding] = useState(false);
-  const { address: account } = useAccount();
+  const { address: account, isAvatarTradingActive } = useAccount();
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
 
+  const handleResult = (tx: PromiseSettledResult<TransactionResult>) => {
+    if (tx.status === "fulfilled") {
+      const txnResult = tx.value;
+      addPopup(
+        {
+          txn: {
+            hash: txnResult.hash,
+            success: true,
+            message: "",
+            type: TransactionType.UNWIND_OVL_POSITION,
+          },
+        },
+        txnResult.hash
+      );
+
+      trackEvent("unwind_ovl_position_success", {
+        transaction_hash: `hash_${txnResult.hash}`,
+        wallet_address: account,
+        timestamp: new Date().toISOString(),
+      });
+
+      handleTxnHashUpdate(txnResult.hash, 0);
+    } else {
+      const error = tx.reason as SDKError;
+      addPopup(
+        {
+          txn: {
+            hash: currentTimeForId,
+            success: false,
+            message: error.message,
+            type: TransactionType.UNWIND_OVL_POSITION,
+          },
+        },
+        currentTimeForId
+      );
+
+      trackEvent("unwind_ovl_position_failed", {
+        error_message: error.message,
+        wallet_address: account,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  };
+
+  const multipleUnwindStable = async () => {
+    const slippage = 1;
+    const unwindPercentage = 1;
+
+    // Get unwind state for each position to obtain priceLimit
+    const unwindStates = await Promise.allSettled(
+      selectedPositions.map((pos) =>
+        sdk.trade.getUnwindState(
+          pos.marketAddress,
+          account as Address,
+          pos.positionId,
+          unwindPercentage,
+          slippage,
+          2
+        )
+      )
+    );
+
+    // Split into valid unwind states and failures
+    const validPairs: { pos: OpenPositionData; state: UnwindStateSuccess }[] = [];
+    const stateFailures: PromiseSettledResult<TransactionResult>[] = [];
+    unwindStates.forEach((result, i) => {
+      if (result.status === "fulfilled" && "priceLimit" in result.value) {
+        validPairs.push({ pos: selectedPositions[i], state: result.value as UnwindStateSuccess });
+      } else {
+        const reason = result.status === "rejected"
+          ? result.reason
+          : new Error(`Failed to get unwind state for position ${selectedPositions[i].positionId}`);
+        stateFailures.push({ status: "rejected", reason } as PromiseRejectedResult);
+      }
+    });
+
+    const transactions = await Promise.allSettled(
+      validPairs.map(({ pos, state }) =>
+        sdk.shiva.unwindStable({
+          marketAddress: pos.marketAddress as Address,
+          positionId: BigInt(pos.positionId),
+          fraction: toWei(unwindPercentage),
+          priceLimit: state.priceLimit,
+          account: account as Address,
+          slippage,
+        })
+      )
+    );
+
+    return [...stateFailures, ...transactions];
+  };
+
+  const multipleUnwindNormal = async () => {
+    return sdk.market.unwindMultiple({
+      positions: selectedPositions.map((pos) => ({
+        marketAddress: pos.marketAddress,
+        positionId: pos.positionId,
+      })),
+      account,
+      slippage: 1,
+      unwindPercentage: 1,
+    });
+  };
+
   const multipleUnwind = async () => {
     try {
       setIsUnwinding(true);
-      const transactions = await sdk.market.unwindMultiple({
-        positions: selectedPositions.map((pos) => ({
-          marketAddress: pos.marketAddress,
-          positionId: pos.positionId,
-        })),
-        account,
-        slippage: 1,
-        unwindPercentage: 1,
-      });
 
-      console.log("Multiple unwind transactions", transactions);
+      const transactions = isAvatarTradingActive
+        ? await multipleUnwindStable()
+        : await multipleUnwindNormal();
 
-      // Handle array of transactions
-      transactions.forEach((tx) => {
-        if (tx.status === "fulfilled") {
-          const txnResult = tx.value as TransactionResult;
-          addPopup(
-            {
-              txn: {
-                hash: txnResult.hash,
-                success: true,
-                message: "",
-                type: TransactionType.UNWIND_OVL_POSITION,
-              },
-            },
-            txnResult.hash
-          );
-          handleTxnHashUpdate(txnResult.hash, 0);
-        } else {
-          const error = tx.reason as SDKError;
-          addPopup(
-            {
-              txn: {
-                hash: currentTimeForId,
-                success: false,
-                message: error.message,
-                type: TransactionType.UNWIND_OVL_POSITION,
-              },
-            },
-            currentTimeForId
-          );
-        }
-      });
+      transactions.forEach(handleResult);
 
       onConfirm();
       handleDismiss();
@@ -117,7 +186,7 @@ const ClosePositionsModal: React.FC<ClosePositionsModalProps> = ({
           <ColorButton
             onClick={handleDismiss}
             width="140px"
-            bgColor={theme.color.grey4}
+            bgcolor={theme.color.grey4}
             color={theme.color.grey1}
             disabled={isUnwinding}
           >

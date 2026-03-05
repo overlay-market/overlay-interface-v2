@@ -11,6 +11,7 @@ import {
 import EligibilityChecker from "./EligibilityChecker";
 import AirdropsClaim from "./AirdropsClaim";
 import useAccount from "../../hooks/useAccount";
+import { trackEvent } from "../../analytics/trackEvent";
 
 export enum EligibilityStatus {
   Eligible = "eligible",
@@ -30,7 +31,9 @@ const Airdrops: React.FC = () => {
   const [eligibilityStatus, setEligibilityStatus] = useState(
     EligibilityStatus.Null
   );
-  const [disqualifiedTorch, setDisqualifiedTorch] = useState<boolean | null>(null);
+  const [disqualifiedTorch, setDisqualifiedTorch] = useState<boolean | null>(
+    null
+  );
 
   useEffect(() => {
     if (account) {
@@ -143,8 +146,12 @@ const Airdrops: React.FC = () => {
             (item) => item.airdropID === airdropId
           )!;
 
-          if (airdropIdAmount && airdropIdAmount["amount"] && airdropId === ClaimId.TORCH) {
-            setDisqualifiedTorch(airdropIdAmount.disqualified ?? null)
+          if (
+            airdropIdAmount &&
+            airdropIdAmount["amount"] &&
+            airdropId === ClaimId.TORCH
+          ) {
+            setDisqualifiedTorch(airdropIdAmount.disqualified ?? null);
           }
         });
       });
@@ -180,6 +187,16 @@ const Airdrops: React.FC = () => {
     }
   }, [responseData, noRewardsAvailable]);
 
+  useEffect(() => {
+    if (eligibilityStatus !== EligibilityStatus.Null && address) {
+      trackEvent("airdrop_check_result", {
+        wallet_address: address,
+        eligibility_status: eligibilityStatus,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [eligibilityStatus, address]);
+
   return (
     <>
       {["eligibleNoRewards", "ineligible", "null"].includes(
@@ -194,7 +211,10 @@ const Airdrops: React.FC = () => {
         />
       )}
       {eligibilityStatus === "eligible" && (
-        <AirdropsClaim airdropsAmounts={airdropsAmounts} disqualifiedTorch={disqualifiedTorch} />
+        <AirdropsClaim
+          airdropsAmounts={airdropsAmounts}
+          disqualifiedTorch={disqualifiedTorch}
+        />
       )}
     </>
   );

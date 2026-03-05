@@ -2,10 +2,10 @@ import { Text } from "@radix-ui/themes";
 import Loader from "../Loader";
 import NumberSpring from "../NumberSpring";
 import theme from "../../theme";
-import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
+import { useStableTokenBalance } from "../../hooks/useStableTokenBalance";
 
 const TokenBalance: React.FC = () => {
-  const { ovlBalance, isLoading, isError } = useOvlTokenBalance();
+  const { stableBalance, isLoading, isError } = useStableTokenBalance();
 
   return (
     <Text
@@ -17,10 +17,10 @@ const TokenBalance: React.FC = () => {
         opacity: 0.8,
       }}
     >
-      {ovlBalance === undefined || isLoading || isError ? (
+      {stableBalance === undefined || isLoading || isError ? (
         <Loader size="12px" stroke="white" />
       ) : (
-        <NumberSpring inputValue={ovlBalance} text="OVL" />
+        <NumberSpring inputValue={stableBalance} text="USDT" />
       )}
     </Text>
   );

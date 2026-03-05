@@ -3,6 +3,7 @@ import {
   useIsNewTxnHash,
   useTradeActionHandlers,
   useTradeState,
+  useCollateralType,
 } from "../../../state/trade/hooks";
 import AdditionalTradeDetails from "./AdditionalTradeDetails";
 import TradeButtonComponent from "./TradeButtonComponent";
@@ -11,7 +12,7 @@ import CollateralInputComponent from "./CollateralInputComponent";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { useEffect, useRef, useState } from "react";
-import { Address } from "viem";
+import { Address, parseUnits } from "viem";
 import { formatWeiToParsedNumber, toWei, TradeStateData } from "overlay-sdk";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
@@ -21,25 +22,35 @@ import { TradeWidgetContainer } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
-import { Flex } from "@radix-ui/themes";
+import { Flex, Checkbox, Text } from "@radix-ui/themes";
+import { isGamblingMarket } from "../../../utils/marketGuards";
+import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
 
-const TradeWidget: React.FC = () => {
+interface TradeWidgetProps {
+  prices?: { bid: bigint; ask: bigint; mid: bigint };
+}
+
+const TradeWidget: React.FC<TradeWidgetProps> = ({ prices }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
-  const { address } = useAccount();
+  const { address, isAvatarTradingActive } = useAccount();
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
   const isNewTxnHash = useIsNewTxnHash();
   const { typedValue, selectedLeverage, isLong, slippageValue } =
     useTradeState();
-  const { handleLeverageSelect } = useTradeActionHandlers();
+  const collateralType = useCollateralType();
+  const { handleLeverageSelect, handleCollateralTypeChange } = useTradeActionHandlers();
   const [loading, setLoading] = useState<boolean>(false);
   const [capLeverage, setCapleverage] = useState<number>(5);
+  const [isLbscAvailable, setIsLbscAvailable] = useState<boolean>(true);
   const [tradeState, setTradeState] = useState<TradeStateData | undefined>(
     undefined
   );
   const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
+  const [ovlPreview, setOvlPreview] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const debouncedTypedValue = useDebounce(typedValue, 500);
   const [leverageInputValue, setLeverageInputValue] = useState<string | null>(
@@ -49,19 +60,108 @@ const TradeWidget: React.FC = () => {
   const [displayedLeverage, setDisplayedLeverage] = useState(selectedLeverage);
 
   const sdkRef = useRef(sdk);
+  const isGambling = isGamblingMarket(market?.marketName);
+  const {
+    data: stableTokenInfo,
+    refetch: refetchStableTokenInfo,
+    isRefetching,
+  } = useStableTokenInfo({
+    includeOraclePrice: true,
+  });
+
   useEffect(() => {
     sdkRef.current = sdk;
   }, [sdk]);
+
+  useEffect(() => {
+    if (
+      collateralType !== "USDT" ||
+      !debouncedTypedValue ||
+      Number(debouncedTypedValue) === 0 ||
+      !stableTokenInfo
+    ) {
+      setOvlPreview(null);
+      setPreviewLoading(false);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const fetchPreview = async () => {
+      setPreviewLoading(true);
+      try {
+        const stableAmount = parseUnits(
+          debouncedTypedValue,
+          stableTokenInfo.decimals
+        );
+        const ovlAmount = await sdkRef.current?.lbsc.previewBorrow(
+          stableAmount
+        );
+        if (isCancelled) return;
+        const formattedOvl = ovlAmount
+          ? formatWeiToParsedNumber(ovlAmount, 18, 4)
+          : null;
+        setOvlPreview(formattedOvl?.toString() ?? null);
+      } catch {
+        if (!isCancelled) {
+          setOvlPreview(null);
+        }
+      } finally {
+        if (!isCancelled) {
+          setPreviewLoading(false);
+        }
+      }
+    };
+
+    fetchPreview();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [collateralType, debouncedTypedValue, stableTokenInfo]);
+
+  // Reset to USDT collateral when funded trading is active (LiFi not available)
+  useEffect(() => {
+    if (isAvatarTradingActive && collateralType === 'OVL') {
+      handleCollateralTypeChange('USDT');
+    }
+  }, [isAvatarTradingActive, collateralType, handleCollateralTypeChange]);
+
+  // Check if LBSC is available on current chain
+  useEffect(() => {
+    if (!sdkRef.current) return;
+    sdkRef.current.lbsc.isAvailable()
+      .then(setIsLbscAvailable)
+      .catch(() => setIsLbscAvailable(false));
+  }, [chainId]);
 
   useEffect(() => {
     setDisplayedLeverage(selectedLeverage);
   }, [selectedLeverage]);
 
   useEffect(() => {
-    if (debouncedSelectedLeverage !== null) {
+    if (marketId && !isGambling) {
+      handleLeverageSelect("5");
+    }
+  }, [marketId, isGambling, handleLeverageSelect]);
+
+  useEffect(() => {
+    if (!isGambling) {
+      return;
+    }
+
+    if (selectedLeverage !== "1") {
+      handleLeverageSelect("1");
+    }
+    setDisplayedLeverage("1");
+    setLeverageInputValue("1");
+  }, [isGambling, selectedLeverage, handleLeverageSelect]);
+
+  useEffect(() => {
+    if (debouncedSelectedLeverage !== null && !isGambling) {
       handleLeverageSelect(debouncedSelectedLeverage);
     }
-  }, [debouncedSelectedLeverage]);
+  }, [debouncedSelectedLeverage, isGambling, handleLeverageSelect]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -81,20 +181,34 @@ const TradeWidget: React.FC = () => {
         setLoading(true);
 
         try {
+          // Get collateral amount in correct decimals
+          let collateralAmount: bigint;
+          if (collateralType === 'USDT') {
+            // For USDT: use token decimals from hook
+            if (!stableTokenInfo) {
+              // Skip if stable token info not loaded yet
+              return;
+            }
+            collateralAmount = parseUnits(debouncedTypedValue, stableTokenInfo.decimals);
+          } else {
+            // For OVL: use 18 decimals
+            collateralAmount = toWei(debouncedTypedValue);
+          }
+
           const tradeState = await sdkRef.current.trade.getTradeState(
             marketId,
-            toWei(debouncedTypedValue),
+            collateralAmount,
             toWei(selectedLeverage),
             Number(slippageValue),
             isLong,
-            address
+            address,
+            collateralType
           );
           if (!isCancelled && tradeState) {
             setTradeState(tradeState);
-            console.log("Trade state fetched:", tradeState);
           }
         } catch (error) {
-          console.error("Error fetching trade state:", error);
+          // Error fetching trade state
         } finally {
           if (!isCancelled) {
             setLoading(false);
@@ -117,6 +231,8 @@ const TradeWidget: React.FC = () => {
     isLong,
     slippageValue,
     isNewTxnHash,
+    collateralType,
+    stableTokenInfo,
   ]);
 
   useEffect(() => {
@@ -127,18 +243,37 @@ const TradeWidget: React.FC = () => {
         const capLeverage = await sdkRef.current.market.getCapLeverage(
           market.id as Address
         );
-        const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 2);
-        parsedCapLeverage &&
-          setCapleverage((prev) =>
-            prev === parsedCapLeverage ? prev : parsedCapLeverage
-          );
+        const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 18, 2);
+        if (parsedCapLeverage) {
+          setCapleverage(parsedCapLeverage);
+
+          // Always adjust leverage when market changes
+          // Get current leverage from Redux state
+          const currentLeverage = Number(selectedLeverage);
+
+          if (parsedCapLeverage <= 1) {
+            // Market has fixed leverage at 1x - always set to 1
+            handleLeverageSelect("1");
+            setDisplayedLeverage("1");
+          } else if (currentLeverage > parsedCapLeverage) {
+            // Selected leverage exceeds new market's max leverage - clamp it
+            const newLeverage = Math.min(currentLeverage, parsedCapLeverage).toString();
+            handleLeverageSelect(newLeverage);
+            setDisplayedLeverage(newLeverage);
+          } else if (currentLeverage < 1) {
+            // Edge case: leverage is somehow less than 1, reset to minimum
+            handleLeverageSelect("1");
+            setDisplayedLeverage("1");
+          }
+        }
       } catch (error) {
-        console.error("Error fetching capLeverage:", error);
+        // Error fetching capLeverage
       }
     };
 
     fetchCapLeverage();
-  }, [market?.id]);
+    // Run when market changes or wallet connects/disconnects
+  }, [market?.id, address]);
 
   const handleLeverageInput = (newValue: number[]) => {
     const stringValue = newValue[0].toString();
@@ -157,19 +292,21 @@ const TradeWidget: React.FC = () => {
       pb={"20px"}
       flexShrink={"0"}
     >
-      <PositionSelectComponent />
+      <PositionSelectComponent prices={prices} />
 
-      <Slider
-        title={"Leverage"}
-        min={1}
-        max={capLeverage ?? 1}
-        step={0.1}
-        value={Number(displayedLeverage)}
-        valueUnit={"x"}
-        handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
-      />
+      {!isGambling ? (
+        <Slider
+          title={"Leverage"}
+          min={1}
+          max={capLeverage ?? 1}
+          step={capLeverage <= 1 ? 1 : 0.1}
+          value={Number(displayedLeverage)}
+          valueUnit={"x"}
+          handleChange={(newValue: number[]) => handleLeverageInput(newValue)}
+        />
+      ) : null}
 
-      <ChainAndTokenSelect />
+      {collateralType === 'OVL' && !isAvatarTradingActive && <ChainAndTokenSelect />}
       <CollateralInputComponent />
       <TradeButtonComponent loading={loading} tradeState={tradeState} />
       <button
@@ -187,7 +324,7 @@ const TradeWidget: React.FC = () => {
           outline: "none",
         }}
       >
-        {detailsOpen ? "Hide Info ▲" : "More Info ▼"}
+        {detailsOpen ? "Hide Advanced Settings ▲" : "Advanced Settings ▼"}
       </button>
 
       {/* Conditionally render details */}
@@ -201,7 +338,69 @@ const TradeWidget: React.FC = () => {
             marginTop: "-14px",
           }}
           direction={"column"}
+          gap="16px"
         >
+          <Flex direction="column" gap="12px" p="8px">
+            {isLbscAvailable && !isAvatarTradingActive && (
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <Checkbox
+                  checked={collateralType === 'OVL'}
+                  onCheckedChange={(checked) => handleCollateralTypeChange(checked ? 'OVL' : 'USDT')}
+                />
+                <Text size="2" style={{ color: theme.color.grey1 }}>
+                  Use OVL as collateral (cross-chain)
+                </Text>
+              </label>
+            )}
+            {collateralType === "USDT" && (
+              <Flex direction="column" gap="8px">
+                <Flex justify="between">
+                  <Text size="1" style={{ color: theme.color.grey3 }}>
+                    OVL Collateral
+                  </Text>
+                  <Text size="1" style={{ color: theme.color.blue1 }}>
+                    {previewLoading
+                      ? "Calculating..."
+                      : ovlPreview
+                        ? `~${ovlPreview} OVL`
+                        : "-"}
+                  </Text>
+                </Flex>
+                <Flex justify="between">
+                  <Flex align="center" gap="1">
+                    <Text size="1" style={{ color: theme.color.grey3 }}>
+                      Borrow Price
+                    </Text>
+                    <Text
+                      size="1"
+                      onClick={() => refetchStableTokenInfo()}
+                      style={{
+                        color: theme.color.blue1,
+                        cursor: "pointer",
+                        userSelect: "none",
+                        opacity: isRefetching ? 0.5 : 1,
+                        transition: "opacity 0.2s",
+                      }}
+                      title="Refresh oracle price"
+                    >
+                      {isRefetching ? "⟳" : "↻"}
+                    </Text>
+                  </Flex>
+                  <Text size="1" style={{ color: theme.color.grey2 }}>
+                    {stableTokenInfo?.oraclePrice
+                      ? `1 OVL = $${formatWeiToParsedNumber(
+                        stableTokenInfo.oraclePrice,
+                        18,
+                        4
+                      )?.toFixed(4) ?? "0.0000"
+                      }`
+                      : "-"}
+                  </Text>
+                </Flex>
+              </Flex>
+            )}
+          </Flex>
+
           <MainTradeDetails tradeState={tradeState} />
           <AdditionalTradeDetails tradeState={tradeState} />
         </Flex>

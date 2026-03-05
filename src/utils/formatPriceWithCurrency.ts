@@ -1,6 +1,6 @@
 import { toPercentUnit } from "overlay-sdk";
 
-const formatNumberWithCommas = (number: number | string): string => {
+export const formatNumberWithCommas = (number: number | string): string => {
   const num = Number(number);
   if (num >= 1_000_000) {
     return (

@@ -1,10 +1,9 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
-import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setSlippage, setTokenState, typeInput, updateTxnHash } from "./actions";
-import usePrevious from "../../hooks/usePrevious";
+import { DefaultTxnSettings, resetTradeState, selectChain, selectLeverage, selectPositionSide, selectToken, setChainState, setCollateralType, setSlippage, setTokenState, setUnwindPreference, typeInput, updateTxnHash, addOptimisticPosition, removeOptimisticPosition } from "./actions";
 import useSDK from "../../providers/SDKProvider/useSDK";
-import {  TokenAmount } from "@lifi/sdk";
+import { TokenAmount } from "@lifi/sdk";
 import { deserializeWithBigInt, serializeWithBigInt } from "../../utils/serializeWithBigInt";
 import { SelectState } from "../../types/selectChainAndTokenTypes";
 import { useOvlTokenBalance } from "../../hooks/useOvlTokenBalance";
@@ -12,11 +11,24 @@ import { DEFAULT_CHAINID } from "../../constants/chains";
 import { useSelectedChain } from "../../hooks/lifi/useSelectedChain";
 import { DEFAULT_TOKEN } from "../../constants/applications";
 import useAccount from "../../hooks/useAccount";
+import { OptimisticPosition } from "./reducer";
 
 export const MINIMUM_SLIPPAGE_VALUE = 0.05;
 
 export function useTradeState(): AppState['trade'] {
   return useAppSelector((state) => state.trade);
+}
+
+export function useCollateralType(): 'OVL' | 'USDT' {
+  return useAppSelector((state) => state.trade.collateralType);
+}
+
+export function useUnwindPreference(): 'normal' | 'stable' {
+  return useAppSelector((state) => state.trade.unwindPreference);
+}
+
+export function useOptimisticPositions(): OptimisticPosition[] {
+  return useAppSelector((state) => state.trade.optimisticPositions);
 }
 
 export function useChainAndTokenState(): {
@@ -45,6 +57,8 @@ export const useTradeActionHandlers = (): {
   handleTokenSelect: (selectedToken: TokenAmount) => void;
   handleChainStateChange: (chainState: SelectState) => void;
   handleTokenStateChange: (tokenState: SelectState) => void;
+  handleCollateralTypeChange: (collateralType: 'OVL' | 'USDT') => void;
+  handleUnwindPreferenceChange: (unwindPreference: 'normal' | 'stable') => void;
   handleTradeStateReset: () => void;
 } => {
   const dispatch = useAppDispatch();
@@ -74,12 +88,12 @@ export const useTradeActionHandlers = (): {
   const handleSlippageSet = useCallback(
     (slippageValue: DefaultTxnSettings | string) => {
       if (Number(slippageValue) < MINIMUM_SLIPPAGE_VALUE && slippageValue.length > 3) {
-        dispatch(setSlippage({slippageValue: MINIMUM_SLIPPAGE_VALUE.toString()}))
+        dispatch(setSlippage({ slippageValue: MINIMUM_SLIPPAGE_VALUE.toString() }))
       }
-      if(slippageValue === '.') {
+      if (slippageValue === '.') {
         dispatch(setSlippage({ slippageValue }))
       }
-      if(slippageRegex.test(slippageValue)) {
+      if (slippageRegex.test(slippageValue)) {
         dispatch(setSlippage({ slippageValue }))
       }
 
@@ -97,13 +111,13 @@ export const useTradeActionHandlers = (): {
   );
 
   const handleTokenSelect = useCallback(
-  (selectedToken: TokenAmount) => {
-    const serializedToken = serializeWithBigInt(selectedToken);
-    dispatch(selectToken({ selectedToken: serializedToken }));
-    localStorage.setItem('lifiSelectedToken', serializedToken);
-  },
-  [dispatch]
-);
+    (selectedToken: TokenAmount) => {
+      const serializedToken = serializeWithBigInt(selectedToken);
+      dispatch(selectToken({ selectedToken: serializedToken }));
+      localStorage.setItem('lifiSelectedToken', serializedToken);
+    },
+    [dispatch]
+  );
 
   const handleChainStateChange = useCallback(
     (chainState: SelectState) => {
@@ -119,21 +133,54 @@ export const useTradeActionHandlers = (): {
     [dispatch]
   );
 
-  const handleTxnHashUpdate =  useCallback(
-    async (txnHash: string, txnBlockNumber: number) => {
-      const checkSubgraphBlock = async () => {
-        const lastSubgraphBlock = await sdk.core.getLastSubgraphProcessedBlock();
-
-        if (lastSubgraphBlock > txnBlockNumber) {
-          dispatch(updateTxnHash({ txnHash }));
-        } else {
-          setTimeout(checkSubgraphBlock, 1000);
-        }
-      };
-  
-      checkSubgraphBlock();          
+  const handleCollateralTypeChange = useCallback(
+    (collateralType: 'OVL' | 'USDT') => {
+      dispatch(setCollateralType({ collateralType }));
+      localStorage.setItem('collateralType', collateralType);
     },
     [dispatch]
+  );
+
+  const handleUnwindPreferenceChange = useCallback(
+    (unwindPreference: 'normal' | 'stable') => {
+      dispatch(setUnwindPreference({ unwindPreference }));
+      localStorage.setItem('unwindPreference', unwindPreference);
+    },
+    [dispatch]
+  );
+
+  const handleTxnHashUpdate = useCallback(
+    async (txnHash: string, txnBlockNumber: number) => {
+      // Dispatch immediately to trigger polling
+      console.log('[handleTxnHashUpdate] Dispatching txnHash immediately:', txnHash);
+      dispatch(updateTxnHash({ txnHash }));
+
+      // Also start checking subgraph for additional refreshes
+      let checkCount = 0;
+      const maxChecks = 30; // Check for up to 30 seconds
+      const checkSubgraphBlock = async () => {
+        checkCount++;
+        const lastSubgraphBlock = await sdk.core.getLastSubgraphProcessedBlock();
+
+        console.log(`[handleTxnHashUpdate] Subgraph check ${checkCount}/${maxChecks}:`, {
+          lastSubgraphBlock,
+          txnBlockNumber,
+          synced: lastSubgraphBlock > txnBlockNumber,
+        });
+
+        if (lastSubgraphBlock > txnBlockNumber) {
+          console.log('[handleTxnHashUpdate] Subgraph synced!');
+          // Don't dispatch again - polling mechanism will handle refreshes
+        } else if (checkCount < maxChecks) {
+          setTimeout(checkSubgraphBlock, 1000);
+        } else {
+          console.log('[handleTxnHashUpdate] Subgraph check timeout');
+        }
+      };
+
+      checkSubgraphBlock();
+    },
+    [dispatch, sdk]
   );
 
   const handleTradeStateReset = useCallback(
@@ -153,33 +200,74 @@ export const useTradeActionHandlers = (): {
     handleTxnHashUpdate,
     handleChainStateChange,
     handleTokenStateChange,
+    handleCollateralTypeChange,
+    handleUnwindPreferenceChange,
     handleTradeStateReset,
   }
 };
 
+export const useOptimisticPositionHandlers = () => {
+  const dispatch = useAppDispatch();
+
+  const handleAddOptimisticPosition = useCallback((position: OptimisticPosition) => {
+    dispatch(addOptimisticPosition(position));
+  }, [dispatch]);
+
+  const handleRemoveOptimisticPosition = useCallback((txHash: string) => {
+    dispatch(removeOptimisticPosition({ txHash }));
+  }, [dispatch]);
+
+  return {
+    handleAddOptimisticPosition,
+    handleRemoveOptimisticPosition,
+  };
+};
+
 export const useIsNewTxnHash = (): boolean => {
   const txnHash = useAppSelector((state) => state.trade.txnHash);
-  const previousTxnHash = usePrevious(txnHash)
-  
-  return txnHash !== '' && txnHash !== previousTxnHash
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [lastTxnHash, setLastTxnHash] = useState('');
+  const [txnHashTimestamp, setTxnHashTimestamp] = useState(0);
+
+  useEffect(() => {
+    setHasInitialized(true);
+  }, []);
+
+  useEffect(() => {
+    // When txnHash changes to a new non-empty value, record the timestamp
+    if (txnHash !== '' && txnHash !== lastTxnHash && !txnHash.endsWith('-synced')) {
+      console.log('[useIsNewTxnHash] New txnHash detected:', txnHash);
+      setLastTxnHash(txnHash);
+      setTxnHashTimestamp(Date.now());
+    }
+  }, [txnHash, lastTxnHash]);
+
+  // Stay true for 70 seconds after a new txnHash is detected
+  // This gives polling enough time to complete its full 60 second cycle
+  const timeSinceLastTxn = Date.now() - txnHashTimestamp;
+  const isRecent = txnHashTimestamp > 0 && timeSinceLastTxn < 70_000;
+
+  const result = hasInitialized && txnHash !== '' && isRecent;
+
+  return result;
 }
 
 export const useSelectStateManager = () => {
   const dispatch = useAppDispatch();
-  const {selectedChainId, chainState,  selectedToken} = useChainAndTokenState();
+  const { selectedChainId, chainState, selectedToken } = useChainAndTokenState();
   const { ovlBalance, isLoading } = useOvlTokenBalance();
   const { loadingChain } = useSelectedChain();
   const { address: account } = useAccount();
   const { handleTokenSelect } = useTradeActionHandlers();
-  
+
   // Effect to manage chain state
   useEffect(() => {
-    if ( isLoading || loadingChain) return;
+    if (isLoading || loadingChain) return;
 
     if (account === undefined) {
       dispatch(setChainState({ chainState: SelectState.EMPTY }));
       return;
-    }  
+    }
 
     if (selectedChainId === DEFAULT_CHAINID && selectedToken.address === DEFAULT_TOKEN.address) {
       dispatch(setChainState({ chainState: SelectState.DEFAULT }));
@@ -190,7 +278,7 @@ export const useSelectStateManager = () => {
 
   // Effect to manage token state
   useEffect(() => {
-    if ( isLoading || loadingChain) return;
+    if (isLoading || loadingChain) return;
 
     if (account === undefined) {
       dispatch(setTokenState({ tokenState: SelectState.EMPTY }));
@@ -215,7 +303,7 @@ export const useSelectStateManager = () => {
       handleTokenSelect(DEFAULT_TOKEN);
       dispatch(setChainState({ chainState: SelectState.DEFAULT }));
       dispatch(setTokenState({ tokenState: SelectState.DEFAULT }));
-     
+
     }
   }, [selectedChainId, ovlBalance, isLoading, loadingChain, selectedToken]);
 };

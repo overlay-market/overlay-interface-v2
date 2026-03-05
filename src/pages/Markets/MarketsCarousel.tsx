@@ -1,9 +1,10 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Mousewheel, Navigation, Pagination } from "swiper/modules";
+import { FreeMode, Mousewheel, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import "swiper/css/free-mode";
 import MarketCards from "../../components/MarketCards";
 import { TransformedMarketData } from "overlay-sdk";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
@@ -35,7 +36,7 @@ const Carousel: React.FC<CarouselProps> = ({
       {(marketsData.length > 0 ||
         (otherChainMarketsData && otherChainMarketsData.length > 0)) && (
         <Swiper
-          modules={[Navigation, Pagination, Mousewheel]}
+          modules={[Navigation, Pagination, Mousewheel, FreeMode]}
           style={{
             height: "auto",
             marginTop: "4px",
@@ -44,6 +45,7 @@ const Carousel: React.FC<CarouselProps> = ({
           slidesPerView="auto"
           loop={false}
           centeredSlides={false}
+          freeMode={true}
           enabled={
             marketsData.length > 0 ||
             (otherChainMarketsData && otherChainMarketsData.length > 0)

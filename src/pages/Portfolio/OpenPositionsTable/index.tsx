@@ -15,7 +15,25 @@ import {
   useIsNewUnwindTxn,
   usePositionRefresh,
 } from "../../../state/portfolio/hooks";
+import useMultiMarketPositionsPnL from "../../../hooks/useMultiMarketPositionsPnL";
 import { triggerLoader } from "../UnwindsTable";
+
+import styled, { keyframes } from "styled-components";
+
+// Loading spinner animation
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+const LoadingSpinner = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid ${theme.color.grey4};
+  border-top: 2px solid ${theme.color.green1};
+  border-radius: 50%;
+  animation: ${spin} 1s linear infinite;
+`;
 
 const POSITIONS_COLUMNS = [
   "Market",
@@ -57,6 +75,10 @@ const OpenPositionsTable: React.FC = () => {
       currentPage,
       itemsPerPage
     );
+
+  const { pnlData, marketPrices } = useMultiMarketPositionsPnL(positions, {
+    isRefreshing: loading,
+  });
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
@@ -103,9 +125,12 @@ const OpenPositionsTable: React.FC = () => {
       }}
     >
       <Flex align="center" justify="between" mb="4">
-        <Text weight={"bold"} size={"5"}>
-          Open Positions
-        </Text>
+        <Flex align="center" gap="2">
+          <Text weight={"bold"} size={"5"}>
+            Open Positions
+          </Text>
+          {loading && positions && <LoadingSpinner />}
+        </Flex>
         <Flex gap="2" style={{ display: isMobile ? "none" : "flex" }}>
           {showCheckboxes ? (
             <>
@@ -115,7 +140,7 @@ const OpenPositionsTable: React.FC = () => {
                   setSelectedPositions(new Set());
                 }}
                 width="140px"
-                bgColor={theme.color.grey4}
+                bgcolor={theme.color.grey4}
                 color={theme.color.grey1}
               >
                 Cancel Selection
@@ -151,7 +176,30 @@ const OpenPositionsTable: React.FC = () => {
         showCheckbox={showCheckboxes}
         onSelectAll={handleSelectAll}
         body={
-          loading && positions ? (
+          positions && positions.length > 0 ? (
+            <>
+              {positions.map((pos) => {
+                const key = getPositionKey(pos);
+                return (
+                  <OpenPosition
+                    key={key}
+                    position={pos}
+                    realtimePnL={pnlData.get(
+                      `${pos.marketAddress}-${pos.positionId}`
+                    )}
+                    realtimeMarketPrices={marketPrices.get(
+                      pos.marketAddress.toLowerCase()
+                    )}
+                    showCheckbox={showCheckboxes}
+                    onCheckboxChange={(checked) =>
+                      handlePositionSelect(pos, checked)
+                    }
+                    isChecked={selectedPositions.has(key)}
+                  />
+                );
+              })}
+            </>
+          ) : loading ? (
             <tr>
               <td
                 colSpan={POSITIONS_COLUMNS.length}
@@ -160,35 +208,29 @@ const OpenPositionsTable: React.FC = () => {
                 <Loader />
               </td>
             </tr>
+          ) : account ? (
+            <tr>
+              <td
+                colSpan={POSITIONS_COLUMNS.length}
+                style={{ padding: "20px 0" }}
+              >
+                <Text>You have no open positions</Text>
+              </td>
+            </tr>
           ) : (
-            positions &&
-            positions.map((position: OpenPositionData) => {
-              const positionKey = getPositionKey(position);
-              return (
-                <OpenPosition
-                  position={position}
-                  key={positionKey}
-                  showCheckbox={showCheckboxes}
-                  onCheckboxChange={(checked) =>
-                    handlePositionSelect(position, checked)
-                  }
-                  isChecked={selectedPositions.has(positionKey)}
-                />
-              );
-            })
+            <tr>
+              <td
+                colSpan={POSITIONS_COLUMNS.length}
+                style={{ padding: "20px 0" }}
+              >
+                <Text style={{ color: theme.color.grey3 }}>
+                  No wallet connected
+                </Text>
+              </td>
+            </tr>
           )
         }
       />
-
-      {loading && !positions ? (
-        <Loader />
-      ) : account ? (
-        positions &&
-        positionsTotalNumber === 0 && <Text>You have no open positions</Text>
-      ) : (
-        <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
-      )}
-
       <ClosePositionsModal
         open={showCloseModal}
         handleDismiss={() => setShowCloseModal(false)}

@@ -2,7 +2,7 @@ import { Text } from "@radix-ui/themes";
 import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import {
   LineSeparator,
   PositionsTableContainer,
@@ -11,11 +11,14 @@ import useAccount from "../../../hooks/useAccount";
 import StyledTable from "../../../components/Table";
 import OpenPosition from "./OpenPosition";
 import { Address } from "viem";
-import { useIsNewTxnHash } from "../../../state/trade/hooks";
+import { useIsNewTxnHash, useOptimisticPositions, useOptimisticPositionHandlers } from "../../../state/trade/hooks";
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { convertToOpenPositionData } from "../../../utils/convertOptimisticPosition";
+import usePositionsPnL from "../../../hooks/usePositionsPnL";
+import { DEFAULT_CHAINID } from "../../../constants/chains";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -25,13 +28,23 @@ const POSITIONS_COLUMNS = [
   "PnL",
 ];
 
-const PositionsTable: React.FC = () => {
+interface PositionsTableProps {
+  onPricesUpdate?: (prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => void;
+}
+
+const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const [searchParams] = useSearchParams();
-  const marketId = searchParams.get("market");
-  const { chainId } = useMultichainContext();
+  const rawMarketId = searchParams.get("market");
+  const marketId = rawMarketId ? decodeURIComponent(rawMarketId) : null;
+  const { chainId: rawChainId } = useMultichainContext();
+  const chainId = typeof rawChainId === 'object' && rawChainId !== null
+    ? rawChainId.id
+    : (rawChainId ?? DEFAULT_CHAINID);
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
+  const optimisticPositions = useOptimisticPositions();
+  const { handleRemoveOptimisticPosition } = useOptimisticPositionHandlers();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [positions, setPositions] = useState<OpenPositionData[] | undefined>(
@@ -41,6 +54,10 @@ const PositionsTable: React.FC = () => {
   const [positionsTotalNumber, setPositionsTotalNumber] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [forceRefresh, setForceRefresh] = useState(0); // Counter to force refresh
+  const previousPositionCountRef = useRef<number>(0); // Track position count before transaction
+  const currentPositionCountRef = useRef<number>(0); // Track current position count (for polling)
+  const knownPositionIdsRef = useRef<Set<number>>(new Set()); // Track position IDs that existed before trade
 
   const isTablet = useMediaQuery("(max-width: 1279px)");
 
@@ -49,16 +66,101 @@ const PositionsTable: React.FC = () => {
     sdkRef.current = sdk;
   }, [sdk]);
 
+  // Update current position count ref whenever it changes
+  useEffect(() => {
+    currentPositionCountRef.current = positionsTotalNumber;
+  }, [positionsTotalNumber]);
+
+  // Snapshot known position IDs when no optimistic positions exist (baseline)
+  useEffect(() => {
+    if (positions && optimisticPositions.length === 0) {
+      knownPositionIdsRef.current = new Set(positions.map(p => p.positionId));
+    }
+  }, [positions, optimisticPositions.length]);
+
+  // Reset forceRefresh when the post-transaction window closes
+  useEffect(() => {
+    if (!isNewTxnHash && forceRefresh > 0) {
+      setForceRefresh(0);
+    }
+  }, [isNewTxnHash, forceRefresh]);
+
+  // Poll for new positions after transaction until we find it or timeout
+  useEffect(() => {
+    if (!isNewTxnHash) return;
+
+    console.log('[PositionsTable] New transaction detected, starting position polling');
+
+    let pollCount = 0;
+    const maxPolls = 20; // Poll every 3 seconds for 60 seconds total
+
+    const pollInterval = setInterval(() => {
+      pollCount++;
+
+      // Set baseline on first tick (after the initial fetch has had time to complete)
+      // This avoids the 0 → N false positive when the component just mounted
+      if (pollCount === 1) {
+        previousPositionCountRef.current = currentPositionCountRef.current;
+      }
+
+      // Check if we found the new position (count increased) - using ref to avoid stale closure
+      const currentCount = currentPositionCountRef.current;
+      const previousCount = previousPositionCountRef.current;
+
+      if (previousCount > 0 && currentCount > previousCount) {
+        console.log('[PositionsTable] ✅ New position detected! Position count increased from', previousCount, 'to', currentCount);
+        clearInterval(pollInterval);
+        return;
+      }
+
+      console.log(`[PositionsTable] Polling for new position (${pollCount}/${maxPolls}) - Current count: ${currentCount}`);
+      setForceRefresh(prev => prev + 1); // Trigger re-fetch
+
+      if (pollCount >= maxPolls) {
+        console.log('[PositionsTable] Polling timeout - no new position found');
+        clearInterval(pollInterval);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => {
+      console.log('[PositionsTable] Cleaning up polling interval');
+      clearInterval(pollInterval);
+    };
+  }, [isNewTxnHash]); // Only depend on isNewTxnHash - don't restart on positionsTotalNumber change
+
+  // Additional trigger: Start polling when new optimistic position is added
+  useEffect(() => {
+    if (optimisticPositions.length === 0) return;
+
+    // Get the newest optimistic position (newest is at index 0)
+    const newestOptimistic = optimisticPositions[0];
+    const timeSinceCreation = Date.now() - newestOptimistic.createdAt;
+
+    // If position was just created (within 2 seconds), trigger a refresh
+    if (timeSinceCreation < 2000) {
+      console.log('[PositionsTable] New optimistic position detected, triggering immediate refresh');
+      setForceRefresh(prev => prev + 1);
+    }
+  }, [optimisticPositions.length]);
+
   useEffect(() => {
     const fetchOpenPositions = async () => {
       if (!account || !marketId) {
         setPositions(undefined);
         setPositionsTotalNumber(0);
+        return; // Early exit if no account or marketId
       }
 
       if (marketId && account) {
-        const refreshData = isNewTxnHash;
+        // Force cache bypass if new transaction or during polling period
+        const refreshData = isNewTxnHash || forceRefresh > 0;
         setLoading(true);
+        console.log('[PositionsTable] Fetching positions:', {
+          marketId,
+          refreshData,
+          isNewTxnHash,
+          forceRefresh,
+        });
         try {
           const positions =
             await sdkRef.current.openPositions.transformOpenPositions(
@@ -68,6 +170,12 @@ const PositionsTable: React.FC = () => {
               account as Address,
               refreshData
             );
+
+          console.log('[PositionsTable] Received positions:', {
+            count: positions?.data?.length || 0,
+            total: positions?.total || 0,
+            positions: positions?.data,
+          });
 
           positions && setPositions(positions.data);
           positions && setPositionsTotalNumber(positions.total);
@@ -84,12 +192,170 @@ const PositionsTable: React.FC = () => {
     };
 
     fetchOpenPositions();
-  }, [chainId, marketId, account, isNewTxnHash, currentPage, itemsPerPage]);
+  }, [chainId, marketId, account, isNewTxnHash, forceRefresh, currentPage, itemsPerPage]);
 
   useEffect(() => {
     setCurrentPage(1);
     setItemsPerPage(10);
   }, [chainId, marketId]);
+
+  // Merge optimistic positions with real positions
+  const mergedPositions = useMemo(() => {
+    // Filter optimistic positions for current market AND current account
+    const relevantOptimistic = optimisticPositions
+      .filter(op =>
+        op.marketName === marketId &&
+        op.account === account &&
+        op.chainId === chainId
+      )
+      .map(op => convertToOpenPositionData(op));
+
+    // If no real positions yet, just return optimistic ones (or undefined if none)
+    if (!positions) {
+      return relevantOptimistic.length > 0 ? relevantOptimistic : undefined;
+    }
+
+    // Prepend optimistic positions (show at top)
+    return [...relevantOptimistic, ...positions];
+  }, [positions, optimisticPositions, marketId, account, chainId]);
+
+  // Smart detection: Remove optimistic positions when matching real position appears
+  // This runs whenever positions change OR during polling period
+  useEffect(() => {
+    if (!positions || optimisticPositions.length === 0) return;
+
+    // Check each optimistic position for a matching real position
+    optimisticPositions.forEach(optimistic => {
+
+      // Find matching real position by market, side, leverage
+      // Sort positions by creation time (newest first) to prioritize recent positions
+      const sortedPositions = [...positions].sort((a, b) => {
+        const timeA = new Date(a.parsedCreatedTimestamp || 0).getTime();
+        const timeB = new Date(b.parsedCreatedTimestamp || 0).getTime();
+        return timeB - timeA; // Newest first
+      });
+
+      // First try: Match by timestamp (within 2 minutes)
+      let matchingReal = sortedPositions.find(real => {
+        // Defensive checks for undefined values
+        if (!real.marketName || !real.positionSide || !marketId) return false;
+
+        const sameMarket = real.marketName === marketId;
+        const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
+
+        // Extract leverage from real position (e.g., "13.10000000000000000120018702277545x Short" -> 13.1)
+        const realLeverageMatch = real.positionSide.match(/^([\d.]+)x/);
+        const realLeverage = realLeverageMatch ? parseFloat(realLeverageMatch[1]) : null;
+        const optimisticLeverageNum = parseFloat(optimistic.leverage);
+
+        // Defensive check for NaN
+        if (realLeverage === null || isNaN(optimisticLeverageNum)) return false;
+
+        // Match if leverage is within 0.01 tolerance (handles precision differences)
+        const sameLeverage = Math.abs(realLeverage - optimisticLeverageNum) < 0.01;
+
+        // Check if real position was created recently (within 2 minutes of optimistic for safety)
+        const realTimestamp = real.parsedCreatedTimestamp
+          ? new Date(real.parsedCreatedTimestamp).getTime()
+          : 0;
+        const optimisticTimestamp = optimistic.createdAt;
+        const timeDiff = Math.abs(realTimestamp - optimisticTimestamp);
+        const isRecent = realTimestamp > 0 && timeDiff < 120_000; // 2 minute window (extended for subgraph lag)
+
+        const isMatch = sameMarket && sameSide && sameLeverage && isRecent;
+
+        // Only log when we find a match (reduce spam)
+        if (isMatch) {
+          console.log('[Smart Detection] ✅ Timestamp match found:', {
+            market: real.marketName,
+            side: real.positionSide,
+            positionId: real.positionId,
+          });
+        }
+
+        return isMatch;
+      });
+
+      // Fallback: If no timestamp match, match a NEW position (not in pre-trade snapshot)
+      // with same market/side/leverage. This handles stale subgraph timestamps.
+      if (!matchingReal) {
+        matchingReal = sortedPositions.find(real => {
+          // Only match positions that appeared AFTER the trade
+          if (knownPositionIdsRef.current.has(real.positionId)) return false;
+
+          // Defensive checks for undefined values
+          if (!real.marketName || !real.positionSide || !marketId) return false;
+
+          const sameMarket = real.marketName === marketId;
+          const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
+
+          // Extract leverage numerically (same as timestamp match above)
+          const realLeverageMatch = real.positionSide.match(/^([\d.]+)x/);
+          const realLeverage = realLeverageMatch ? parseFloat(realLeverageMatch[1]) : null;
+          const optimisticLeverageNum = parseFloat(optimistic.leverage);
+
+          // Defensive check for NaN
+          if (realLeverage === null || isNaN(optimisticLeverageNum)) return false;
+
+          const sameLeverage = Math.abs(realLeverage - optimisticLeverageNum) < 0.01;
+          const isMatch = sameMarket && sameSide && sameLeverage;
+
+          // Only log when we find a match
+          if (isMatch) {
+            console.log('[Smart Detection] ✅ Fallback match found (new position):', {
+              market: real.marketName,
+              side: real.positionSide,
+              positionId: real.positionId,
+            });
+          }
+
+          return isMatch;
+        });
+      }
+
+      // If matching real position found, remove optimistic immediately
+      if (matchingReal) {
+        console.log('[Smart Detection] Removing optimistic position for', optimistic.marketName);
+        handleRemoveOptimisticPosition(optimistic.txHash);
+      }
+      // Silently continue if no match (reduces spam - it's expected during polling)
+    });
+  }, [positions, optimisticPositions, marketId, handleRemoveOptimisticPosition]);
+
+  // Cleanup stale optimistic positions (older than 2 minutes)
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      optimisticPositions.forEach(op => {
+        if (now - op.createdAt > 120_000) {
+          handleRemoveOptimisticPosition(op.txHash);
+        }
+      });
+    }, 10_000); // Check every 10 seconds
+
+    return () => clearInterval(cleanup);
+  }, [optimisticPositions, handleRemoveOptimisticPosition]);
+
+  // Real-time PnL updates
+  const positionsList = useMemo(
+    () =>
+      positions?.map((p) => ({
+        marketAddress: p.marketAddress,
+        positionId: p.positionId,
+        router: p.router,
+        loan: p.loan,
+      })) ?? [],
+    [positions]
+  );
+
+  const { pnlData, prices } = usePositionsPnL(marketId, positionsList);
+
+  // Report prices to parent component for use in Chart and TradeWidget
+  useEffect(() => {
+    if (onPricesUpdate) {
+      onPricesUpdate(prices);
+    }
+  }, [prices, onPricesUpdate]);
 
   return (
     <>
@@ -110,18 +376,33 @@ const PositionsTable: React.FC = () => {
           setCurrentPage={setCurrentPage}
           setItemsPerPage={setItemsPerPage}
           body={
-            positions &&
-            positions.map((position: OpenPositionData, index: number) => (
-              <OpenPosition position={position} key={index} />
-            ))
+            mergedPositions &&
+            mergedPositions.map((position: OpenPositionData, index: number) => {
+              const pnlKey = `${position.marketAddress}-${position.positionId}`;
+              const realtimePnL = pnlData.get(pnlKey);
+
+              return (
+                <OpenPosition
+                  position={position}
+                  realtimePnL={realtimePnL}
+                  key={`${position.marketAddress}-${position.positionId}-${index}`}
+                />
+              );
+            })
           }
         />
 
-        {loading && !positions ? (
+        {loading && !mergedPositions ? (
           <Loader />
         ) : account ? (
-          positions &&
-          positionsTotalNumber === 0 && <Text>No current positions</Text>
+          mergedPositions &&
+          positionsTotalNumber === 0 &&
+          optimisticPositions.filter(op =>
+            op.marketName === marketId &&
+            op.account === account &&
+            op.chainId === chainId
+          ).length === 0 &&
+          <Text>No current positions</Text>
         ) : (
           <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
         )}

@@ -310,7 +310,11 @@ const Leaderboard: React.FC = () => {
           </Flex>
         </Flex>
 
-        <LeaderboardTable ranks={allRanks} currentUserData={currentUserData} />
+        <LeaderboardTable
+          ranks={allRanks}
+          currentUserData={currentUserData}
+          seasonId={seasonId}
+        />
 
         {isLoading && (
           <Flex

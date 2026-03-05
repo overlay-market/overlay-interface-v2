@@ -47,7 +47,7 @@ const AdditionalTradeDetails: React.FC<AdditionalTradeDetailsProps> = ({
           const fee = await sdk.trade.getFee(marketId);
           fee && setFee(fee);
         } catch (error) {
-          console.error("Error fetching fee:", error);
+          // Error fetching fee
         }
       }
     };

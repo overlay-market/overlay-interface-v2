@@ -27,7 +27,13 @@ const theme = {
     grey9: '#1F2538',
     grey10: '#8D8F94',
     grey11: '#B9BABD',
-  },  
+    yellow1: '#ffc107',
+  },
+  tooltip: {
+    background: 'rgba(32, 36, 49, 0.8)',
+    borderRadius: '8px',
+    padding: '8px',
+  },
   headerSize: {
     width: '88px',
     height: '52px',

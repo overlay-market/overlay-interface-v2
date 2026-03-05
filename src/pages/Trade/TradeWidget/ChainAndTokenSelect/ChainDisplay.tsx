@@ -5,7 +5,7 @@ import { useSelectedChain } from "../../../../hooks/lifi/useSelectedChain";
 import { SelectState } from "../../../../types/selectChainAndTokenTypes";
 import { DEFAULT_CHAIN_LOGO, DEFAULT_NET } from "../../../../constants/chains";
 import { useMemo } from "react";
-import { useAccount } from "wagmi";
+import useAccount from "../../../../hooks/useAccount";
 
 interface ChainDisplayProps {
   onClick: () => void;

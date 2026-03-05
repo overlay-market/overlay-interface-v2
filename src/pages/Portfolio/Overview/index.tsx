@@ -6,18 +6,27 @@ import useAccount from "../../../hooks/useAccount";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import MainOverviewCard from "./MainOverviewCard";
 import OverviewChart from "./OverviewChart";
-import { UNIT } from "../../../constants/applications";
 import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
 import { useOverviewDataRefresh } from "./hooks";
-import OverviewCard from "../../../components/OverviewCard";
+import { useFundedTraderStats } from "../../../hooks/useFundedTraderStats";
+import LimitBarsCard from "./FundedTraderStats/LimitBarsCard";
+import EvaluationBarsCard from "./FundedTraderStats/EvaluationBarsCard";
 
 const Overview: React.FC = () => {
   const sdk = useSDK();
-  const { address: account } = useAccount();
+  const { address: account, isAvatarTradingActive } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
   const isNewUnwindTxn = useIsNewUnwindTxn();
+
+  const { data: fundedStats, isError: isFundedStatsError } = useFundedTraderStats(
+    account,
+    isAvatarTradingActive
+  );
+  const showFundedCard =
+    isAvatarTradingActive && !!fundedStats && !isFundedStatsError
+    && fundedStats.phase !== "terminated";
 
   const [selectedInterval, setSelectedInterval] = useState<IntervalType>("1M");
   const previousSelectedInterval = usePrevious(selectedInterval);
@@ -39,7 +48,8 @@ const Overview: React.FC = () => {
   }, [account, overviewData, isNewTxnHash, isNewUnwindTxn]);
 
   useEffect(() => {
-    setTimeout(refreshOverviewData, 1000);
+    const id = setTimeout(refreshOverviewData, 1000);
+    return () => clearTimeout(id);
   }, [isNewTxnHash, isNewUnwindTxn, isNewSelectedInterval]);
 
   return (
@@ -63,14 +73,20 @@ const Overview: React.FC = () => {
               chartData={overviewData?.dataByPeriod}
             />
 
-            <MainOverviewCard
-              title={"Locked Sum + uPnL"}
-              value={overviewData?.lockedPlusUnrealized}
-              unit={UNIT}
-            />
+            {!showFundedCard ? (
+              <MainOverviewCard
+                title={"Locked Sum + uPnL"}
+                value={overviewData?.lockedPlusUnrealized}
+                unit="USDT"
+              />
+            ) : fundedStats.phase === "funded" ? (
+              <LimitBarsCard data={fundedStats} />
+            ) : fundedStats.phase === "evaluation" ? (
+              <EvaluationBarsCard data={fundedStats} />
+            ) : null}
           </MainCardsGrid>
 
-          <InfoCardsGrid>
+          <InfoCardsGrid $columns={showFundedCard ? 5 : 4}>
             <OverviewCard
               title="Open Positions"
               value={overviewData?.numberOfOpenPositions}
@@ -80,22 +96,50 @@ const Overview: React.FC = () => {
             <OverviewCard
               title="Locked Sum"
               value={overviewData?.totalValueLocked}
-              valueType={UNIT}
+              unit="USDT"
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
 
             <OverviewCard
               title="Realized"
-              value={overviewData?.realizedPnl}
-              valueType={UNIT}
+              isMultiValue={true}
+              value={
+                overviewData ? (
+                  <Flex direction="column" gap="1" style={{ lineHeight: "1.2" }}>
+                    {parseFloat(overviewData.realizedPnlUsdt) !== 0 && (
+                      <>
+                        <Text size="3" weight="bold">{overviewData.realizedPnlUsdt}</Text>
+                        <Text style={{ fontSize: "14px" }}>USDT</Text>
+                      </>
+                    )}
+                    {parseFloat(overviewData.realizedPnlOvl) !== 0 && (
+                      <>
+                        <Text size="3" weight="bold">{overviewData.realizedPnlOvl}</Text>
+                        <Text style={{ fontSize: "14px" }}>OVL</Text>
+                      </>
+                    )}
+                    {parseFloat(overviewData.realizedPnlUsdt) === 0 && parseFloat(overviewData.realizedPnlOvl) === 0 && (
+                      <Text size="3" weight="bold">0</Text>
+                    )}
+                  </Flex>
+                ) : undefined
+              }
             />
 
             <OverviewCard
               title="Unrealized"
               value={overviewData?.unrealizedPnL}
-              valueType={UNIT}
+              unit="USDT"
               isOver1000OpenPositions={isOver1000OpenPositions}
             />
+
+            {showFundedCard && (
+              <OverviewCard
+                title="Locked Sum + uPnL"
+                value={overviewData?.lockedPlusUnrealized}
+                unit="USDT"
+              />
+            )}
           </InfoCardsGrid>
         </>
       )}

@@ -49,6 +49,20 @@ import BtcUsdLogo from '../assets/images/markets-full-logos/BTC-USD.webp';
 import EthUsdLogo from '../assets/images/markets-full-logos/ETH-USD.webp';
 import CoinVsHood from '../assets/images/markets-full-logos/coin-vs-hood.png';
 import AsterMyx from '../assets/images/markets-full-logos/aster-myx.jpg';
+import MrBeastLogo from '../assets/images/markets-full-logos/MrBeast.jpg';
+import GoldUsdLogo from '../assets/images/markets-full-logos/gold-usd-logo.jpg';
+import DoNLogo from '../assets/images/markets-full-logos/DoN.jpg';
+import JamesWynnLogo from '../assets/images/markets-full-logos/JamesWynnLogo.jpg';
+import ElonMuskIndexLogo from '../assets/images/markets-full-logos/ElonMuskIndex.jpg';
+import FoundersOperationsLogo from '../assets/images/markets-full-logos/FoundersOperationsLogo.jpg';
+import CZClarityLogo from '../assets/images/markets-full-logos/cz.jpg';
+import SilverLogo from '../assets/images/markets-full-logos/silver-logo.jpg';
+import GoldSilverLogo from '../assets/images/markets-full-logos/gold-silver-logo.jpg';
+import BadBunnyLogo from '../assets/images/markets-full-logos/badbunny-logo.jpg';
+import GoogleAiLogo from '../assets/images/markets-full-logos/googleai.jpg';
+import OpenAiLogo from '../assets/images/markets-full-logos/openailogo.jpg';
+import AnthropicAiLogo from '../assets/images/markets-full-logos/anthropicai.jpg';
+import UsIranLogo from '../assets/images/markets-full-logos/us-iran-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -57,8 +71,10 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Rifles%20-%20CS2%20Skins": RiflesCS2Skins,
   "Knives%20-%20CS2%20Skins": KnivesCS2Skins,
   "Knives%20vs%20Rifles%20-%20CS2%20Skins": KnivesVsRiflesCS2Skins,
+  "SILVER%20%2F%20USD": SilverLogo,
   "BTC%20Dominance": BTCDominance,
   "ETH%20Dominance": ETHDominance,
+  "GOLD%20%2F%20SILVER": GoldSilverLogo,
   "Bitcoin%20Frogs": BTCFrog,
   NodeMonkes: NodeMonkes,
   "Quantum%20Cats": QuantumCats,
@@ -97,12 +113,23 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "SOL%2FUSD": SolUsd,
   "The%20Weeknd%20Index": TheWeekend,
   "Billie%20Eilish%20Index": BillieEilish,
+  "Bad%20Bunny": BadBunnyLogo,
   "Strategic%20Reserve%20Index": StrategicReverseIndex,
   "ETH%20%2F%20USD": EthUsdLogo,
   "BTC%20%2F%20USD": BtcUsdLogo,
   "Coin%20Vs%20Hood": CoinVsHood,
-  "ASTER%20%2F%20MYX": AsterMyx,
   "ASTER%20vs%20MYX": AsterMyx,
+  "MrBeast%20Index": MrBeastLogo,
+  "GOLD%20%2F%20USD": GoldUsdLogo,
+  "Double%20or%20Nothing": DoNLogo,
+  "James%20Wynn%20Mind%20Stability%20Index": JamesWynnLogo,
+  "Elon%20Musk%20Mood%20Index": ElonMuskIndexLogo,
+  "Founders%20Operations%20Index": FoundersOperationsLogo,
+  "CZ%20Signals%20Clarity%20Index": CZClarityLogo,
+  "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March": GoogleAiLogo,
+  "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March": OpenAiLogo,
+  "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March": AnthropicAiLogo,
+  "US%20x%20Iran%20ceasefire%20by%20May%2031": UsIranLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -110,11 +137,23 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 };
 
 export const MARKETSORDER = [
-  "amouranth%20vs%20peachJars",
-  "binance%20alpha%20index",
+  "Elon%20Musk%20Mood%20Index",
+  "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
+  "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
+  "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
+  "US%20x%20Iran%20ceasefire%20by%20May%2031",
+  "Double%20or%20Nothing",
+  "MrBeast%20Index",
+  "GOLD%20%2F%20SILVER",
+  "Bad%20Bunny",
+  "Amouranth%20vs%20peachJars",
+  "James%20Wynn%20Mind%20Stability%20Index",
+  "Binance%20Alpha%20Index",
+  "Founders%20Operations%20Index",
   "Counter-Strike%202%20Skins",
-  "ASTER%20%2F%20MYX",
+  "CZ%20Signals%20Clarity%20Index",
   "ASTER%20vs%20MYX",
+  "SILVER%20%2F%20USD",
   "ETH%20%2F%20USD",
   "BTC%20%2F%20USD",
   "The%20Weeknd%20Index",
@@ -125,6 +164,7 @@ export const MARKETSORDER = [
   "BNB%20%2F%20USD",
   "Jessicanigri%20vs%20Monalita",
   "Made%20In%20USA%20Index",
+  "GOLD%20%2F%20USD",
   "SOL%2FUSD",
   "HENLO%20%2F%20USD",
   "BTC%20Dominance",
@@ -143,6 +183,7 @@ export const MARKETSORDER = [
   "HoneyComb%20and%20Jars%20NFT%20Index",
   "Defi%20Index",
   "Lana%20Del%20Rey",
+  "Coin%20Vs%20Hood",
   "ETH%20%2F%20SOL",
   "Quantum%20Cats",
   "Bitcoin%20Frogs",
@@ -162,6 +203,8 @@ export const MARKETSORDER = [
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
 
+export const MARKETS_WITH_GAMBLING_TIMELINE = ["Double%20or%20Nothing"];
+
 export enum CategoryName {
   MemeWar = "Meme Wars",
   CounterStrikeSkins = "Counter-Strike",
@@ -170,8 +213,14 @@ export enum CategoryName {
   Chess = "Chess",
   Artists = "Artists",
   Bera = "Bera",
-  Fansly = "Fansly",
+  Fansly = "Adult Content Creators",
   Other = "Other",
+  YouTube = "YouTube",
+  Twitter = "Twitter",
+  Gambling = "Gambling",
+  Indices = "Indices",
+  Majors = "Majors",
+  Prediction = "Prediction Markets",
 }
 
 export type MarketCategoryMap = {
@@ -206,8 +255,11 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Crypto]: [
     "BTC%20Dominance",
     "ETH%20Dominance",
-    "ASTER%20%2F%20MYX",
     "ASTER%20vs%20MYX",
+    "BNB%20%2F%20USD",
+    "SOL%20Index",
+    "SOL%2FUSD",
+    "Binance%20Alpha%20Index",
     "AI%20Index",
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",
@@ -217,6 +269,9 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   ],
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
+    "The%20Weeknd%20Index",
+    "Billie%20Eilish%20Index",
+    "Bad%20Bunny",
     "Mr%20Beast%20Popularity%20Index",
   ],
   [CategoryName.Fansly]: [
@@ -224,5 +279,44 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "Jessicanigri%20vs%20Monalita",
     "Monalita%20vs%20Elvasnaps",
   ],
+  [CategoryName.YouTube]: [
+    "MrBeast%20Index",
+  ],
+  [CategoryName.Twitter]: [
+    "James%20Wynn%20Mind%20Stability%20Index",
+    "Elon%20Musk%20Mood%20Index",
+    "Founders%20Operations%20Index",
+    "CZ%20Signals%20Clarity%20Index",
+  ],
+  [CategoryName.Gambling]: [
+    "Double%20or%20Nothing",
+  ],
+  [CategoryName.Indices]: [
+    "Strategic%20Reserve%20Index",
+    "Made%20In%20USA%20Index",
+    "SOL%20Index",
+    "Binance%20Alpha%20Index",
+    "AI%20Index",
+    "AI%20Agents%20Index",
+  ],
+  [CategoryName.Majors]: [
+    "ETH%20%2F%20USD",
+    "BTC%20%2F%20USD",
+    "GOLD%20%2F%20USD",
+    "GOLD%20%2F%20SILVER",
+    "SILVER%20%2F%20USD",
+  ],
+  [CategoryName.Prediction]: [
+    "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
+    "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
+    "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
+    "US%20x%20Iran%20ceasefire%20by%20May%2031",
+  ],
   [CategoryName.Other]: [],
 };
+
+export const NEW_CATEGORIES = [
+  CategoryName.YouTube,
+  CategoryName.Twitter,
+  CategoryName.Prediction,
+];

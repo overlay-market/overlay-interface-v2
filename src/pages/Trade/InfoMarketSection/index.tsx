@@ -7,9 +7,13 @@ import { InfoMarketContainer } from "./info-market-section-styles";
 import RiskParameters from "./RiskParameters";
 import TabsMobile from "./TabsMobile";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import { isGamblingMarket } from "../../../utils/marketGuards";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 
 const InfoMarketSection: React.FC = () => {
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const { currentMarket } = useCurrentMarketState();
+  const isGambling = isGamblingMarket(currentMarket?.marketName);
 
   return (
     <Flex
@@ -32,7 +36,7 @@ const InfoMarketSection: React.FC = () => {
           <Analytics />
         </InfoMarketContainer>
 
-        {!isMobile && <GrafanaPanel />}
+        {(!isMobile && !isGambling) && <GrafanaPanel />}
       </Flex>
       {!isMobile && <RiskParameters />}
 

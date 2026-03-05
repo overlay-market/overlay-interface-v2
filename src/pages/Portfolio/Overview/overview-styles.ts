@@ -1,19 +1,19 @@
 import { Grid } from "@radix-ui/themes";
 import styled from "styled-components";
 
-export const InfoCardsGrid = styled(Grid)`
-  grid-template-columns: 1fr; 
+export const InfoCardsGrid = styled(Grid)<{ $columns?: number }>`
+  grid-template-columns: 1fr;
   gap: 8px;
-  
-  @media (min-width: 380px) {    
-    grid-template-columns: repeat(2, 1fr); 
+
+  @media (min-width: 380px) {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (min-width: 768px) {    
-    grid-template-columns: repeat(4, 1fr); 
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(${({ $columns }) => $columns || 4}, 1fr);
   }
 
-  @media (min-width: 1024px) {   
+  @media (min-width: 1024px) {
     gap: 24px;
   }
 `

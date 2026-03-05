@@ -17,6 +17,10 @@ export const DEFAULT_MARKET = "BTC Dominance";
 
 export const TRADE_POLLING_INTERVAL = 30000;
 
+// Market data polling configuration for combined bid/ask + PnL updates
+export const MARKET_DATA_POLLING_INTERVAL = 10000; // 10 seconds
+export const MARKET_DATA_CACHE_TTL = 15000; // 15 seconds (1.5x polling interval)
+
 export const UNIT = "OVL";
 
 export enum NAVBAR_MODE {
@@ -29,6 +33,8 @@ export const LEADERBOARD_API = 'https://api.overlay.market/leaderboard/'
 export const PERMANENT_LEADERBOARD_API = LEADERBOARD_API + 'permanent/'
 
 export const FAUCET_API = 'https://api.overlay.market/faucet/'
+
+export const FUNDED_TRADER_API = 'https://api.overlay.market/funded-traders'
 
 export type AddressMap = { [chainId: number]: Address };
 
@@ -44,6 +50,7 @@ export const REWARDS_API = 'https://api.overlay.market/rewards'
 
 export const SHIVA_ADDRESS: AddressMap = {
   [SUPPORTED_CHAINID.BSC_MAINNET]: "0xeB497c228F130BD91E7F13f81c312243961d894A",
+  [SUPPORTED_CHAINID.BSC_TESTNET]: "0x9fB7D92526Fc13bB3c0603d39E55e5C371c26Ce6",
 };
 
 export const DEFAULT_TOKEN_SYMBOL = "OVL";
@@ -60,3 +67,5 @@ export const DEFAULT_TOKEN = {
 } as TokenAmount;
 
 export const OVL_DECIMALS = 18;
+
+export const GA_TRACKING_ID = "G-LBE2VY2GPX";

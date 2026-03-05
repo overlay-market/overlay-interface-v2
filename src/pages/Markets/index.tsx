@@ -3,12 +3,10 @@ import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
 import MarketsTable from "./MarketsTable";
-import { TransformedMarketData } from "overlay-sdk";
+import { TransformedMarketData, OverlaySDK, getSupplyChange24h, CHAINS } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
-import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
-import { OverlaySDK } from "overlay-sdk";
 
 const Markets: React.FC = () => {
   const [marketsData, setMarketsData] = useState<TransformedMarketData[]>([]);
@@ -16,7 +14,7 @@ const Markets: React.FC = () => {
     TransformedMarketData[]
   >([]); // new state
   const [totalSupplyChange, setTotalSupplyChange] = useState<
-    string | undefined
+    number | undefined
   >();
   const [currentPrice, setCurrentPrice] = useState<number | undefined>();
   const sdk = useSDK();
@@ -28,9 +26,8 @@ const Markets: React.FC = () => {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
           activeMarkets && setMarketsData(activeMarkets);
         });
-        sdk.ovl.totalSupplyDayChange().then((supplyChange) => {
-          supplyChange &&
-            setTotalSupplyChange(formatPriceWithCurrency(supplyChange, "%"));
+        getSupplyChange24h(chainId as CHAINS).then((supplyChange) => {
+          supplyChange !== undefined && setTotalSupplyChange(supplyChange);
         });
         sdk.ovl.price().then((price) => {
           price && setCurrentPrice(price);

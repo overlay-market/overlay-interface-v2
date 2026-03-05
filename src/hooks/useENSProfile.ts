@@ -66,7 +66,7 @@ export const useResolveENSProfilesBatched = (users: ExtendedUserData[] | undefin
           const username = await mainnetClient.getEnsName({
             address: user.walletAddress as Address,
           });
-          let avatar = null;
+          let avatar: string | null = null;
           if (username) {
             avatar = await mainnetClient.getEnsAvatar({ name: normalize(username) });
           }

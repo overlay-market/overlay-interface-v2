@@ -1,11 +1,12 @@
 import { Box, Flex, Skeleton, Text } from "@radix-ui/themes";
 import React, { useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Mousewheel, Navigation, Pagination } from "swiper/modules";
+import { FreeMode, Mousewheel, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/mousewheel";
+import "swiper/css/free-mode";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import TradeMarketCard from "../../../components/MarketCards/TradeMarketCard";
 import {
@@ -164,7 +165,7 @@ const SuggestedCards: React.FC = () => {
             </Text>
             <Box>
               <Swiper
-                modules={[Navigation, Pagination, Mousewheel]}
+                modules={[Navigation, Pagination, Mousewheel, FreeMode]}
                 style={{
                   height: "280px",
                   paddingTop: "4px",
@@ -173,6 +174,7 @@ const SuggestedCards: React.FC = () => {
                 slidesPerView={"auto"}
                 loop={false}
                 centeredSlides={false}
+                freeMode={true}
                 enabled={similarMarkets.length > 0}
                 mousewheel={true}
               >
@@ -203,7 +205,7 @@ const SuggestedCards: React.FC = () => {
             </Text>
             <Box>
               <Swiper
-                modules={[Navigation, Pagination, Mousewheel]}
+                modules={[Navigation, Pagination, Mousewheel, FreeMode]}
                 style={{
                   height: "280px",
                   paddingTop: "4px",
@@ -212,6 +214,7 @@ const SuggestedCards: React.FC = () => {
                 slidesPerView={"auto"}
                 loop={false}
                 centeredSlides={false}
+                freeMode={true}
                 enabled={topMarkets.length > 0}
                 mousewheel={true}
               >

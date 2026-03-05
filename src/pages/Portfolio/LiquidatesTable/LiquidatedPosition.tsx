@@ -15,13 +15,18 @@ const LiquidatedPosition: React.FC<LiquidatedPositionProps> = ({
     : [undefined, undefined];
   const isLong = positionSide === "Long";
 
+  // Format size amount - use stable values if available (for LBSC positions)
+  const collateralAmount = position.stableValues?.size
+    ? `${position.stableValues.size} USDT`
+    : `${position.size} OVL`;
+
   return (
     <StyledRow style={{ fontSize: "12px", cursor: "auto" }}>
       <StyledCell>{position.marketName}</StyledCell>
-      <StyledCell>{position.size} OVL</StyledCell>
+      <StyledCell>{collateralAmount}</StyledCell>
       <StyledCell>
         <Flex gap={"6px"}>
-          {positionLeverage}
+          {positionLeverage && Number(positionLeverage.slice(0, -1))}x
           <Text
             weight={"medium"}
             style={{ color: isLong ? theme.color.green1 : theme.color.red1 }}

@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { AppState } from "../state";
 import { setCurrentMarket } from "./actions";
-import { shallowEqual } from "../../utils/equalityUtils";
 import { MarketDataParsed } from "../../types/marketTypes";
 
 export function useCurrentMarketState(): AppState['currentMarket'] {
@@ -13,7 +12,6 @@ export const useCurrentMarketActionHandlers = (): {
   handleCurrentMarketSet: (currentMarket: MarketDataParsed) => void;
 } => {
   const dispatch = useAppDispatch();
-  const { currentMarket: prevMarket } = useCurrentMarketState();
 
   const handleCurrentMarketSet = useCallback(
     (currentMarket: MarketDataParsed) => { 
@@ -38,8 +36,6 @@ export const useCurrentMarketActionHandlers = (): {
         parsedOiLong: currentMarket.parsedOiLong?.toString(),
         parsedOiShort: currentMarket.parsedOiShort?.toString(),
       }
-
-      if (shallowEqual(prevMarket, currentMarketParsed)) return;
 
       dispatch(setCurrentMarket({ currentMarket: currentMarketParsed }));
     },
