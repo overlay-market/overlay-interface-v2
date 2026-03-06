@@ -273,32 +273,40 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
           )}
         </Flex>
 
+        {!account && (
+          <Text style={{ padding: "20px 8px" }}>Nothing here yet. Connect the wallet.</Text>
+        )}
+
         <Grid columns={{ initial: "1", sm: "2", md: "2", lg: "4" }} gap="4">
           {cardsData.map((card) => (
             <Box key={card.title} p="2">
               <OverviewCard
                 title={card.title}
-                value={card.value || "0"}
-                valueType={card.valueType}
+                value={account ? (card.value || "0") : "—"}
+                valueType={account ? card.valueType : null}
                 valueTypeLink={card.valueTypeLink}
                 infoTooltip={card.infoTooltip}
                 variant="referrals"
-                buttonText={card?.buttonText}
-                button={card?.button}
+                buttonText={account ? card?.buttonText : undefined}
+                button={account ? card?.button : undefined}
                 showModal={setShowConfirmAffiliateModal}
-                buttonTooltip={card.buttonTooltip}
-                hasClaimableReward={card.hasClaimableReward}
+                buttonTooltip={account ? card.buttonTooltip : undefined}
+                hasClaimableReward={account ? card.hasClaimableReward : false}
               />
             </Box>
           ))}
         </Grid>
 
-        <RebatesTable />
+        {account && (
+          <>
+            <RebatesTable />
 
-        <ConfirmAffiliateModal
-          open={showConfirmAffiliateModal}
-          handleDismiss={() => setShowConfirmAffiliateModal(false)}
-        />
+            <ConfirmAffiliateModal
+              open={showConfirmAffiliateModal}
+              handleDismiss={() => setShowConfirmAffiliateModal(false)}
+            />
+          </>
+        )}
       </Flex>
     </Flex>
   );
