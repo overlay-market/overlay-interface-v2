@@ -1,11 +1,11 @@
 import { Box, Flex, Text } from "@radix-ui/themes";
 import React, { useEffect, useMemo, useState } from "react";
 import { InfoCardsGrid, MainCardsGrid } from "./overview-styles";
-import OverviewCard from "./OverviewCard";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import MainOverviewCard from "./MainOverviewCard";
+import OverviewCard from "./OverviewCard";
 import OverviewChart from "./OverviewChart";
 import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
