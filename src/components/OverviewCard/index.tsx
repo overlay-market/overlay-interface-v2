@@ -22,6 +22,7 @@ type OverviewCardProps = {
   buttonTooltip?: string;
   hasClaimableReward?: boolean;
   variant?: "profile" | "referrals";
+  valueTooltip?: string;
 };
 
 const OverviewCard: React.FC<OverviewCardProps> = ({
@@ -39,6 +40,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
   buttonTooltip,
   hasClaimableReward,
   variant,
+  valueTooltip,
 }) => {
   const [toastVisible, setToastVisible] = useState(false);
 
@@ -140,7 +142,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
       )}
 
       {/* Value */}
-      <Box py="12px">
+      <Flex py="12px" align="center" gap="2">
         {value === null || value === undefined ? (
           <Text size="2" style={{ color: theme.color.grey3 }}>
             No data
@@ -150,7 +152,6 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
             size={variant === "referrals" ? "4" : "3"}
             weight={variant === "referrals" ? "medium" : "bold"}
             style={{
-              display: "block",
               maxWidth: "100%",
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -160,7 +161,39 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
             {value}
           </Text>
         )}
-      </Box>
+
+        {valueTooltip && (
+          <Tooltip.Provider delayDuration={200}>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <InfoIcon size={14} />
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  side="top"
+                  sideOffset={6}
+                  style={{
+                    backgroundColor: theme.color.grey9,
+                    border: `1px solid ${theme.color.darkBlue}`,
+                    padding: "6px 10px",
+                    borderRadius: "4px",
+                    fontSize: "12px",
+                    zIndex: 50,
+                  }}
+                >
+                  {valueTooltip}
+                  <Tooltip.Arrow
+                    offset={5}
+                    width={8}
+                    height={4}
+                    style={{ fill: theme.color.grey5 }}
+                  />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        )}
+      </Flex>
 
       {/* Footer row */}
       <Flex align="center">

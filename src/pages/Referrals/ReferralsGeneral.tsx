@@ -41,20 +41,23 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
   const [affiliateLink, setAffiliateLink] = useState("");
 
-  const createCodeValue = useMemo(() => {
-    if (!minTradingVolume || !ovlPrice) {
-      return undefined;
-    }
+  const ovlVolumeLeft = useMemo(() => {
+    if (!minTradingVolume) return undefined;
 
-    const ovlLeft =
+    return Math.max(
+      0,
       minTradingVolume -
-      Number(
-        formatBigNumber(referralAccountData?.account?.ovlVolumeTraded, 18, 0) ??
-          0
-      );
+        Number(
+          formatBigNumber(referralAccountData?.account?.ovlVolumeTraded, 18, 0) ?? 0
+        )
+    );
+  }, [minTradingVolume, referralAccountData]);
 
-    return Math.max(0, Math.round(ovlLeft * ovlPrice));
-  }, [minTradingVolume, referralAccountData, ovlPrice]);
+  const createCodeValue = useMemo(() => {
+    if (ovlVolumeLeft === undefined || !ovlPrice) return undefined;
+
+    return Math.round(ovlVolumeLeft * ovlPrice);
+  }, [ovlVolumeLeft, ovlPrice]);
 
   const referralPositionsChecker =
     (referralAccountData?.account?.referralPositions?.length ?? 0) > 0;
@@ -144,6 +147,10 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             ? `~$${createCodeValue.toLocaleString("en-US")}`
             : "—",
         valueType: "volume left",
+        valueTooltip:
+          ovlVolumeLeft !== undefined
+            ? `${ovlVolumeLeft.toLocaleString("en-US")} OVL`
+            : undefined,
         valueTypeLink: false,
         infoTooltip: {
           title: `Trade ~$${minTradingVolume && ovlPrice ? Math.round(minTradingVolume * ovlPrice).toLocaleString("en-US") : "..."} volume to be able to create a referral link.`,
@@ -207,12 +214,14 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             infoTooltip: undefined,
           };
         }
-        if (createCodeValue && createCodeValue <= 0) {
+        if (createCodeValue !== undefined && createCodeValue <= 0) {
           return {
             ...card,
-            value: `$0 left`,
+            value: "Eligible",
             valueType: "Create code ->",
             valueTypeLink: true,
+            valueTooltip: undefined,
+            infoTooltip: undefined,
           };
         }
       }
@@ -284,6 +293,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
                 title={card.title}
                 value={account ? (card.value || "0") : "—"}
                 valueType={account ? card.valueType : null}
+                valueTooltip={account ? card.valueTooltip : undefined}
                 valueTypeLink={card.valueTypeLink}
                 infoTooltip={card.infoTooltip}
                 variant="referrals"
