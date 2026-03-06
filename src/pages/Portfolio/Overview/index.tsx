@@ -5,6 +5,7 @@ import useSDK from "../../../providers/SDKProvider/useSDK";
 import useAccount from "../../../hooks/useAccount";
 import { useIsNewTxnHash } from "../../../state/trade/hooks";
 import MainOverviewCard from "./MainOverviewCard";
+import OverviewCard from "./OverviewCard";
 import OverviewChart from "./OverviewChart";
 import { IntervalType } from "overlay-sdk";
 import usePrevious from "../../../hooks/usePrevious";
@@ -90,7 +91,6 @@ const Overview: React.FC = () => {
             <OverviewCard
               title="Open Positions"
               value={overviewData?.numberOfOpenPositions}
-              valueType={null}
             />
 
             <OverviewCard

@@ -39,11 +39,11 @@ export const FUNDED_TRADER_API = 'https://api.overlay.market/funded-traders'
 export type AddressMap = { [chainId: number]: Address };
 
 export const REFERRAL_LIST_ADDRESS: AddressMap = {
-  [SUPPORTED_CHAINID.BSC_MAINNET]: '0xa19338c002a065f4dc3ad1949738ccdc4b10061d',
+  [SUPPORTED_CHAINID.BSC_MAINNET]: '0xd36a37a5c116ef661a84bd2314b4ef59e1a0f307',
 }
 
 export const REFERRAL_CLAIM_ADDRESS: AddressMap = {
-  [SUPPORTED_CHAINID.BSC_MAINNET]: '0x8de4a375a373444e6737ef89ff86366e0e22da43',
+  [SUPPORTED_CHAINID.BSC_MAINNET]: '0xb80346e4c7bfa4f44b1ff64f6c962aea055ebcf9',
 }
 
 export const REWARDS_API = 'https://api.overlay.market/rewards'
