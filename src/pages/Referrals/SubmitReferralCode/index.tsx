@@ -1,13 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAccount } from "wagmi";
-// import { useAffiliateAlias } from "../../../hooks/referrals/useAffiliateAlias";
-// import { useTraderStatus } from "../../../hooks/referrals/useTraderStatus";
-// import { useAffiliateAddress } from "../../../hooks/referrals/useAffiliateAddress";
+import { useAffiliateAlias } from "../../../hooks/referrals/useAffiliateAlias";
+import { useAffiliateAddress } from "../../../hooks/referrals/useAffiliateAddress";
 import { isAddress } from "viem";
 import { shortenAddress } from "../../../utils/web3";
-// import AliasSubmit from "./AliasSubmit";
+import AliasSubmit from "./AliasSubmit";
 import { Success } from "./Success";
-// import { SignedUp } from "./SignedUp";
+import { SignedUp } from "./SignedUp";
 import { Form } from "./Form";
 import { Flex, Text } from "@radix-ui/themes";
 import theme from "../../../theme";
@@ -17,6 +16,7 @@ import {
 } from "./submit-referral-code-styles";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { ReferralAddAffiliateOrKOLCallbackState, useReferralAddAffiliateOrKOLCallback } from "../../../hooks/referrals/useReferralAddAffiliateOrKOLCallback";
+import { useReferralAccountData } from "../../../hooks/referrals/useReferralAccountData";
 import { useAddPopup } from "../../../state/application/hooks";
 
 type SubmitReferralCodeProps = {
@@ -36,7 +36,7 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [succeededToSignUp, setSucceededToSignUp] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [storedError, setStoredError] = useState<string | null>(null);
+  const [, setStoredError] = useState<string | null>(null);
 
   useEffect(() => {
     setErrorMessage(null);
@@ -61,43 +61,65 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
     return () => clearTimeout(timeout);
   }, [status, isInitialLoading]);
 
-  // const { data: affiliateAliasData, isLoading: loadingAffiliate } =
-  //   useAffiliateAlias(traderAddress);
+  const { data: affiliateAliasData, isLoading: loadingAffiliate } =
+    useAffiliateAlias(traderAddress);
 
-  // const { data: traderStatusData, isLoading: loadingTrader } = useTraderStatus(
-  //   traderAddress && !affiliateAliasData?.isValid ? traderAddress : undefined
-  // );
+  const { referralAccountData, isLoading: loadingAccountData } =
+    useReferralAccountData(traderAddress);
 
-  // const {
-  //   data: aliasOfSignedUpAffiliate,
-  //   isLoading: loadingAliasOfSignedUpAffiliate,
-  // } = useAffiliateAlias(traderStatusData?.affiliate);
+  const affiliatedToAddress =
+    referralAccountData?.account?.referralPositions?.[0]?.affiliatedTo?.id;
 
-  // const traderSignedUpTo = useMemo(() => {
-  //   const affiliateAddr = traderStatusData?.affiliate;
-  //   if (!affiliateAddr) return "";
-  //   return aliasOfSignedUpAffiliate?.alias ?? shortenAddress(affiliateAddr, 7);
-  // }, [traderStatusData, aliasOfSignedUpAffiliate]);
+  const { data: aliasOfSignedUpAffiliate } =
+    useAffiliateAlias(affiliatedToAddress);
 
+  const traderSignedUpTo = useMemo(() => {
+    if (!affiliatedToAddress) return "";
+    return aliasOfSignedUpAffiliate?.alias?.toUpperCase() ?? shortenAddress(affiliatedToAddress, 7);
+  }, [affiliatedToAddress, aliasOfSignedUpAffiliate]);
+
+  // Resolve alias to address when affiliate is not a valid address
+  const { data: resolvedAffiliateData } = useAffiliateAddress(
+    !isAddress(affiliate) && affiliate ? affiliate : undefined
+  );
+
+  // Look up alias for the affiliate (when entered as address)
+  const { data: affiliateAliasLookup } = useAffiliateAlias(
+    isAddress(affiliate) ? affiliate : undefined
+  );
+
+  const resolvedAffiliate = isAddress(affiliate)
+    ? affiliate
+    : resolvedAffiliateData?.address ?? "";
 
   const {
     callback: referralAddAffiliateOrKOLCallback,
     state,
     error: hookError,
-  } = useReferralAddAffiliateOrKOLCallback(affiliate as `0x${string}`);
+  } = useReferralAddAffiliateOrKOLCallback(resolvedAffiliate as `0x${string}`);
 
   const handleSubmit = useCallback(async () => {
-    if (!referralAddAffiliateOrKOLCallback) {
-      setStoredError(
-        isAddress(affiliate)
-          ? "Not an Address"
-          : "Transaction not ready"
-      );
+    if (!resolvedAffiliate) {
+      setStoredError("Could not resolve alias");
       addPopup({
         txn: {
           hash: Date.now().toString(),
           success: false,
-          message: storedError || "Unknown error",
+          message: "Could not resolve alias",
+          type: "error",
+        },
+      });
+      return;
+    }
+
+    if (!referralAddAffiliateOrKOLCallback) {
+      const message = "Transaction not ready";
+      setStoredError(message);
+      addPopup({
+        txn: {
+          hash: Date.now().toString(),
+          success: false,
+          message,
           type: "error",
         },
       });
@@ -126,23 +148,27 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
       });
     }
   }, [
+    resolvedAffiliate,
     referralAddAffiliateOrKOLCallback,
     addPopup,
     hookError,
-    storedError,
   ]);
 
   const isLoading = state === ReferralAddAffiliateOrKOLCallbackState.LOADING
+    || loadingAffiliate || loadingAccountData;
 
   const renderContent = () => {
-    // if (affiliateAliasData?.isValid)
-    //   return <AliasSubmit alias={affiliateAliasData.alias} />;
+    if (affiliateAliasData?.isValid)
+      return <AliasSubmit alias={affiliateAliasData.alias} />;
 
-    if (succeededToSignUp)
-      return <Success traderSignedUpTo={shortenAddress(affiliate)} />;
+    if (succeededToSignUp) {
+      const displayAffiliate = affiliateAliasLookup?.alias?.toUpperCase()
+        || (!isAddress(affiliate) ? affiliate.toUpperCase() : shortenAddress(affiliate));
+      return <Success traderSignedUpTo={displayAffiliate} />;
+    }
 
-    // if (traderSignedUpTo)
-    //   return <SignedUp traderSignedUpTo={traderSignedUpTo} />;
+    if (traderSignedUpTo)
+      return <SignedUp traderSignedUpTo={traderSignedUpTo} />;
 
     return (
       <Form

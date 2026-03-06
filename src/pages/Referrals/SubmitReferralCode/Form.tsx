@@ -43,7 +43,7 @@ export const Form: React.FC<FormProps> = ({
           value={isAddress(affiliate) ? affiliate : affiliate.toUpperCase()}
           disabled={fetchingSignature || postingSignature}
           onChange={(e) => setAffiliate(e.target.value.trim())}
-          placeholder="Enter Affiliate Address"
+          placeholder="Enter Affiliate Address or Alias"
         />
         {errorMessage && (
           <Text size="1" weight="medium" style={{ color: theme.color.red1 }}>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   GradientLoaderButton,
   GradientSolidButton,
@@ -18,13 +19,21 @@ import { CopyGradientIcon } from "../../../assets/icons/svg-icons";
 import { CopyLink, Toast } from "./alias-submit-styles";
 import { useLocation } from "react-router-dom";
 
+const InlineWrapper = ({ children, ...props }: React.ComponentProps<typeof Flex>) => (
+  <Flex direction="column" gap="20px" width="100%" {...props}>
+    {children}
+  </Flex>
+);
+
 type AliasSubmitProps = {
   alias: string | null;
+  inline?: boolean;
 };
 
-const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
+const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias, inline }) => {
   const { address: affiliateAddress } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
+  const queryClient = useQueryClient();
   const location = useLocation();
 
   const [aliasValue, setAliasValue] = useState("");
@@ -144,6 +153,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
       if (result.alias && result.createdAt) {
         setSucceededToSubmit(true);
         setRegisteredAlias(result.alias);
+        queryClient.invalidateQueries({ queryKey: ["affiliateAlias"] });
       }
     } catch (error) {
       console.error("Error registering alias:", error);
@@ -188,12 +198,14 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
     showToast();
   };
 
+  const Wrapper = inline ? InlineWrapper : ContentContainer;
+
   return (
     <>
       {!succeededToSubmit && (
         <>
           {alias && (
-            <ContentContainer>
+            <Wrapper align={"center"}>
               <Flex direction={"column"} align={"center"} gap="8px">
                 <Text weight={"medium"}>Your affiliate alias is active</Text>
                 <GradientText weight={"medium"} size={"4"}>
@@ -209,74 +221,65 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
                   </Toast>
                 </Flex>
               </Flex>
-            </ContentContainer>
+            </Wrapper>
           )}
           {!alias && (
-            <ContentContainer height={debouncedAliasValue && "276px"}>
+            <Wrapper>
               <Text
-                size={{ initial: "2", sm: "4" }}
-                weight={"bold"}
-                align={"center"}
+                size={"2"}
+                style={{ color: theme.color.grey3 }}
               >
-                Affiliate Alias
+                Choose a unique name to identify your affiliate profile
               </Text>
+              <StyledInput
+                type="text"
+                disabled={fetchingSignature || registeringAlias}
+                value={aliasValue.toUpperCase()}
+                onChange={(e) => setAliasValue(e.target.value.trim())}
+                placeholder="Enter 3-8 alphanumeric chars"
+              />
 
-              <Flex direction={"column"} gap="8px">
+              {errorMessage && (
                 <Text
-                  size={"1"}
-                  style={{ paddingLeft: "16px", color: `${theme.color.grey3}` }}
+                  size="1"
+                  weight={"medium"}
+                  style={{ color: theme.color.red1 }}
                 >
-                  Choose a unique name to identify your affiliate profile
+                  {errorMessage}
                 </Text>
-                <StyledInput
-                  type="text"
-                  disabled={fetchingSignature || registeringAlias}
-                  value={aliasValue.toUpperCase()}
-                  onChange={(e) => setAliasValue(e.target.value.trim())}
-                  placeholder="Enter 3-8 alphanumeric chars"
-                />
-
-                {errorMessage && (
-                  <Text
-                    size="1"
-                    weight={"medium"}
-                    style={{ color: theme.color.red1 }}
-                  >
-                    {errorMessage}
-                  </Text>
-                )}
-                {successMessage && (
-                  <Text
-                    size="1"
-                    weight={"medium"}
-                    style={{ color: theme.color.green1 }}
-                  >
-                    {successMessage}
-                  </Text>
-                )}
-              </Flex>
+              )}
+              {successMessage && (
+                <Text
+                  size="1"
+                  weight={"medium"}
+                  style={{ color: theme.color.green1 }}
+                >
+                  {successMessage}
+                </Text>
+              )}
 
               {successMessage &&
                 (fetchingSignature || registeringAlias ? (
                   <GradientLoaderButton
                     title={"Processing ..."}
-                    height={"49px"}
+                    height={"46px"}
+                    width="100%"
                   />
                 ) : (
                   <GradientSolidButton
-                    title={"Sign and Confirm Alias"}
-                    height={"49px"}
+                    title={"Sign and Confirm"}
+                    height={"46px"}
+                    width="100%"
                     handleClick={handleAliasConfirm}
                   />
                 ))}
-            </ContentContainer>
+            </Wrapper>
           )}
         </>
       )}
 
       {succeededToSubmit && (
-        <ContentContainer align={"center"}>
-          <Text size="7">🎉</Text>
+        <Wrapper align={"center"}>
           <Text size="6" weight={"bold"}>
             Success!
           </Text>
@@ -298,7 +301,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias }) => {
               Link copied to clipboard
             </Toast>
           </Flex>
-        </ContentContainer>
+        </Wrapper>
       )}
     </>
   );
