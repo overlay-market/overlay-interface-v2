@@ -19,6 +19,7 @@ import {
 import { Hex } from "viem";
 import { formatAmount } from "../../utils/formatAmount";
 import { useAlreadyClaimed } from "../../hooks/referrals/useAlreadyClaimed";
+import { useOvlPrice } from "../../hooks/useOvlPrice";
 
 type ReferralsGeneralProps = {
   setShowSubmitReferralCodeForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,6 +31,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   const { address: account, chainId } = useAccount();
 
   const { data: minTradingVolume } = useMinTradingVolume();
+  const { data: ovlPrice } = useOvlPrice();
   const { referralAccountData, isLoading, refetch, isUninitialized } =
     useReferralAccountData(account);
 
@@ -40,18 +42,19 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   const [affiliateLink, setAffiliateLink] = useState("");
 
   const createCodeValue = useMemo(() => {
-    if (!minTradingVolume) {
+    if (!minTradingVolume || !ovlPrice) {
       return undefined;
     }
 
-    return (
+    const ovlLeft =
       minTradingVolume -
       Number(
         formatBigNumber(referralAccountData?.account?.ovlVolumeTraded, 18, 0) ??
           0
-      )
-    );
-  }, [minTradingVolume, referralAccountData]);
+      );
+
+    return Math.max(0, Math.round(ovlLeft * ovlPrice));
+  }, [minTradingVolume, referralAccountData, ovlPrice]);
 
   const referralPositionsChecker =
     (referralAccountData?.account?.referralPositions?.length ?? 0) > 0;
@@ -138,12 +141,12 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
         title: "Create a referral code",
         value:
           createCodeValue !== undefined
-            ? `${createCodeValue.toLocaleString("en-US")} ${UNIT}`
+            ? `~$${createCodeValue.toLocaleString("en-US")}`
             : "—",
         valueType: "volume left",
         valueTypeLink: false,
         infoTooltip: {
-          title: `Trade ${minTradingVolume} ${UNIT} volume to be able to create a referral link.`,
+          title: `Trade ~$${minTradingVolume && ovlPrice ? Math.round(minTradingVolume * ovlPrice).toLocaleString("en-US") : "..."} volume to be able to create a referral link.`,
           description:
             "You will need to sign transaction to become an affiliate.",
         },
@@ -207,7 +210,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
         if (createCodeValue && createCodeValue <= 0) {
           return {
             ...card,
-            value: `0 ${UNIT} left`,
+            value: `$0 left`,
             valueType: "Create code ->",
             valueTypeLink: true,
           };
