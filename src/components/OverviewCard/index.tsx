@@ -23,6 +23,8 @@ type OverviewCardProps = {
   hasClaimableReward?: boolean;
   variant?: "profile" | "referrals";
   valueTooltip?: string;
+  copyValue?: string;
+  secondaryAction?: string;
 };
 
 const OverviewCard: React.FC<OverviewCardProps> = ({
@@ -41,6 +43,8 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
   hasClaimableReward,
   variant,
   valueTooltip,
+  copyValue,
+  secondaryAction,
 }) => {
   const [toastVisible, setToastVisible] = useState(false);
 
@@ -52,8 +56,9 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
   };
 
   const copyText = () => {
-    if (navigator.clipboard && value) {
-      navigator.clipboard.writeText(value.toString()).then(() => {
+    const textToCopy = copyValue || value?.toString();
+    if (navigator.clipboard && textToCopy) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
         showToast();
       });
     }
@@ -201,25 +206,40 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
         {!valueType ? (
           <Box mt="18px" />
         ) : (
-          <Text size="2" style={{ color: theme.color.grey2 }}>
-            {valueTypeLink ? (
-              <a
-                onClick={
-                  valueType === "Copy link ->"
-                    ? () => copyText()
-                    : () => showModal && showModal(true)
-                }
-                style={{
-                  color: theme.color.blue2,
-                  cursor: "pointer",
-                }}
-              >
-                {valueType}
-              </a>
-            ) : (
-              <span>{valueType}</span>
+          <Flex gap="3" align="center">
+            <Text size="2" style={{ color: theme.color.grey2 }}>
+              {valueTypeLink ? (
+                <a
+                  onClick={
+                    valueType === "Copy link ->"
+                      ? () => copyText()
+                      : () => showModal && showModal(true)
+                  }
+                  style={{
+                    color: theme.color.blue2,
+                    cursor: "pointer",
+                  }}
+                >
+                  {valueType}
+                </a>
+              ) : (
+                <span>{valueType}</span>
+              )}
+            </Text>
+            {secondaryAction && (
+              <Text size="2">
+                <a
+                  onClick={() => showModal && showModal(true)}
+                  style={{
+                    color: theme.color.blue2,
+                    cursor: "pointer",
+                  }}
+                >
+                  {secondaryAction}
+                </a>
+              </Text>
             )}
-          </Text>
+          </Flex>
         )}
         <Toast visible={toastVisible.toString()}>
           Link copied to clipboard

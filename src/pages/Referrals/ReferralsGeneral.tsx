@@ -20,6 +20,7 @@ import { Hex } from "viem";
 import { formatAmount } from "../../utils/formatAmount";
 import { useAlreadyClaimed } from "../../hooks/referrals/useAlreadyClaimed";
 import { useOvlPrice } from "../../hooks/useOvlPrice";
+import { useAffiliateAlias } from "../../hooks/referrals/useAffiliateAlias";
 
 type ReferralsGeneralProps = {
   setShowSubmitReferralCodeForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,6 +35,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   const { data: ovlPrice } = useOvlPrice();
   const { referralAccountData, isLoading, refetch, isUninitialized } =
     useReferralAccountData(account);
+  const { data: affiliateAliasData } = useAffiliateAlias(account);
 
   const affiliatedTo =
     referralAccountData?.account?.referralPositions[0]?.affiliatedTo?.id;
@@ -93,11 +95,12 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
   useEffect(() => {
     if (account) {
+      const referrerParam = affiliateAliasData?.alias ?? account;
       setAffiliateLink(
-        `${window.location.origin}${location.pathname}?referrer=${account}`
+        `${window.location.origin}${location.pathname}?referrer=${referrerParam}`
       );
     }
-  }, [account]);
+  }, [account, affiliateAliasData]);
 
   const handleClaim = async () => {
     if (state !== ReferralClaimCallbackState.VALID || !account || !claim)
@@ -157,6 +160,8 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
           description:
             "You will need to sign transaction to become an affiliate.",
         },
+        copyValue: undefined as string | undefined,
+        secondaryAction: undefined as string | undefined,
       },
       {
         title: "Rewards pending",
@@ -205,12 +210,17 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
     return baseCards.map((card) => {
       if (card.title === "Create a referral code") {
         if (tier && tier > 0) {
+          const alias = affiliateAliasData?.alias;
+          const displayValue = alias?.toUpperCase() || account;
           return {
             ...card,
             title: "Referral code",
-            value: affiliateLink,
+            value: displayValue,
+            copyValue: affiliateLink,
             valueType: "Copy link ->",
             valueTypeLink: true,
+            secondaryAction: !alias ? "Set alias ->" : undefined,
+            valueTooltip: undefined,
             infoTooltip: undefined,
           };
         }
@@ -236,6 +246,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
     state,
     tier,
     affiliateLink,
+    affiliateAliasData,
     handleClaim,
   ]);
 
@@ -302,6 +313,8 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
                 showModal={setShowConfirmAffiliateModal}
                 buttonTooltip={account ? card.buttonTooltip : undefined}
                 hasClaimableReward={account ? card.hasClaimableReward : false}
+                copyValue={card.copyValue}
+                secondaryAction={account ? card.secondaryAction : undefined}
               />
             </Box>
           ))}
@@ -314,6 +327,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
             <ConfirmAffiliateModal
               open={showConfirmAffiliateModal}
               handleDismiss={() => setShowConfirmAffiliateModal(false)}
+              isAlreadyAffiliate={!!tier && tier > 0}
             />
           </>
         )}
