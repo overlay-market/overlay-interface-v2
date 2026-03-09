@@ -24,7 +24,7 @@ import { formatAmount } from "../../utils/formatAmount";
 const referralColumns = ["Date", "Amount", "Bscscan"];
 
 export const RebatesTable = () => {
-  const { address: account, chainId } = useAccount();
+  const { signerAddress: account, chainId } = useAccount();
   const [open, setOpen] = useState(true);
   const isMobile = useMediaQuery("(max-width: 767px)");
 

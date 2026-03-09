@@ -28,7 +28,7 @@ const ConfirmAffiliateModal = ({
   handleDismiss,
   isAlreadyAffiliate,
 }: ConfirmAffiliateModalProps) => {
-  const { address: account } = useAccount();
+  const { signerAddress: account } = useAccount();
   const { data: tierRates } = useReferralTierRates(1); // AFFILIATE tier
   const addPopup = useAddPopup();
 

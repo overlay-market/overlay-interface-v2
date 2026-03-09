@@ -2,11 +2,8 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ReferralsGeneral } from "./ReferralsGeneral";
 import SubmitReferralCode from "./SubmitReferralCode";
-import useAccount from "../../hooks/useAccount";
-
 const Referrals: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { isAvatarTradingActive } = useAccount();
   const referrer = searchParams.get("referrer");
 
   const [showSubmitReferralCodeForm, setShowSubmitReferralCodeForm] =
@@ -14,10 +11,10 @@ const Referrals: React.FC = () => {
   const [affiliate, setAffiliate] = useState(referrer || "");
 
   useEffect(() => {
-    if (referrer && !isAvatarTradingActive) {
+    if (referrer) {
       setShowSubmitReferralCodeForm(true);
     }
-  }, [referrer, isAvatarTradingActive]);
+  }, [referrer]);
 
   const handleBack = () => {
     setAffiliate("");
