@@ -28,9 +28,10 @@ const InlineWrapper = ({ children, ...props }: React.ComponentProps<typeof Flex>
 type AliasSubmitProps = {
   alias: string | null;
   inline?: boolean;
+  onSuccess?: () => void;
 };
 
-const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias, inline }) => {
+const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias, inline, onSuccess }) => {
   const { address: affiliateAddress } = useAccount();
   const { signTypedDataAsync } = useSignTypedData();
   const queryClient = useQueryClient();
@@ -154,6 +155,7 @@ const AliasSubmit: React.FC<AliasSubmitProps> = ({ alias, inline }) => {
         setSucceededToSubmit(true);
         setRegisteredAlias(result.alias);
         queryClient.invalidateQueries({ queryKey: ["affiliateAlias"] });
+        onSuccess?.();
       }
     } catch (error) {
       console.error("Error registering alias:", error);

@@ -37,6 +37,7 @@ const ConfirmAffiliateModal = ({
   const [submitting, setSubmitting] = useState(false);
   const [, setStoredError] = useState<string | null>(null);
   const [showAliasRegistration, setShowAliasRegistration] = useState(false);
+  const [aliasRegistered, setAliasRegistered] = useState(false);
 
   const showAlias = showAliasRegistration || isAlreadyAffiliate;
 
@@ -118,6 +119,7 @@ const ConfirmAffiliateModal = ({
 
   const handleClose = () => {
     setShowAliasRegistration(false);
+    setAliasRegistered(false);
     handleDismiss?.();
   };
 
@@ -136,18 +138,20 @@ const ConfirmAffiliateModal = ({
     >
       {showAlias ? (
         <Flex direction="column" width="100%" gap="16px" mt="12px">
-          <AliasSubmit alias={null} inline />
-          <Text
-            onClick={handleClose}
-            style={{
-              color: theme.color.grey3,
-              fontSize: "13px",
-              cursor: "pointer",
-              textAlign: "center",
-            }}
-          >
-            Skip for now
-          </Text>
+          <AliasSubmit alias={null} inline onSuccess={() => setAliasRegistered(true)} />
+          {!aliasRegistered && (
+            <Text
+              onClick={handleClose}
+              style={{
+                color: theme.color.grey3,
+                fontSize: "13px",
+                cursor: "pointer",
+                textAlign: "center",
+              }}
+            >
+              Skip for now
+            </Text>
+          )}
         </Flex>
       ) : (
         <Flex direction="column" width="100%">
