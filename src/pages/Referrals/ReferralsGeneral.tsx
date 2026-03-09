@@ -29,7 +29,8 @@ type ReferralsGeneralProps = {
 export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
   setShowSubmitReferralCodeForm,
 }) => {
-  const { address: account, chainId } = useAccount();
+  const { address: account, chainId, isAvatarTradingActive } = useAccount();
+  const isEligible = !!account && !isAvatarTradingActive;
 
   const { data: minTradingVolume } = useMinTradingVolume();
   const { data: ovlPrice } = useOvlPrice();
@@ -266,7 +267,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
           Referrals
         </Text>
 
-        {!affiliatedTo && (!tier || tier === 0) && (
+        {isEligible && !affiliatedTo && (!tier || tier === 0) && (
           <Flex display={{ initial: "flex", sm: "none" }}>
             <EnterReferralCodeLink
               onClick={() => setShowSubmitReferralCodeForm(true)}
@@ -284,7 +285,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
         <Flex pt={"36px"} px={"8px"} justify={"between"}>
           <ReferralModal tier="ambassador" />
 
-          {!affiliatedTo && (!tier || tier === 0) && (
+          {isEligible && !affiliatedTo && (!tier || tier === 0) && (
             <Flex display={{ initial: "none", sm: "flex" }}>
               <EnterReferralCodeLink
                 onClick={() => setShowSubmitReferralCodeForm(true)}
@@ -297,30 +298,36 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
           <Text style={{ padding: "20px 8px" }}>Nothing here yet. Connect the wallet.</Text>
         )}
 
+        {account && isAvatarTradingActive && (
+          <Text style={{ padding: "20px 8px", color: theme.color.grey3 }}>
+            Funded accounts are not eligible for the referral program. Please switch to your personal wallet.
+          </Text>
+        )}
+
         <Grid columns={{ initial: "1", sm: "2", md: "2", lg: "4" }} gap="4">
           {cardsData.map((card) => (
             <Box key={card.title} p="2">
               <OverviewCard
                 title={card.title}
-                value={account ? (card.value || "0") : "—"}
-                valueType={account ? card.valueType : null}
-                valueTooltip={account ? card.valueTooltip : undefined}
+                value={isEligible ? (card.value || "0") : "—"}
+                valueType={isEligible ? card.valueType : null}
+                valueTooltip={isEligible ? card.valueTooltip : undefined}
                 valueTypeLink={card.valueTypeLink}
-                infoTooltip={card.infoTooltip}
+                infoTooltip={isEligible ? card.infoTooltip : undefined}
                 variant="referrals"
-                buttonText={account ? card?.buttonText : undefined}
-                button={account ? card?.button : undefined}
+                buttonText={isEligible ? card?.buttonText : undefined}
+                button={isEligible ? card?.button : undefined}
                 showModal={setShowConfirmAffiliateModal}
-                buttonTooltip={account ? card.buttonTooltip : undefined}
-                hasClaimableReward={account ? card.hasClaimableReward : false}
-                copyValue={card.copyValue}
-                secondaryAction={account ? card.secondaryAction : undefined}
+                buttonTooltip={isEligible ? card.buttonTooltip : undefined}
+                hasClaimableReward={isEligible ? card.hasClaimableReward : false}
+                copyValue={isEligible ? card.copyValue : undefined}
+                secondaryAction={isEligible ? card.secondaryAction : undefined}
               />
             </Box>
           ))}
         </Grid>
 
-        {account && (
+        {isEligible && (
           <>
             <RebatesTable />
 
