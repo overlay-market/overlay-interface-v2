@@ -68,6 +68,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
     useState(false);
   const [reward, setReward] = useState("");
   const [proof, setProof] = useState<Hex[]>([]);
+  const [claimCounter, setClaimCounter] = useState(0);
 
   const rewardsUrl = `${REWARDS_API}/rewards/${account?.toLowerCase()}?campaign=referral`;
 
@@ -136,6 +137,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
       }
 
       await fetchRewards();
+      setClaimCounter((c) => c + 1);
     } catch (err) {
       console.error("Claim failed", err);
     }
@@ -322,7 +324,7 @@ export const ReferralsGeneral: React.FC<ReferralsGeneralProps> = ({
 
         {account && (
           <>
-            <RebatesTable />
+            <RebatesTable claimCounter={claimCounter} />
 
             <ConfirmAffiliateModal
               open={showConfirmAffiliateModal}

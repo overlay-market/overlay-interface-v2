@@ -23,7 +23,11 @@ import { formatAmount } from "../../utils/formatAmount";
 
 const referralColumns = ["Date", "Amount", "Bscscan"];
 
-export const RebatesTable = () => {
+type RebatesTableProps = {
+  claimCounter?: number;
+};
+
+export const RebatesTable = ({ claimCounter }: RebatesTableProps) => {
   const { signerAddress: account, chainId } = useAccount();
   const [open, setOpen] = useState(true);
   const isMobile = useMediaQuery("(max-width: 767px)");
@@ -41,7 +45,7 @@ export const RebatesTable = () => {
 
   useEffect(() => {
     if (!isUninitialized) refetch();
-  }, [chainId, account, isLoading, isUninitialized, refetch]);
+  }, [chainId, account, isLoading, isUninitialized, refetch, claimCounter]);
 
   const sortedValues = useMemo(() => {
     return tokenTransfersData?.tokenTransfers?.map((transfer) =>
