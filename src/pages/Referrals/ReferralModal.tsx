@@ -61,12 +61,12 @@ const ReferralModal = ({ tier }: ReferralModalProps) => {
           style={{ color: theme.color.grey2 }}
         >
           <Text size="3" mt="16px">
-            Referrers earn 10% of referred users’ fees, and referred users
-            receive a x% discount of fees. Referral earnings will have a cap per
+            Referrers earn up to 30% of referred users’ fees, and referred users
+            receive a 10% discount of fees. Referral earnings will have a cap per
             referred user.
           </Text>
           <Text size="3" mt="12px">
-            If you have over $xM volume on Overlay in 30d or have 5000+ social
+            If you have over $100k volume on Overlay in 30d or have 5000+ social
             media followers, you can apply for the Ambassador Program.
           </Text>
 
