@@ -12,6 +12,7 @@ import Portfolio from "./pages/Portfolio";
 import { AppContainer } from "./app-styles";
 import SDKProvider from "./providers/SDKProvider";
 import ScrollToTop from "./utils/scrollToTop";
+import Referrals from "./pages/Referrals";
 import Leaderboard from "./pages/Leaderboard";
 import { LiFiProvider } from "./providers/LiFiProvider";
 import Airdrops from "./pages/Airdrops";
@@ -56,6 +57,7 @@ const AppContent = () => {
             <Route path="/markets" element={<Markets />} />
             <Route path="/trade/*" element={<Trade />} />
             <Route path="/portfolio" element={<Portfolio />} />
+            <Route path="/referrals" element={<Referrals />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route
               path="/leaderboard/:seasonId"

@@ -10,6 +10,9 @@ export enum MARKET_CHART_URL {
   DEFAULT = "https://api.overlay.market/charts/v1/charts",
 }
 
+export const REFERRAL_API_BASE_URL = "https://api.overlay.market/referral";
+
+export const DEFAULT_MARKET_ID = encodeURIComponent("BTC Dominance");
 export const DEFAULT_MARKET = "BTC Dominance";
 
 export const TRADE_POLLING_INTERVAL = 30000;
@@ -34,6 +37,16 @@ export const FAUCET_API = 'https://api.overlay.market/faucet/'
 export const FUNDED_TRADER_API = 'https://api.overlay.market/funded-traders'
 
 export type AddressMap = { [chainId: number]: Address };
+
+export const REFERRAL_LIST_ADDRESS: AddressMap = {
+  [SUPPORTED_CHAINID.BSC_MAINNET]: '0xd36a37a5c116ef661a84bd2314b4ef59e1a0f307',
+}
+
+export const REFERRAL_CLAIM_ADDRESS: AddressMap = {
+  [SUPPORTED_CHAINID.BSC_MAINNET]: '0xb80346e4c7bfa4f44b1ff64f6c962aea055ebcf9',
+}
+
+export const REWARDS_API = 'https://api.overlay.market/rewards'
 
 export const SHIVA_ADDRESS: AddressMap = {
   [SUPPORTED_CHAINID.BSC_MAINNET]: "0xeB497c228F130BD91E7F13f81c312243961d894A",

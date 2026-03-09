@@ -3,9 +3,10 @@ import LogoImg from "../../assets/images/overlay-logo-only-no-background.webp";
 import theme from "../../theme";
 import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
-import { LinksWrapper, MobileNavBar } from "./navbar-styles";
+import { LinksWrapper } from "./navbar-styles";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useNavigate } from "react-router-dom";
+import { MobileNavBar } from "./MobileNavBar";
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
@@ -57,9 +58,7 @@ const NavBar: React.FC = () => {
         </Flex>
       </Box>
 
-      <MobileNavBar>
-        <NavLinksSection />
-      </MobileNavBar>
+      <MobileNavBar />
     </>
   );
 };
