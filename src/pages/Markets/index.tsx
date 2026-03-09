@@ -3,7 +3,7 @@ import MarketsHeader from "./MarketsHeader";
 import { FirstSection } from "./MarketsFirstSection";
 import Carousel from "./MarketsCarousel";
 import MarketsTable from "./MarketsTable";
-import { TransformedMarketData, OverlaySDK, getSupplyChange24h, CHAINS } from "overlay-sdk";
+import { TransformedMarketData, OverlaySDK } from "overlay-sdk";
 import { useEffect, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
@@ -13,9 +13,6 @@ const Markets: React.FC = () => {
   const [otherChainMarketsData, setOtherChainMarketsData] = useState<
     TransformedMarketData[]
   >([]); // new state
-  const [totalSupplyChange, setTotalSupplyChange] = useState<
-    number | undefined
-  >();
   const [currentPrice, setCurrentPrice] = useState<number | undefined>();
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
@@ -25,9 +22,6 @@ const Markets: React.FC = () => {
       try {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
           activeMarkets && setMarketsData(activeMarkets);
-        });
-        getSupplyChange24h(chainId as CHAINS).then((supplyChange) => {
-          supplyChange !== undefined && setTotalSupplyChange(supplyChange);
         });
         sdk.ovl.price().then((price) => {
           price && setCurrentPrice(price);
@@ -56,10 +50,7 @@ const Markets: React.FC = () => {
 
   return (
     <Flex direction="column" width={"100%"} overflowX={"hidden"}>
-      <MarketsHeader
-        ovlSupplyChange={totalSupplyChange}
-        ovlCurrentPrice={currentPrice}
-      />
+      <MarketsHeader ovlCurrentPrice={currentPrice} />
       <FirstSection marketsData={marketsData} />
       <Carousel
         marketsData={marketsData}
