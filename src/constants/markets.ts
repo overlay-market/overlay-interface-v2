@@ -326,3 +326,12 @@ export const NEW_CATEGORIES = [
   CategoryName.Altcoins,
   CategoryName.Prediction,
 ];
+
+export const MARKETS_PAGE_CATEGORY_ORDER: CategoryName[] = [
+  CategoryName.Altcoins,
+  CategoryName.Twitter,
+  CategoryName.Prediction,
+  CategoryName.Gambling,
+  CategoryName.Majors,
+  CategoryName.Indices,
+];
