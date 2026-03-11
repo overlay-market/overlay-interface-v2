@@ -24,6 +24,7 @@ import { isGamblingMarket } from "../../../utils/marketGuards";
 import {
   CategoryName,
   MARKET_CATEGORIES,
+  MARKETS_PAGE_CATEGORY_ORDER,
   NEW_CATEGORIES,
 } from "../../../constants/markets";
 
@@ -74,16 +75,20 @@ export default function MarketsTable({
     if (isLoadingMarkets) return [];
 
     const allMarketsId = new Set(marketsData.map((m) => m.marketId));
+    const orderedCategories = [
+      ...MARKETS_PAGE_CATEGORY_ORDER,
+      ...(Object.keys(MARKET_CATEGORIES) as CategoryName[]).filter(
+        (category) => !MARKETS_PAGE_CATEGORY_ORDER.includes(category)
+      ),
+    ];
 
-    const liveCategories = (Object.keys(MARKET_CATEGORIES) as CategoryName[]).filter(
-      (category) => {
-        if (category === CategoryName.Other) {
-          return marketsData.some((m) => !categorizedIds.has(m.marketId));
-        }
-        const idsInCategory = MARKET_CATEGORIES[category];
-        return idsInCategory.some((id) => allMarketsId.has(id));
+    const liveCategories = orderedCategories.filter((category) => {
+      if (category === CategoryName.Other) {
+        return marketsData.some((m) => !categorizedIds.has(m.marketId));
       }
-    );
+      const idsInCategory = MARKET_CATEGORIES[category];
+      return idsInCategory.some((id) => allMarketsId.has(id));
+    });
 
     return ["All", ...liveCategories];
   }, [isLoadingMarkets, marketsData, categorizedIds]);
