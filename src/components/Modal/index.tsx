@@ -17,6 +17,7 @@ type ModalProps = {
   title?: string;
   children?: React.ReactNode;
   open?: boolean;
+  hideCloseButton?: boolean;
 };
 
 const Modal: React.FC<ModalProps> = ({
@@ -33,6 +34,7 @@ const Modal: React.FC<ModalProps> = ({
   title,
   children,
   open,
+  hideCloseButton,
 }) => {
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -65,17 +67,19 @@ const Modal: React.FC<ModalProps> = ({
 
           {children}
 
-          <StyledClose
-            asChild
-            style={{
-              position: "absolute",
-              top: "24px",
-              right: "24px",
-              cursor: "pointer",
-            }}
-          >
-            <X size={24} />
-          </StyledClose>
+          {!hideCloseButton && (
+            <StyledClose
+              asChild
+              style={{
+                position: "absolute",
+                top: "24px",
+                right: "24px",
+                cursor: "pointer",
+              }}
+            >
+              <X size={24} />
+            </StyledClose>
+          )}
         </StyledContent>
       </Dialog.Portal>
     </Dialog.Root>
