@@ -63,6 +63,7 @@ import GoogleAiLogo from '../assets/images/markets-full-logos/googleai.jpg';
 import OpenAiLogo from '../assets/images/markets-full-logos/openailogo.jpg';
 import AnthropicAiLogo from '../assets/images/markets-full-logos/anthropicai.jpg';
 import UsIranLogo from '../assets/images/markets-full-logos/us-iran-logo.jpg';
+import DashLogo from '../assets/images/markets-full-logos/dash-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -130,6 +131,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March": OpenAiLogo,
   "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March": AnthropicAiLogo,
   "US%20x%20Iran%20ceasefire%20by%20May%2031": UsIranLogo,
+  "DASH%20%2F%20USD": DashLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -147,6 +149,7 @@ export const MARKETSORDER = [
   "GOLD%20%2F%20SILVER",
   "Bad%20Bunny",
   "Amouranth%20vs%20peachJars",
+  "DASH%20%2F%20USD",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
@@ -221,6 +224,7 @@ export enum CategoryName {
   Indices = "Indices",
   Majors = "Majors",
   Prediction = "Prediction Markets",
+  Altcoins = "Altcoins",
 }
 
 export type MarketCategoryMap = {
@@ -312,11 +316,13 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
     "US%20x%20Iran%20ceasefire%20by%20May%2031",
   ],
+  [CategoryName.Altcoins]: [
+    "DASH%20%2F%20USD",
+  ],
   [CategoryName.Other]: [],
 };
 
 export const NEW_CATEGORIES = [
-  CategoryName.YouTube,
-  CategoryName.Twitter,
+  CategoryName.Altcoins,
   CategoryName.Prediction,
 ];
