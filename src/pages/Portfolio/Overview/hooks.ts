@@ -1,8 +1,7 @@
 import { IntervalType, OpenPositionData, OverlaySDK, OverviewData } from "overlay-sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
-import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
-import { Address } from "viem";
+import { Address, formatUnits } from "viem";
 import useAccount from "../../../hooks/useAccount";
 import { isShutdownOpenPosition } from "../../../utils/positionGuards";
 
@@ -11,14 +10,16 @@ const RETRY_DELAY = 2000;
 const POLLING_INTERVAL = 5000;
 const MAX_POLLING_TIME = 60000;
 
-const WAD = 1e18;
-
 const calculateOverviewTotals = (
   positions: OpenPositionData[],
   oraclePrice?: bigint
 ) => {
   let totalValueLocked = 0;
   let unrealizedPnL = 0;
+
+  const oraclePriceFloat = oraclePrice
+    ? parseFloat(formatUnits(oraclePrice, 18))
+    : 0;
 
   positions.forEach((position) => {
     if (isShutdownOpenPosition(position)) {
@@ -35,7 +36,7 @@ const calculateOverviewTotals = (
       return;
     }
 
-    if (!oraclePrice) {
+    if (!oraclePriceFloat) {
       return;
     }
 
@@ -46,8 +47,8 @@ const calculateOverviewTotals = (
       ? parseFloat(String(position.unrealizedPnL))
       : 0;
 
-    totalValueLocked += (initialCollateralOvl * Number(oraclePrice)) / WAD;
-    unrealizedPnL += (pnlOvl * Number(oraclePrice)) / WAD;
+    totalValueLocked += initialCollateralOvl * oraclePriceFloat;
+    unrealizedPnL += pnlOvl * oraclePriceFloat;
   });
 
   return {
@@ -71,7 +72,7 @@ export function useOverviewDataRefresh(
   const startTimeRef = useRef<number | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const isNewUnwindTxn = useIsNewUnwindTxn();
-  const previousOverviewData = usePrevious(overviewData);
+  const previousOverviewDataRef = useRef<OverviewData | undefined>(undefined);
 
   const sdkRef = useRef(sdk);
   const fetchVersionRef = useRef(0);
@@ -141,8 +142,9 @@ export function useOverviewDataRefresh(
         }
 
         const hasNewData =
-          !areOverviewDataEqual(nextOverviewData, previousOverviewData) &&
+          !areOverviewDataEqual(nextOverviewData, previousOverviewDataRef.current) &&
           Boolean(nextOverviewData);
+        previousOverviewDataRef.current = nextOverviewData;
         setOverviewData(nextOverviewData);
         return hasNewData;
       } catch (error) {
