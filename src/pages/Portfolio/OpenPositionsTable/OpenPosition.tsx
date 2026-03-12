@@ -7,6 +7,7 @@ import { OpenPositionData } from "overlay-sdk";
 import { formatUnits } from "viem";
 import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 import { isGamblingMarket } from "../../../utils/marketGuards";
+import { isShutdownOpenPosition } from "../../../utils/positionGuards";
 import type { PositionPnLEntry, MarketPrices } from "../../../hooks/useMultiMarketPositionsPnL";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 
@@ -108,9 +109,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     () => isGamblingMarket(position.marketName),
     [position.marketName]
   );
+  const isShutdownPosition = isShutdownOpenPosition(position);
+  const displayedSize = isShutdownPosition ? "-" : currentSize;
 
   const handleItemClick = (event: React.MouseEvent) => {
-    if (position.size === "0") return;
+    if (position.size === "0" && !isShutdownPosition) return;
 
     if ((event.target as HTMLElement).tagName !== "INPUT") {
       setSelectedPosition(position);
@@ -138,6 +141,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
           >
             <Checkbox
               checked={isChecked}
+              disabled={isShutdownPosition}
               onCheckedChange={handleCheckboxChange}
               size="3"
               onClick={(e) => e.stopPropagation()}
@@ -159,7 +163,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             )}
           </Flex>
         </StyledCell>
-        <StyledCell>{currentSize}</StyledCell>
+        <StyledCell>{displayedSize}</StyledCell>
         <StyledCell>
           <Flex gap={"6px"}>
             {positionLeverage && Number(positionLeverage.slice(0, -1))}x

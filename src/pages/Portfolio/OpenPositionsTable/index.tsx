@@ -17,6 +17,7 @@ import {
 } from "../../../state/portfolio/hooks";
 import useMultiMarketPositionsPnL from "../../../hooks/useMultiMarketPositionsPnL";
 import { triggerLoader } from "../UnwindsTable";
+import { isShutdownOpenPosition } from "../../../utils/positionGuards";
 
 import styled, { keyframes } from "styled-components";
 
@@ -79,11 +80,20 @@ const OpenPositionsTable: React.FC = () => {
   const { pnlData, marketPrices } = useMultiMarketPositionsPnL(positions, {
     isRefreshing: loading,
   });
+  const selectedCloseablePositions =
+    positions?.filter(
+      (pos) =>
+        selectedPositions.has(getPositionKey(pos)) && !isShutdownOpenPosition(pos)
+    ) || [];
 
   const handleSelectAll = (selectAll: boolean) => {
     if (selectAll) {
       setSelectedPositions(
-        new Set(positions?.map((p) => getPositionKey(p)) || [])
+        new Set(
+          positions
+            ?.filter((position) => !isShutdownOpenPosition(position))
+            .map((position) => getPositionKey(position)) || []
+        )
       );
     } else {
       setSelectedPositions(new Set());
@@ -148,9 +158,9 @@ const OpenPositionsTable: React.FC = () => {
               <ColorButton
                 onClick={() => setShowCloseModal(true)}
                 width="180px"
-                disabled={selectedPositions.size === 0}
+                disabled={selectedCloseablePositions.length === 0}
               >
-                Close Selected ({selectedPositions.size})
+                Close Selected ({selectedCloseablePositions.length})
               </ColorButton>
             </>
           ) : (
@@ -234,12 +244,8 @@ const OpenPositionsTable: React.FC = () => {
       <ClosePositionsModal
         open={showCloseModal}
         handleDismiss={() => setShowCloseModal(false)}
-        selectedCount={selectedPositions.size}
-        selectedPositions={
-          positions?.filter((pos) =>
-            selectedPositions.has(getPositionKey(pos))
-          ) || []
-        }
+        selectedCount={selectedCloseablePositions.length}
+        selectedPositions={selectedCloseablePositions}
         onConfirm={handleClosePositions}
       />
     </Flex>

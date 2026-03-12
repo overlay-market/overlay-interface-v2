@@ -3,15 +3,17 @@ import theme from "../../theme";
 import { UNIT } from "../../constants/applications";
 import { OpenPositionData, UnwindStateError } from "overlay-sdk";
 import { GradientLoaderButton, GradientOutlineButton } from "../Button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
 import { currentTimeParsed } from "../../utils/currentTime";
 import { useTradeActionHandlers } from "../../state/trade/hooks";
-import { Address } from "viem";
+import { Address, formatUnits, parseUnits } from "viem";
 import useAccount from "../../hooks/useAccount";
 import { trackEvent } from "../../analytics/trackEvent";
+import { useStableTokenInfo } from "../../hooks/useStableTokenInfo";
+import { formatNumberWithCommas } from "../../utils/formatPriceWithCurrency";
 
 type WithdrawOVLProps = {
   position: OpenPositionData;
@@ -29,12 +31,53 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
   const addPopup = useAddPopup();
   const currentTimeForId = currentTimeParsed();
   const { handleTxnHashUpdate } = useTradeActionHandlers();
+  const { data: stableTokenInfo } = useStableTokenInfo();
 
   const [attemptingWithdraw, setAttemptingWithdraw] = useState(false);
+  const isStableCollateralPosition = !!position.loan;
 
   const cost = unwindState.cost
     ? Number(unwindState.cost).toString()
     : undefined;
+  const stableCollateral = useMemo(() => {
+    if (
+      !isStableCollateralPosition ||
+      !cost ||
+      !position.initialCollateral ||
+      !position.loan?.stableAmount ||
+      !position.loan?.ovlAmount ||
+      stableTokenInfo?.decimals === undefined
+    ) {
+      return undefined;
+    }
+
+    const borrowedOvlWei = BigInt(position.loan.ovlAmount);
+    if (borrowedOvlWei === 0n) {
+      return undefined;
+    }
+
+    const withdrawnOvlWei = parseUnits(cost, 18);
+
+    const initialStableCollateralWei = BigInt(position.loan.stableAmount);
+    const withdrawnStableCollateralWei =
+      (initialStableCollateralWei * withdrawnOvlWei) / borrowedOvlWei;
+
+    return formatNumberWithCommas(
+      formatUnits(withdrawnStableCollateralWei, stableTokenInfo.decimals)
+    );
+  }, [
+    cost,
+    isStableCollateralPosition,
+    position.initialCollateral,
+    position.loan?.ovlAmount,
+    position.loan?.stableAmount,
+    stableTokenInfo?.decimals,
+  ]);
+  const withdrawAmount = isStableCollateralPosition ? stableCollateral : cost;
+  const withdrawUnit = isStableCollateralPosition ? "USDT" : UNIT;
+  const withdrawCopy = isStableCollateralPosition
+    ? "This market has been shut down.\nYou may only withdraw your previously deposited USDT collateral."
+    : "This market has been shut down.\nYou may only withdraw any previously deposited OVL.";
 
   const handleWithdraw = async () => {
     if (position) {
@@ -127,21 +170,20 @@ const WithdrawOVL: React.FC<WithdrawOVLProps> = ({
             fontSize: "20px",
           }}
         >
-          Withdraw: {cost ?? "-"} {UNIT}
+          Withdraw: {withdrawAmount ?? "-"} {withdrawUnit}
         </Text>
         <Text
           style={{
             textAlign: "center",
+            whiteSpace: "pre-line",
           }}
         >
-          This market has been shut down.
-          <br />
-          You may only withdraw any previously deposited OVL.
+          {withdrawCopy}
         </Text>
 
         {!attemptingWithdraw && (
           <GradientOutlineButton
-            title={`Withdraw ${UNIT}`}
+            title={`Withdraw ${withdrawUnit}`}
             width={"100%"}
             height={"46px"}
             handleClick={handleWithdraw}
