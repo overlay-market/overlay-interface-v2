@@ -1,14 +1,62 @@
-import { IntervalType, OverlaySDK, OverviewData } from "overlay-sdk";
+import { IntervalType, OpenPositionData, OverlaySDK, OverviewData } from "overlay-sdk";
 import { useCallback, useEffect, useRef, useState } from "react";
-import usePrevious from "../../../hooks/usePrevious";
 import { useIsNewUnwindTxn } from "../../../state/portfolio/hooks";
-import { Address } from "viem";
+import { Address, formatUnits } from "viem";
 import useAccount from "../../../hooks/useAccount";
+import { isShutdownOpenPosition } from "../../../utils/positionGuards";
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const POLLING_INTERVAL = 5000;
 const MAX_POLLING_TIME = 60000;
+
+const calculateOverviewTotals = (
+  positions: OpenPositionData[],
+  oraclePrice?: bigint
+) => {
+  let totalValueLocked = 0;
+  let unrealizedPnL = 0;
+
+  const oraclePriceFloat = oraclePrice
+    ? parseFloat(formatUnits(oraclePrice, 18))
+    : 0;
+
+  positions.forEach((position) => {
+    if (isShutdownOpenPosition(position)) {
+      return;
+    }
+
+    if (position.stableValues) {
+      totalValueLocked += position.stableValues.initialCollateral
+        ? parseFloat(position.stableValues.initialCollateral)
+        : 0;
+      unrealizedPnL += position.stableValues.unrealizedPnL
+        ? parseFloat(position.stableValues.unrealizedPnL)
+        : 0;
+      return;
+    }
+
+    if (!oraclePriceFloat) {
+      return;
+    }
+
+    const initialCollateralOvl = position.initialCollateral
+      ? parseFloat(String(position.initialCollateral))
+      : 0;
+    const pnlOvl = position.unrealizedPnL
+      ? parseFloat(String(position.unrealizedPnL))
+      : 0;
+
+    totalValueLocked += initialCollateralOvl * oraclePriceFloat;
+    unrealizedPnL += pnlOvl * oraclePriceFloat;
+  });
+
+  return {
+    totalValueLocked: totalValueLocked.toFixed(2),
+    unrealizedPnL: unrealizedPnL.toFixed(2),
+    lockedPlusUnrealized: (totalValueLocked + unrealizedPnL).toFixed(2),
+  };
+};
 
 export function useOverviewDataRefresh(
   sdk: OverlaySDK,
@@ -24,7 +72,7 @@ export function useOverviewDataRefresh(
   const startTimeRef = useRef<number | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const isNewUnwindTxn = useIsNewUnwindTxn();
-  const previousOverviewData = usePrevious(overviewData);
+  const previousOverviewDataRef = useRef<OverviewData | undefined>(undefined);
 
   const sdkRef = useRef(sdk);
   const fetchVersionRef = useRef(0);
@@ -71,8 +119,33 @@ export function useOverviewDataRefresh(
           throw new Error("No overview data received");
         }
 
-        const hasNewData = !areOverviewDataEqual(result, previousOverviewData) && Boolean(result);
-        setOverviewData(result);
+        let nextOverviewData = result;
+
+        try {
+          const [openPositionsResult, oraclePrice] = await Promise.all([
+            sdkRef.current.openPositions.transformOpenPositions(
+              1,
+              1000,
+              undefined,
+              account as Address,
+              refreshData
+            ),
+            sdkRef.current.lbsc.getOraclePrice().catch(() => undefined),
+          ]);
+
+          nextOverviewData = {
+            ...result,
+            ...calculateOverviewTotals(openPositionsResult.data, oraclePrice),
+          };
+        } catch (correctionError) {
+          console.error("Error correcting overview totals:", correctionError);
+        }
+
+        const hasNewData =
+          !areOverviewDataEqual(nextOverviewData, previousOverviewDataRef.current) &&
+          Boolean(nextOverviewData);
+        previousOverviewDataRef.current = nextOverviewData;
+        setOverviewData(nextOverviewData);
         return hasNewData;
       } catch (error) {
         if (thisVersion !== fetchVersionRef.current) return false;

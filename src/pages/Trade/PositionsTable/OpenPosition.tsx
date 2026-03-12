@@ -6,6 +6,7 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
 import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 import { isGamblingMarket } from "../../../utils/marketGuards";
+import { isShutdownOpenPosition } from "../../../utils/positionGuards";
 import { PositionPnLData } from "../../../hooks/usePositionsPnL";
 
 type OpenPositionProps = {
@@ -53,10 +54,12 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL }) =>
         ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
         : formatNumberWithCommas((Number(position.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' OVL'
     );
+  const isShutdownPosition = isShutdownOpenPosition(position);
+  const displayedSize = isShutdownPosition ? "-" : currentSize;
 
   const handleItemClick = () => {
-    // Prevent clicking on zero-sized or optimistic positions
-    if (position.size === "0" || position.positionId === -1) return;
+    // Shutdown rows use size=0 in the SDK, but still need to open the withdraw flow.
+    if ((position.size === "0" && !isShutdownPosition) || position.positionId === -1) return;
 
     setSelectedPosition(position);
     setShowModal(true);
@@ -96,7 +99,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL }) =>
       <StyledRow onClick={handleItemClick}>
         <StyledCell>
           <Flex gap="6px" align="center">
-            {currentSize}
+            {displayedSize}
             {position.deprecated && (
               <Tooltip
                 content="This position was built on a deprecated version of the market. You can still unwind it."
