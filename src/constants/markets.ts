@@ -65,6 +65,7 @@ import AnthropicAiLogo from '../assets/images/markets-full-logos/anthropicai.jpg
 import UsIranLogo from '../assets/images/markets-full-logos/us-iran-logo.jpg';
 import DashLogo from '../assets/images/markets-full-logos/dash-logo.jpg';
 import AeroLogo from '../assets/images/markets-full-logos/aero-logo.jpg';
+import OilUsdLogo from '../assets/images/markets-full-logos/oil-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -134,6 +135,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "US%20x%20Iran%20ceasefire%20by%20May%2031": UsIranLogo,
   "DASH%20%2F%20USD": DashLogo,
   "AERO%20%2F%20USD": AeroLogo,
+  "OIL%20%2F%20USD": OilUsdLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -142,6 +144,7 @@ export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
 
 export const MARKETSORDER = [
   "Elon%20Musk%20Mood%20Index",
+  "OIL%20%2F%20USD",
   "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
   "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
   "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
@@ -312,6 +315,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "GOLD%20%2F%20USD",
     "GOLD%20%2F%20SILVER",
     "SILVER%20%2F%20USD",
+    "OIL%20%2F%20USD",
   ],
   [CategoryName.Prediction]: [
     "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
