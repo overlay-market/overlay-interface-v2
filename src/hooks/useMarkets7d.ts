@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { MARKET_CHART_URL } from "../constants/applications";
-import { CHAINS } from "overlay-sdk";
 import useMultichainContext from "../providers/MultichainContextProvider/useMultichainContext";
 import { SUPPORTED_CHAINID } from "../constants/chains";
+import { fetchMarketAddressMapping } from "../utils/fetchMarketAddressMapping";
 
 interface MarketDataPoint {
   latestPrice: number;
@@ -43,57 +43,14 @@ export function useMarkets7d(marketIds: string[]): MarketDataWithOpenPrice[] {
 
   // Fetch the market address mapping once per active chain
   useEffect(() => {
-    const fetchMarketAddressMapping = async () => {
-      try {
-        const response2 = await axios.get(
-          "https://api.overlay.market/data/api/markets"
-        );
-        const mapping: Record<string, string> = {};
+    const numericChainId =
+      typeof chainId === "number"
+        ? chainId
+        : undefined;
 
-        const activeChainId =
-          chainId === SUPPORTED_CHAINID.BSC_TESTNET
-            ? CHAINS.BscTestnet
-            : CHAINS.BscMainnet;
-
-        const marketsForChain = Array.isArray(response2.data?.[activeChainId])
-          ? response2.data[activeChainId]
-          : [];
-
-        marketsForChain.forEach(
-          (item: {
-            marketId: string;
-            chains: {
-              chainId?: number;
-              deploymentAddress: string;
-              deprecated?: boolean;
-            }[];
-          }) => {
-            if (!Array.isArray(item.chains) || item.chains.length === 0) {
-              return;
-            }
-
-            // Prefer deployment that matches the active chain when available
-            const chainDeployment =
-              item.chains.find(
-                (c) => c.chainId === activeChainId && !c.deprecated
-              ) ||
-              item.chains.find((c) => c.chainId === activeChainId) ||
-              item.chains.find((c) => !c.deprecated) ||
-              item.chains[0];
-
-            if (chainDeployment?.deploymentAddress) {
-              mapping[item.marketId] = chainDeployment.deploymentAddress.toLowerCase();
-            }
-          }
-        );
-
-        setMarketAddressMapping(mapping);
-      } catch (error) {
-        console.error("Error fetching response2 data:", error);
-      }
-    };
-
-    fetchMarketAddressMapping();
+    fetchMarketAddressMapping(numericChainId)
+      .then(setMarketAddressMapping)
+      .catch((error) => console.error("Error fetching market address mapping:", error));
   }, [chainId]);
 
   // Fetch marketsPricesOverview whenever marketIds or the mapping changes

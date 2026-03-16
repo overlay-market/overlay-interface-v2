@@ -7,7 +7,7 @@ import ProgressBar from "../../../components/ProgressBar";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import {
   CategoriesBar,
@@ -27,6 +27,41 @@ import {
   MARKETS_PAGE_CATEGORY_ORDER,
   NEW_CATEGORIES,
 } from "../../../constants/markets";
+import { getMarketGroup } from "../../../utils/marketGuards";
+
+const RotatingLogo: React.FC<{
+  ids: string[];
+  labels: Record<string, string>;
+  getMarketLogo: (id: string) => string;
+}> = ({ ids, labels, getMarketLogo }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % ids.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [ids.length]);
+
+  return (
+    <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
+      {ids.map((id, i) => (
+        <MarketsLogos
+          key={id}
+          src={getMarketLogo(id)}
+          alt={labels[id]}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            opacity: i === activeIndex ? 1 : 0,
+            transition: "opacity 0.5s ease-in-out",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
@@ -421,283 +456,393 @@ export default function MarketsTable({
         </Table.Header>
         <Table.Body style={{ verticalAlign: "middle" }}>
           {sortedData.length > 0 ? (
-            sortedData.map((market, index) => {
-              const market7d = markets7d.find(
-                (m) => m.marketId === market.marketId
-              );
+            (() => {
+              // Track which group IDs we've already rendered
+              const renderedGroupIds = new Set<string>();
 
-              const isComingSoon = !defaultMarketIds.has(market.marketId);
-              const marketName =
-                market.marketName ?? decodeURIComponent(market.marketId);
-              const isGambling = isGamblingMarket(marketName);
+              return sortedData.map((market, index) => {
+                const marketName =
+                  market.marketName ?? decodeURIComponent(market.marketId);
 
-              const lineColor =
-                market7d &&
-                  market7d.sevenDaysChartData &&
-                  market7d.sevenDaysChartData.length > 0
-                  ? market7d.sevenDaysChartData[
-                    market7d.sevenDaysChartData.length - 1
-                  ] > market7d.sevenDaysChartData[0]
-                    ? theme.color.green2
-                    : theme.color.red2
-                  : theme.color.grey3;
+                // Check if this market belongs to a prediction group
+                const group = getMarketGroup(marketName);
+                if (group) {
+                  // Skip if we already rendered this group
+                  if (renderedGroupIds.has(group.groupId)) return null;
+                  renderedGroupIds.add(group.groupId);
 
-              return (
-                <Table.Row
-                  key={index}
-                  style={{
-                    borderBottom: `1px solid ${theme.color.darkBlue}`,
-                    cursor: isComingSoon ? "default" : "pointer",
-                    opacity: isComingSoon ? 0.8 : 1,
-                  }}
-                  onClick={() =>
-                    !isComingSoon && redirectToTradePage(market.marketId)
-                  }
-                >
-                  <Table.Cell
-                    style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
-                  >
-                    <Flex style={{ alignItems: "center" }}>
-                      <div
-                        style={{
-                          position: "relative",
-                          display: "inline-block",
-                        }}
+                  // Find all group markets in sortedData for probability display
+                  const groupMarkets = group.marketIds
+                    .map((id) => sortedData.find((m) => m.marketId === id))
+                    .filter(Boolean) as TransformedMarketData[];
+
+                  return (
+                    <Table.Row
+                      key={`group-${group.groupId}`}
+                      style={{
+                        borderBottom: `1px solid ${theme.color.darkBlue}`,
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        redirectToTradePage(group.marketIds[0], group.groupId)
+                      }
+                    >
+                      <Table.Cell
+                        style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                       >
-                        <MarketsLogos
-                          src={getMarketLogo(market.marketId)}
-                          alt={decodeURIComponent(market.marketId)}
-                          className="rounded-full"
-                          style={{
-                            filter: isComingSoon
-                              ? "grayscale(100%) brightness(0.6)"
-                              : "none",
-                          }}
-                        />
-                        {isComingSoon && (
+                        <Flex style={{ alignItems: "center" }}>
                           <div
                             style={{
-                              position: "absolute",
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              bottom: 0,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              color: "white",
-                              fontSize: "8px",
-                              fontWeight: "bold",
-                              textAlign: "center",
-                              borderRadius: "50%",
+                              position: "relative",
+                              display: "inline-block",
                             }}
                           >
-                            SOON
+                            {isMobile ? (
+                              <RotatingLogo
+                                ids={group.marketIds}
+                                labels={group.outcomeLabels}
+                                getMarketLogo={getMarketLogo}
+                              />
+                            ) : (
+                              <Flex style={{ position: "relative" }}>
+                                {group.marketIds.slice(0, 3).map((id, i) => (
+                                  <MarketsLogos
+                                    key={id}
+                                    src={getMarketLogo(id)}
+                                    alt={group.outcomeLabels[id]}
+                                    className="rounded-full"
+                                    style={{
+                                      marginLeft: i > 0 ? -10 : 0,
+                                      zIndex: 3 - i,
+                                      border: `2px solid ${theme.color.background}`,
+                                    }}
+                                  />
+                                ))}
+                              </Flex>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <span
-                        style={{
-                          alignSelf: "center",
-                          marginLeft: 20,
-                          color: isComingSoon ? "#8B8B8B" : "inherit",
-                        }}
-                      >
-                        {isMobile &&
-                          decodeURIComponent(market.marketId).length > 28
-                          ? `${decodeURIComponent(market.marketId).slice(
-                            0,
-                            28
-                          )}...`
-                          : decodeURIComponent(market.marketId)}
-                      </span>
-                    </Flex>
-                  </Table.Cell>
-                  <Table.Cell
-                    style={{
-                      color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
-                    }}
-                  >
-                    {!isGambling
-                      ? formatPriceWithCurrency(
-                        market.price ?? 0,
-                        market.priceCurrency
-                      )
-                      : "-"}
-                  </Table.Cell>
-                  {!isMobile && (
-                    <>
-                      <Table.Cell
-                        style={{
-                          color: isComingSoon || isGambling
-                            ? "#8B8B8B"
-                            : (market7d?.oneHourChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
-                        }}
-                      >
-                        {isGambling ? (
-                          "-"
-                        ) : (
-                          <Skeleton loading={!market7d}>
-                            {market7d?.oneHourChange?.toFixed(2)}%
-                          </Skeleton>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell
-                        style={{
-                          color: isComingSoon || isGambling
-                            ? "#8B8B8B"
-                            : (market7d?.twentyFourHourChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
-                        }}
-                      >
-                        {isGambling ? (
-                          "-"
-                        ) : (
-                          <Skeleton loading={!market7d}>
-                            {market7d?.twentyFourHourChange?.toFixed(2)}%
-                          </Skeleton>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell
-                        style={{
-                          color: isComingSoon || isGambling
-                            ? "#8B8B8B"
-                            : (market7d?.sevenDayChange ?? 0) >= 0
-                              ? theme.color.green2
-                              : theme.color.red2,
-                        }}
-                      >
-                        {isGambling ? (
-                          "-"
-                        ) : (
-                          <Skeleton loading={!market7d}>
-                            {market7d?.sevenDayChange?.toFixed(2)}%
-                          </Skeleton>
-                        )}
-                      </Table.Cell>
-                      <Table.Cell
-                        style={{
-                          color:
-                            isComingSoon || isGambling
-                              ? "#8B8B8B"
-                              : theme.color.green2,
-                        }}
-                      >
-                        {isGambling ? (
-                          "-"
-                        ) : (
                           <span
                             style={{
-                              color: isComingSoon
-                                ? "#8B8B8B"
-                                : market.funding && Number(market.funding) < 0
-                                  ? theme.color.red2
-                                  : theme.color.green2,
+                              alignSelf: "center",
+                              marginLeft: 20,
                             }}
                           >
-                            {market.funding && Number(market.funding) < 0
-                              ? market.funding
-                              : `+${market.funding}`}
-                            %
+                            {isMobile && group.title.length > 20
+                              ? `${group.title.slice(0, 20)}...`
+                              : group.title}
                           </span>
-                        )}
+                        </Flex>
                       </Table.Cell>
                       <Table.Cell>
-                        {isComingSoon ? (
-                          <Text
-                            size="4"
-                            style={{
-                              background:
-                                "linear-gradient(90deg, #A8A6A6 0%, #ff7cd5 100%)",
-                              backgroundClip: "text",
-                              WebkitBackgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Coming Soon
-                          </Text>
-                        ) : isGambling ? (
-                          <Text size="2" style={{ color: "#8B8B8B" }}>
-                            -
-                          </Text>
-                        ) : (
-                          <Flex align="center" gap="2">
-                            <Text size="2" style={{ color: theme.color.red2 }}>
-                              {Math.round(
-                                Number(market.shortPercentageOfTotalOi)
-                              )}
-                              %
-                            </Text>
-                            <ProgressBar
-                              max={100}
-                              value={Number(market.shortPercentageOfTotalOi)}
-                            />
-                            <Text
-                              size="2"
-                              style={{ color: theme.color.green2 }}
-                            >
-                              {Math.round(
-                                Number(market.longPercentageOfTotalOi)
-                              )}
-                              %
-                            </Text>
-                          </Flex>
-                        )}
+                        <Flex direction="column" gap="2px">
+                          {groupMarkets.map((gm) => {
+                            const mid = gm.price
+                              ? (Number(gm.price) * 100).toFixed(1)
+                              : "-";
+                            return (
+                              <Text
+                                key={gm.marketId}
+                                size="1"
+                                style={{ color: theme.color.grey2 }}
+                              >
+                                {group.outcomeLabels[gm.marketId] ??
+                                  decodeURIComponent(gm.marketId)}
+                                : {mid}%
+                              </Text>
+                            );
+                          })}
+                        </Flex>
                       </Table.Cell>
-                      <Table.Cell style={{ textAlign: "center" }}>
-                        <img
-                          src={market.oracleLogo}
-                          alt={decodeURIComponent(market.marketId)}
-                          style={{
-                            maxWidth: 24,
-                            maxHeight: 24,
-                          }}
-                        />
-                      </Table.Cell>
-                    </>
-                  )}
-                  <Table.Cell
+                      {!isMobile && (
+                        <>
+                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                        </>
+                      )}
+                      <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                    </Table.Row>
+                  );
+                }
+
+                const market7d = markets7d.find(
+                  (m) => m.marketId === market.marketId
+                );
+
+                const isComingSoon = !defaultMarketIds.has(market.marketId);
+                const isGambling = isGamblingMarket(marketName);
+
+                const lineColor =
+                  market7d &&
+                    market7d.sevenDaysChartData &&
+                    market7d.sevenDaysChartData.length > 0
+                    ? market7d.sevenDaysChartData[
+                      market7d.sevenDaysChartData.length - 1
+                    ] > market7d.sevenDaysChartData[0]
+                      ? theme.color.green2
+                      : theme.color.red2
+                    : theme.color.grey3;
+
+                return (
+                  <Table.Row
+                    key={index}
                     style={{
-                      color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
+                      borderBottom: `1px solid ${theme.color.darkBlue}`,
+                      cursor: isComingSoon ? "default" : "pointer",
+                      opacity: isComingSoon ? 0.8 : 1,
                     }}
+                    onClick={() =>
+                      !isComingSoon && redirectToTradePage(market.marketId)
+                    }
                   >
-                    {isGambling ? (
-                      "-"
-                    ) : (
-                      <Skeleton loading={!market7d}>
-                        <LineChart
-                          width={isMobile ? 80 : 100}
-                          height={30}
-                          data={market7d?.sevenDaysChartData?.map(
-                            (value) => ({
-                              value,
-                            })
-                          )}
-                          margin={{ top: 0, bottom: 0 }}
+                    <Table.Cell
+                      style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
+                    >
+                      <Flex style={{ alignItems: "center" }}>
+                        <div
+                          style={{
+                            position: "relative",
+                            display: "inline-block",
+                          }}
                         >
-                          <YAxis
-                            type="number"
-                            domain={["dataMin", "dataMax"]}
-                            hide
+                          <MarketsLogos
+                            src={getMarketLogo(market.marketId)}
+                            alt={decodeURIComponent(market.marketId)}
+                            className="rounded-full"
+                            style={{
+                              filter: isComingSoon
+                                ? "grayscale(100%) brightness(0.6)"
+                                : "none",
+                            }}
                           />
-                          <Line
-                            type="monotone"
-                            dataKey="value"
-                            stroke={isComingSoon ? "#8B8B8B" : lineColor}
-                            strokeWidth={2}
-                            dot={false}
+                          {isComingSoon && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "white",
+                                fontSize: "8px",
+                                fontWeight: "bold",
+                                textAlign: "center",
+                                borderRadius: "50%",
+                              }}
+                            >
+                              SOON
+                            </div>
+                          )}
+                        </div>
+                        <span
+                          style={{
+                            alignSelf: "center",
+                            marginLeft: 20,
+                            color: isComingSoon ? "#8B8B8B" : "inherit",
+                          }}
+                        >
+                          {isMobile &&
+                            decodeURIComponent(market.marketId).length > 28
+                            ? `${decodeURIComponent(market.marketId).slice(
+                              0,
+                              28
+                            )}...`
+                            : decodeURIComponent(market.marketId)}
+                        </span>
+                      </Flex>
+                    </Table.Cell>
+                    <Table.Cell
+                      style={{
+                        color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
+                      }}
+                    >
+                      {!isGambling
+                        ? formatPriceWithCurrency(
+                          market.price ?? 0,
+                          market.priceCurrency
+                        )
+                        : "-"}
+                    </Table.Cell>
+                    {!isMobile && (
+                      <>
+                        <Table.Cell
+                          style={{
+                            color: isComingSoon || isGambling
+                              ? "#8B8B8B"
+                              : (market7d?.oneHourChange ?? 0) >= 0
+                                ? theme.color.green2
+                                : theme.color.red2,
+                          }}
+                        >
+                          {isGambling ? (
+                            "-"
+                          ) : (
+                            <Skeleton loading={!market7d}>
+                              {market7d?.oneHourChange?.toFixed(2)}%
+                            </Skeleton>
+                          )}
+                        </Table.Cell>
+                        <Table.Cell
+                          style={{
+                            color: isComingSoon || isGambling
+                              ? "#8B8B8B"
+                              : (market7d?.twentyFourHourChange ?? 0) >= 0
+                                ? theme.color.green2
+                                : theme.color.red2,
+                          }}
+                        >
+                          {isGambling ? (
+                            "-"
+                          ) : (
+                            <Skeleton loading={!market7d}>
+                              {market7d?.twentyFourHourChange?.toFixed(2)}%
+                            </Skeleton>
+                          )}
+                        </Table.Cell>
+                        <Table.Cell
+                          style={{
+                            color: isComingSoon || isGambling
+                              ? "#8B8B8B"
+                              : (market7d?.sevenDayChange ?? 0) >= 0
+                                ? theme.color.green2
+                                : theme.color.red2,
+                          }}
+                        >
+                          {isGambling ? (
+                            "-"
+                          ) : (
+                            <Skeleton loading={!market7d}>
+                              {market7d?.sevenDayChange?.toFixed(2)}%
+                            </Skeleton>
+                          )}
+                        </Table.Cell>
+                        <Table.Cell
+                          style={{
+                            color:
+                              isComingSoon || isGambling
+                                ? "#8B8B8B"
+                                : theme.color.green2,
+                          }}
+                        >
+                          {isGambling ? (
+                            "-"
+                          ) : (
+                            <span
+                              style={{
+                                color: isComingSoon
+                                  ? "#8B8B8B"
+                                  : market.funding && Number(market.funding) < 0
+                                    ? theme.color.red2
+                                    : theme.color.green2,
+                              }}
+                            >
+                              {market.funding && Number(market.funding) < 0
+                                ? market.funding
+                                : `+${market.funding}`}
+                              %
+                            </span>
+                          )}
+                        </Table.Cell>
+                        <Table.Cell>
+                          {isComingSoon ? (
+                            <Text
+                              size="4"
+                              style={{
+                                background:
+                                  "linear-gradient(90deg, #A8A6A6 0%, #ff7cd5 100%)",
+                                backgroundClip: "text",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Coming Soon
+                            </Text>
+                          ) : isGambling ? (
+                            <Text size="2" style={{ color: "#8B8B8B" }}>
+                              -
+                            </Text>
+                          ) : (
+                            <Flex align="center" gap="2">
+                              <Text size="2" style={{ color: theme.color.red2 }}>
+                                {Math.round(
+                                  Number(market.shortPercentageOfTotalOi)
+                                )}
+                                %
+                              </Text>
+                              <ProgressBar
+                                max={100}
+                                value={Number(market.shortPercentageOfTotalOi)}
+                              />
+                              <Text
+                                size="2"
+                                style={{ color: theme.color.green2 }}
+                              >
+                                {Math.round(
+                                  Number(market.longPercentageOfTotalOi)
+                                )}
+                                %
+                              </Text>
+                            </Flex>
+                          )}
+                        </Table.Cell>
+                        <Table.Cell style={{ textAlign: "center" }}>
+                          <img
+                            src={market.oracleLogo}
+                            alt={decodeURIComponent(market.marketId)}
+                            style={{
+                              maxWidth: 24,
+                              maxHeight: 24,
+                            }}
                           />
-                        </LineChart>
-                      </Skeleton>
+                        </Table.Cell>
+                      </>
                     )}
-                  </Table.Cell>
-                </Table.Row>
-              );
-            })
+                    <Table.Cell
+                      style={{
+                        color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
+                      }}
+                    >
+                      {isGambling ? (
+                        "-"
+                      ) : (
+                        <Skeleton loading={!market7d}>
+                          <LineChart
+                            width={isMobile ? 80 : 100}
+                            height={30}
+                            data={market7d?.sevenDaysChartData?.map(
+                              (value) => ({
+                                value,
+                              })
+                            )}
+                            margin={{ top: 0, bottom: 0 }}
+                          >
+                            <YAxis
+                              type="number"
+                              domain={["dataMin", "dataMax"]}
+                              hide
+                            />
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke={isComingSoon ? "#8B8B8B" : lineColor}
+                              strokeWidth={2}
+                              dot={false}
+                            />
+                          </LineChart>
+                        </Skeleton>
+                      )}
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              });
+            })()
           ) : (
             <>
               {Array.from({ length: 3 }).map(() => (

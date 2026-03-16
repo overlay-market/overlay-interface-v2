@@ -12,9 +12,10 @@ import { PositionPnLData } from "../../../hooks/usePositionsPnL";
 type OpenPositionProps = {
   position: OpenPositionData;
   realtimePnL?: PositionPnLData;
+  outcomeLabel?: string;
 };
 
-const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL }) => {
+const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL, outcomeLabel }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);
@@ -97,6 +98,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL }) =>
   return (
     <>
       <StyledRow onClick={handleItemClick}>
+        {outcomeLabel !== undefined && (
+          <StyledCell>
+            <Text weight="medium">{outcomeLabel}</Text>
+          </StyledCell>
+        )}
         <StyledCell>
           <Flex gap="6px" align="center">
             {displayedSize}

@@ -18,8 +18,13 @@ import useMultichainContext from "../../../providers/MultichainContextProvider/u
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import { isGamblingMarket } from "../../../utils/marketGuards";
+import { PredictionMarketGroup } from "../../../constants/markets";
 
-const TradeHeader: React.FC = () => {
+interface TradeHeaderProps {
+  predictionGroup?: PredictionMarketGroup;
+}
+
+const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
 
@@ -45,8 +50,10 @@ const TradeHeader: React.FC = () => {
     [market?.marketName]
   );
 
+  const hideMarketInfo = isGambling || !!predictionGroup;
+
   useEffect(() => {
-    if (!marketId || isGambling) return;
+    if (!marketId || hideMarketInfo) return;
 
     const fetchPrice = async () => {
       try {
@@ -75,10 +82,10 @@ const TradeHeader: React.FC = () => {
     fetchPrice();
     const intervalId = setInterval(fetchPrice, TRADE_POLLING_INTERVAL);
     return () => clearInterval(intervalId);
-  }, [marketId, typedValue, selectedLeverage, isLong, chainId, market, isGambling]);
+  }, [marketId, typedValue, selectedLeverage, isLong, chainId, market, hideMarketInfo]);
 
   useEffect(() => {
-    if (!marketId || isGambling) return;
+    if (!marketId || hideMarketInfo) return;
 
     const fetchStaticMarketData = async () => {
       try {
@@ -103,7 +110,7 @@ const TradeHeader: React.FC = () => {
       TRADE_POLLING_INTERVAL
     );
     return () => clearInterval(intervalId);
-  }, [marketId, chainId, isGambling]);
+  }, [marketId, chainId, hideMarketInfo]);
 
   const isFundingRatePositive = useMemo(() => {
     return Math.sign(Number(funding)) > 0;
@@ -111,9 +118,9 @@ const TradeHeader: React.FC = () => {
 
   return (
     <TradeHeaderContainer>
-      <MarketsList />
+      <MarketsList predictionGroup={predictionGroup} />
 
-      {!isGambling ? (
+      {!hideMarketInfo ? (
         <MarketInfoContainer>
           <StyledFlex width={{ initial: "149px", sm: "167px", lg: "149px" }}>
             <Text weight="light" style={{ fontSize: "10px" }}>

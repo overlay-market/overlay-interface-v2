@@ -25,12 +25,18 @@ import ChainAndTokenSelect from "./ChainAndTokenSelect";
 import { Flex, Checkbox, Text } from "@radix-ui/themes";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 import { useStableTokenInfo } from "../../../hooks/useStableTokenInfo";
+import { PredictionMarketGroup } from "../../../constants/markets";
+import PredictionGroupPanel from "../PredictionGroupPanel";
 
 interface TradeWidgetProps {
   prices?: { bid: bigint; ask: bigint; mid: bigint };
+  predictionGroup?: PredictionMarketGroup;
+  selectedMarketId?: string | null;
+  isLong?: boolean;
+  onOutcomeSelect?: (marketId: string, isLong: boolean) => void;
 }
 
-const TradeWidget: React.FC<TradeWidgetProps> = ({ prices }) => {
+const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, selectedMarketId, isLong: isLongFromParent, onOutcomeSelect }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
   const { chainId } = useMultichainContext();
@@ -140,10 +146,10 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices }) => {
   }, [selectedLeverage]);
 
   useEffect(() => {
-    if (marketId && !isGambling) {
+    if (marketId && !isGambling && !predictionGroup) {
       handleLeverageSelect("5");
     }
-  }, [marketId, isGambling, handleLeverageSelect]);
+  }, [marketId, isGambling, predictionGroup, handleLeverageSelect]);
 
   useEffect(() => {
     if (!isGambling) {
@@ -292,7 +298,16 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices }) => {
       pb={"20px"}
       flexShrink={"0"}
     >
-      <PositionSelectComponent prices={prices} />
+      {predictionGroup && onOutcomeSelect ? (
+        <PredictionGroupPanel
+          group={predictionGroup}
+          selectedMarketId={selectedMarketId ?? null}
+          isLong={isLongFromParent ?? true}
+          onOutcomeSelect={onOutcomeSelect}
+        />
+      ) : (
+        <PositionSelectComponent prices={prices} />
+      )}
 
       {!isGambling ? (
         <Slider

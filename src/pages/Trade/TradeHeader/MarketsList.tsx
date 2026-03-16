@@ -15,13 +15,18 @@ import {
   CategoryName,
   MARKET_CATEGORIES,
   MARKETSORDER,
+  PredictionMarketGroup,
 } from "../../../constants/markets";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
 import SearchBar from "../../../components/SearchBar";
 import useActiveMarkets from "../../../hooks/useActiveMarkets";
 
-const MarketsList: React.FC = () => {
+interface MarketsListProps {
+  predictionGroup?: PredictionMarketGroup;
+}
+
+const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
   const { currentMarket } = useCurrentMarketState();
   const { data: markets } = useActiveMarkets();
 
@@ -82,7 +87,9 @@ const MarketsList: React.FC = () => {
               alt={currentMarket.marketName}
             />
           )}
-          <HeaderMarketName>{currentMarket?.marketName}</HeaderMarketName>
+          <HeaderMarketName>
+            {predictionGroup ? predictionGroup.title : currentMarket?.marketName}
+          </HeaderMarketName>
         </Flex>
 
         {isOpen ? (
