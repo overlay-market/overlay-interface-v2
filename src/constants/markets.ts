@@ -66,6 +66,11 @@ import UsIranLogo from '../assets/images/markets-full-logos/us-iran-logo.jpg';
 import DashLogo from '../assets/images/markets-full-logos/dash-logo.jpg';
 import AeroLogo from '../assets/images/markets-full-logos/aero-logo.jpg';
 import OilUsdLogo from '../assets/images/markets-full-logos/oil-logo.jpg';
+import ArgentinaWcLogo from '../assets/images/markets-full-logos/argentina-wc.jpg';
+import BrazilWcLogo from '../assets/images/markets-full-logos/brazil-wc.jpg';
+import FranceWcLogo from '../assets/images/markets-full-logos/france-wc.jpg';
+import EnglandWcLogo from '../assets/images/markets-full-logos/england-wc.jpg';
+import SpainWcLogo from '../assets/images/markets-full-logos/spain-wc.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -136,6 +141,11 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "DASH%20%2F%20USD": DashLogo,
   "AERO%20%2F%20USD": AeroLogo,
   "OIL%20%2F%20USD": OilUsdLogo,
+  "Will%20Brazil%20Win%20the%202026%20FIFA%20World%20Cup": BrazilWcLogo,
+  "Will%20Argentina%20Win%20the%202026%20FIFA%20World%20Cup": ArgentinaWcLogo,
+  "Will%20France%20Win%20the%202026%20FIFA%20World%20Cup": FranceWcLogo,
+  "Will%20England%20Win%20the%202026%20FIFA%20World%20Cup": EnglandWcLogo,
+  "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup": SpainWcLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -148,6 +158,11 @@ export const MARKETSORDER = [
   "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
   "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
   "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
+  "Will%20Brazil%20Win%20the%202026%20FIFA%20World%20Cup",
+  "Will%20Argentina%20Win%20the%202026%20FIFA%20World%20Cup",
+  "Will%20France%20Win%20the%202026%20FIFA%20World%20Cup",
+  "Will%20England%20Win%20the%202026%20FIFA%20World%20Cup",
+  "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup",
   "US%20x%20Iran%20ceasefire%20by%20May%2031",
   "Double%20or%20Nothing",
   "MrBeast%20Index",
@@ -235,6 +250,24 @@ export const PREDICTION_MARKET_GROUPS: PredictionMarketGroup[] = [
       "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March": "Google",
       "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March": "OpenAI",
       "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March": "Anthropic",
+    },
+  },
+  {
+    groupId: "fifa-world-cup-2026-winner",
+    title: "2026 FIFA World Cup Winner",
+    marketIds: [
+      "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup",
+      "Will%20England%20Win%20the%202026%20FIFA%20World%20Cup",
+      "Will%20France%20Win%20the%202026%20FIFA%20World%20Cup",
+      "Will%20Argentina%20Win%20the%202026%20FIFA%20World%20Cup",
+      "Will%20Brazil%20Win%20the%202026%20FIFA%20World%20Cup",
+    ],
+    outcomeLabels: {
+      "Will%20Brazil%20Win%20the%202026%20FIFA%20World%20Cup": "Brazil",
+      "Will%20Argentina%20Win%20the%202026%20FIFA%20World%20Cup": "Argentina",
+      "Will%20France%20Win%20the%202026%20FIFA%20World%20Cup": "France",
+      "Will%20England%20Win%20the%202026%20FIFA%20World%20Cup": "England",
+      "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup": "Spain",
     },
   },
 ];
@@ -347,6 +380,11 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
     "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
     "US%20x%20Iran%20ceasefire%20by%20May%2031",
+    "Will%20Brazil%20Win%20the%202026%20FIFA%20World%20Cup",
+    "Will%20Argentina%20Win%20the%202026%20FIFA%20World%20Cup",
+    "Will%20France%20Win%20the%202026%20FIFA%20World%20Cup",
+    "Will%20England%20Win%20the%202026%20FIFA%20World%20Cup",
+    "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup",
   ],
   [CategoryName.Altcoins]: [
     "DASH%20%2F%20USD",
