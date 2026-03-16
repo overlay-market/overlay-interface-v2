@@ -214,6 +214,31 @@ export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
 
 export const MARKETS_WITH_GAMBLING_TIMELINE = ["Double%20or%20Nothing"];
 
+export interface PredictionMarketGroup {
+  groupId: string;
+  title: string;
+  description?: string;
+  marketIds: string[];
+  outcomeLabels: Record<string, string>;
+}
+
+export const PREDICTION_MARKET_GROUPS: PredictionMarketGroup[] = [
+  {
+    groupId: "best-ai-model-march",
+    title: "Who will have the best AI model end of March?",
+    marketIds: [
+      "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
+      "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March",
+      "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March",
+    ],
+    outcomeLabels: {
+      "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March": "Google",
+      "Will%20OpenAI%20have%20the%20best%20AI%20model%20end%20of%20March": "OpenAI",
+      "Will%20Anthropic%20have%20the%20best%20AI%20model%20end%20of%20March": "Anthropic",
+    },
+  },
+];
+
 export enum CategoryName {
   MemeWar = "Meme Wars",
   CounterStrikeSkins = "Counter-Strike",
