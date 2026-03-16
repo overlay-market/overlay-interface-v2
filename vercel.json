@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/trade.ts": {
+      "includeFiles": "src/constants/markets.ts"
+    }
+  },
+  "rewrites": [
+    { "source": "/trade", "destination": "/api/trade" }
+  ]
+}
