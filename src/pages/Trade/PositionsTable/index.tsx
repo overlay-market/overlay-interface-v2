@@ -19,6 +19,7 @@ import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { convertToOpenPositionData } from "../../../utils/convertOptimisticPosition";
 import usePositionsPnL from "../../../hooks/usePositionsPnL";
 import { DEFAULT_CHAINID } from "../../../constants/chains";
+import { PREDICTION_MARKET_GROUPS } from "../../../constants/markets";
 
 const POSITIONS_COLUMNS = [
   "Size",
@@ -28,14 +29,32 @@ const POSITIONS_COLUMNS = [
   "PnL",
 ];
 
+const GROUP_POSITIONS_COLUMNS = [
+  "Outcome",
+  "Size",
+  "Position",
+  "Entry Price",
+  "Liq. Price",
+  "PnL",
+];
+
 interface PositionsTableProps {
   onPricesUpdate?: (prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => void;
+  groupMarketIds?: string[];
 }
 
-const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
+const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMarketIds }) => {
   const [searchParams] = useSearchParams();
   const rawMarketId = searchParams.get("market");
   const marketId = rawMarketId ? decodeURIComponent(rawMarketId) : null;
+
+  // For prediction groups, fetch positions for all markets in the group
+  const marketIdForFetch: string | string[] | null = useMemo(() => {
+    if (groupMarketIds && groupMarketIds.length > 0) {
+      return groupMarketIds.map(id => decodeURIComponent(id));
+    }
+    return marketId;
+  }, [groupMarketIds, marketId]);
   const { chainId: rawChainId } = useMultichainContext();
   const chainId = typeof rawChainId === 'object' && rawChainId !== null
     ? rawChainId.id
@@ -89,7 +108,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   useEffect(() => {
     if (!isNewTxnHash) return;
 
-    console.log('[PositionsTable] New transaction detected, starting position polling');
+
 
     let pollCount = 0;
     const maxPolls = 20; // Poll every 3 seconds for 60 seconds total
@@ -108,22 +127,22 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
       const previousCount = previousPositionCountRef.current;
 
       if (previousCount > 0 && currentCount > previousCount) {
-        console.log('[PositionsTable] ✅ New position detected! Position count increased from', previousCount, 'to', currentCount);
+
         clearInterval(pollInterval);
         return;
       }
 
-      console.log(`[PositionsTable] Polling for new position (${pollCount}/${maxPolls}) - Current count: ${currentCount}`);
+
       setForceRefresh(prev => prev + 1); // Trigger re-fetch
 
       if (pollCount >= maxPolls) {
-        console.log('[PositionsTable] Polling timeout - no new position found');
+
         clearInterval(pollInterval);
       }
     }, 3000); // Poll every 3 seconds
 
     return () => {
-      console.log('[PositionsTable] Cleaning up polling interval');
+
       clearInterval(pollInterval);
     };
   }, [isNewTxnHash]); // Only depend on isNewTxnHash - don't restart on positionsTotalNumber change
@@ -138,44 +157,35 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
 
     // If position was just created (within 2 seconds), trigger a refresh
     if (timeSinceCreation < 2000) {
-      console.log('[PositionsTable] New optimistic position detected, triggering immediate refresh');
+
       setForceRefresh(prev => prev + 1);
     }
   }, [optimisticPositions.length]);
 
   useEffect(() => {
     const fetchOpenPositions = async () => {
-      if (!account || !marketId) {
+      if (!account || !marketIdForFetch) {
         setPositions(undefined);
         setPositionsTotalNumber(0);
         return; // Early exit if no account or marketId
       }
 
-      if (marketId && account) {
+      if (marketIdForFetch && account) {
         // Force cache bypass if new transaction or during polling period
         const refreshData = isNewTxnHash || forceRefresh > 0;
         setLoading(true);
-        console.log('[PositionsTable] Fetching positions:', {
-          marketId,
-          refreshData,
-          isNewTxnHash,
-          forceRefresh,
-        });
+
         try {
           const positions =
             await sdkRef.current.openPositions.transformOpenPositions(
               currentPage,
               itemsPerPage,
-              marketId,
+              marketIdForFetch,
               account as Address,
               refreshData
             );
 
-          console.log('[PositionsTable] Received positions:', {
-            count: positions?.data?.length || 0,
-            total: positions?.total || 0,
-            positions: positions?.data,
-          });
+
 
           positions && setPositions(positions.data);
           positions && setPositionsTotalNumber(positions.total);
@@ -192,19 +202,43 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
     };
 
     fetchOpenPositions();
-  }, [chainId, marketId, account, isNewTxnHash, forceRefresh, currentPage, itemsPerPage]);
+  }, [chainId, marketIdForFetch, account, isNewTxnHash, forceRefresh, currentPage, itemsPerPage]);
 
   useEffect(() => {
     setCurrentPage(1);
     setItemsPerPage(10);
-  }, [chainId, marketId]);
+  }, [chainId, marketIdForFetch]);
+
+  const isGroupMode = !!(groupMarketIds && groupMarketIds.length > 0);
+
+  const getOutcomeLabel = useMemo(() => {
+    // Build a lookup from marketName -> short label (e.g. "Google")
+    const labelMap = new Map<string, string>();
+    for (const group of PREDICTION_MARKET_GROUPS) {
+      for (const [encodedId, label] of Object.entries(group.outcomeLabels)) {
+        labelMap.set(decodeURIComponent(encodedId), label);
+      }
+    }
+    return (marketName?: string) => {
+      if (!marketName) return undefined;
+      return labelMap.get(marketName) ?? marketName;
+    };
+  }, []);
+
+  // Set of market IDs relevant for optimistic position matching
+  const relevantMarketIds = useMemo(() => {
+    if (groupMarketIds && groupMarketIds.length > 0) {
+      return new Set(groupMarketIds.map(id => decodeURIComponent(id)));
+    }
+    return marketId ? new Set([marketId]) : new Set<string>();
+  }, [groupMarketIds, marketId]);
 
   // Merge optimistic positions with real positions
   const mergedPositions = useMemo(() => {
-    // Filter optimistic positions for current market AND current account
+    // Filter optimistic positions for current market(s) AND current account
     const relevantOptimistic = optimisticPositions
       .filter(op =>
-        op.marketName === marketId &&
+        relevantMarketIds.has(op.marketName) &&
         op.account === account &&
         op.chainId === chainId
       )
@@ -217,7 +251,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
 
     // Prepend optimistic positions (show at top)
     return [...relevantOptimistic, ...positions];
-  }, [positions, optimisticPositions, marketId, account, chainId]);
+  }, [positions, optimisticPositions, relevantMarketIds, account, chainId]);
 
   // Smart detection: Remove optimistic positions when matching real position appears
   // This runs whenever positions change OR during polling period
@@ -238,9 +272,9 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
       // First try: Match by timestamp (within 2 minutes)
       let matchingReal = sortedPositions.find(real => {
         // Defensive checks for undefined values
-        if (!real.marketName || !real.positionSide || !marketId) return false;
+        if (!real.marketName || !real.positionSide || relevantMarketIds.size === 0) return false;
 
-        const sameMarket = real.marketName === marketId;
+        const sameMarket = relevantMarketIds.has(real.marketName);
         const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
 
         // Extract leverage from real position (e.g., "13.10000000000000000120018702277545x Short" -> 13.1)
@@ -266,11 +300,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
 
         // Only log when we find a match (reduce spam)
         if (isMatch) {
-          console.log('[Smart Detection] ✅ Timestamp match found:', {
-            market: real.marketName,
-            side: real.positionSide,
-            positionId: real.positionId,
-          });
+
         }
 
         return isMatch;
@@ -284,9 +314,9 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
           if (knownPositionIdsRef.current.has(real.positionId)) return false;
 
           // Defensive checks for undefined values
-          if (!real.marketName || !real.positionSide || !marketId) return false;
+          if (!real.marketName || !real.positionSide || relevantMarketIds.size === 0) return false;
 
-          const sameMarket = real.marketName === marketId;
+          const sameMarket = relevantMarketIds.has(real.marketName);
           const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
 
           // Extract leverage numerically (same as timestamp match above)
@@ -302,11 +332,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
 
           // Only log when we find a match
           if (isMatch) {
-            console.log('[Smart Detection] ✅ Fallback match found (new position):', {
-              market: real.marketName,
-              side: real.positionSide,
-              positionId: real.positionId,
-            });
+
           }
 
           return isMatch;
@@ -315,12 +341,12 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
 
       // If matching real position found, remove optimistic immediately
       if (matchingReal) {
-        console.log('[Smart Detection] Removing optimistic position for', optimistic.marketName);
+
         handleRemoveOptimisticPosition(optimistic.txHash);
       }
       // Silently continue if no match (reduces spam - it's expected during polling)
     });
-  }, [positions, optimisticPositions, marketId, handleRemoveOptimisticPosition]);
+  }, [positions, optimisticPositions, relevantMarketIds, handleRemoveOptimisticPosition]);
 
   // Cleanup stale optimistic positions (older than 2 minutes)
   useEffect(() => {
@@ -367,7 +393,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
         </Text>
 
         <StyledTable
-          headerColumns={POSITIONS_COLUMNS}
+          headerColumns={isGroupMode ? GROUP_POSITIONS_COLUMNS : POSITIONS_COLUMNS}
           width={isTablet ? "100%" : "849px"}
           minWidth={"654px"}
           currentPage={currentPage}
@@ -385,6 +411,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
                 <OpenPosition
                   position={position}
                   realtimePnL={realtimePnL}
+                  outcomeLabel={isGroupMode ? getOutcomeLabel(position.marketName) : undefined}
                   key={`${position.marketAddress}-${position.positionId}-${index}`}
                 />
               );
@@ -398,7 +425,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
           mergedPositions &&
           positionsTotalNumber === 0 &&
           optimisticPositions.filter(op =>
-            op.marketName === marketId &&
+            relevantMarketIds.has(op.marketName) &&
             op.account === account &&
             op.chainId === chainId
           ).length === 0 &&
