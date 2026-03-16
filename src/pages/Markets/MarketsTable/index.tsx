@@ -7,7 +7,7 @@ import ProgressBar from "../../../components/ProgressBar";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
 import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
 import { Theme } from "@radix-ui/themes";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import {
   CategoriesBar,
@@ -28,6 +28,40 @@ import {
   NEW_CATEGORIES,
 } from "../../../constants/markets";
 import { getMarketGroup } from "../../../utils/marketGuards";
+
+const RotatingLogo: React.FC<{
+  ids: string[];
+  labels: Record<string, string>;
+  getMarketLogo: (id: string) => string;
+}> = ({ ids, labels, getMarketLogo }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % ids.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [ids.length]);
+
+  return (
+    <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
+      {ids.map((id, i) => (
+        <MarketsLogos
+          key={id}
+          src={getMarketLogo(id)}
+          alt={labels[id]}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            opacity: i === activeIndex ? 1 : 0,
+            transition: "opacity 0.5s ease-in-out",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
@@ -457,24 +491,44 @@ export default function MarketsTable({
                         style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
                       >
                         <Flex style={{ alignItems: "center" }}>
-                          <Flex style={{ position: "relative" }}>
-                            {group.marketIds.slice(0, 3).map((id, i) => (
-                              <MarketsLogos
-                                key={id}
-                                src={getMarketLogo(id)}
-                                alt={group.outcomeLabels[id]}
-                                className="rounded-full"
-                                style={{
-                                  marginLeft: i > 0 ? -10 : 0,
-                                  zIndex: 3 - i,
-                                  border: `2px solid ${theme.color.background}`,
-                                }}
+                          <div
+                            style={{
+                              position: "relative",
+                              display: "inline-block",
+                            }}
+                          >
+                            {isMobile ? (
+                              <RotatingLogo
+                                ids={group.marketIds}
+                                labels={group.outcomeLabels}
+                                getMarketLogo={getMarketLogo}
                               />
-                            ))}
-                          </Flex>
-                          <span style={{ alignSelf: "center", marginLeft: 12 }}>
-                            {isMobile && group.title.length > 28
-                              ? `${group.title.slice(0, 28)}...`
+                            ) : (
+                              <Flex style={{ position: "relative" }}>
+                                {group.marketIds.slice(0, 3).map((id, i) => (
+                                  <MarketsLogos
+                                    key={id}
+                                    src={getMarketLogo(id)}
+                                    alt={group.outcomeLabels[id]}
+                                    className="rounded-full"
+                                    style={{
+                                      marginLeft: i > 0 ? -10 : 0,
+                                      zIndex: 3 - i,
+                                      border: `2px solid ${theme.color.background}`,
+                                    }}
+                                  />
+                                ))}
+                              </Flex>
+                            )}
+                          </div>
+                          <span
+                            style={{
+                              alignSelf: "center",
+                              marginLeft: 20,
+                            }}
+                          >
+                            {isMobile && group.title.length > 20
+                              ? `${group.title.slice(0, 20)}...`
                               : group.title}
                           </span>
                         </Flex>
