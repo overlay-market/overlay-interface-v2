@@ -11,6 +11,9 @@ export enum MARKET_CHART_URL {
 }
 
 export const REFERRAL_API_BASE_URL = "https://api.overlay.market/referral";
+export const DATA_API_BASE_URL =
+  import.meta.env.VITE_DATA_API_BASE_URL ||
+  "https://api.overlay.market/data/api";
 
 export const DEFAULT_MARKET_ID = encodeURIComponent("BTC Dominance");
 export const DEFAULT_MARKET = "BTC Dominance";
