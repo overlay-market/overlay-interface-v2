@@ -1,17 +1,34 @@
 import React from "react";
-import { Flex, Text } from "@radix-ui/themes";
+import { Flex, Text, Tooltip } from "@radix-ui/themes";
 import theme from "../../../../theme";
 import { FundedPhaseStats } from "./types";
 import { formatUsdt } from "./utils";
 import LimitProgressBar from "./LimitProgressBar";
 import { PhaseBadge } from "./funded-trader-stats-styles";
+import { usePayoutDate } from "../../../../hooks/usePayoutDate";
 
 type LimitBarsCardProps = {
   data: FundedPhaseStats;
 };
 
+const formatPayoutDate = (dateStr: string): string => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 const LimitBarsCard: React.FC<LimitBarsCardProps> = ({ data }) => {
-  const { health, planName, tradingDays } = data;
+  const { health, planName, tradingDays, safeAddress } = data;
+  const { data: payoutData } = usePayoutDate(safeAddress, !!safeAddress);
+
+  const tooltipStyle = {
+    background: theme.tooltip.background,
+    borderRadius: theme.tooltip.borderRadius,
+    padding: theme.tooltip.padding,
+  };
 
   const currentValue = BigInt(health.currentValueUsdt);
   const dailyBaseline = BigInt(health.dailyBaselineUsdt);
@@ -42,9 +59,29 @@ const LimitBarsCard: React.FC<LimitBarsCardProps> = ({ data }) => {
             </Text>
           )}
         </Flex>
-        <Text size="1" style={{ color: theme.color.grey3 }}>
-          {tradingDays} day{tradingDays !== 1 ? "s" : ""}
-        </Text>
+        <Flex align="center" gap="8px">
+          <Tooltip
+            content="Number of days traded on this account"
+            style={tooltipStyle}
+          >
+            <Text size="1" style={{ color: theme.color.grey3, cursor: "help" }}>
+              {tradingDays} day{tradingDays !== 1 ? "s" : ""}
+            </Text>
+          </Tooltip>
+          {payoutData?.nextPayoutDate && (
+            <>
+              <Text size="1" style={{ color: theme.color.grey3 }}>·</Text>
+              <Tooltip
+                content="Next scheduled payout date"
+                style={tooltipStyle}
+              >
+                <Text size="1" style={{ color: theme.color.grey3, cursor: "help" }}>
+                  Payout {formatPayoutDate(payoutData.nextPayoutDate)}
+                </Text>
+              </Tooltip>
+            </>
+          )}
+        </Flex>
       </Flex>
 
       <Flex direction="column" gap="2px">
