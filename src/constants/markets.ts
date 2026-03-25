@@ -71,6 +71,7 @@ import BrazilWcLogo from '../assets/images/markets-full-logos/brazil-wc.jpg';
 import FranceWcLogo from '../assets/images/markets-full-logos/france-wc.jpg';
 import EnglandWcLogo from '../assets/images/markets-full-logos/england-wc.jpg';
 import SpainWcLogo from '../assets/images/markets-full-logos/spain-wc.jpg';
+import MocaLogo from '../assets/images/markets-full-logos/mocaLogo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -146,6 +147,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Will%20France%20Win%20the%202026%20FIFA%20World%20Cup": FranceWcLogo,
   "Will%20England%20Win%20the%202026%20FIFA%20World%20Cup": EnglandWcLogo,
   "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup": SpainWcLogo,
+  "MOCA%20%2F%20USD": MocaLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -171,6 +173,7 @@ export const MARKETSORDER = [
   "Amouranth%20vs%20peachJars",
   "DASH%20%2F%20USD",
   "AERO%20%2F%20USD",
+  "MOCA%20%2F%20USD",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
@@ -389,6 +392,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
   [CategoryName.Altcoins]: [
     "DASH%20%2F%20USD",
     "AERO%20%2F%20USD",
+    "MOCA%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
