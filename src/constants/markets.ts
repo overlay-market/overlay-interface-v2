@@ -71,7 +71,7 @@ import BrazilWcLogo from '../assets/images/markets-full-logos/brazil-wc.jpg';
 import FranceWcLogo from '../assets/images/markets-full-logos/france-wc.jpg';
 import EnglandWcLogo from '../assets/images/markets-full-logos/england-wc.jpg';
 import SpainWcLogo from '../assets/images/markets-full-logos/spain-wc.jpg';
-import MocaLogo from '../assets/images/markets-full-logos/mocaLogo.jpg';
+import MocaLogo from '../assets/images/markets-full-logos/MocaLogo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
