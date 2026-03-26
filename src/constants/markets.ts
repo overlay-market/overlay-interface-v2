@@ -72,6 +72,7 @@ import FranceWcLogo from '../assets/images/markets-full-logos/france-wc.jpg';
 import EnglandWcLogo from '../assets/images/markets-full-logos/england-wc.jpg';
 import SpainWcLogo from '../assets/images/markets-full-logos/spain-wc.jpg';
 import MocaLogo from '../assets/images/markets-full-logos/MocaLogo.jpg';
+import PlumeLogo from '../assets/images/markets-full-logos/plumeLogo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -148,6 +149,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Will%20England%20Win%20the%202026%20FIFA%20World%20Cup": EnglandWcLogo,
   "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup": SpainWcLogo,
   "MOCA%20%2F%20USD": MocaLogo,
+  "PLUME%20%2F%20USD": PlumeLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -174,6 +176,7 @@ export const MARKETSORDER = [
   "DASH%20%2F%20USD",
   "AERO%20%2F%20USD",
   "MOCA%20%2F%20USD",
+  "PLUME%20%2F%20USD",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
@@ -393,6 +396,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "DASH%20%2F%20USD",
     "AERO%20%2F%20USD",
     "MOCA%20%2F%20USD",
+    "PLUME%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
