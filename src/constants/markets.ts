@@ -73,6 +73,7 @@ import EnglandWcLogo from '../assets/images/markets-full-logos/england-wc.jpg';
 import SpainWcLogo from '../assets/images/markets-full-logos/spain-wc.jpg';
 import MocaLogo from '../assets/images/markets-full-logos/MocaLogo.jpg';
 import PlumeLogo from '../assets/images/markets-full-logos/plumeLogo.jpg';
+import BandLogo from '../assets/images/markets-full-logos/bandLogo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -150,6 +151,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "Will%20Spain%20Win%20the%202026%20FIFA%20World%20Cup": SpainWcLogo,
   "MOCA%20%2F%20USD": MocaLogo,
   "PLUME%20%2F%20USD": PlumeLogo,
+  "BAND%20%2F%20USD": BandLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -177,6 +179,7 @@ export const MARKETSORDER = [
   "AERO%20%2F%20USD",
   "MOCA%20%2F%20USD",
   "PLUME%20%2F%20USD",
+  "BAND%20%2F%20USD",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
@@ -397,6 +400,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "AERO%20%2F%20USD",
     "MOCA%20%2F%20USD",
     "PLUME%20%2F%20USD",
+    "BAND%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
