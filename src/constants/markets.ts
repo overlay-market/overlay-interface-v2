@@ -75,6 +75,7 @@ import MocaLogo from '../assets/images/markets-full-logos/MocaLogo.jpg';
 import PlumeLogo from '../assets/images/markets-full-logos/plumeLogo.jpg';
 import BandLogo from '../assets/images/markets-full-logos/bandLogo.jpg';
 import VvvLogo from '../assets/images/markets-full-logos/vvv-logo.jpg';
+import ChzLogo from '../assets/images/markets-full-logos/chzLogo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -154,6 +155,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "PLUME%20%2F%20USD": PlumeLogo,
   "BAND%20%2F%20USD": BandLogo,
   "VVV%20%2F%20USD": VvvLogo,
+  "CHZ%20%2F%20USD": ChzLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -183,6 +185,7 @@ export const MARKETSORDER = [
   "PLUME%20%2F%20USD",
   "BAND%20%2F%20USD",
   "VVV%20%2F%20USD",
+  "CHZ%20%2F%20USD",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
@@ -405,6 +408,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "PLUME%20%2F%20USD",
     "BAND%20%2F%20USD",
     "VVV%20%2F%20USD",
+    "CHZ%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
