@@ -223,7 +223,7 @@ const MarketsInfo: React.FC = () => {
           </StatCard>
           <StatCard>
             <Text size="1" style={{ color: "#A8A6A6", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              Total Open Interest
+              Current Open Interest
             </Text>
             <Text size="7" weight="bold" style={{ color: "#FFFFFF", marginTop: 8 }}>
               {formatMetric(totalOpenInterestUsd, undefined, { prefix: "$", maxFractionDigits: 2 })}
