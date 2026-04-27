@@ -45,7 +45,7 @@ export const HeroTitle = styled.h1`
 export const HeroSubtitle = styled(Text)`
   font-size: 14px;
   font-weight: 500;
-  background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+  background: ${theme.gradient.accentText};
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -67,22 +67,19 @@ export const ProgramCardContainer = styled(Box)<{
 }>`
   width: 280px;
   min-height: 480px;
-  border-radius: 16px;
-  border: 1px solid transparent;
+  border-radius: ${theme.radius.md};
+  border: 1px solid ${theme.semantic.border};
   padding: 20px;
-  background: ${({ $isLocked, $accentColor }) =>
+  background: ${({ $isLocked }) =>
     $isLocked
-      ? `linear-gradient(${theme.color.grey7}, ${theme.color.grey7}) padding-box,
-         linear-gradient(135deg, ${theme.color.grey10} 0%, ${theme.color.grey11} 100%) border-box`
-      : `linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
-         linear-gradient(135deg, ${$accentColor} 0%,
-         ${theme.color.white}20 100%) border-box`
+      ? theme.semantic.bgElevated
+      : theme.semantic.panel
   };
 
   box-shadow: ${({ $accentColor, $isLocked }) =>
     $isLocked
       ? '0px 4px 12px rgba(0, 0, 0, 0.3)'
-      : `0px 4px 24px ${$accentColor}40, 0px 0px 4px ${theme.color.white}20 inset`
+      : `inset 0 1px 0 ${$accentColor}33`
   };
 
   opacity: ${({ $isLocked }) => $isLocked ? 0.6 : 1};
@@ -130,9 +127,9 @@ export const CardSection = styled(Flex)`
   flex-direction: column;
   gap: 6px;
   padding: 12px;
-  border-radius: 12px;
-  background: ${theme.color.grey4}40;
-  border: 1px solid ${theme.color.darkBlue};
+  border-radius: ${theme.radius.md};
+  background: ${theme.semantic.field};
+  border: 1px solid ${theme.semantic.border};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     gap: 8px;
@@ -259,8 +256,8 @@ export const NoticeBox = styled(Flex)`
   padding: 16px;
   flex-direction: column;
   gap: 8px;
-  border-radius: 12px;
-  background: ${theme.color.grey4}40;
+  border-radius: ${theme.radius.md};
+  background: ${theme.semantic.panel};
   border: 1px solid ${theme.color.yellow1}60;
   border-left: 4px solid ${theme.color.yellow1};
   max-width: 900px;

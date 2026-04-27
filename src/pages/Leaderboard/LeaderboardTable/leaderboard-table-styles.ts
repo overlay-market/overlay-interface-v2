@@ -3,9 +3,14 @@ import theme from "../../../theme";
 
 export const Table = styled.table`
   width: calc(100% - 16px);
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 0 8px;
   margin-bottom: 60px;
+  background: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
+  overflow: hidden;
 
   @media (min-width: ${theme.breakpoints.sm}) {
     margin-bottom: 0px;
@@ -17,7 +22,8 @@ export const StyledHeader = styled.th<{textalign: string}>`
   text-align: ${({textalign}) => textalign};
   font-size: 12px;
   font-weight: 400;
-  color: ${theme.color.white};
+  color: ${theme.semantic.textMuted};
+  background: ${theme.semantic.bgElevated};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 8px 12px 12px 12px;
@@ -25,7 +31,11 @@ export const StyledHeader = styled.th<{textalign: string}>`
 `;
 
 export const StyledRow = styled.tr`
-  border-bottom: 1px solid ${theme.color.darkBlue};
+  border-bottom: 1px solid ${theme.semantic.borderMuted};
+
+  &:hover {
+    background: ${theme.semantic.hover};
+  }
 `;
 
 export const StyledCell = styled.td<{textalign: string, weight?: string}>`

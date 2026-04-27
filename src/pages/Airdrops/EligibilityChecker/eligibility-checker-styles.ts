@@ -10,7 +10,7 @@ export const LineSeparator = styled(Flex)`
     position: absolute;
     top: ${theme.headerSize.height};
     left: ${theme.headerSize.tabletWidth};
-    border-bottom: 1px solid ${theme.color.darkBlue};
+    border-bottom: 1px solid ${theme.semantic.border};
   }
 
   @media (min-width: ${theme.breakpoints.md}) {
@@ -25,11 +25,10 @@ export const LineSeparator = styled(Flex)`
 
 export const GradientBorderBox = styled(Flex)<{ bordercolor?: string }>`
   @media (min-width: ${theme.breakpoints.sm}) {    
-    border: solid 1px ${({ bordercolor }) => (bordercolor ? bordercolor : 'transparent')}; 
-    border-radius: 16px;
-    background: ${({ bordercolor }) => (bordercolor ? '' : `linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
-      linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box`)};
-    box-shadow: 0px 0px 12px 3px rgba(255, 255, 255, 0.45);
+    border: 1px solid ${({ bordercolor }) => (bordercolor ? bordercolor : theme.semantic.border)}; 
+    border-radius: ${theme.radius.md};
+    background: ${theme.semantic.panel};
+    box-shadow: none;
   }  
 `;
 
@@ -37,11 +36,11 @@ export const StyledInput = styled.input`
   width: 100%;
   padding: 16px;
   outline: none;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   box-sizing: border-box;
   color: ${theme.color.white};
-  background-color: ${theme.color.grey4};
+  background-color: ${theme.semantic.field};
   font-size: 14px;
   font-weight: 600;
   font-family: Inter;
@@ -50,7 +49,7 @@ export const StyledInput = styled.input`
   white-space: nowrap;
 
   &::placeholder {
-    color: #6c7180;
+    color: ${theme.semantic.textMuted};
   }
 `;
 
@@ -58,11 +57,11 @@ export const DisabledButton = styled.button`
   width: 100%;
   height: 49px;
   color: ${theme.color.grey11};
-  background: #393939;
+  background: ${theme.semantic.field};
   cursor: default;
   font-size: 14px;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: ${theme.radius.md};
   border: none;
   transition: opacity 0.2s ease;
 `;
@@ -72,8 +71,8 @@ export const BummerContainer = styled(Flex)`
   gap: 8px;
   width: 100%;
   padding: 16px;
-  border: solid 1px ${theme.color.red1}; 
-  border-radius: 16px;
+  border: solid 1px ${theme.semantic.negative}; 
+  border-radius: ${theme.radius.md};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 16px 32px;
@@ -85,8 +84,8 @@ export const InfoContainer = styled(Flex)`
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  border: solid 1px ${theme.color.darkBlue}; 
-  border-radius: 16px;
+  border: solid 1px ${theme.semantic.border}; 
+  border-radius: ${theme.radius.md};
   margin-top: -20px;
 
   @media (min-width: ${theme.breakpoints.sm}) {
@@ -98,7 +97,7 @@ export const GradientLink = styled(Text)`
   font-size: 12px;
   font-weight: 500;
   color: transparent;
-  --grad: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+  --grad: ${theme.gradient.accentText};
   background: var(--grad), var(--grad) bottom 2px left 0/100% 1px no-repeat;
   background-clip: text, padding-box;
   -webkit-background-clip: text, padding-box;
