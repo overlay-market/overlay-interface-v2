@@ -47,7 +47,11 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
   const { typedValue, selectedLeverage, isLong, slippageValue } =
     useTradeState();
   const collateralType = useCollateralType();
-  const { handleLeverageSelect, handleCollateralTypeChange } = useTradeActionHandlers();
+  const {
+    handleLeverageSelect,
+    handleCollateralTypeChange,
+    handlePositionSideSelect,
+  } = useTradeActionHandlers();
   const [loading, setLoading] = useState<boolean>(false);
   const [capLeverage, setCapleverage] = useState<number>(5);
   const [isLbscAvailable, setIsLbscAvailable] = useState<boolean>(true);
@@ -156,12 +160,22 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
       return;
     }
 
+    if (!isLong) {
+      handlePositionSideSelect(true);
+    }
+
     if (selectedLeverage !== "1") {
       handleLeverageSelect("1");
     }
     setDisplayedLeverage("1");
     setLeverageInputValue("1");
-  }, [isGambling, selectedLeverage, handleLeverageSelect]);
+  }, [
+    isGambling,
+    isLong,
+    selectedLeverage,
+    handleLeverageSelect,
+    handlePositionSideSelect,
+  ]);
 
   useEffect(() => {
     if (debouncedSelectedLeverage !== null && !isGambling) {
