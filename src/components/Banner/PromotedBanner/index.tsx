@@ -28,6 +28,7 @@ export const PromotedBanner = ({
 
   return (
     <StyledPromotedBanner
+      type="button"
       style={{
         backgroundImage: `${
           !videoSrc ? "url(" + getMarketLogo(Id) + ")" : "none"
@@ -75,7 +76,7 @@ export const PromotedBanner = ({
         justify={"start"}
         align={"start"}
         width={"100%"}
-        style={{ position: "relative", zIndex: 1 }} // Keep content above the video
+        style={{ position: "relative", zIndex: 2 }} // Keep content above media overlay.
       >
         <SubtitleText>{Title}</SubtitleText>
         <TitleText>{Name}</TitleText>

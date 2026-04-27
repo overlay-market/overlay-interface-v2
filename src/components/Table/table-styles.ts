@@ -3,51 +3,91 @@ import theme from "../../theme";
 import { Button, Flex } from "@radix-ui/themes";
 import { ChevronDown } from "react-feather";
 
-export const Table = styled.table<{ width?: string, minwidth?: string }>`
+type TableVariant = "default" | "positions";
+
+export const Table = styled.table<{ width?: string, minwidth?: string, $variant?: TableVariant }>`
   width: ${(props) => (props.width ?? '100%')};
   min-width: ${(props) => (props.minwidth ?? '100%')};
-  border-collapse: collapse;
-  margin: 24px 0px;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: ${({ $variant }) => ($variant === "positions" ? "fixed" : "auto")};
+  margin: ${({ $variant }) => ($variant === "positions" ? "8px 0 0" : "16px 0px")};
+  background: ${({ $variant }) =>
+    $variant === "positions" ? "#08090a" : theme.semantic.panel};
+  border: ${({ $variant }) =>
+    $variant === "positions" ? "0" : `1px solid ${theme.semantic.border}`};
+  border-radius: ${({ $variant }) =>
+    $variant === "positions" ? "0" : theme.radius.md};
+  overflow: hidden;
 `;
 
-export const StyledHeader = styled.th`
-  padding-bottom: 16px;
+export const StyledHeader = styled.th<{ $variant?: TableVariant }>`
+  padding: ${({ $variant }) =>
+    $variant === "positions" ? "8px 14px 7px" : "12px 16px"};
   text-align: left;
-  font-weight: 400;
-  color: ${theme.color.grey3};
-  border-bottom: 1px solid ${theme.color.grey6};
+  font-size: ${({ $variant }) => ($variant === "positions" ? "10px" : "12px")};
+  font-weight: ${({ $variant }) => ($variant === "positions" ? 700 : 600)};
+  color: ${theme.semantic.textMuted};
+  background: ${({ $variant }) =>
+    $variant === "positions" ? "#08090a" : theme.semantic.bgElevated};
+  border-bottom: ${({ $variant }) =>
+    $variant === "positions" ? "0" : `1px solid ${theme.semantic.border}`};
+  text-decoration: ${({ $variant }) =>
+    $variant === "positions" ? `underline dotted ${theme.semantic.border}` : "none"};
+  text-underline-offset: 4px;
+  white-space: nowrap;
 `;
 
 export const StyledRow = styled.tr`
-  border-bottom: 1px solid ${theme.color.grey6};
+  border-bottom: 1px solid ${theme.semantic.borderMuted};
 
   &:hover {
-    background-color: ${theme.color.grey7};
+    background-color: ${theme.semantic.hover};
     cursor: pointer;
    }
+
+  .positions-terminal-table & {
+    height: 54px;
+    border-bottom: 0;
+
+    &:hover {
+      background: #0d0f12;
+    }
+  }
 `;
 
 export const StyledCell = styled.td`
-  padding: 16px 0px;
+  padding: 14px 16px;
   text-align: left;
+  border-bottom: 1px solid ${theme.semantic.borderMuted};
+  color: ${theme.semantic.textSecondary};
+  font-variant-numeric: tabular-nums;
+
+  .positions-terminal-table & {
+    padding: 8px 14px;
+    border-bottom: 0;
+    color: ${theme.semantic.textSecondary};
+    font-size: 11px;
+    vertical-align: middle;
+  }
 `;
 
 export const PaginationButton = styled(Button)<{ $active?: string, $navbutton: string }>`
-  background-color: ${({ $navbutton }) => ($navbutton === 'true' ? theme.color.grey4 : theme.color.background)};
-  border: ${({ $active }) => ($active === 'true' ? `1px solid ${theme.color.grey3}` : '')};
-  border-radius: 4px;
-  color: ${theme.color.grey2};
+  background-color: ${({ $navbutton }) => ($navbutton === 'true' ? theme.semantic.field : theme.semantic.panel)};
+  border: 1px solid ${({ $active }) => ($active === 'true' ? theme.semantic.accent : theme.semantic.border)};
+  border-radius: ${theme.radius.sm};
+  color: ${({ $active }) => ($active === 'true' ? theme.semantic.accent : theme.semantic.textSecondary)};
   width: 28px;
   padding: 4px 8px;
   margin: 0 4px;
   cursor: pointer;
 
   &:hover {
-   box-shadow: 0 0 5px ${theme.color.grey3};
+   box-shadow: 0 0 0 1px ${theme.semantic.border};
   }
 
   &[disabled] {
-    color: ${theme.color.grey5};
+    color: ${theme.semantic.textMuted};
     cursor: not-allowed;
     &:hover {
       box-shadow: none;
@@ -63,8 +103,9 @@ export const PaginationFlex = styled(Flex)`
 export const Dropdown = styled.div`
   position: relative;
   padding: 6.5px 10px;
-  background: ${theme.color.grey4};
-  border-radius: 4px;
+  background: ${theme.semantic.field};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.sm};
   margin-left: 8px;
   box-sizing: border-box;
   max-width: 104px;
@@ -90,19 +131,30 @@ export const DropdownMenu = styled.div`
   z-index: 1;
   top: 100%;
   left: 0;
-  background: ${theme.color.grey4};
-  border-radius: 0 0 4px 4px;
+  background: ${theme.semantic.field};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: 0 0 ${theme.radius.sm} ${theme.radius.sm};
   display: none;
 
-  > div {
-    border-radius: 4px;
+  > button {
+    width: 104px;
+    border: 0;
+    border-radius: ${theme.radius.sm};
     padding: 6.5px 10px;
     box-sizing: border-box;
-    width: 104px;
     white-space: nowrap;
+    background: transparent;
+    color: ${theme.semantic.textSecondary};
+    text-align: left;
+    cursor: pointer;
 
     &:hover {
-      box-shadow: 0 0 2px ${theme.color.grey3};
+      background: ${theme.semantic.hover};
+    }
+
+    &:focus-visible {
+      outline: 1px solid ${theme.semantic.focus};
+      outline-offset: -2px;
     }
   }
 `

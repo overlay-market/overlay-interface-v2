@@ -3,10 +3,10 @@ import * as Dialog from "@radix-ui/react-dialog";
 import  theme  from "../../theme";
 
 export const StyledOverlay = styled(Dialog.Overlay)`
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.72);
   position: fixed;
   inset: 0;
-  backdrop-filter: blur(7px);
+  backdrop-filter: blur(6px);
 `;
 
 export const StyledContent = styled(Dialog.Content)<{
@@ -17,8 +17,8 @@ export const StyledContent = styled(Dialog.Content)<{
   bordercolor?: string;
   boxshadow?: string;
 }>`
-  background-color: ${theme.color.background};
-  border-radius: 20px;
+  background-color: ${theme.semantic.panel};
+  border-radius: ${theme.radius.lg};
   box-sizing: border-box;
   padding: 24px;
   width: 80%;
@@ -31,8 +31,8 @@ export const StyledContent = styled(Dialog.Content)<{
   transform: translate(-50%, -50%);
   outline: none;
   box-shadow: ${({ boxshadow }) =>
-    boxshadow ?? `0px 0px 12px 6px rgba(91, 96, 164, 0.25)`};
-  border: 1px solid ${({ bordercolor }) => bordercolor ?? `${theme.color.blue2}80`};
+    boxshadow ?? theme.shadow.popover};
+  border: 1px solid ${({ bordercolor }) => bordercolor ?? theme.semantic.border};
   @media (min-width: ${theme.breakpoints.xs}) {
     width: ${({ width }) => (width ? width : "400px")};
   }
@@ -40,7 +40,8 @@ export const StyledContent = styled(Dialog.Content)<{
 
 export const StyledClose = styled(Dialog.Close)`
   color: ${theme.color.grey2};
+  border-radius: ${theme.radius.sm};
   &:hover {
-    opacity: 0.7;
+    color: ${theme.semantic.accent};
   }
 `;

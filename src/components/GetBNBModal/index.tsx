@@ -119,11 +119,11 @@ export const GetBNBModal: React.FC<GetBNBModalProps> = ({
           <Button
             size="3"
             style={{
-              background: "linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%)",
+              background: theme.gradient.accent,
               color: theme.color.black,
               cursor: "pointer",
               border: "none",
-              borderRadius: "8px",
+              borderRadius: theme.radius.md,
               fontWeight: "600",
               width: "100%",
               marginBottom: "12px",
