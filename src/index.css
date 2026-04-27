@@ -4,7 +4,7 @@
   font-weight: 400;
 
   color: rgba(255, 255, 255, 0.87);
-  background-color: #171721;
+  background-color: #050607;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,7 +19,9 @@
     --default-font-size: 14px;
     --radius-2: 8px;
     --cursor-button: pointer;
-    --gray-12: #ECECEC;
+    --gray-12: #F4F5F6;
+    --color-background: #050607;
+    --focus-8: #F3A91B;
   }
 
   .rt-Skeleton {
@@ -43,18 +45,24 @@
 
 @keyframes rt-skeleton-pulse2 {
   from {
-      background-color: #2f2e37;
+      background-color: #15171b;
   }
   to {
-      background-color: #111017;
+      background-color: #050607;
   }
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
   max-width: 100vw;
+  overflow-x: hidden;
+}
+
+html,
+#root {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
