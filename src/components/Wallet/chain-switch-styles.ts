@@ -9,12 +9,13 @@ export const ChainLogo = styled.div<{ src: string }>`
 `;
 
 export const DropdownContent = styled(DropdownMenu.Content)`
-  background-color: ${theme.color.grey4};
-  border-radius: 8px;
+  background-color: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   padding: 10px 0px;
   width: 232px;
   max-width: 232px;
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: ${theme.shadow.popover};
 `;
 
 export const DropdownItem = styled(DropdownMenu.Item)`
@@ -26,7 +27,7 @@ export const DropdownItem = styled(DropdownMenu.Item)`
   cursor: pointer;
   
   &:hover {
-    background-color: ${theme.color.background};
+    background-color: ${theme.semantic.hover};
     font-weight: 700;
     border-radius: 0px;
   }

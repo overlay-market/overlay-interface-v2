@@ -30,3 +30,4 @@ dist-ssr
 *.sw?
 
 pnpm-workspace.yaml
+.playwright-mcp/*.yml

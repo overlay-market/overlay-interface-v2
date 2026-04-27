@@ -35,35 +35,32 @@ const SeasonSelectTrigger = styled(Select.Trigger)`
   justify-content: space-between;
   padding: 0 16px;
   border-radius: 8px;
-  border: 1px solid transparent;
-  background: linear-gradient(${theme.color.background}, ${theme.color.background})
-      padding-box,
-    linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
-  color: ${theme.color.white};
+  border: 1px solid ${theme.semantic.border};
+  background: ${theme.semantic.field};
+  color: ${theme.semantic.textPrimary};
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   outline: none;
 
   &:hover {
-    box-shadow: 0px 0px 12px 3px #ffffff73;
+    border-color: ${theme.semantic.accent};
   }
 `;
 
 const SeasonSelectContent = styled(Select.Content)`
-  background-color: ${theme.color.grey4};
-  border-radius: 12px;
+  background-color: ${theme.semantic.panel};
+  border-radius: ${theme.radius.md};
   padding: 6px;
-  border: 1px solid ${theme.color.darkBlue};
-  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
-    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  border: 1px solid ${theme.semantic.border};
+  box-shadow: ${theme.shadow.popover};
 `;
 
 const SeasonSelectItem = styled(Select.Item)`
   font-size: 14px;
   line-height: 1;
-  color: ${theme.color.white};
-  border-radius: 8px;
+  color: ${theme.semantic.textPrimary};
+  border-radius: ${theme.radius.sm};
   display: flex;
   align-items: center;
   height: 34px;
@@ -74,7 +71,7 @@ const SeasonSelectItem = styled(Select.Item)`
 
   &[data-highlighted] {
     outline: none;
-    background: rgba(255, 255, 255, 0.12);
+    background: ${theme.semantic.hover};
   }
 
   &[data-state="checked"] {

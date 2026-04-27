@@ -1,26 +1,34 @@
-import {
-  Box,
-  Flex,  
-} from "@radix-ui/themes";
+import { Box } from "@radix-ui/themes";
 import  theme  from "../../../theme";
 import styled from "styled-components";
 
-export const MarketInfo = styled(Flex)`
+export const MarketInfo = styled.button`
   width: 100%;
   height: 49px;
+  display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
   padding: 12px 8px;
-  border-bottom: 1px solid ${theme.color.darkBlue};
+  border: 0;
+  border-bottom: 1px solid ${theme.semantic.border};
+  background: transparent;
+  color: ${theme.semantic.textSecondary};
   cursor: pointer;
+  text-align: left;
 
   @media (min-width: ${theme.breakpoints.xxl}) {
     padding: 12px 8px 12px 16px;
   }
 
   &:hover {
-    background: ${theme.color.grey7};
+    background: ${theme.semantic.hover};
+    color: ${theme.semantic.textPrimary};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: -2px;
   }
 `;
 
@@ -45,7 +53,7 @@ export const MarketLogo = styled.img`
   width: 34px;
   height: 34px;
   object-fit: cover;
-  border-radius: 8px;
-  border: 0.5px solid rgba(236, 236, 236, 0.15);
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: ${theme.radius.sm};
+  border: 1px solid ${theme.semantic.border};
+  box-shadow: none;
 `;

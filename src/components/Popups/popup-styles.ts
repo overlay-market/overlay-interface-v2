@@ -12,7 +12,9 @@ export const PopupContainer = styled.div`
   z-index: 69420;
   margin-top: 4px;
   border-radius: 8px;
-  background: ${theme.color.grey4};
+  background: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
+  box-shadow: ${theme.shadow.popover};
   overflow: hidden;
 `;
 
@@ -22,7 +24,7 @@ const Fader = styled.div`
   left: 0px;
   width: 100%;
   height: 2px;
-  background-color: ${theme.color.blue3};
+  background-color: ${theme.semantic.accent};
 `;
 
 export const AnimatedFader = animated(Fader);

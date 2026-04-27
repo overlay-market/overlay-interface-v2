@@ -1,5 +1,4 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { ColorButton } from "../../../components/Button";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useState } from "react";
 import useAccount from "../../../hooks/useAccount";
@@ -10,7 +9,6 @@ import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import type { OpenPositionData } from "overlay-sdk";
 import ClosePositionsModal from "../../../components/ClosePositionsModal";
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import {
   useIsNewUnwindTxn,
   usePositionRefresh,
@@ -18,6 +16,14 @@ import {
 import useMultiMarketPositionsPnL from "../../../hooks/useMultiMarketPositionsPnL";
 import { triggerLoader } from "../UnwindsTable";
 import { isShutdownOpenPosition } from "../../../utils/positionGuards";
+import {
+  CloseAllButton,
+  PositionFilterChip,
+  PositionsFilters,
+  PositionsTitle,
+  PositionsToolbar,
+  PositionsToolbarLeft,
+} from "../../../styles/positions-table";
 
 import styled, { keyframes } from "styled-components";
 
@@ -37,15 +43,17 @@ const LoadingSpinner = styled.div`
 `;
 
 const POSITIONS_COLUMNS = [
-  "Market",
+  "Contract",
   "Size",
-  "Position",
   "Entry Price",
-  "Current Price",
-  "Liq. Price",
-  "Created",
-  "Unrealized PnL",
-  "Funding",
+  "Mark Price",
+  "Est. Liq. Price",
+  "Break-Even Price",
+  "Margin",
+  "MMR",
+  "Unrealized PnL (ROE)",
+  "Realized P",
+  "Reduce/Close",
 ];
 
 const OpenPositionsTable: React.FC = () => {
@@ -63,10 +71,8 @@ const OpenPositionsTable: React.FC = () => {
   const getPositionKey = (position: OpenPositionData) => {
     return `${position.positionId}-${position.marketAddress}`;
   };
-  const [showCheckboxes, setShowCheckboxes] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
-
-  const isMobile = useMediaQuery("(max-width: 767px)");
+  const [marginMode, setMarginMode] = useState<"all" | "cross" | "isolated">("all");
 
   const { loading, positions, positionsTotalNumber, refreshPositions } =
     usePositionRefresh(
@@ -80,45 +86,18 @@ const OpenPositionsTable: React.FC = () => {
   const { pnlData, marketPrices } = useMultiMarketPositionsPnL(positions, {
     isRefreshing: loading,
   });
+  const closeablePositions =
+    positions?.filter((pos) => !isShutdownOpenPosition(pos)) || [];
   const selectedCloseablePositions =
-    positions?.filter(
-      (pos) =>
-        selectedPositions.has(getPositionKey(pos)) && !isShutdownOpenPosition(pos)
-    ) || [];
+    positions?.filter((pos) => selectedPositions.has(getPositionKey(pos))) || [];
 
-  const handleSelectAll = (selectAll: boolean) => {
-    if (selectAll) {
-      setSelectedPositions(
-        new Set(
-          positions
-            ?.filter((position) => !isShutdownOpenPosition(position))
-            .map((position) => getPositionKey(position)) || []
-        )
-      );
-    } else {
-      setSelectedPositions(new Set());
-    }
-  };
-
-  const handlePositionSelect = (
-    position: OpenPositionData,
-    checked: boolean
-  ) => {
-    setSelectedPositions((prev) => {
-      const newSet = new Set(prev);
-      const positionKey = getPositionKey(position);
-      if (checked) {
-        newSet.add(positionKey);
-      } else {
-        newSet.delete(positionKey);
-      }
-      return newSet;
-    });
+  const handleCloseAll = () => {
+    setSelectedPositions(new Set(closeablePositions.map(getPositionKey)));
+    setShowCloseModal(true);
   };
 
   const handleClosePositions = async () => {
     setShowCloseModal(false);
-    setShowCheckboxes(false);
     setSelectedPositions(new Set());
     triggerLoader && triggerLoader();
     setTimeout(refreshPositions, 1000);
@@ -134,57 +113,41 @@ const OpenPositionsTable: React.FC = () => {
         borderBottom: `1px solid ${theme.color.darkBlue}`,
       }}
     >
-      <Flex align="center" justify="between" mb="4">
-        <Flex align="center" gap="2">
-          <Text weight={"bold"} size={"5"}>
-            Open Positions
-          </Text>
+      <PositionsToolbar>
+        <PositionsToolbarLeft>
+          <PositionsTitle>Positions({positionsTotalNumber})</PositionsTitle>
           {loading && positions && <LoadingSpinner />}
-        </Flex>
-        <Flex gap="2" style={{ display: isMobile ? "none" : "flex" }}>
-          {showCheckboxes ? (
-            <>
-              <ColorButton
-                onClick={() => {
-                  setShowCheckboxes(false);
-                  setSelectedPositions(new Set());
-                }}
-                width="140px"
-                bgcolor={theme.color.grey4}
-                color={theme.color.grey1}
+          <PositionsFilters aria-label="Position margin mode filters">
+            {(["all", "cross", "isolated"] as const).map((mode) => (
+              <PositionFilterChip
+                key={mode}
+                type="button"
+                $active={marginMode === mode}
+                onClick={() => setMarginMode(mode)}
               >
-                Cancel Selection
-              </ColorButton>
-              <ColorButton
-                onClick={() => setShowCloseModal(true)}
-                width="180px"
-                disabled={selectedCloseablePositions.length === 0}
-              >
-                Close Selected ({selectedCloseablePositions.length})
-              </ColorButton>
-            </>
-          ) : (
-            <ColorButton
-              onClick={() => setShowCheckboxes(true)}
-              width="140px"
-              style={{ display: positionsTotalNumber === 0 ? "none" : "block" }}
-            >
-              Select Positions
-            </ColorButton>
-          )}
-        </Flex>
-      </Flex>
+                {mode === "all" ? "All" : mode === "cross" ? "Cross" : "Isolated"}
+              </PositionFilterChip>
+            ))}
+          </PositionsFilters>
+        </PositionsToolbarLeft>
+        <CloseAllButton
+          type="button"
+          disabled={closeablePositions.length === 0}
+          onClick={handleCloseAll}
+        >
+          Close All
+        </CloseAllButton>
+      </PositionsToolbar>
 
       <StyledTable
         headerColumns={POSITIONS_COLUMNS}
-        minWidth="950px"
+        variant="positions"
+        minWidth="1360px"
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
         positionsTotalNumber={positionsTotalNumber}
         setCurrentPage={setCurrentPage}
         setItemsPerPage={setItemsPerPage}
-        showCheckbox={showCheckboxes}
-        onSelectAll={handleSelectAll}
         body={
           positions && positions.length > 0 ? (
             <>
@@ -200,11 +163,8 @@ const OpenPositionsTable: React.FC = () => {
                     realtimeMarketPrices={marketPrices.get(
                       pos.marketAddress.toLowerCase()
                     )}
-                    showCheckbox={showCheckboxes}
-                    onCheckboxChange={(checked) =>
-                      handlePositionSelect(pos, checked)
-                    }
-                    isChecked={selectedPositions.has(key)}
+                    showCheckbox={false}
+                    isChecked={false}
                   />
                 );
               })}

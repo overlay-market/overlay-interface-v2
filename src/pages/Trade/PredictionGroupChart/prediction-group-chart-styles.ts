@@ -6,9 +6,9 @@ export const ChartContainer = styled(Flex)`
   flex-direction: column;
   width: 100%;
   height: 350px;
-  border: 1px solid ${theme.color.darkBlue};
-  border-radius: 8px;
-  background: ${theme.color.grey4};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
+  background: ${theme.semantic.panel};
   padding: 16px;
   margin-top: 16px;
 
@@ -22,7 +22,7 @@ export const IntervalButton = styled(Box)<{ selected: boolean }>`
   padding: 0 10px;
   cursor: pointer;
   color: ${({ selected }) =>
-    selected ? theme.color.blue2 : theme.color.grey3};
+    selected ? theme.semantic.accent : theme.semantic.textMuted};
 `;
 
 export const LegendDot = styled.div<{ color: string }>`

@@ -1,9 +1,9 @@
-import { Box, Flex } from "@radix-ui/themes";
+import { Box } from "@radix-ui/themes";
 import styled from "styled-components";
 import theme from "../../../theme";
 
 export const HeaderMarketName = styled(Box)`
-  max-width: 160px; 
+  max-width: 190px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -13,42 +13,54 @@ export const HeaderMarketName = styled(Box)`
   text-align: left;
 `;
 
-export const MarketsListContainer = styled(Flex)`
-  height: ${theme.headerSize.height};
+export const MarketsListContainer = styled.button`
+  height: 64px;
   width: 100%;
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  padding-left: 15px;
-  padding-right: 15px;
+  gap: 12px;
+  padding-left: 18px;
+  padding-right: 16px;
   cursor: pointer;
+  border: 0;
+  border-right: 1px solid ${theme.semantic.borderMuted};
+  background: transparent;
+  color: ${theme.semantic.textPrimary};
+  text-align: left;
+
+  &:hover {
+    background: ${theme.semantic.hover};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: -2px;
+  }
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: 334px;
-    padding-left: 8px;
+    width: 300px;
+    padding-left: 18px;
     padding-right: 16px;
-    border-right: 1px solid ${theme.color.darkBlue};
+    border-right: 1px solid ${theme.semantic.borderMuted};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
-    width: 260px;
-    padding-left: 8px;
-    padding-right: 10px;
+    width: 300px;
   }
 
   @media (min-width: ${theme.breakpoints.xxl}) {
-    width: 272px;
-    padding-left: 0;
+    width: 320px;
   }
 `
 
 export const CurrentMarketLogo = styled.img`
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   object-fit: cover;
-  border-radius: 8px;
-  border: 1px solid rgba(236, 236, 236, 0.15);
-  box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  border-radius: ${theme.radius.sm};
+  border: 1px solid ${theme.semantic.border};
+  box-shadow: none;
   @media (min-width: ${theme.breakpoints.md}) {
     width: 34px;
     height: 34px;
@@ -60,24 +72,25 @@ export const DropdownContainer = styled(Box)`
   height: 520px;
   padding: 0 8px;
   position: absolute;
-  top: ${theme.headerSize.height}
+  top: 64px;
   left: 0;
   z-index: 10;
-  background-color: ${theme.color.background};
-  border-top: 1px solid ${theme.color.darkBlue};
-  border-right: 1px solid ${theme.color.darkBlue};
+  background-color: #08090a;
+  border: 1px solid ${theme.semantic.border};
+  border-left: 0;
+  box-shadow: ${theme.shadow.popover};
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: 334px;
+    width: 300px;
     height: 614px;
     padding: 0;
   }
   @media (min-width: ${theme.breakpoints.lg}) {
-    width: 260px;
+    width: 300px;
     height: 562px;
   }
   @media (min-width: ${theme.breakpoints.xxl}) {
-    width: calc(272px + 16px);
+    width: 320px;
     height: 645px;
     left: 0;
   }
@@ -99,11 +112,11 @@ export const StyledScrollArea = styled.div`
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: ${theme.color.grey6};
+    background-color: ${theme.semantic.border};
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background-color: ${theme.color.darkBlue};
+    background-color: ${theme.semantic.textMuted};
   }
   @media (min-width: ${theme.breakpoints.sm}) {
     height: 614px;
@@ -120,6 +133,6 @@ export const StyledScrollArea = styled.div`
 
 export const SearchEmptyMessage = styled.div`
   width: 100%;
-  color: #777;
+  color: ${theme.semantic.textMuted};
   padding-left: 16px;
 `

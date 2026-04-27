@@ -17,6 +17,7 @@ type TableProps = {
   headerColumns: string[];
   width?: string;
   minWidth?: string;
+  variant?: "default" | "positions";
   currentPage: number;
   positionsTotalNumber: number;
   itemsPerPage: number;
@@ -31,6 +32,7 @@ const StyledTable: React.FC<TableProps> = ({
   headerColumns,
   width,
   minWidth,
+  variant = "default",
   currentPage,
   positionsTotalNumber,
   itemsPerPage,
@@ -75,11 +77,17 @@ const StyledTable: React.FC<TableProps> = ({
   return (
     <>
       <ScrollArea type="auto" scrollbars="horizontal" size="2">
-        <Table width={width} minwidth={minWidth}>
+        <Table
+          width={width}
+          minwidth={minWidth}
+          $variant={variant}
+          className={variant === "positions" ? "positions-terminal-table" : undefined}
+        >
           <thead>
             <tr>
               {showCheckbox && (
                 <StyledHeader
+                  $variant={variant}
                   style={{
                     width: "40px",
                     paddingLeft: "10px",
@@ -93,7 +101,7 @@ const StyledTable: React.FC<TableProps> = ({
                 </StyledHeader>
               )}
               {headerColumns.map((column: string, index) => (
-                <StyledHeader key={index}>{column}</StyledHeader>
+                <StyledHeader $variant={variant} key={index}>{column}</StyledHeader>
               ))}
             </tr>
           </thead>
@@ -232,12 +240,13 @@ const StyledTable: React.FC<TableProps> = ({
                 {ROWS_PER_PAGE.map(
                   (value) =>
                     value !== itemsPerPage && (
-                      <div
+                      <button
+                        type="button"
                         key={value}
                         onClick={() => handleItemsPerPageChange(value)}
                       >
                         <Text>{value} / page</Text>
-                      </div>
+                      </button>
                     )
                 )}
               </DropdownMenu>

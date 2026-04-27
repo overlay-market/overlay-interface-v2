@@ -24,8 +24,9 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
     px={"24px"}
     gap={isMultiValue ? "12px" : undefined}
     style={{
-      backgroundColor: theme.color.grey4,
-      borderRadius: "8px",
+      backgroundColor: theme.semantic.panel,
+      border: `1px solid ${theme.semantic.border}`,
+      borderRadius: theme.radius.md,
       minHeight: "140px",
     }}
   >

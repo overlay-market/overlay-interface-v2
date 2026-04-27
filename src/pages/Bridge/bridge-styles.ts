@@ -19,11 +19,10 @@ export const BridgeContainer = styled(Flex)`
 
 export const GradientBorderBox = styled(Flex)`
   @media (min-width: ${theme.breakpoints.sm}) {    
-    border: solid 1px transparent; 
-    border-radius: 16px;
-    background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
-      linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
-    box-shadow: 0px 0px 12px 3px rgba(255, 255, 255, 0.45);
+    border: 1px solid ${theme.semantic.border}; 
+    border-radius: ${theme.radius.md};
+    background: ${theme.semantic.panel};
+    box-shadow: none;
   }  
 `;
 
@@ -31,11 +30,11 @@ export const StyledInput = styled.input`
   width: 100%;
   padding: 16px;
   outline: none;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   box-sizing: border-box;
   color: ${theme.color.white};
-  background-color: ${theme.color.grey4};
+  background-color: ${theme.semantic.field};
   font-size: 14px;
   font-weight: 600;
   font-family: Inter;
@@ -44,6 +43,6 @@ export const StyledInput = styled.input`
   white-space: nowrap;
 
   &::placeholder {
-    color: #6c7180;
+    color: ${theme.semantic.textMuted};
   }
 `;

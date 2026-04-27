@@ -316,10 +316,12 @@ export default function MarketsTable({
         variant="surface"
         ml={{ xs: "16px" }}
         style={{
-          background: `${theme.color.background}`,
-          border: "none",
+          background: theme.semantic.panel,
+          border: `1px solid ${theme.semantic.border}`,
+          borderRadius: theme.radius.md,
           marginTop: 0,
           marginBottom: `${isMobile ? "90px" : "30px"}`,
+          overflow: "hidden",
         }}
       >
         <Table.Header style={{ verticalAlign: "middle" }}>
@@ -754,8 +756,7 @@ export default function MarketsTable({
                             <Text
                               size="4"
                               style={{
-                                background:
-                                  "linear-gradient(90deg, #A8A6A6 0%, #ff7cd5 100%)",
+                                background: theme.gradient.accentText,
                                 backgroundClip: "text",
                                 WebkitBackgroundClip: "text",
                                 WebkitTextFillColor: "transparent",
@@ -845,15 +846,16 @@ export default function MarketsTable({
             })()
           ) : (
             <>
-              {Array.from({ length: 3 }).map(() => (
+              {Array.from({ length: 3 }).map((_, rowIndex) => (
                 <Table.Row
+                  key={`markets-skeleton-row-${rowIndex}`}
                   style={{
                     borderBottom: `1px solid ${theme.color.darkBlue}`,
                     width: "100%",
                   }}
                 >
-                  {Array.from({ length: isMobile ? 3 : 9 }).map(() => (
-                    <Table.Cell>
+                  {Array.from({ length: isMobile ? 3 : 9 }).map((_, cellIndex) => (
+                    <Table.Cell key={`markets-skeleton-cell-${rowIndex}-${cellIndex}`}>
                       <Skeleton width={"100%"} height={"42px"} />
                     </Table.Cell>
                   ))}

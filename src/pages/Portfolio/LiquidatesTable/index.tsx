@@ -11,16 +11,23 @@ import LiquidatedPosition from "./LiquidatedPosition";
 import { LiquidatedPositionData } from "overlay-sdk";
 
 const LIQUIDATED_POSITIONS_COLUMNS = [
-  "Market",
+  "Contract",
   "Size",
-  "Position",
   "Entry Price",
   "Exit Price",
   "Created",
   "Liquidated",
 ];
 
-const LiquidatesTable: React.FC = () => {
+type LiquidatesTableProps = {
+  embedded?: boolean;
+  title?: string;
+};
+
+const LiquidatesTable: React.FC<LiquidatesTableProps> = ({
+  embedded = false,
+  title = "Liquidations",
+}) => {
   const { chainId } = useMultichainContext();
   const sdk = useSDK();
   const { address: account } = useAccount();
@@ -97,20 +104,27 @@ const LiquidatesTable: React.FC = () => {
   return (
     <Flex
       direction={"column"}
-      pt={"16px"}
-      pb={"120px"}
+      pt={embedded ? "0" : "16px"}
+      pb={embedded ? "0" : "120px"}
       width={"100%"}
-      style={{
-        borderBottom: `1px solid ${theme.color.darkBlue}`,
-      }}
+      style={
+        embedded
+          ? undefined
+          : {
+              borderBottom: `1px solid ${theme.color.darkBlue}`,
+            }
+      }
     >
-      <Text weight={"bold"} size={"5"}>
-        Liquidations
-      </Text>
+      {title && (
+        <Text weight={"bold"} size={"5"}>
+          {title}
+        </Text>
+      )}
 
       <StyledTable
         headerColumns={LIQUIDATED_POSITIONS_COLUMNS}
-        minWidth="800px"
+        variant="positions"
+        minWidth="920px"
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
         positionsTotalNumber={positionsTotalNumber}

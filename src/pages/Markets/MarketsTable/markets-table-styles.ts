@@ -20,7 +20,7 @@ export const CategoryBarWrapper = styled(Flex)`
   display: flex;
   align-items: center;
   width: 100%;
-  border-bottom: 1px solid #2B3139;
+  border-bottom: 1px solid ${theme.semantic.border};
 `;
 
 export const CategoriesBar = styled(Flex)`
@@ -49,21 +49,21 @@ export const ScrollIndicator = styled.button<{
   width: 40px;
   background: ${({ $side }) =>
     $side === "left"
-      ? `linear-gradient(270deg, transparent, ${theme.color.background} 80%)`
-      : `linear-gradient(90deg, transparent, ${theme.color.background} 80%)`};
+      ? `linear-gradient(270deg, transparent, ${theme.semantic.bg} 80%)`
+      : `linear-gradient(90deg, transparent, ${theme.semantic.bg} 80%)`};
   display: ${({ $visible }) => ($visible ? "flex" : "none")};
   align-items: center;
   justify-content: ${({ $side }) =>
     $side === "left" ? "flex-start" : "flex-end"};
   padding-${({ $side }) => ($side === "left" ? "left" : "right")}: 8px;
   pointer-events: auto;
-  color: #848e9c;
+  color: ${theme.semantic.textMuted};
   z-index: 10;
   transition: color 0.2s ease;
   cursor: pointer;
 
   &:hover {
-    color: ${theme.color.white};
+    color: ${theme.semantic.textPrimary};
   }
 
   @media (max-width: ${theme.breakpoints.sm}) {
@@ -76,8 +76,8 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
   cursor: pointer;
   padding: 6px 14px;
   border-radius: 999px;
-  background: ${({ $active }) => ($active ? "#2B3139" : "transparent")};
-  color: ${({ $active }) => ($active ? theme.color.white1 : "#848E9C")};
+  background: ${({ $active }) => ($active ? theme.semantic.hover : "transparent")};
+  color: ${({ $active }) => ($active ? theme.semantic.textPrimary : theme.semantic.textMuted)};
   font-size: 14px;
   font-weight: 500;
   position: relative;
@@ -86,7 +86,7 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
 
   &:hover {
     color: ${theme.color.white1};
-    background: ${({ $active }) => ($active ? "#2B3139" : "#1E2329")};
+    background: ${({ $active }) => ($active ? theme.semantic.hover : theme.semantic.field)};
   }
 
   &:focus-visible {
@@ -97,7 +97,7 @@ export const CategoryButton = styled.button<{ $active: boolean }>`
 `;
 
 export const NewBadge = styled.span`
-  background-color: #FCD535;
+  background-color: ${theme.semantic.accent};
   color: #000000;
   font-size: 9px;
   font-weight: 700;

@@ -31,6 +31,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
       />
       {searchTerm && (
         <ClearButton
+          type="button"
+          aria-label="Clear search"
           onMouseDown={(e) => {
             e.preventDefault();
             setSearchTerm("");

@@ -9,7 +9,7 @@ export const TokenItem = styled(Flex)`
   cursor: pointer;
   
   &:hover {
-    background: ${theme.color.background};
-    border-radius: 8px;
+    background: ${theme.semantic.hover};
+    border-radius: ${theme.radius.sm};
   }
 `;

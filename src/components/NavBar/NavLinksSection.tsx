@@ -156,8 +156,10 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
     <>
       {mode === NAVBAR_MODE.DEFAULT && (
         <Flex
-          direction={{ initial: "row", sm: "column" }}
-          gap={{ initial: "4px", sm: "8px" }}
+          direction="row"
+          gap="0"
+          height="100%"
+          align="center"
         >
           {NAV_LINKS.filter((link) => link.showOnMobile).map((link) => (
             <StyledNavLink key={link.label} link={link} mode={mode} />

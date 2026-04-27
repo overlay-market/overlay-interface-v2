@@ -3,12 +3,13 @@ import styled from "styled-components";
 import theme from "../../theme";
 
 export const DropdownContent = styled(DropdownMenu.Content)`
-  background-color: ${theme.color.grey4};
-  border-radius: 8px;
+  background-color: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   padding: 10px 0px;
   width: 240px;
   max-width: 240px;
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: ${theme.shadow.popover};
 `;
 
 export const DropdownItem = styled(DropdownMenu.Item)`
@@ -20,7 +21,7 @@ export const DropdownItem = styled(DropdownMenu.Item)`
   cursor: pointer;
   
   &:hover {
-    background-color: ${theme.color.background};
+    background-color: ${theme.semantic.hover};
     border-radius: 0px;
   }
 `;
@@ -47,12 +48,12 @@ export const HeaderMenuButton = styled.div`
   display: flex;
   align-items: center;
   padding: 8px;
-  border-radius: 8px;
+  border-radius: ${theme.radius.md};
   gap: 8px;
-  background: ${theme.color.grey4};
+  background: ${theme.semantic.field};
+  border: 1px solid ${theme.semantic.border};
   position: relative;
   outline: none;
-  border: 0;
   cursor: pointer;
 `;
 
@@ -61,7 +62,7 @@ export const Separator = styled.div`
   justify-content: center;
   height: 1px;
   width: 86%;
-  background: ${theme.color.grey5};
+  background: ${theme.semantic.border};
   margin: 16px auto;
   
   @media (min-width: 1024px) {

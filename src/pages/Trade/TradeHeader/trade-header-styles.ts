@@ -1,64 +1,61 @@
-import {  Flex } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import theme from "../../../theme";
 import styled from "styled-components";
 
 export const TradeHeaderContainer = styled(Flex)`
   flex-direction: column;
   position: relative;
-  margin-left: -12px;
-  margin-right: -12px;
-  width: calc(100% + 24px);
-  border-top: 1px solid ${theme.color.darkBlue};
-  border-bottom: 1px solid ${theme.color.darkBlue};
+  min-width: 0;
+  width: 100%;
+  background: #08090a;
 
-  @media (min-width: ${theme.breakpoints.sm}) {
-    width: calc(100% + 20px);
-    margin-left: 0;
-    margin-right: -20px;
-    border-top: none;
-  }
-  
   @media (min-width: ${theme.breakpoints.lg}) {
     flex-direction: row;
-  }
-
-  @media (min-width: ${theme.breakpoints.xxl}) {
-    margin-left: -16px;
-    padding-left: 16px;
-    width: calc(100% + 20px + 16px);
+    height: 64px;
   }
 `;
 
 export const MarketInfoContainer = styled(Flex)`
-  height: 50px;
+  min-height: 64px;
   width: 100%;
-  justify-content: space-between;
-  border-top: 1px solid ${theme.color.darkBlue};
+  justify-content: start;
+  overflow-x: auto;
+  scrollbar-width: none;
 
-  @media (min-width:  ${theme.breakpoints.sm}) {    
-    height: ${theme.headerSize.height};
+  &::-webkit-scrollbar {
+    display: none;
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
-    justify-content: start;
-    border-top: none;
+    overflow: hidden;
   }
 `;
 
 export const StyledFlex = styled(Flex)`
-  height: 100%;
+  min-width: 122px;
+  height: 64px;
   flex-direction: column;
   justify-content: center;
-  align-items: end;
-  padding-right: 12px;
-  padding-left: 12px;
-  border-right: 1px solid ${theme.color.darkBlue};
+  align-items: start;
+  padding: 0 14px;
+  border-right: 1px solid ${theme.semantic.borderMuted};
+  color: ${theme.semantic.textSecondary};
+
+  span:first-child {
+    color: ${theme.semantic.textMuted};
+    font-size: 11px !important;
+    line-height: 1.1;
+  }
+
+  span:last-child {
+    color: ${theme.semantic.textPrimary};
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
 `;
 
-
 export const BalanceFlex = styled(Flex)`
-  @media (min-width: ${theme.breakpoints.lg}) {
-    border-right: 1px solid ${theme.color.darkBlue};
-    height: 100%;
-  }
+  min-width: 204px;
+  border-right: 1px solid ${theme.semantic.borderMuted};
 `;

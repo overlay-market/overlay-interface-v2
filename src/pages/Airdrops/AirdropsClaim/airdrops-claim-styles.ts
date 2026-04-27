@@ -219,7 +219,7 @@ export const AirdropsClaimContent = styled(Flex)`
     border: solid 1px #AAAAAA; 
     border-radius: 16px;
     background: #0B0F1C;
-    box-shadow: 0px 0px 220px 0px rgba(255, 124, 213, 0.6), 0px 0px 4px 0px rgba(255, 255, 255, 0.7) inset;
+    box-shadow: 0 0 90px rgba(243, 169, 27, 0.16);
   } 
   @media (min-width: ${theme.breakpoints.lg}) {    
     width: 640px;
@@ -234,10 +234,9 @@ export const MobileShadowBox = styled(Flex)`
   gap: 8px;
   position: relative;
   z-index: 50;  
-  background: rgba(255, 124, 213, 0.3);
+  background: rgba(243, 169, 27, 0.14);
   border-radius: 16px;
-  box-shadow: 0px 0px 220px 10px rgba(255, 124, 213, 0.4),
-  0px 0px 220px 20px rgba(255, 124, 213, 0.25);
+  box-shadow: 0 0 90px rgba(243, 169, 27, 0.14);
  
 
   @media (min-width: ${theme.breakpoints.sm}) {    
@@ -253,13 +252,12 @@ export const GradientBorderBox = styled(Flex)`
   width: 100%;
   padding: 20px;
   gap: 8px;
-  border: solid 1px transparent; 
-  border-radius: 16px;
-  background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
-    linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;  
+  border: 1px solid ${theme.semantic.border}; 
+  border-radius: ${theme.radius.md};
+  background: ${theme.semantic.panel};  
 
   @media (min-width: ${theme.breakpoints.sm}) {    
-    box-shadow: 0px 0px 12px 3px rgba(255, 255, 255, 0.45);
+    box-shadow: none;
   }  
 `;
 
@@ -268,7 +266,7 @@ export const GradientText = styled(Text)`
   font-family: Roboto Mono;
   line-height: 37px;
   width: fit-content;
-  background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+  background: ${theme.gradient.accentText};
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

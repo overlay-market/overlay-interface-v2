@@ -43,11 +43,11 @@ const ExchangeLiFi: React.FC = () => {
       colorSchemes: {
         dark: {
           palette: {
-            primary: { main: theme.color.darkBlue },
-            secondary: { main: theme.color.green1 },
+            primary: { main: theme.semantic.accent },
+            secondary: { main: theme.semantic.positive },
             background: {
               default: theme.color.background,
-              paper: theme.color.grey4,
+              paper: theme.semantic.panel,
             },
             text: {
               primary: theme.color.grey2,
@@ -84,7 +84,7 @@ const ExchangeLiFi: React.FC = () => {
               ...(ownerState.variant === "contained" &&
                 ownerState.fullWidth && {
                   background:
-                    "linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%)",
+              theme.gradient.accent,
                   color: theme.color.black,
                 }),
             }),

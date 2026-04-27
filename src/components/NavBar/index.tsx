@@ -1,62 +1,37 @@
-import { Box, Flex } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import LogoImg from "../../assets/images/overlay-logo-only-no-background.webp";
-import theme from "../../theme";
-import SocialLinksSection from "./SocialLinksSection";
 import NavLinksSection from "./NavLinksSection";
-import { LinksWrapper } from "./navbar-styles";
-import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { BrandButton, BrandText, LinksWrapper, TopNavShell } from "./navbar-styles";
 import { useNavigate } from "react-router-dom";
 import { MobileNavBar } from "./MobileNavBar";
 
 const NavBar: React.FC = () => {
   const navigate = useNavigate();
 
-  const isMobile = useMediaQuery("(max-width: 767px)");
   return (
     <>
-      <Box
-        width={{
-          initial: "100%",
-          sm: `${theme.headerSize.tabletWidth}`,
-          md: `${theme.headerSize.width}`,
-        }}
-        minWidth={{
-          initial: "100%",
-          sm: `${theme.headerSize.tabletWidth}`,
-          md: `${theme.headerSize.width}`,
-        }}
-        height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "100vh" }}
-        py={{ initial: "0", sm: "10px" }}
-        px={{ initial: "3px", sm: "6px" }}
-        position={{ initial: "static", sm: "sticky" }}
-        top={"0"}
-        style={{
-          borderRight: isMobile
-            ? "0px solid transparent"
-            : `1px solid ${theme.color.darkBlue}`,
-        }}
-      >
+      <TopNavShell>
         <Flex
-          direction={{ initial: "row", sm: "column" }}
-          gap={{ initial: "20px", sm: "8px" }}
-          height={{ initial: `${theme.headerSize.mobileHeight}`, sm: "97vh" }}
+          direction="row"
+          gap="0"
+          height="100%"
           align={"center"}
         >
-          <img
-            src={LogoImg}
-            alt="Logo"
-            width={"32px"}
-            height={"32px"}
-            style={{ cursor: "pointer" }}
-            onClick={() => navigate(`/markets`)}
-          />
+          <BrandButton type="button" onClick={() => navigate(`/markets`)}>
+            <img
+              src={LogoImg}
+              alt="Logo"
+              width={"28px"}
+              height={"28px"}
+            />
+            <BrandText>OVERLAY</BrandText>
+          </BrandButton>
 
-          <LinksWrapper direction="column" justify={"between"} flexGrow={"1"}>
+          <LinksWrapper direction="row" align="center" flexGrow={"1"}>
             <NavLinksSection />
-            <SocialLinksSection />
           </LinksWrapper>
         </Flex>
-      </Box>
+      </TopNavShell>
 
       <MobileNavBar />
     </>

@@ -1,30 +1,49 @@
-import { Box } from "@radix-ui/themes"
 import styled from "styled-components"
 import  theme  from "../../../theme"
 
-export const LongPositionSelectButton = styled(Box)<{ active: string }>`
+export const LongPositionSelectButton = styled.button<{ $active: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 4px 12px;
-  border-radius: 8px;
+  border-radius: ${theme.radius.sm};
   width: 100%; 
   cursor: pointer;
-  color: ${theme.color.green1};
-  border: ${(props) => (props.active === 'true' && `1px solid ${theme.color.green1}`)};
+  color: ${theme.semantic.positive};
+  border: 1px solid ${(props) => (props.$active ? theme.semantic.positive : theme.semantic.borderMuted)};
+  background: ${(props) => (props.$active ? "#083d2f" : theme.semantic.panelRaised)};
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
   
   &:hover {
-    box-shadow: 0px 0px 10px 0px ${theme.color.green1} !important;
+    border-color: ${theme.semantic.positive};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
   }
 `
 
-export const ShortPositionSelectButton = styled(Box)<{ active: string }>`
+export const ShortPositionSelectButton = styled.button<{ $active: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 4px 12px;
-  border-radius: 8px;
+  border-radius: ${theme.radius.sm};
   width: 100%;  
   cursor: pointer; 
-  color: ${ theme.color.red1};
-  border: ${(props) => (props.active === 'false' && `1px solid ${theme.color.red1}`)};
+  color: ${ theme.semantic.negative};
+  border: 1px solid ${(props) => (!props.$active ? theme.semantic.negative : theme.semantic.borderMuted)};
+  background: ${(props) => (!props.$active ? theme.semantic.negativeSoft : theme.semantic.panelRaised)};
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
  
   &:hover {
-    box-shadow: 0px 0px 10px 0px ${theme.color.red1};
+    border-color: ${theme.semantic.negative};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
   }
 `
 

@@ -20,7 +20,9 @@ export const RiskParamsTablesContainer = styled(Flex)`
 export const RiskParamsTable = styled(Box)`
   flex: 0 0 280px;
   border-radius: 4px;
-  background: ${theme.color.grey4};
+  background: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   overflow: hidden;
 
   @media (min-width: ${theme.breakpoints.sm}) { 
@@ -42,5 +44,5 @@ export const RiskParamsTable = styled(Box)`
 export const RiskParamsItem = styled(Flex)`
   justify-content: space-between;
   padding: 16px;
-  border-bottom: 1px solid #2c2c2c;
+  border-bottom: 1px solid ${theme.semantic.borderMuted};
 `

@@ -20,22 +20,30 @@ export const GradientOutlineBtnWrapper = styled(Button)<{
   width: ${({ width }) => (width ? width : "auto")};
   height: ${({ height }) => (height ? height : "auto")};
   border: 1px solid transparent;  
-  border-radius: 8px;
+  border-radius: ${theme.radius.md};
   background: ${({ disabled }) => (disabled 
-    ? `linear-gradient(${theme.color.grey7}, ${theme.color.background}) padding-box,
-    linear-gradient(90deg, ${theme.color.grey4} 0%, ${theme.color.grey4} 100%) border-box`
-    : `linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
-      linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box`)};
+    ? `linear-gradient(${theme.semantic.panel}, ${theme.semantic.panel}) padding-box,
+    linear-gradient(90deg, ${theme.semantic.border} 0%, ${theme.semantic.border} 100%) border-box`
+    : `linear-gradient(${theme.semantic.panel}, ${theme.semantic.panel}) padding-box,
+      ${theme.gradient.accent} border-box`)};
+  color: ${theme.semantic.accent};
+  font-weight: 700;
+  transition: background 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 
   &:hover {
-    box-shadow: ${({ disabled }) => (disabled ? 'none' : '0px 0px 12px 3px #ffffff73')};
+    box-shadow: ${({ disabled }) => (disabled ? 'none' : '0 0 0 1px rgba(243, 169, 27, 0.35), 0 8px 18px rgba(0, 0, 0, 0.28)')};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
   }
 `;
 
 export const ButtonTitle = styled.div<{ color?: string, disabled?: boolean }>`
   background: ${({ disabled }) => (disabled 
-    ? `linear-gradient(90deg, ${theme.color.grey3} 0%, #ff7cd5 100%)` 
-    : `linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%)`)};
+    ? `linear-gradient(90deg, ${theme.semantic.textMuted} 0%, ${theme.semantic.textSecondary} 100%)` 
+    : theme.gradient.accentText)};
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -48,15 +56,24 @@ export const GradientSolidBtnWrapper = styled(Button)<{
   disabled?: boolean;
 }>`
   padding: 7px 16px;
-  border-radius: 8px;
+  border-radius: ${theme.radius.md};
   width: ${({ width }) => (width ? width : "auto")};
   height: ${({ height }) => (height ? height : "auto")};
-  background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
-  font-weight: 600;
+  background: ${theme.gradient.accent};
+  color: ${theme.color.black};
+  font-weight: 700;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  box-shadow: none;
+  transition: filter 0.16s ease, box-shadow 0.16s ease;
   
   &:hover {
-    box-shadow:  ${({ disabled }) => (disabled ? 'none' : '0px 0px 12px 3px #ffffff73')};
+    box-shadow:  ${({ disabled }) => (disabled ? 'none' : '0 8px 18px rgba(240, 185, 11, 0.22)')};
+    filter: ${({ disabled }) => (disabled ? 'none' : 'brightness(1.05)')};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
   }
 `;
 
@@ -68,17 +85,17 @@ export const GradientLoaderBtnWrapper = styled(Button)<{
   width: ${({ width }) => (width ? width : "100%")};
   height: ${({ height }) => (height ? height : "40px")};
   border: 1px solid transparent;  
-  border-radius: 8px;
+  border-radius: ${theme.radius.md};
   cursor: auto;
-  background: linear-gradient(${theme.color.grey7}, ${theme.color.background}) padding-box,
-    linear-gradient(90deg, ${theme.color.grey4} 0%, ${theme.color.grey4} 100%) border-box;
+  background: linear-gradient(${theme.semantic.panel}, ${theme.semantic.panel}) padding-box,
+    linear-gradient(90deg, ${theme.semantic.border} 0%, ${theme.semantic.border} 100%) border-box;
   
   background-image: linear-gradient(
     to right,
-    ${theme.color.grey7} 0%,
-    ${theme.color.grey6} 20%,
-    ${theme.color.grey4} 40%,
-    ${theme.color.grey7} 100%
+    ${theme.semantic.panel} 0%,
+    ${theme.semantic.hover} 20%,
+    ${theme.semantic.field} 40%,
+    ${theme.semantic.panel} 100%
   );
   background-size: 800px 104px;
   display: inline-block;
