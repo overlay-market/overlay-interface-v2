@@ -5,7 +5,7 @@ import theme from "../../theme";
 export const HeaderEmptyPlaceholder = styled(Box)`
   height: 0;
   margin: 0 3px;
-  border-bottom: 1px solid ${theme.color.darkBlue};
+  border-bottom: 1px solid ${theme.semantic.border};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     width: 100%;
@@ -28,7 +28,7 @@ export const LineSeparator = styled(Flex)`
     position: absolute;
     top: ${theme.headerSize.height};
     left: ${theme.headerSize.tabletWidth};
-    border-bottom: 1px solid ${theme.color.darkBlue};
+    border-bottom: 1px solid ${theme.semantic.border};
   }
 
   @media (min-width: ${theme.breakpoints.md}) {
