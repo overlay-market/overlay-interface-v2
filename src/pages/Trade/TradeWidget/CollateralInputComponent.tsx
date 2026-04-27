@@ -30,7 +30,7 @@ const SliderRoot = styled(Slider.Root)`
 `;
 
 const SliderTrack = styled(Slider.Track)`
-  background-color: ${theme.color.grey5};
+  background-color: ${theme.semantic.border};
   position: relative;
   flex-grow: 1;
   border-radius: 9999px;
@@ -39,7 +39,7 @@ const SliderTrack = styled(Slider.Track)`
 
 const SliderRange = styled(Slider.Range)`
   position: absolute;
-  background-color: ${theme.color.green2};
+  background-color: ${theme.semantic.accent};
   border-radius: 9999px;
   height: 100%;
 `;
@@ -48,7 +48,7 @@ const SliderThumb = styled(Slider.Thumb)`
   display: block;
   width: 8px;
   height: 8px;
-  background-color: ${theme.color.green2};
+  background-color: ${theme.semantic.accent};
   border-radius: 10px;
   transition: transform 0.1s ease;
   
@@ -58,20 +58,41 @@ const SliderThumb = styled(Slider.Thumb)`
   
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px ${theme.color.green2}44;
+    box-shadow: ${theme.shadow.focus};
   }
 `;
 
-const Mark = styled.div<{ active: boolean }>`
+const Mark = styled.div<{ $active: boolean }>`
   position: absolute;
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background-color: ${props => props.active ? theme.color.green2 : theme.color.grey5};
+  background-color: ${props => props.$active ? theme.semantic.accent : theme.semantic.border};
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
   pointer-events: none;
+`;
+
+const GetTokenButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: ${theme.semantic.accent};
+  background: rgba(243, 169, 27, 0.12);
+  padding: 4px 8px;
+  border-radius: ${theme.radius.sm};
+  border: 1px solid rgba(243, 169, 27, 0.5);
+
+  &:hover {
+    background: rgba(243, 169, 27, 0.18);
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+  }
 `;
 
 const CollateralInputComponent: React.FC = () => {
@@ -158,7 +179,11 @@ const CollateralInputComponent: React.FC = () => {
     <Box
       width={"100%"}
       p={"8px"}
-      style={{ borderRadius: "8px", background: theme.color.grey4 }}
+      style={{
+        borderRadius: theme.radius.md,
+        background: theme.semantic.field,
+        border: `1px solid ${theme.semantic.borderMuted}`,
+      }}
     >
       <Flex direction={"column"} gap="2px">
         <Flex justify="between" align="center" gap="12px">
@@ -200,7 +225,7 @@ const CollateralInputComponent: React.FC = () => {
               <Mark
                 key={mark}
                 style={{ left: `${mark}%` }}
-                active={sliderValue[0] >= mark}
+                $active={sliderValue[0] >= mark}
               />
             ))}
             <SliderThumb />
@@ -213,21 +238,12 @@ const CollateralInputComponent: React.FC = () => {
             handleUserInput={handleUserInput}
           />
           <Flex align="center" gap="8px">
-            <Text size="3" weight={"bold"} style={{ color: theme.color.blue1 }}>
+            <Text size="3" weight={"bold"} style={{ color: theme.semantic.textPrimary }}>
               {collateralType}
             </Text>
             {collateralType === "USDT" && (
-              <Flex
-                align="center"
-                gap="4px"
-                style={{
-                  cursor: "pointer",
-                  color: theme.color.blue3,
-                  background: 'rgba(18, 180, 255, 0.1)',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  border: `1px solid ${theme.color.blue3}`
-                }}
+              <GetTokenButton
+                type="button"
                 onClick={() => setShowLiFiModal(true)}
               >
                 <Text size="1" weight="bold">GET</Text>
@@ -236,7 +252,7 @@ const CollateralInputComponent: React.FC = () => {
                   alt="USDT"
                   style={{ width: '16px', height: '16px' }}
                 />
-              </Flex>
+              </GetTokenButton>
             )}
           </Flex>
         </Flex>

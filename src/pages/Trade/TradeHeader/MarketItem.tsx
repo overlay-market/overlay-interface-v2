@@ -33,7 +33,7 @@ const MarketItem: React.FC<MarketItemProps> = ({
   const isGambling = isGamblingMarket(marketName);
 
   return (
-    <MarketInfo onClick={() => handleMarketSelect(marketId)}>
+    <MarketInfo type="button" onClick={() => handleMarketSelect(marketId)}>
       <MarketLogo src={marketLogo} alt={`logo`} />
       <Flex gap={"8px"} width={"100%"} justify={"between"} align={"center"}>
         <MarketName>{marketName}</MarketName>

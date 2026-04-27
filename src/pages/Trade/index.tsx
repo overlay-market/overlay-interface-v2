@@ -3,7 +3,6 @@ import TradeHeader from "./TradeHeader";
 import TradeWidget from "./TradeWidget";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTradeActionHandlers, useTradeState } from "../../state/trade/hooks";
-import Chart from "./Chart";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useSDK from "../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../providers/MultichainContextProvider/useMultichainContext";
@@ -13,15 +12,44 @@ import {
   useCurrentMarketState,
 } from "../../state/currentMarket/hooks";
 import PositionsTable from "./PositionsTable";
-import InfoMarketSection from "./InfoMarketSection";
-import { StyledFlex, TradeContainer } from "./trade-styles";
-import SuggestedCards from "./SuggestedCards";
+import {
+  AssetsBody,
+  AssetsHeader,
+  AssetsRegion,
+  BottomTab,
+  BottomTabs,
+  ChartRegion,
+  ControlPill,
+  OrderBookRegion,
+  PositionsPlaceholder,
+  PositionsRegion,
+  PositionsTabPanel,
+  TicketRegion,
+  TradeContainer,
+  TradeGrid,
+  TradeMarketBar,
+  TradeShell,
+  TradeTopRightControls,
+} from "./trade-styles";
 import { DEFAULT_MARKET } from "../../constants/applications";
 import useActiveMarkets from "../../hooks/useActiveMarkets";
-import GamblingTimeline from "./Chart/GamblingTimeline";
 import { isGamblingMarket, getMarketGroup, getGroupById } from "../../utils/marketGuards";
 import { PredictionMarketGroup } from "../../constants/markets";
-import PredictionGroupChart from "./PredictionGroupChart";
+import TradeTickerStrip from "./TradeTickerStrip";
+import OrderBookPanel from "./OrderBookPanel";
+import TradeWorkspaceTabs from "./TradeWorkspaceTabs";
+import PositionHistoryPanel from "./PositionHistoryPanel";
+
+const POSITION_TABS = [
+  { id: "positions", label: "Positions" },
+  { id: "position-history", label: "Position History" },
+  { id: "open-orders", label: "Open Orders" },
+  { id: "order-history", label: "Order History" },
+  { id: "trade-history", label: "Trade History" },
+  { id: "transaction-history", label: "Transaction History" },
+] as const;
+
+type PositionTab = (typeof POSITION_TABS)[number]["id"];
 
 const Trade: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,7 +62,7 @@ const Trade: React.FC = () => {
 
   const { currentMarket } = useCurrentMarketState();
   const { handleTradeStateReset, handlePositionSideSelect } = useTradeActionHandlers();
-  const { isLong } = useTradeState();
+  const { isLong, selectedLeverage } = useTradeState();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { data: markets } = useActiveMarkets();
   const prevMarketRef = useRef<string | undefined>();
@@ -42,6 +70,8 @@ const Trade: React.FC = () => {
   // Store prices from PositionsTable to pass to Chart and TradeWidget
   // This eliminates duplicate bid/ask polling
   const [marketPrices, setMarketPrices] = useState<{ bid: bigint; ask: bigint; mid: bigint } | undefined>(undefined);
+  const [activePositionTab, setActivePositionTab] =
+    useState<PositionTab>("positions");
 
   const handlePricesUpdate = useCallback((prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => {
     setMarketPrices(prices);
@@ -143,32 +173,40 @@ const Trade: React.FC = () => {
   );
 
   return (
-    <TradeContainer direction="column" width={"100%"} mb="100px">
-      <TradeHeader predictionGroup={predictionGroup} />
+    <TradeContainer direction="column" width={"100%"}>
+      <TradeShell>
+        <TradeTickerStrip markets={markets} activeMarketId={marketParam} />
+        <TradeMarketBar>
+          <TradeHeader predictionGroup={predictionGroup} />
+          <TradeTopRightControls>
+            <ControlPill type="button">Cross</ControlPill>
+            <ControlPill type="button">Leverage {selectedLeverage}x</ControlPill>
+            <ControlPill type="button" aria-label="Trade settings">▦</ControlPill>
+          </TradeTopRightControls>
+        </TradeMarketBar>
 
-      <Flex direction="column">
-        <StyledFlex
-          width={"100%"}
-          direction={{ initial: "column", sm: "row" }}
-          align={{ initial: "center", sm: "start" }}
-          px={{ initial: "4px", sm: "0" }}
-        >
+        <TradeGrid>
           {currentMarket ? (
             <>
-              {predictionGroup ? (
-                <PredictionGroupChart group={predictionGroup} />
-              ) : shouldRenderGamblingTimeline ? (
-                <GamblingTimeline />
-              ) : (
-                <Chart prices={marketPrices} />
-              )}
-              <TradeWidget
-                prices={marketPrices}
-                predictionGroup={predictionGroup}
-                selectedMarketId={marketParam}
-                isLong={isLong}
-                onOutcomeSelect={handleOutcomeSelect}
-              />
+              <ChartRegion>
+                <TradeWorkspaceTabs
+                  prices={marketPrices}
+                  predictionGroup={predictionGroup}
+                  shouldRenderGamblingTimeline={shouldRenderGamblingTimeline}
+                />
+              </ChartRegion>
+              <OrderBookRegion>
+                <OrderBookPanel prices={marketPrices} />
+              </OrderBookRegion>
+              <TicketRegion>
+                <TradeWidget
+                  prices={marketPrices}
+                  predictionGroup={predictionGroup}
+                  selectedMarketId={marketParam}
+                  isLong={isLong}
+                  onOutcomeSelect={handleOutcomeSelect}
+                />
+              </TicketRegion>
             </>
           ) : (
             <Flex
@@ -180,14 +218,59 @@ const Trade: React.FC = () => {
               <Loader />
             </Flex>
           )}
-        </StyledFlex>
-        <PositionsTable
-          onPricesUpdate={handlePricesUpdate}
-          groupMarketIds={predictionGroup?.marketIds}
-        />
-        <InfoMarketSection />
-        <SuggestedCards />
-      </Flex>
+          <PositionsRegion>
+            <BottomTabs role="tablist" aria-label="Positions and orders">
+              {POSITION_TABS.map((tab) => (
+                <BottomTab
+                  key={tab.id}
+                  id={`trade-bottom-tab-${tab.id}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={activePositionTab === tab.id}
+                  aria-controls={`trade-bottom-panel-${tab.id}`}
+                  $active={activePositionTab === tab.id}
+                  onClick={() => setActivePositionTab(tab.id)}
+                >
+                  {tab.label}
+                </BottomTab>
+              ))}
+            </BottomTabs>
+            <PositionsTabPanel
+              id="trade-bottom-panel-positions"
+              role="tabpanel"
+              aria-labelledby="trade-bottom-tab-positions"
+              hidden={activePositionTab !== "positions"}
+            >
+              <PositionsTable onPricesUpdate={handlePricesUpdate} />
+            </PositionsTabPanel>
+            {activePositionTab === "position-history" && (
+              <PositionsTabPanel
+                id="trade-bottom-panel-position-history"
+                role="tabpanel"
+                aria-labelledby="trade-bottom-tab-position-history"
+              >
+                <PositionHistoryPanel />
+              </PositionsTabPanel>
+            )}
+            {activePositionTab !== "positions" &&
+              activePositionTab !== "position-history" && (
+                <PositionsTabPanel
+                  id={`trade-bottom-panel-${activePositionTab}`}
+                  role="tabpanel"
+                  aria-labelledby={`trade-bottom-tab-${activePositionTab}`}
+                >
+                  {/* TODO: Wire real order/trade/transaction history tables. */}
+                  <PositionsPlaceholder>LOREM IPSUM</PositionsPlaceholder>
+                </PositionsTabPanel>
+              )}
+          </PositionsRegion>
+          <AssetsRegion>
+            <AssetsHeader>Assets</AssetsHeader>
+            <AssetsBody>Connect Wallet</AssetsBody>
+          </AssetsRegion>
+        </TradeGrid>
+
+      </TradeShell>
     </TradeContainer>
   );
 };

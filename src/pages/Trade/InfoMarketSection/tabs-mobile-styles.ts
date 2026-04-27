@@ -11,7 +11,7 @@ export const TabsContainer = styled(Tabs.Root)`
 
 export const TabsList = styled(Tabs.List)`
   display: flex;
-  border-bottom: 1px solid #1e1e1e;
+  border-bottom: 1px solid ${theme.semantic.border};
   gap: 24px;
   padding-bottom: 8px;
 `;
@@ -33,7 +33,7 @@ export const TabsTrigger = styled(Tabs.Trigger)`
     right: 0;
     bottom: -8px;
     height: 1px;
-    background: linear-gradient(90deg, #FFC955, #FF7CD5); 
+    background: ${theme.semantic.accent}; 
     transform: scaleX(0); 
     transform-origin: left;    
   }

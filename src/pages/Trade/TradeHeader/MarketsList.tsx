@@ -79,7 +79,12 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
 
   return (
     <Box ref={ref} width={{ initial: "100%", sm: "260px" }}>
-      <MarketsListContainer onClick={toggleDropdown}>
+      <MarketsListContainer
+        type="button"
+        onClick={toggleDropdown}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
         <Flex justify={"start"} align={"center"} gap={"10px"}>
           {currentMarket && (
             <CurrentMarketLogo

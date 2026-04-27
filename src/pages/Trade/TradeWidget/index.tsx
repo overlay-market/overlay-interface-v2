@@ -18,7 +18,16 @@ import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
-import { TradeWidgetContainer } from "./trade-widget-styles";
+import {
+  AdvancedPanel,
+  AdvancedSettingsButton,
+  OrderTypeButton,
+  OrderTypeTabs,
+  TicketMetaRow,
+  TicketModeButton,
+  TicketModeTabs,
+  TradeWidgetContainer,
+} from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
@@ -35,6 +44,9 @@ interface TradeWidgetProps {
   isLong?: boolean;
   onOutcomeSelect?: (marketId: string, isLong: boolean) => void;
 }
+
+const TICKET_BALANCE_PLACEHOLDER = "LOREM IPSUM"; // TODO: Replace with selected collateral balance from the shared wallet balance hook.
+const TICKET_MAX_OPEN_PLACEHOLDER = "Max Open: LOREM IPSUM"; // TODO: Replace with max-open values calculated from current collateral/leverage.
 
 const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, selectedMarketId, isLong: isLongFromParent, onOutcomeSelect }) => {
   const [searchParams] = useSearchParams();
@@ -290,14 +302,37 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
   return (
     <TradeWidgetContainer
       direction={"column"}
-      gap={{ initial: "16px", sm: "24px" }}
-      width={{ initial: "343px", sm: "321px" }}
+      gap={{ initial: "12px", sm: "14px" }}
+      width={{ initial: "100%", sm: "321px" }}
       pr={"0px"}
-      pl={{ initial: "0px", sm: "16px", lg: "8px" }}
-      pt={"8px"}
-      pb={"20px"}
+      pl={"0px"}
+      pt={"0px"}
+      pb={"0px"}
       flexShrink={"0"}
     >
+      <TicketModeTabs aria-label="Position mode">
+        <TicketModeButton type="button" $active>
+          Open
+        </TicketModeButton>
+        {/* TODO: Wire LOREM IPSUM close-position ticket when close-order composition exists. */}
+        <TicketModeButton type="button" disabled>
+          Close
+        </TicketModeButton>
+      </TicketModeTabs>
+
+      <OrderTypeTabs aria-label="Order type">
+        {/* TODO: Replace disabled LOREM IPSUM order-type affordances when limit/conditional orders are supported. */}
+        <OrderTypeButton type="button" disabled>
+          Limit
+        </OrderTypeButton>
+        <OrderTypeButton type="button" $active>
+          Market
+        </OrderTypeButton>
+        <OrderTypeButton type="button" disabled>
+          Conditional
+        </OrderTypeButton>
+      </OrderTypeTabs>
+
       {predictionGroup && onOutcomeSelect ? (
         <PredictionGroupPanel
           group={predictionGroup}
@@ -323,37 +358,28 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
 
       {collateralType === 'OVL' && !isAvatarTradingActive && <ChainAndTokenSelect />}
       <CollateralInputComponent />
+      <TicketMetaRow>
+        <span>Available</span>
+        <span>{TICKET_BALANCE_PLACEHOLDER}</span>
+      </TicketMetaRow>
       <TradeButtonComponent loading={loading} tradeState={tradeState} />
-      <button
+      <TicketMetaRow>
+        <span>{TICKET_MAX_OPEN_PLACEHOLDER}</span>
+        <span>{TICKET_MAX_OPEN_PLACEHOLDER}</span>
+      </TicketMetaRow>
+      <AdvancedSettingsButton
         onClick={() => setDetailsOpen((o) => !o)}
-        style={{
-          background: "none",
-          border: "none",
-          padding: 0,
-          marginBottom: "8px",
-          fontSize: "16px",
-          fontWeight: 500,
-          color: theme.color.grey3,
-          cursor: "pointer",
-          textAlign: "right",
-          outline: "none",
-        }}
+        type="button"
+        aria-expanded={detailsOpen}
       >
-        {detailsOpen ? "Hide Advanced Settings ▲" : "Advanced Settings ▼"}
-      </button>
+        {detailsOpen ? "Hide Advanced Settings" : "Advanced Settings"}
+      </AdvancedSettingsButton>
 
       {/* Conditionally render details */}
       {detailsOpen && (
-        <Flex
-          style={{
-            background: theme.color.background,
-            zIndex: 100,
-            border: "8px solid transparent",
-            boxShadow: `rgb(0 0 0 / 40%) 0px 0px 12px 0px`,
-            marginTop: "-14px",
-          }}
+        <AdvancedPanel
           direction={"column"}
-          gap="16px"
+          gap="14px"
         >
           <Flex direction="column" gap="12px" p="8px">
             {isLbscAvailable && !isAvatarTradingActive && (
@@ -418,7 +444,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
 
           <MainTradeDetails tradeState={tradeState} />
           <AdditionalTradeDetails tradeState={tradeState} />
-        </Flex>
+        </AdvancedPanel>
       )}
     </TradeWidgetContainer>
   );

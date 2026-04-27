@@ -9,8 +9,9 @@ export const InfoBox = styled(Box)`
   width: 100%;
   height: 58px;
   padding: 16px;
-  border-radius: 8px;
-  background: ${theme.color.grey4};
+  border-radius: ${theme.radius.md};
+  background: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
 
   @media (min-width: ${theme.breakpoints.sm}) {      
     flex-direction: column;
@@ -36,7 +37,7 @@ export const TextLabel = styled(Text)`
 export const TextValue = styled(Text)`
   font-size: 22px;
   font-weight: 700;
-  color: ${theme.color.grey3};
+  color: ${theme.semantic.textMuted};
 
   @media (min-width: ${theme.breakpoints.sm}) {      
     font-size: 32px;

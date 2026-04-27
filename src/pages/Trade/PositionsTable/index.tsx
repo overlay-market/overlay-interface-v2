@@ -1,10 +1,8 @@
 import { Text } from "@radix-ui/themes";
-import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useEffect, useRef, useState, useMemo } from "react";
 import {
-  LineSeparator,
   PositionsTableContainer,
 } from "./positions-table-styles";
 import useAccount from "../../../hooks/useAccount";
@@ -15,50 +13,42 @@ import { useIsNewTxnHash, useOptimisticPositions, useOptimisticPositionHandlers 
 import Loader from "../../../components/Loader";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import { convertToOpenPositionData } from "../../../utils/convertOptimisticPosition";
-import usePositionsPnL from "../../../hooks/usePositionsPnL";
+import useMultiMarketPositionsPnL from "../../../hooks/useMultiMarketPositionsPnL";
 import { DEFAULT_CHAINID } from "../../../constants/chains";
-import { PREDICTION_MARKET_GROUPS } from "../../../constants/markets";
+import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
+import {
+  PositionFilterChip,
+  PositionsFilters,
+  PositionsTitle,
+  PositionsToolbar,
+  PositionsToolbarLeft,
+} from "../../../styles/positions-table";
 
 const POSITIONS_COLUMNS = [
+  "Contract",
   "Size",
-  "Position",
   "Entry Price",
-  "Liq. Price",
-  "PnL",
-];
-
-const GROUP_POSITIONS_COLUMNS = [
-  "Outcome",
-  "Size",
-  "Position",
-  "Entry Price",
-  "Liq. Price",
-  "PnL",
+  "Mark Price",
+  "Est. Liq. Price",
+  "Break-Even Price",
+  "Margin",
+  "MMR",
+  "Unrealized PnL (ROE)",
+  "Realized P",
+  "Reduce/Close",
 ];
 
 interface PositionsTableProps {
   onPricesUpdate?: (prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => void;
-  groupMarketIds?: string[];
 }
 
-const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMarketIds }) => {
-  const [searchParams] = useSearchParams();
-  const rawMarketId = searchParams.get("market");
-  const marketId = rawMarketId ? decodeURIComponent(rawMarketId) : null;
-
-  // For prediction groups, fetch positions for all markets in the group
-  const marketIdForFetch: string | string[] | null = useMemo(() => {
-    if (groupMarketIds && groupMarketIds.length > 0) {
-      return groupMarketIds.map(id => decodeURIComponent(id));
-    }
-    return marketId;
-  }, [groupMarketIds, marketId]);
+const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const { chainId: rawChainId } = useMultichainContext();
   const chainId = typeof rawChainId === 'object' && rawChainId !== null
     ? rawChainId.id
     : (rawChainId ?? DEFAULT_CHAINID);
+  const { currentMarket } = useCurrentMarketState();
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
@@ -77,8 +67,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
   const previousPositionCountRef = useRef<number>(0); // Track position count before transaction
   const currentPositionCountRef = useRef<number>(0); // Track current position count (for polling)
   const knownPositionIdsRef = useRef<Set<number>>(new Set()); // Track position IDs that existed before trade
-
-  const isTablet = useMediaQuery("(max-width: 1279px)");
+  const [marginMode, setMarginMode] = useState<"all" | "cross" | "isolated">("all");
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -164,81 +153,52 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
 
   useEffect(() => {
     const fetchOpenPositions = async () => {
-      if (!account || !marketIdForFetch) {
+      if (!account) {
         setPositions(undefined);
         setPositionsTotalNumber(0);
-        return; // Early exit if no account or marketId
+        return;
       }
 
-      if (marketIdForFetch && account) {
-        // Force cache bypass if new transaction or during polling period
-        const refreshData = isNewTxnHash || forceRefresh > 0;
-        setLoading(true);
+      // Force cache bypass if new transaction or during polling period
+      const refreshData = isNewTxnHash || forceRefresh > 0;
+      setLoading(true);
 
-        try {
-          const positions =
-            await sdkRef.current.openPositions.transformOpenPositions(
-              currentPage,
-              itemsPerPage,
-              marketIdForFetch,
-              account as Address,
-              refreshData
-            );
+      try {
+        const positions =
+          await sdkRef.current.openPositions.transformOpenPositions(
+            currentPage,
+            itemsPerPage,
+            undefined,
+            account as Address,
+            refreshData
+          );
 
-
-
-          positions && setPositions(positions.data);
-          positions && setPositionsTotalNumber(positions.total);
-          if (!positions) {
-            setPositions(undefined);
-            setPositionsTotalNumber(0);
-          }
-        } catch (error) {
-          console.error("Error fetching open positions:", error);
-        } finally {
-          setLoading(false);
+        positions && setPositions(positions.data);
+        positions && setPositionsTotalNumber(positions.total);
+        if (!positions) {
+          setPositions(undefined);
+          setPositionsTotalNumber(0);
         }
+      } catch (error) {
+        console.error("Error fetching open positions:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchOpenPositions();
-  }, [chainId, marketIdForFetch, account, isNewTxnHash, forceRefresh, currentPage, itemsPerPage]);
+  }, [chainId, account, isNewTxnHash, forceRefresh, currentPage, itemsPerPage]);
 
   useEffect(() => {
     setCurrentPage(1);
     setItemsPerPage(10);
-  }, [chainId, marketIdForFetch]);
-
-  const isGroupMode = !!(groupMarketIds && groupMarketIds.length > 0);
-
-  const getOutcomeLabel = useMemo(() => {
-    // Build a lookup from marketName -> short label (e.g. "Google")
-    const labelMap = new Map<string, string>();
-    for (const group of PREDICTION_MARKET_GROUPS) {
-      for (const [encodedId, label] of Object.entries(group.outcomeLabels)) {
-        labelMap.set(decodeURIComponent(encodedId), label);
-      }
-    }
-    return (marketName?: string) => {
-      if (!marketName) return undefined;
-      return labelMap.get(marketName) ?? marketName;
-    };
-  }, []);
-
-  // Set of market IDs relevant for optimistic position matching
-  const relevantMarketIds = useMemo(() => {
-    if (groupMarketIds && groupMarketIds.length > 0) {
-      return new Set(groupMarketIds.map(id => decodeURIComponent(id)));
-    }
-    return marketId ? new Set([marketId]) : new Set<string>();
-  }, [groupMarketIds, marketId]);
+  }, [chainId, account]);
 
   // Merge optimistic positions with real positions
   const mergedPositions = useMemo(() => {
-    // Filter optimistic positions for current market(s) AND current account
+    // Filter optimistic positions for the current account only; the trade tab now shows all open wallet positions.
     const relevantOptimistic = optimisticPositions
       .filter(op =>
-        relevantMarketIds.has(op.marketName) &&
         op.account === account &&
         op.chainId === chainId
       )
@@ -251,7 +211,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
 
     // Prepend optimistic positions (show at top)
     return [...relevantOptimistic, ...positions];
-  }, [positions, optimisticPositions, relevantMarketIds, account, chainId]);
+  }, [positions, optimisticPositions, account, chainId]);
 
   // Smart detection: Remove optimistic positions when matching real position appears
   // This runs whenever positions change OR during polling period
@@ -272,9 +232,9 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
       // First try: Match by timestamp (within 2 minutes)
       let matchingReal = sortedPositions.find(real => {
         // Defensive checks for undefined values
-        if (!real.marketName || !real.positionSide || relevantMarketIds.size === 0) return false;
+        if (!real.marketName || !real.positionSide) return false;
 
-        const sameMarket = relevantMarketIds.has(real.marketName);
+        const sameMarket = real.marketName === optimistic.marketName;
         const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
 
         // Extract leverage from real position (e.g., "13.10000000000000000120018702277545x Short" -> 13.1)
@@ -314,9 +274,9 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
           if (knownPositionIdsRef.current.has(real.positionId)) return false;
 
           // Defensive checks for undefined values
-          if (!real.marketName || !real.positionSide || relevantMarketIds.size === 0) return false;
+          if (!real.marketName || !real.positionSide) return false;
 
-          const sameMarket = relevantMarketIds.has(real.marketName);
+          const sameMarket = real.marketName === optimistic.marketName;
           const sameSide = real.positionSide.includes(optimistic.isLong ? 'Long' : 'Short');
 
           // Extract leverage numerically (same as timestamp match above)
@@ -346,7 +306,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
       }
       // Silently continue if no match (reduces spam - it's expected during polling)
     });
-  }, [positions, optimisticPositions, relevantMarketIds, handleRemoveOptimisticPosition]);
+  }, [positions, optimisticPositions, handleRemoveOptimisticPosition]);
 
   // Cleanup stale optimistic positions (older than 2 minutes)
   useEffect(() => {
@@ -362,40 +322,49 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
     return () => clearInterval(cleanup);
   }, [optimisticPositions, handleRemoveOptimisticPosition]);
 
-  // Real-time PnL updates
-  const positionsList = useMemo(
-    () =>
-      positions?.map((p) => ({
-        marketAddress: p.marketAddress,
-        positionId: p.positionId,
-        router: p.router,
-        loan: p.loan,
-      })) ?? [],
-    [positions]
-  );
+  // Real-time PnL updates across every open market in the wallet.
+  const { pnlData, marketPrices } = useMultiMarketPositionsPnL(positions, {
+    isRefreshing: loading,
+  });
 
-  const { pnlData, prices } = usePositionsPnL(marketId, positionsList);
+  const selectedMarketPrices = useMemo(() => {
+    if (!currentMarket?.id) return undefined;
+    return marketPrices.get(currentMarket.id.toLowerCase());
+  }, [currentMarket?.id, marketPrices]);
 
   // Report prices to parent component for use in Chart and TradeWidget
   useEffect(() => {
     if (onPricesUpdate) {
-      onPricesUpdate(prices);
+      onPricesUpdate(selectedMarketPrices);
     }
-  }, [prices, onPricesUpdate]);
+  }, [selectedMarketPrices, onPricesUpdate]);
 
   return (
     <>
-      <LineSeparator />
-
       <PositionsTableContainer>
-        <Text weight={"bold"} size={"5"}>
-          Positions
-        </Text>
+        <PositionsToolbar>
+          <PositionsToolbarLeft>
+            <PositionsTitle>Positions({positionsTotalNumber})</PositionsTitle>
+            <PositionsFilters aria-label="Position margin mode filters">
+              {(["all", "cross", "isolated"] as const).map((mode) => (
+                <PositionFilterChip
+                  key={mode}
+                  type="button"
+                  $active={marginMode === mode}
+                  onClick={() => setMarginMode(mode)}
+                >
+                  {mode === "all" ? "All" : mode === "cross" ? "Cross" : "Isolated"}
+                </PositionFilterChip>
+              ))}
+            </PositionsFilters>
+          </PositionsToolbarLeft>
+        </PositionsToolbar>
 
         <StyledTable
-          headerColumns={isGroupMode ? GROUP_POSITIONS_COLUMNS : POSITIONS_COLUMNS}
-          width={isTablet ? "100%" : "849px"}
-          minWidth={"654px"}
+          headerColumns={POSITIONS_COLUMNS}
+          variant="positions"
+          width="100%"
+          minWidth={"1360px"}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
           positionsTotalNumber={positionsTotalNumber}
@@ -411,7 +380,9 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
                 <OpenPosition
                   position={position}
                   realtimePnL={realtimePnL}
-                  outcomeLabel={isGroupMode ? getOutcomeLabel(position.marketName) : undefined}
+                  realtimeMarketPrices={marketPrices.get(
+                    position.marketAddress.toLowerCase()
+                  )}
                   key={`${position.marketAddress}-${position.positionId}-${index}`}
                 />
               );
@@ -425,7 +396,6 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
           mergedPositions &&
           positionsTotalNumber === 0 &&
           optimisticPositions.filter(op =>
-            relevantMarketIds.has(op.marketName) &&
             op.account === account &&
             op.chainId === chainId
           ).length === 0 &&
@@ -434,8 +404,6 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate, groupMa
           <Text style={{ color: theme.color.grey3 }}>No wallet connected</Text>
         )}
       </PositionsTableContainer>
-
-      <LineSeparator />
     </>
   );
 };
