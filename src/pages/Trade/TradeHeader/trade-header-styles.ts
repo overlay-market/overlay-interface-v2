@@ -6,8 +6,10 @@ export const TradeHeaderContainer = styled(Flex)`
   flex-direction: row;
   position: relative;
   min-width: 0;
+  max-width: 100%;
   width: 100%;
   min-height: 72px;
+  box-sizing: border-box;
   background: #08090a;
   border: 1px solid ${theme.semantic.borderMuted};
   border-top: 0;
@@ -20,10 +22,16 @@ export const TradeHeaderContainer = styled(Flex)`
 `;
 
 export const MarketInfoContainer = styled(Flex)`
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 72px;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   justify-content: start;
+  align-items: stretch;
   overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   background: #08090a;
 
@@ -33,13 +41,19 @@ export const MarketInfoContainer = styled(Flex)`
 `;
 
 export const HeaderPriceBlock = styled.div`
-  flex: 0 0 122px;
-  min-width: 122px;
+  box-sizing: border-box;
+  flex: 0 0 136px;
+  width: 136px;
+  min-width: 136px;
+  max-width: 136px;
   height: 72px;
   display: flex;
+  min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
   padding: 0 14px;
+  overflow: hidden;
+  border-right: 1px solid ${theme.semantic.borderMuted};
 `;
 
 export const LastPrice = styled.div<{ $positive?: boolean }>`
@@ -51,6 +65,9 @@ export const LastPrice = styled.div<{ $positive?: boolean }>`
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const PriceChange = styled.div<{ $positive?: boolean }>`
@@ -62,20 +79,30 @@ export const PriceChange = styled.div<{ $positive?: boolean }>`
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const HeaderMetric = styled.div<{ $wide?: boolean }>`
-  flex: 0 0 ${({ $wide }) => ($wide ? "150px" : "118px")};
-  min-width: ${({ $wide }) => ($wide ? "150px" : "118px")};
+  box-sizing: border-box;
+  flex: 0 0 ${({ $wide }) => ($wide ? "178px" : "124px")};
+  width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+  min-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+  max-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
   height: 72px;
   display: flex;
+  min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
   padding: 0 13px;
+  overflow: hidden;
+  border-right: 1px solid ${theme.semantic.borderMuted};
 `;
 
 export const MetricLabel = styled.div`
-  width: fit-content;
+  display: block;
+  width: max-content;
   max-width: 100%;
   color: ${theme.semantic.textMuted};
   border-bottom: 1px dotted #4a4f58;
@@ -83,6 +110,8 @@ export const MetricLabel = styled.div`
   font-weight: 500;
   line-height: 1.15;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const MetricValue = styled.div<{ $tone?: "positive" | "negative" }>`
@@ -98,6 +127,9 @@ export const MetricValue = styled.div<{ $tone?: "positive" | "negative" }>`
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 export const StyledFlex = styled(Flex)`

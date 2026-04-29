@@ -23,9 +23,10 @@ export const TradeShell = styled.div`
 export const TradeMarketBar = styled.div`
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  min-height: 64px;
+  min-height: 72px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
   background: #08090a;
+  overflow: visible;
 
   @media (min-width: 1100px) {
     grid-template-columns: minmax(0, 1fr) 320px;
@@ -34,6 +35,7 @@ export const TradeMarketBar = styled.div`
 
 export const TradeTopRightControls = styled.div`
   display: none;
+  min-width: 0;
 
   @media (min-width: 1100px) {
     display: flex;

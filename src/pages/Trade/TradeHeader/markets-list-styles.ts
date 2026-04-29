@@ -4,15 +4,23 @@ import theme from "../../../theme";
 
 export const MarketSelectorRoot = styled(Box)`
   position: relative;
+  flex: 0 0 100%;
+  min-width: 0;
   width: 100%;
 
   @media (min-width: ${theme.breakpoints.sm}) {
+    flex-basis: 280px;
     width: 280px;
+  }
+
+  @media (min-width: ${theme.breakpoints.xxl}) {
+    flex-basis: 300px;
   }
 `;
 
 export const HeaderMarketName = styled(Box)`
-  max-width: 172px;
+  max-width: 100%;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -24,12 +32,17 @@ export const HeaderMarketName = styled(Box)`
 
 export const HeaderMarketText = styled.div`
   display: flex;
+  flex: 1 1 auto;
   min-width: 0;
+  max-width: 100%;
   flex-direction: column;
   gap: 5px;
+  overflow: hidden;
 `;
 
 export const HeaderLeverageBadge = styled.span`
+  flex: 0 0 auto;
+  max-width: 100%;
   width: fit-content;
   height: 18px;
   padding: 2px 7px;
@@ -39,17 +52,24 @@ export const HeaderLeverageBadge = styled.span`
   font-size: 11px;
   font-weight: 800;
   line-height: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const HeaderActions = styled.span`
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   color: ${theme.semantic.textMuted};
 `;
 
 export const MarketsListContainer = styled.button`
+  box-sizing: border-box;
   height: 72px;
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -87,6 +107,7 @@ export const MarketsListContainer = styled.button`
 `
 
 export const CurrentMarketLogo = styled.img`
+  flex: 0 0 auto;
   width: 32px;
   height: 32px;
   object-fit: cover;
