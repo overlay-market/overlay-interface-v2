@@ -216,7 +216,7 @@ const CoinOverview: React.FC = () => {
           <StatValue>{normalizeAnalyticsValue(totalVolume)}</StatValue>
         </StatCard>
         <StatCard>
-          <StatLabel>Tokens Locked</StatLabel>
+          <StatLabel>TVL</StatLabel>
           <StatValue>
             {tokensLockedLabel}
             {tokensLockedLabel !== "-" ? <StatUnit>USD</StatUnit> : null}
