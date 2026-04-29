@@ -203,14 +203,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     currencyPrice !== "-" ? currencyPrice.replace(/[^0-9.-]/g, "") : market?.parsedMid,
     market?.priceCurrency
   );
-  const markPrice = formatHeaderPrice(
-    currencyPrice !== "-" ? currencyPrice.replace(/[^0-9.-]/g, "") : market?.parsedMid,
-    market?.priceCurrency
-  );
-  const indexPrice = formatHeaderPrice(
-    marketOverview?.latestPrice ?? market?.parsedMid,
-    market?.priceCurrency
-  );
   const priceChangeLabel = formatSignedChange(
     marketOverview?.latestPrice,
     marketOverview?.twentyFourHourChange,
@@ -236,16 +228,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
               {priceChangeLabel}
             </PriceChange>
           </HeaderPriceBlock>
-
-          <HeaderMetric>
-            <MetricLabel>Mark Price</MetricLabel>
-            <MetricValue>{markPrice}</MetricValue>
-          </HeaderMetric>
-
-          <HeaderMetric>
-            <MetricLabel>Index Price</MetricLabel>
-            <MetricValue>{indexPrice}</MetricValue>
-          </HeaderMetric>
 
           <HeaderMetric $wide>
             <MetricLabel>Funding Rate/Countdown</MetricLabel>
