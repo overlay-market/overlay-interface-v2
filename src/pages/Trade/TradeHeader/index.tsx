@@ -25,7 +25,6 @@ import { isGamblingMarket } from "../../../utils/marketGuards";
 import { PredictionMarketGroup } from "../../../constants/markets";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
 import { useMarket24hRange } from "../../../hooks/useMarket24hRange";
-import { useAggregatorContracts } from "../../../hooks/useAggregatorContracts";
 import {
   formatUsdOpenInterest,
   getMarketOpenInterestUsd,
@@ -101,7 +100,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     [market?.marketId]
   );
   const marketOverview = useMarkets7d(marketOverviewIds)[0];
-  const { data: aggregatorContracts = [] } = useAggregatorContracts();
   const { data: market24hRange } = useMarket24hRange({
     marketAddress: market?.id,
     chainId: typeof chainId === "number" ? chainId : undefined,
@@ -187,7 +185,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     market24hRange?.low,
     market?.priceCurrency
   );
-  const { totalOiUsd } = getMarketOpenInterestUsd(market, aggregatorContracts);
+  const { totalOiUsd } = getMarketOpenInterestUsd(market);
   const openInterestLabel = formatUsdOpenInterest(totalOiUsd);
 
   return (

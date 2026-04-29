@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { useAggregatorContracts } from "../../../hooks/useAggregatorContracts";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
   formatUsdOpenInterest,
@@ -93,7 +92,6 @@ const normalizeAnalyticsValue = (value: string) => {
 
 const CoinOverview: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
-  const { data: aggregatorContracts = [] } = useAggregatorContracts();
   const { totalVolume, totalTokensLocked, totalTransactions } =
     useMarketAnalytics();
 
@@ -112,7 +110,7 @@ const CoinOverview: React.FC = () => {
         : [UNAVAILABLE_DESCRIPTION];
 
   const { longOi, totalOi, longOiUsd, shortOiUsd, totalOiUsd } =
-    getMarketOpenInterestUsd(currentMarket, aggregatorContracts);
+    getMarketOpenInterestUsd(currentMarket);
   const longShare = totalOi > 0 ? (longOi / totalOi) * 100 : 0;
   const shortShare = totalOi > 0 ? 100 - longShare : 0;
   const marketLogo =

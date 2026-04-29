@@ -1,9 +1,7 @@
-import type { AggregatorContractTicker } from "../hooks/useAggregatorContracts";
 import { formatPriceWithCurrency } from "./formatPriceWithCurrency";
 
 export interface MarketOpenInterestInput {
-  marketName?: string;
-  marketId?: string;
+  currency?: string;
   parsedMid?: string | number;
   mid?: string | number;
   priceCurrency?: string;
@@ -17,7 +15,7 @@ export const formatUsdOpenInterest = (value?: number) => {
   return formatPriceWithCurrency(value, "$");
 };
 
-const normalizeTickerKey = (value?: string) => {
+const normalizeCurrency = (value?: string) => {
   if (!value) return "";
 
   try {
@@ -35,78 +33,32 @@ const normalizeTickerKey = (value?: string) => {
   }
 };
 
-const getAggregatorTickerKeys = (marketName?: string, marketId?: string) => {
-  const pairKeys = new Set(
-    [marketName, marketId]
-      .map(normalizeTickerKey)
-      .filter((key) => key.length > 0)
-  );
+const USD_QUOTE_CURRENCIES = new Set(["USD", "USDC", "DAI", "PERCENTAGE"]);
 
-  return new Set(
-    Array.from(pairKeys).flatMap((key) => [key, `${key}-PERP`])
-  );
-};
+const getQuoteUsdMultiplier = (market?: MarketOpenInterestInput) => {
+  const normalizedCurrency = normalizeCurrency(market?.currency);
 
-const getQuoteUsdMultiplier = (
-  openInterest?: number,
-  openInterestUsd?: number,
-  lastPrice?: number
-) => {
   if (
-    !openInterest ||
-    !openInterestUsd ||
-    !lastPrice ||
-    !Number.isFinite(openInterest) ||
-    !Number.isFinite(openInterestUsd) ||
-    !Number.isFinite(lastPrice)
+    market?.priceCurrency === "$" ||
+    market?.priceCurrency === "%" ||
+    USD_QUOTE_CURRENCIES.has(normalizedCurrency)
   ) {
-    return undefined;
+    return 1;
   }
 
-  return openInterestUsd / (openInterest * lastPrice);
-};
-
-export const findAggregatorContractForMarket = (
-  aggregatorContracts: AggregatorContractTicker[],
-  marketName?: string,
-  marketId?: string
-) => {
-  const tickerKeys = getAggregatorTickerKeys(marketName, marketId);
-
-  if (tickerKeys.size === 0) return undefined;
-
-  return aggregatorContracts.find((contract) => {
-    const contractKeys = [
-      contract.ticker_id,
-      contract.index_name,
-      `${contract.base_currency}-${contract.target_currency}`,
-    ].map(normalizeTickerKey);
-
-    return contractKeys.some((key) => tickerKeys.has(key));
-  });
+  return undefined;
 };
 
 export const getMarketOpenInterestUsd = (
-  market: MarketOpenInterestInput | undefined,
-  aggregatorContracts: AggregatorContractTicker[]
+  market: MarketOpenInterestInput | undefined
 ) => {
+  // Mirrors data-api-backend aggregator/contractsService:
+  // openInterestUsd = (oiLong + oiShort) * mid * quoteUsd.
   const longOi = Number(market?.parsedOiLong ?? 0);
   const shortOi = Number(market?.parsedOiShort ?? 0);
   const totalOi = longOi + shortOi;
-  const aggregatorContract = findAggregatorContractForMarket(
-    aggregatorContracts,
-    market?.marketName,
-    market?.marketId
-  );
-  const openInterestPrice = Number(
-    aggregatorContract?.last_price ?? market?.parsedMid ?? market?.mid
-  );
-  const quoteUsdMultiplier =
-    getQuoteUsdMultiplier(
-      aggregatorContract?.open_interest,
-      aggregatorContract?.open_interest_usd,
-      aggregatorContract?.last_price
-    ) ?? (market?.priceCurrency === "$" ? 1 : undefined);
+  const openInterestPrice = Number(market?.parsedMid ?? market?.mid);
+  const quoteUsdMultiplier = getQuoteUsdMultiplier(market);
   const canCalculateOpenInterestUsd =
     Number.isFinite(openInterestPrice) &&
     openInterestPrice > 0 &&
