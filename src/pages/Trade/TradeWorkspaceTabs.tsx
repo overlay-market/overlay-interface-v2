@@ -3,8 +3,7 @@ import styled from "styled-components";
 import Chart from "./Chart";
 import GamblingTimeline from "./Chart/GamblingTimeline";
 import PredictionGroupChart from "./PredictionGroupChart";
-import Description from "./InfoMarketSection/Description";
-import Analytics from "./InfoMarketSection/Analytics";
+import CoinOverview from "./InfoMarketSection/CoinOverview";
 import GrafanaPanel from "./InfoMarketSection/GrafanaPanel";
 import RiskParameters from "./InfoMarketSection/RiskParameters";
 import { PredictionMarketGroup } from "../../constants/markets";
@@ -93,15 +92,9 @@ const ChartFrame = styled.div`
 `;
 
 const CoinOverviewPanel = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
+  container-type: inline-size;
+  min-height: 100%;
   padding: 14px;
-
-  @media (min-width: 1180px) {
-    grid-template-columns: minmax(360px, 0.72fr) minmax(260px, 0.28fr);
-    align-items: start;
-  }
 `;
 
 const TradingDataPanel = styled.div`
@@ -169,8 +162,7 @@ const TradeWorkspaceTabs: React.FC<TradeWorkspaceTabsProps> = ({
 
         {activeTab === "overview" ? (
           <CoinOverviewPanel>
-            <Description />
-            <Analytics />
+            <CoinOverview />
           </CoinOverviewPanel>
         ) : null}
 
