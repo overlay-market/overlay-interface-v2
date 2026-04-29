@@ -54,8 +54,3 @@ export const StyledFlex = styled(Flex)`
     line-height: 1.1;
   }
 `;
-
-export const BalanceFlex = styled(Flex)`
-  min-width: 204px;
-  border-right: 1px solid ${theme.semantic.borderMuted};
-`;

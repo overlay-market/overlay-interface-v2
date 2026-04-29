@@ -1,9 +1,7 @@
-import { Flex, Text } from "@radix-ui/themes";
+import { Text } from "@radix-ui/themes";
 import theme from "../../../theme";
-import ProgressBar from "../../../components/ProgressBar";
 import MarketsList from "./MarketsList";
 import {
-  BalanceFlex,
   MarketInfoContainer,
   StyledFlex,
   TradeHeaderContainer,
@@ -35,10 +33,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
 
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
   const [funding, setFunding] = useState<string | undefined>(undefined);
-  const [shortPercentageOfTotalOi, setShortPercentageOfTotalOi] =
-    useState<string>("0");
-  const [longPercentageOfTotalOi, setLongPercentageOfTotalOi] =
-    useState<string>("0");
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -89,16 +83,12 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
 
     const fetchStaticMarketData = async () => {
       try {
-        const [funding, oiBalance] = await Promise.all([
+        const [funding] = await Promise.all([
           sdkRef.current.trade.getFunding(marketId),
           sdkRef.current.trade.getOIBalance(marketId),
         ]);
 
         if (funding) setFunding(funding);
-        if (oiBalance) {
-          setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
-          setLongPercentageOfTotalOi(oiBalance.longPercentageOfTotalOi);
-        }
       } catch (error) {
         console.error("Error fetching static market data:", error);
       }
@@ -144,30 +134,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
               {funding ? `${funding}%` : `-`}
             </Text>
           </StyledFlex>
-
-          <BalanceFlex
-            direction={"column"}
-            width={{ initial: "184px", sm: "336px", lg: "195px" }}
-            height={"100%"}
-            justify={"center"}
-            align={"end"}
-            pr={{ initial: "12px", sm: "20px", lg: "12px" }}
-            pl={"10px"}
-            ml={{ sm: "auto", lg: "0" }}
-          >
-            <Text weight="light" style={{ fontSize: "10px" }}>
-              OI balance
-            </Text>
-            <Flex gap={"4px"} align={"center"}>
-              <Text style={{ color: theme.color.red2 }}>
-                {shortPercentageOfTotalOi}%
-              </Text>
-              <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
-              <Text style={{ color: theme.color.green2 }}>
-                {longPercentageOfTotalOi}%
-              </Text>
-            </Flex>
-          </BalanceFlex>
         </MarketInfoContainer>
       ) : null}
     </TradeHeaderContainer>
