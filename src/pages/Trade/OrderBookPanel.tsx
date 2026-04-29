@@ -38,6 +38,19 @@ const TRADE_HISTORY_QUERY = gql`
         isLong
       }
     }
+    liquidates(
+      where: { position_: { market: $marketId } }
+      first: 100
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
+      timestamp
+      price
+      size
+      position {
+        isLong
+      }
+    }
   }
 `;
 
@@ -137,7 +150,7 @@ type OrderBookPanelProps = {
   prices?: { bid: bigint; ask: bigint; mid: bigint };
 };
 
-type TradeHistoryType = "build" | "unwind";
+type TradeHistoryType = "build" | "unwind" | "liquidate";
 type TradeHistoryTone = "positive" | "negative";
 
 type BuildTrade = {
@@ -161,6 +174,7 @@ type UnwindTrade = {
 type TradeHistoryResponse = {
   builds: BuildTrade[];
   unwinds: UnwindTrade[];
+  liquidates: UnwindTrade[];
 };
 
 type TradeHistoryEntry = {
@@ -219,7 +233,7 @@ const getTradeHistoryTone = (
     return type === "build" ? "positive" : "negative";
   }
 
-  return (type === "build" && isLong) || (type === "unwind" && !isLong)
+  return (type === "build" && isLong) || (type !== "build" && !isLong)
     ? "positive"
     : "negative";
 };
@@ -273,8 +287,17 @@ const OrderBookPanel: React.FC<OrderBookPanelProps> = () => {
           tone: getTradeHistoryTone("unwind", unwind.position?.isLong),
         }));
 
+        const liquidates = data.liquidates.map((liquidate, index) => ({
+          id: `liquidate-${liquidate.timestamp}-${index}`,
+          type: "liquidate" as const,
+          timestamp: Number(liquidate.timestamp),
+          price: liquidate.price,
+          amountOvl: liquidate.size,
+          tone: getTradeHistoryTone("liquidate", liquidate.position?.isLong),
+        }));
+
         setTradeHistory(
-          [...builds, ...unwinds]
+          [...builds, ...unwinds, ...liquidates]
             .sort((a, b) => b.timestamp - a.timestamp)
             .slice(0, 100)
         );
