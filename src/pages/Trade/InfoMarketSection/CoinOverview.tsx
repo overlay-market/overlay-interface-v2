@@ -34,7 +34,6 @@ import {
   SectionHeader,
   SectionTitle,
   SmallLogo,
-  StatCaption,
   StatCard,
   StatLabel,
   StatRail,
@@ -198,17 +197,14 @@ const CoinOverview: React.FC = () => {
         <StatCard>
           <StatLabel>Total Volume</StatLabel>
           <StatValue>{normalizeAnalyticsValue(totalVolume)}</StatValue>
-          <StatCaption>Converted from OVL using the oracle price.</StatCaption>
         </StatCard>
         <StatCard>
           <StatLabel>Tokens Locked</StatLabel>
           <StatValue>{normalizeAnalyticsValue(totalTokensLocked)}</StatValue>
-          <StatCaption>Aggregated across deployments for this market.</StatCaption>
         </StatCard>
         <StatCard>
           <StatLabel>Transactions</StatLabel>
           <StatValue>{normalizeAnalyticsValue(totalTransactions)}</StatValue>
-          <StatCaption>Builds, unwinds, and liquidations.</StatCaption>
         </StatCard>
       </StatRail>
     </OverviewShell>
