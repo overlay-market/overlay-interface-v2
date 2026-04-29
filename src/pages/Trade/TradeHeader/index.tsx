@@ -25,6 +25,7 @@ import { isGamblingMarket } from "../../../utils/marketGuards";
 import { PredictionMarketGroup } from "../../../constants/markets";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
 import { useMarket24hRange } from "../../../hooks/useMarket24hRange";
+import { useOvlPrice } from "../../../hooks/useOvlPrice";
 
 interface TradeHeaderProps {
   predictionGroup?: PredictionMarketGroup;
@@ -68,10 +69,22 @@ const formatSignedChange = (
   return `${sign}${formattedAbsolute} (${sign}${(twentyFourHourChange as number).toFixed(2)}%)`;
 };
 
-const formatOpenInterest = (longOi?: string, shortOi?: string) => {
+const formatOpenInterest = (
+  longOi?: string,
+  shortOi?: string,
+  ovlPrice?: number
+) => {
   const openInterest = Number(longOi ?? 0) + Number(shortOi ?? 0);
-  if (!Number.isFinite(openInterest) || openInterest <= 0) return "-";
-  return formatNumberWithCommas(openInterest);
+  if (
+    !Number.isFinite(openInterest) ||
+    openInterest <= 0 ||
+    !ovlPrice ||
+    !Number.isFinite(ovlPrice)
+  ) {
+    return "-";
+  }
+
+  return formatPriceWithCurrency(openInterest * ovlPrice, "$");
 };
 
 const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
@@ -102,6 +115,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     [market?.marketId]
   );
   const marketOverview = useMarkets7d(marketOverviewIds)[0];
+  const { data: ovlPrice } = useOvlPrice();
   const { data: market24hRange } = useMarket24hRange({
     marketAddress: market?.id,
     chainId: typeof chainId === "number" ? chainId : undefined,
@@ -189,7 +203,8 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
   );
   const openInterestLabel = formatOpenInterest(
     market?.parsedOiLong,
-    market?.parsedOiShort
+    market?.parsedOiShort,
+    ovlPrice
   );
 
   return (
@@ -225,7 +240,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
           </HeaderMetric>
 
           <HeaderMetric $wide>
-            <MetricLabel>Open Interest (OVL)</MetricLabel>
+            <MetricLabel>Open Interest (USD)</MetricLabel>
             <MetricValue>{openInterestLabel}</MetricValue>
           </HeaderMetric>
         </MarketInfoContainer>
