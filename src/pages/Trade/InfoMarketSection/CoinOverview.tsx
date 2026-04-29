@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
   formatNumberWithCommas,
@@ -34,7 +34,6 @@ import {
   OiRows,
   OiValue,
   OverviewShell,
-  ReadToggle,
   SectionHeader,
   SectionTitle,
   SmallLogo,
@@ -120,11 +119,6 @@ const CoinOverview: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
   const { totalVolume, totalTokensLocked, totalTransactions } =
     useMarketAnalytics();
-  const [expanded, setExpanded] = useState(false);
-
-  useEffect(() => {
-    setExpanded(false);
-  }, [currentMarket?.id]);
 
   const paragraphs = useMemo(
     () => splitDescription(currentMarket?.descriptionText),
@@ -236,19 +230,11 @@ const CoinOverview: React.FC = () => {
             <SectionHeader>
               <SectionTitle>About This Market</SectionTitle>
             </SectionHeader>
-            <DescriptionText $expanded={expanded}>
+            <DescriptionText>
               {displayedDescription.map((paragraph, index) => (
                 <p key={index}>{renderWithLinks(paragraph)}</p>
               ))}
             </DescriptionText>
-            {(detailParagraphs.length > 0 || paragraphs.length > 1) && (
-              <ReadToggle
-                type="button"
-                onClick={() => setExpanded((value) => !value)}
-              >
-                {expanded ? "Read Less" : "Read More"}
-              </ReadToggle>
-            )}
           </NarrativePanel>
 
           <MicroPanel>

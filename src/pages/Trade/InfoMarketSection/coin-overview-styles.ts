@@ -227,15 +227,10 @@ export const SectionTitle = styled.h3`
   font-weight: 900;
 `;
 
-export const DescriptionText = styled.div<{ $expanded?: boolean }>`
-  display: -webkit-box;
-  max-height: ${({ $expanded }) => ($expanded ? "none" : "210px")};
-  overflow: hidden;
+export const DescriptionText = styled.div`
   color: ${theme.semantic.textSecondary};
   font-size: 13px;
   line-height: 1.65;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: ${({ $expanded }) => ($expanded ? "unset" : "8")};
 
   p {
     margin: 0 0 12px;
@@ -249,30 +244,6 @@ export const DescriptionText = styled.div<{ $expanded?: boolean }>`
     color: ${theme.semantic.accentHover};
     text-decoration: underline;
     text-underline-offset: 3px;
-  }
-`;
-
-export const ReadToggle = styled.button`
-  display: inline-flex;
-  align-items: center;
-  height: 28px;
-  margin-top: 10px;
-  padding: 0 10px;
-  border: 1px solid ${theme.semantic.border};
-  border-radius: ${theme.radius.xs};
-  background: ${theme.semantic.field};
-  color: ${theme.semantic.textPrimary};
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-
-  &:hover {
-    background: ${theme.semantic.hover};
-  }
-
-  &:focus-visible {
-    outline: 1px solid ${theme.semantic.focus};
-    outline-offset: 2px;
   }
 `;
 
