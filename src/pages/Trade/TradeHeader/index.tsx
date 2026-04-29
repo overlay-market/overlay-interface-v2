@@ -69,29 +69,6 @@ const formatSignedChange = (
   return `${sign}${formattedAbsolute} (${sign}${(twentyFourHourChange as number).toFixed(2)}%)`;
 };
 
-const formatFundingCountdown = (seconds: number) => {
-  const hours = Math.floor(seconds / 3600)
-    .toString()
-    .padStart(2, "0");
-  const minutes = Math.floor((seconds % 3600) / 60)
-    .toString()
-    .padStart(2, "0");
-  const secs = Math.floor(seconds % 60)
-    .toString()
-    .padStart(2, "0");
-
-  return `${hours}:${minutes}:${secs}`;
-};
-
-const getFundingCountdownSeconds = () => {
-  const now = new Date();
-  const elapsedSeconds =
-    (now.getUTCHours() % 8) * 3600 +
-    now.getUTCMinutes() * 60 +
-    now.getUTCSeconds();
-  return 8 * 3600 - elapsedSeconds;
-};
-
 const formatOpenInterest = (longOi?: string, shortOi?: string) => {
   const openInterest = Number(longOi ?? 0) + Number(shortOi ?? 0);
   if (!Number.isFinite(openInterest) || openInterest <= 0) return "-";
@@ -109,9 +86,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
 
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
   const [funding, setFunding] = useState<string | undefined>(undefined);
-  const [fundingCountdownSeconds, setFundingCountdownSeconds] = useState(
-    getFundingCountdownSeconds
-  );
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -190,14 +164,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     return Math.sign(Number(funding)) > 0;
   }, [funding]);
 
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setFundingCountdownSeconds(getFundingCountdownSeconds());
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
-  }, []);
-
   const isPriceChangePositive = (marketOverview?.twentyFourHourChange ?? 0) >= 0;
   const displayLastPrice = formatHeaderPrice(
     currencyPrice !== "-" ? currencyPrice.replace(/[^0-9.-]/g, "") : market?.parsedMid,
@@ -208,7 +174,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     marketOverview?.twentyFourHourChange,
     market?.priceCurrency
   );
-  const fundingLabel = `${isFundingRatePositive ? "+" : ""}${funding ? `${funding}%` : "-"} / ${formatFundingCountdown(fundingCountdownSeconds)}`;
+  const fundingLabel = `${isFundingRatePositive ? "+" : ""}${funding ? `${funding}%` : "-"} / 24h`;
   const openInterestLabel = formatOpenInterest(
     market?.parsedOiLong,
     market?.parsedOiShort
@@ -230,7 +196,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
           </HeaderPriceBlock>
 
           <HeaderMetric $wide>
-            <MetricLabel>Funding Rate/Countdown</MetricLabel>
+            <MetricLabel>Funding Rate</MetricLabel>
             <MetricValue $tone={isFundingRatePositive ? "positive" : "negative"}>
               {fundingLabel}
             </MetricValue>
