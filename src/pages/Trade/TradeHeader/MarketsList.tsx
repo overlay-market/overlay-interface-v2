@@ -1,5 +1,9 @@
 import { Flex, ChevronDownIcon } from "@radix-ui/themes";
-import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  StarIcon,
+} from "@radix-ui/react-icons";
 import useOutsideClick from "../../../hooks/useOutsideClick";
 import React, {
   useCallback,
@@ -16,6 +20,10 @@ import {
   CategoryTabs,
   CategoryTabsShell,
   HeaderMarketName,
+  HeaderActions,
+  HeaderFavoriteIcon,
+  HeaderLeverageBadge,
+  HeaderMarketText,
   HeaderRight,
   CurrentMarketLogo,
   DropdownContent,
@@ -306,23 +314,33 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
-        <Flex justify={"start"} align={"center"} gap={"10px"}>
+        <Flex justify={"start"} align={"center"} gap={"12px"} minWidth="0">
           {currentMarket && (
             <CurrentMarketLogo
               src={getMarketLogo(currentMarket.marketId)}
               alt={currentMarket.marketName}
             />
           )}
-          <HeaderMarketName>
-            {predictionGroup ? predictionGroup.title : currentMarket?.marketName}
-          </HeaderMarketName>
+          <HeaderMarketText>
+            <HeaderMarketName>
+              {predictionGroup ? predictionGroup.title : currentMarket?.marketName}
+            </HeaderMarketName>
+            <HeaderLeverageBadge>
+              {formatLeverage(currentMarket?.capLeverage)}
+            </HeaderLeverageBadge>
+          </HeaderMarketText>
         </Flex>
 
-        {isOpen ? (
-          <ChevronDownIcon style={{ transform: "rotate(180deg)" }} />
-        ) : (
-          <ChevronDownIcon />
-        )}
+        <HeaderActions>
+          {isOpen ? (
+            <ChevronDownIcon style={{ transform: "rotate(180deg)" }} />
+          ) : (
+            <ChevronDownIcon />
+          )}
+          <HeaderFavoriteIcon aria-hidden="true">
+            <StarIcon />
+          </HeaderFavoriteIcon>
+        </HeaderActions>
       </MarketsListContainer>
 
       {isOpen && (

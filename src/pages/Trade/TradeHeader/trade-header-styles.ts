@@ -3,32 +3,101 @@ import theme from "../../../theme";
 import styled from "styled-components";
 
 export const TradeHeaderContainer = styled(Flex)`
-  flex-direction: column;
+  flex-direction: row;
   position: relative;
   min-width: 0;
   width: 100%;
+  min-height: 72px;
   background: #08090a;
+  border: 1px solid ${theme.semantic.borderMuted};
+  border-top: 0;
+  border-radius: 0 0 ${theme.radius.md} ${theme.radius.md};
+  overflow: visible;
 
-  @media (min-width: ${theme.breakpoints.lg}) {
-    flex-direction: row;
-    height: 64px;
+  @media (max-width: ${theme.breakpoints.sm}) {
+    flex-direction: column;
   }
 `;
 
 export const MarketInfoContainer = styled(Flex)`
-  min-height: 64px;
+  min-height: 72px;
   width: 100%;
   justify-content: start;
   overflow-x: auto;
   scrollbar-width: none;
+  background: #08090a;
 
   &::-webkit-scrollbar {
     display: none;
   }
+`;
 
-  @media (min-width: ${theme.breakpoints.lg}) {
-    overflow: hidden;
-  }
+export const HeaderPriceBlock = styled.div`
+  flex: 0 0 122px;
+  min-width: 122px;
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 14px;
+`;
+
+export const LastPrice = styled.div<{ $positive?: boolean }>`
+  color: ${({ $positive }) =>
+    $positive === false ? theme.semantic.negative : theme.semantic.positive};
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+`;
+
+export const PriceChange = styled.div<{ $positive?: boolean }>`
+  margin-top: 5px;
+  color: ${({ $positive }) =>
+    $positive === false ? theme.semantic.negative : theme.semantic.positive};
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+`;
+
+export const HeaderMetric = styled.div<{ $wide?: boolean }>`
+  flex: 0 0 ${({ $wide }) => ($wide ? "150px" : "118px")};
+  min-width: ${({ $wide }) => ($wide ? "150px" : "118px")};
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 13px;
+`;
+
+export const MetricLabel = styled.div`
+  width: fit-content;
+  max-width: 100%;
+  color: ${theme.semantic.textMuted};
+  border-bottom: 1px dotted #4a4f58;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.15;
+  white-space: nowrap;
+`;
+
+export const MetricValue = styled.div<{ $tone?: "positive" | "negative" }>`
+  margin-top: 7px;
+  color: ${({ $tone }) =>
+    $tone === "positive"
+      ? theme.semantic.positive
+      : $tone === "negative"
+        ? theme.semantic.negative
+        : theme.semantic.textPrimary};
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 `;
 
 export const StyledFlex = styled(Flex)`
