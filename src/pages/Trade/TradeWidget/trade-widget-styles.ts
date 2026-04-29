@@ -42,57 +42,6 @@ export const TradeWidgetContainer = styled(Flex)`
   }
 `;
 
-export const TicketModeTabs = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 30px;
-  padding: 2px;
-  border-radius: 999px;
-  background: ${theme.semantic.panelRaised};
-`;
-
-export const TicketModeButton = styled.button<{ $active?: boolean }>`
-  border: 0;
-  border-radius: 999px;
-  background: ${({ $active }) => ($active ? theme.semantic.hover : "transparent")};
-  color: ${({ $active }) =>
-    $active ? theme.semantic.textPrimary : theme.semantic.textMuted};
-  font-size: 12px;
-  font-weight: 800;
-  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
-
-  &:focus-visible {
-    outline: 1px solid ${theme.semantic.focus};
-    outline-offset: 2px;
-  }
-`;
-
-export const OrderTypeTabs = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  min-height: 34px;
-`;
-
-export const OrderTypeButton = styled.button<{ $active?: boolean }>`
-  height: 34px;
-  padding: 0;
-  border: 0;
-  border-bottom: 2px solid
-    ${({ $active }) => ($active ? theme.semantic.textPrimary : "transparent")};
-  background: transparent;
-  color: ${({ $active }) =>
-    $active ? theme.semantic.textPrimary : theme.semantic.textMuted};
-  font-size: 14px;
-  font-weight: 700;
-  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
-
-  &:focus-visible {
-    outline: 1px solid ${theme.semantic.focus};
-    outline-offset: 2px;
-  }
-`;
-
 export const TicketMetaRow = styled.div`
   display: flex;
   align-items: center;

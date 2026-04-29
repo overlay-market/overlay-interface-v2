@@ -21,11 +21,7 @@ import Slider from "../../../components/Slider";
 import {
   AdvancedPanel,
   AdvancedSettingsButton,
-  OrderTypeButton,
-  OrderTypeTabs,
   TicketMetaRow,
-  TicketModeButton,
-  TicketModeTabs,
   TradeWidgetContainer,
 } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
@@ -310,29 +306,6 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
       pb={"0px"}
       flexShrink={"0"}
     >
-      <TicketModeTabs aria-label="Position mode">
-        <TicketModeButton type="button" $active>
-          Open
-        </TicketModeButton>
-        {/* TODO: Wire LOREM IPSUM close-position ticket when close-order composition exists. */}
-        <TicketModeButton type="button" disabled>
-          Close
-        </TicketModeButton>
-      </TicketModeTabs>
-
-      <OrderTypeTabs aria-label="Order type">
-        {/* TODO: Replace disabled LOREM IPSUM order-type affordances when limit/conditional orders are supported. */}
-        <OrderTypeButton type="button" disabled>
-          Limit
-        </OrderTypeButton>
-        <OrderTypeButton type="button" $active>
-          Market
-        </OrderTypeButton>
-        <OrderTypeButton type="button" disabled>
-          Conditional
-        </OrderTypeButton>
-      </OrderTypeTabs>
-
       {predictionGroup && onOutcomeSelect ? (
         <PredictionGroupPanel
           group={predictionGroup}
