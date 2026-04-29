@@ -24,12 +24,13 @@ import {
 import { isGamblingMarket } from "../../../utils/marketGuards";
 import { PredictionMarketGroup } from "../../../constants/markets";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
+import { useMarket24hRange } from "../../../hooks/useMarket24hRange";
 
 interface TradeHeaderProps {
   predictionGroup?: PredictionMarketGroup;
 }
 
-const UNAVAILABLE_HEADER_METRIC = "LOREM IPSUM"; // TODO: Replace when the market data API exposes exact 24h high, low, and turnover fields.
+const UNAVAILABLE_TURNOVER_METRIC = "LOREM IPSUM"; // TODO: Replace when the market data API exposes exact 24h turnover.
 
 const formatHeaderPrice = (
   value?: string | number,
@@ -103,6 +104,11 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     [market?.marketId]
   );
   const marketOverview = useMarkets7d(marketOverviewIds)[0];
+  const { data: market24hRange } = useMarket24hRange({
+    marketAddress: market?.id,
+    chainId: typeof chainId === "number" ? chainId : undefined,
+    enabled: !hideMarketInfo,
+  });
 
   useEffect(() => {
     if (!marketId || hideMarketInfo) return;
@@ -175,6 +181,14 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     market?.priceCurrency
   );
   const fundingLabel = `${isFundingRatePositive ? "+" : ""}${funding ? `${funding}%` : "-"} / 24h`;
+  const twentyFourHourHighLabel = formatHeaderPrice(
+    market24hRange?.high,
+    market?.priceCurrency
+  );
+  const twentyFourHourLowLabel = formatHeaderPrice(
+    market24hRange?.low,
+    market?.priceCurrency
+  );
   const openInterestLabel = formatOpenInterest(
     market?.parsedOiLong,
     market?.parsedOiShort
@@ -204,17 +218,17 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
 
           <HeaderMetric>
             <MetricLabel>24h High</MetricLabel>
-            <MetricValue>{UNAVAILABLE_HEADER_METRIC}</MetricValue>
+            <MetricValue>{twentyFourHourHighLabel}</MetricValue>
           </HeaderMetric>
 
           <HeaderMetric>
             <MetricLabel>24h Low</MetricLabel>
-            <MetricValue>{UNAVAILABLE_HEADER_METRIC}</MetricValue>
+            <MetricValue>{twentyFourHourLowLabel}</MetricValue>
           </HeaderMetric>
 
           <HeaderMetric $wide>
             <MetricLabel>24h Turnover (USDT)</MetricLabel>
-            <MetricValue>{UNAVAILABLE_HEADER_METRIC}</MetricValue>
+            <MetricValue>{UNAVAILABLE_TURNOVER_METRIC}</MetricValue>
           </HeaderMetric>
 
           <HeaderMetric $wide>
