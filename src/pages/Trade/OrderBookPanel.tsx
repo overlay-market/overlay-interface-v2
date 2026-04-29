@@ -22,6 +22,7 @@ const TRADE_HISTORY_QUERY = gql`
       price
       position {
         initialNotional
+        isLong
       }
     }
     unwinds(
@@ -33,6 +34,9 @@ const TRADE_HISTORY_QUERY = gql`
       timestamp
       price
       size
+      position {
+        isLong
+      }
     }
   }
 `;
@@ -112,9 +116,9 @@ const TradeRow = styled.div`
   }
 `;
 
-const TradePrice = styled.span<{ $type: TradeHistoryType }>`
-  color: ${({ $type }) =>
-    $type === "build" ? theme.semantic.positive : theme.semantic.negative};
+const TradePrice = styled.span<{ $tone: TradeHistoryTone }>`
+  color: ${({ $tone }) =>
+    $tone === "positive" ? theme.semantic.positive : theme.semantic.negative};
   font-weight: 700;
 `;
 
@@ -134,12 +138,14 @@ type OrderBookPanelProps = {
 };
 
 type TradeHistoryType = "build" | "unwind";
+type TradeHistoryTone = "positive" | "negative";
 
 type BuildTrade = {
   timestamp: string;
   price: string;
   position?: {
     initialNotional?: string;
+    isLong?: boolean;
   } | null;
 };
 
@@ -147,6 +153,9 @@ type UnwindTrade = {
   timestamp: string;
   price: string;
   size: string;
+  position?: {
+    isLong?: boolean;
+  } | null;
 };
 
 type TradeHistoryResponse = {
@@ -160,6 +169,7 @@ type TradeHistoryEntry = {
   timestamp: number;
   price: string;
   amountOvl: string;
+  tone: TradeHistoryTone;
 };
 
 const TRADE_HISTORY_PRICE_PLACEHOLDER = "LOREM IPSUM"; // TODO: Replace when a subgraph trade price cannot be parsed.
@@ -201,6 +211,19 @@ const getPriceLabel = (priceCurrency?: string) => {
   return priceCurrency;
 };
 
+const getTradeHistoryTone = (
+  type: TradeHistoryType,
+  isLong?: boolean
+): TradeHistoryTone => {
+  if (isLong === undefined) {
+    return type === "build" ? "positive" : "negative";
+  }
+
+  return (type === "build" && isLong) || (type === "unwind" && !isLong)
+    ? "positive"
+    : "negative";
+};
+
 const OrderBookPanel: React.FC<OrderBookPanelProps> = () => {
   const { currentMarket } = useCurrentMarketState();
   const sdk = useSDK();
@@ -238,6 +261,7 @@ const OrderBookPanel: React.FC<OrderBookPanelProps> = () => {
           timestamp: Number(build.timestamp),
           price: build.price,
           amountOvl: build.position?.initialNotional ?? "0",
+          tone: getTradeHistoryTone("build", build.position?.isLong),
         }));
 
         const unwinds = data.unwinds.map((unwind, index) => ({
@@ -246,6 +270,7 @@ const OrderBookPanel: React.FC<OrderBookPanelProps> = () => {
           timestamp: Number(unwind.timestamp),
           price: unwind.price,
           amountOvl: unwind.size,
+          tone: getTradeHistoryTone("unwind", unwind.position?.isLong),
         }));
 
         setTradeHistory(
@@ -307,7 +332,7 @@ const OrderBookPanel: React.FC<OrderBookPanelProps> = () => {
           tradeRows.map((trade) => (
             <TradeRow key={trade.id}>
               <span>{trade.timeLabel}</span>
-              <TradePrice $type={trade.type}>{trade.priceLabel}</TradePrice>
+              <TradePrice $tone={trade.tone}>{trade.priceLabel}</TradePrice>
               <TradeAmount>{trade.amountLabel}</TradeAmount>
             </TradeRow>
           ))
