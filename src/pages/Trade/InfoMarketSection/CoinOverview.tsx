@@ -1,9 +1,6 @@
 import React, { useMemo } from "react";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import {
-  formatNumberWithCommas,
-  formatPriceWithCurrency,
-} from "../../../utils/formatPriceWithCurrency";
+import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
 import { useMarketAnalytics } from "./useMarketAnalytics";
 import {
@@ -15,10 +12,6 @@ import {
   DossierPanel,
   DossierTop,
   Eyebrow,
-  FactCell,
-  FactGrid,
-  FactLabel,
-  FactValue,
   LeadText,
   LeverageBadge,
   LogoFrame,
@@ -80,22 +73,6 @@ const formatLeverage = (capLeverage?: string | number | null) => {
   return `${Number.isInteger(leverage) ? leverage : leverage.toFixed(1).replace(/\.0$/, "")}x`;
 };
 
-const formatMarketPrice = (
-  value?: string | number,
-  priceCurrency: string = "$"
-) => {
-  if (value === undefined || value === null || value === "") return "-";
-  return formatPriceWithCurrency(value, priceCurrency);
-};
-
-const formatPercent = (value?: string | number) => {
-  const numericValue = Number(value);
-
-  if (!Number.isFinite(numericValue)) return "-";
-
-  return `${numericValue >= 0 ? "+" : ""}${numericValue.toFixed(2)}%`;
-};
-
 const formatOpenInterest = (value?: string | number) => {
   const numericValue = Number(value);
 
@@ -140,42 +117,8 @@ const CoinOverview: React.FC = () => {
   const totalOi = longOi + shortOi;
   const longShare = totalOi > 0 ? (longOi / totalOi) * 100 : 0;
   const shortShare = totalOi > 0 ? 100 - longShare : 0;
-  const fundingValue = Number(
-    currentMarket?.parsedDailyFundingRate ?? currentMarket?.fundingRate
-  );
-  const fundingTone = fundingValue >= 0 ? "positive" : "negative";
   const marketLogo =
     currentMarket?.marketId ? getMarketLogo(currentMarket.marketId) : undefined;
-
-  const facts = [
-    {
-      label: "Last Price",
-      value: formatMarketPrice(
-        currentMarket?.parsedMid ?? currentMarket?.mid,
-        currentMarket?.priceCurrency
-      ),
-      tone: undefined,
-    },
-    {
-      label: "Funding / 24h",
-      value: formatPercent(
-        currentMarket?.parsedDailyFundingRate ?? currentMarket?.fundingRate
-      ),
-      tone: fundingTone,
-    },
-    {
-      label: "Open Interest",
-      value: formatOpenInterest(totalOi),
-      tone: undefined,
-    },
-    {
-      label: "Cap OI",
-      value: formatOpenInterest(
-        currentMarket?.parsedCapOi ?? currentMarket?.capOi
-      ),
-      tone: undefined,
-    },
-  ] as const;
 
   return (
     <OverviewShell>
@@ -215,15 +158,6 @@ const CoinOverview: React.FC = () => {
             <LeadText>{leadText}</LeadText>
           </DossierHeader>
         </DossierTop>
-
-        <FactGrid>
-          {facts.map((fact) => (
-            <FactCell key={fact.label}>
-              <FactLabel>{fact.label}</FactLabel>
-              <FactValue $tone={fact.tone}>{fact.value}</FactValue>
-            </FactCell>
-          ))}
-        </FactGrid>
 
         <DescriptionGrid>
           <NarrativePanel>

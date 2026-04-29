@@ -149,53 +149,6 @@ export const LeadText = styled.p`
   line-height: 1.55;
 `;
 
-export const FactGrid = styled.div`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid ${theme.semantic.borderMuted};
-  border-radius: ${theme.radius.md};
-  background: ${theme.semantic.borderMuted};
-
-  @container (min-width: 520px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @container (min-width: 800px) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-`;
-
-export const FactCell = styled.div`
-  min-width: 0;
-  padding: 12px;
-  background: rgba(10, 11, 13, 0.96);
-`;
-
-export const FactLabel = styled.div`
-  margin-bottom: 7px;
-  color: ${theme.semantic.textMuted};
-  font-size: 11px;
-  font-weight: 700;
-`;
-
-export const FactValue = styled.div<{ $tone?: "positive" | "negative" }>`
-  min-width: 0;
-  color: ${({ $tone }) => {
-    if ($tone === "positive") return theme.semantic.positive;
-    if ($tone === "negative") return theme.semantic.negative;
-    return theme.semantic.textPrimary;
-  }};
-  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
-  font-size: 15px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
 export const DescriptionGrid = styled.div`
   display: grid;
   grid-template-columns: minmax(0, 1fr);
