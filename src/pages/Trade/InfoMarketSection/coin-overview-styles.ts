@@ -304,6 +304,14 @@ export const StatValue = styled.div`
   }
 `;
 
+export const StatUnit = styled.span`
+  margin-left: 8px;
+  color: ${theme.semantic.textMuted};
+  font-size: 12px;
+  font-weight: 800;
+  vertical-align: baseline;
+`;
+
 export const StatCaption = styled.div`
   margin-top: 8px;
   color: ${theme.semantic.textMuted};

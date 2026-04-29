@@ -41,6 +41,7 @@ import {
   StatCard,
   StatLabel,
   StatRail,
+  StatUnit,
   StatValue,
 } from "./coin-overview-styles";
 
@@ -120,6 +121,7 @@ const CoinOverview: React.FC = () => {
   const marketAddressUrl = currentMarket?.id
     ? getExplorerLink(56, currentMarket.id, ExplorerDataType.ADDRESS)
     : undefined;
+  const tokensLockedLabel = normalizeAnalyticsValue(totalTokensLocked);
 
   return (
     <OverviewShell>
@@ -215,7 +217,10 @@ const CoinOverview: React.FC = () => {
         </StatCard>
         <StatCard>
           <StatLabel>Tokens Locked</StatLabel>
-          <StatValue>{normalizeAnalyticsValue(totalTokensLocked)}</StatValue>
+          <StatValue>
+            {tokensLockedLabel}
+            {tokensLockedLabel !== "-" ? <StatUnit>USD</StatUnit> : null}
+          </StatValue>
         </StatCard>
         <StatCard>
           <StatLabel>Transactions</StatLabel>
