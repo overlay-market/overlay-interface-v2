@@ -7,12 +7,12 @@ export const MarketSelectorRoot = styled(Box)`
   width: 100%;
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: 210px;
+    width: 280px;
   }
 `;
 
 export const HeaderMarketName = styled(Box)`
-  max-width: 92px;
+  max-width: 172px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -44,25 +44,7 @@ export const HeaderLeverageBadge = styled.span`
 export const HeaderActions = styled.span`
   display: inline-flex;
   align-items: center;
-  gap: 12px;
   color: ${theme.semantic.textMuted};
-`;
-
-export const HeaderFavoriteIcon = styled.span`
-  width: 20px;
-  height: 20px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid ${theme.semantic.border};
-  border-radius: 50%;
-  background: #0c0d0f;
-  color: #5f6670;
-
-  svg {
-    width: 13px;
-    height: 13px;
-  }
 `;
 
 export const MarketsListContainer = styled.button`
@@ -91,16 +73,16 @@ export const MarketsListContainer = styled.button`
   }
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: 210px;
+    width: 280px;
     border-right: 1px solid ${theme.semantic.borderMuted};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
-    width: 210px;
+    width: 280px;
   }
 
   @media (min-width: ${theme.breakpoints.xxl}) {
-    width: 220px;
+    width: 300px;
   }
 `
 

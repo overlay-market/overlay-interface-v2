@@ -2,7 +2,6 @@ import { Flex, ChevronDownIcon } from "@radix-ui/themes";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  StarIcon,
 } from "@radix-ui/react-icons";
 import useOutsideClick from "../../../hooks/useOutsideClick";
 import React, {
@@ -21,7 +20,6 @@ import {
   CategoryTabsShell,
   HeaderMarketName,
   HeaderActions,
-  HeaderFavoriteIcon,
   HeaderLeverageBadge,
   HeaderMarketText,
   HeaderRight,
@@ -87,7 +85,7 @@ const decodeMarketId = (marketId: string) => {
   }
 };
 
-const formatLeverage = (capLeverage?: string | number) => {
+const formatLeverage = (capLeverage?: string | number | null) => {
   const leverage = Number(capLeverage);
 
   if (!Number.isFinite(leverage) || leverage <= 0) {
@@ -123,6 +121,9 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
   const [marketLeverageCaps, setMarketLeverageCaps] = useState<
     Record<string, string | number | null>
   >({});
+  const [currentMarketLeverageCap, setCurrentMarketLeverageCap] = useState<
+    string | number | null
+  >(null);
   const [categoryScrollState, setCategoryScrollState] = useState({
     left: false,
     right: false,
@@ -217,6 +218,39 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
       cancelled = true;
     };
   }, [isOpen, marketLeverageCaps, sdk, sortedMarkets]);
+
+  useEffect(() => {
+    if (!currentMarket?.id || currentMarket.capLeverage) {
+      setCurrentMarketLeverageCap(null);
+      return;
+    }
+
+    let cancelled = false;
+    setCurrentMarketLeverageCap(null);
+
+    const fetchCurrentMarketLeverageCap = async () => {
+      try {
+        const capLeverage = await sdk.market.getCapLeverage(
+          currentMarket.id as Address
+        );
+        const parsedCapLeverage = formatWeiToParsedNumber(capLeverage, 18, 2);
+
+        if (!cancelled) {
+          setCurrentMarketLeverageCap(parsedCapLeverage ?? null);
+        }
+      } catch {
+        if (!cancelled) {
+          setCurrentMarketLeverageCap(null);
+        }
+      }
+    };
+
+    fetchCurrentMarketLeverageCap();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentMarket?.capLeverage, currentMarket?.id, sdk]);
 
   const getMarketCategory = useMemo(() => {
     return (marketName: string, marketId: string) => {
@@ -326,7 +360,9 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
               {predictionGroup ? predictionGroup.title : currentMarket?.marketName}
             </HeaderMarketName>
             <HeaderLeverageBadge>
-              {formatLeverage(currentMarket?.capLeverage)}
+              {formatLeverage(
+                currentMarket?.capLeverage ?? currentMarketLeverageCap
+              )}
             </HeaderLeverageBadge>
           </HeaderMarketText>
         </Flex>
@@ -337,9 +373,6 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
           ) : (
             <ChevronDownIcon />
           )}
-          <HeaderFavoriteIcon aria-hidden="true">
-            <StarIcon />
-          </HeaderFavoriteIcon>
         </HeaderActions>
       </MarketsListContainer>
 
