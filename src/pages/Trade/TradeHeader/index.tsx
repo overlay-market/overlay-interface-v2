@@ -30,8 +30,6 @@ interface TradeHeaderProps {
   predictionGroup?: PredictionMarketGroup;
 }
 
-const UNAVAILABLE_TURNOVER_METRIC = "LOREM IPSUM"; // TODO: Replace when the market data API exposes exact 24h turnover.
-
 const formatHeaderPrice = (
   value?: string | number,
   priceCurrency: string = "$"
@@ -224,11 +222,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
           <HeaderMetric>
             <MetricLabel>24h Low</MetricLabel>
             <MetricValue>{twentyFourHourLowLabel}</MetricValue>
-          </HeaderMetric>
-
-          <HeaderMetric $wide>
-            <MetricLabel>24h Turnover (USDT)</MetricLabel>
-            <MetricValue>{UNAVAILABLE_TURNOVER_METRIC}</MetricValue>
           </HeaderMetric>
 
           <HeaderMetric $wide>
