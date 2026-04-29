@@ -42,8 +42,7 @@ import {
 } from "./coin-overview-styles";
 
 const URL_REGEX = /(https?:\/\/[^\s)]+)(?=[\s)]|$)/g;
-const UNKNOWN_LEVERAGE_LABEL = "LOREM IPSUM"; // TODO: Replace when the market payload does not include capLeverage.
-const UNKNOWN_DESCRIPTION = "LOREM IPSUM"; // TODO: Replace when the market payload does not include descriptionText.
+const UNAVAILABLE_DESCRIPTION = "Market details are currently unavailable.";
 
 const renderWithLinks = (text: string): React.ReactNode[] => {
   const parts = text.split(URL_REGEX);
@@ -71,7 +70,7 @@ const formatLeverage = (capLeverage?: string | number | null) => {
   const leverage = Number(capLeverage);
 
   if (!Number.isFinite(leverage) || leverage <= 0) {
-    return UNKNOWN_LEVERAGE_LABEL;
+    return undefined;
   }
 
   return `${Number.isInteger(leverage) ? leverage : leverage.toFixed(1).replace(/\.0$/, "")}x`;
@@ -99,14 +98,14 @@ const CoinOverview: React.FC = () => {
     [currentMarket?.descriptionText]
   );
 
-  const leadText = paragraphs[0] ?? UNKNOWN_DESCRIPTION;
+  const leadText = paragraphs[0] ?? UNAVAILABLE_DESCRIPTION;
   const detailParagraphs = paragraphs.slice(1);
   const displayedDescription =
     detailParagraphs.length > 0
       ? detailParagraphs
       : paragraphs.length > 0
         ? paragraphs
-        : [UNKNOWN_DESCRIPTION];
+        : [UNAVAILABLE_DESCRIPTION];
 
   const { longOi, totalOi, longOiUsd, shortOiUsd, totalOiUsd } =
     getMarketOpenInterestUsd(currentMarket, aggregatorContracts);
@@ -114,6 +113,7 @@ const CoinOverview: React.FC = () => {
   const shortShare = totalOi > 0 ? 100 - longShare : 0;
   const marketLogo =
     currentMarket?.marketId ? getMarketLogo(currentMarket.marketId) : undefined;
+  const leverageLabel = formatLeverage(currentMarket?.capLeverage);
 
   return (
     <OverviewShell>
@@ -133,9 +133,9 @@ const CoinOverview: React.FC = () => {
                   alt={`${currentMarket.marketName} icon`}
                 />
               ) : null}
-              <LeverageBadge>
-                {formatLeverage(currentMarket?.capLeverage)}
-              </LeverageBadge>
+              {leverageLabel ? (
+                <LeverageBadge>{leverageLabel}</LeverageBadge>
+              ) : null}
             </LogoOverlay>
           </LogoFrame>
 
@@ -143,9 +143,9 @@ const CoinOverview: React.FC = () => {
             <Eyebrow>Market dossier</Eyebrow>
             <MarketTitleRow>
               <MarketTitle>{currentMarket?.marketName ?? "Market"}</MarketTitle>
-              <LeverageBadge>
-                {formatLeverage(currentMarket?.capLeverage)}
-              </LeverageBadge>
+              {leverageLabel ? (
+                <LeverageBadge>{leverageLabel}</LeverageBadge>
+              ) : null}
             </MarketTitleRow>
             <MarketAddress title={currentMarket?.id}>
               {formatCompactAddress(currentMarket?.id)}
