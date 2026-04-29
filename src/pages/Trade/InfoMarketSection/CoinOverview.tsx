@@ -6,6 +6,10 @@ import {
   getMarketOpenInterestUsd,
 } from "../../../utils/openInterestUsd";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
+import {
+  ExplorerDataType,
+  getExplorerLink,
+} from "../../../utils/getExplorerLink";
 import { useMarketAnalytics } from "./useMarketAnalytics";
 import {
   BarSegment,
@@ -113,6 +117,9 @@ const CoinOverview: React.FC = () => {
   const marketLogo =
     currentMarket?.marketId ? getMarketLogo(currentMarket.marketId) : undefined;
   const leverageLabel = formatLeverage(currentMarket?.capLeverage);
+  const marketAddressUrl = currentMarket?.id
+    ? getExplorerLink(56, currentMarket.id, ExplorerDataType.ADDRESS)
+    : undefined;
 
   return (
     <OverviewShell>
@@ -146,9 +153,17 @@ const CoinOverview: React.FC = () => {
                 <LeverageBadge>{leverageLabel}</LeverageBadge>
               ) : null}
             </MarketTitleRow>
-            <MarketAddress title={currentMarket?.id}>
-              {formatCompactAddress(currentMarket?.id)}
-            </MarketAddress>
+            {marketAddressUrl ? (
+              <MarketAddress
+                href={marketAddressUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={currentMarket?.id}
+                aria-label="Open market address on BscScan"
+              >
+                {formatCompactAddress(currentMarket?.id)}
+              </MarketAddress>
+            ) : null}
             <LeadText>{leadText}</LeadText>
           </DossierHeader>
         </DossierTop>

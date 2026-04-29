@@ -125,7 +125,7 @@ export const MarketTitle = styled.h2`
   }
 `;
 
-export const MarketAddress = styled.div`
+export const MarketAddress = styled.a`
   width: fit-content;
   max-width: 100%;
   padding: 6px 8px;
@@ -138,6 +138,18 @@ export const MarketAddress = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-decoration: none;
+
+  &:hover {
+    border-color: ${theme.semantic.border};
+    color: ${theme.semantic.textPrimary};
+    background: ${theme.semantic.hover};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+  }
 `;
 
 export const LeadText = styled.p`
