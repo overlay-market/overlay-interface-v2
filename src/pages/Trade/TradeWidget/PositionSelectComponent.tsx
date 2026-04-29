@@ -82,6 +82,12 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
     [market?.marketName]
   );
 
+  useEffect(() => {
+    if (isDoubleOrNothing && !isLong) {
+      handlePositionSideSelect(true);
+    }
+  }, [isDoubleOrNothing, isLong, handlePositionSideSelect]);
+
   return (
     <Flex height={"52px"} gap={"8px"}>
       <LongPositionSelectButton
@@ -106,18 +112,14 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
           </Flex>
         )}
       </LongPositionSelectButton>
-      <ShortPositionSelectButton
-        type="button"
-        $active={isLong}
-        onClick={() => handleSelectPositionSide(false)}
-        aria-label={shortLabel}
-        title={shortLabel}
-      >
-        {isDoubleOrNothing ? (
-          <Flex direction={"column"} justify={"center"} align={"center"}>
-            <Triangle $direction="down" />
-          </Flex>
-        ) : (
+      {!isDoubleOrNothing && (
+        <ShortPositionSelectButton
+          type="button"
+          $active={isLong}
+          onClick={() => handleSelectPositionSide(false)}
+          aria-label={shortLabel}
+          title={shortLabel}
+        >
           <Flex direction={"column"} justify={"center"} align={"center"}>
             <Text size={"3"} weight={"bold"}>
               {shortLabel}
@@ -126,8 +128,8 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
               {currencyBid}
             </Text>
           </Flex>
-        )}
-      </ShortPositionSelectButton>
+        </ShortPositionSelectButton>
+      )}
     </Flex>
   );
 };
