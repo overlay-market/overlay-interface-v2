@@ -25,7 +25,11 @@ import { isGamblingMarket } from "../../../utils/marketGuards";
 import { PredictionMarketGroup } from "../../../constants/markets";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
 import { useMarket24hRange } from "../../../hooks/useMarket24hRange";
-import { useOvlPrice } from "../../../hooks/useOvlPrice";
+import { useAggregatorContracts } from "../../../hooks/useAggregatorContracts";
+import {
+  formatUsdOpenInterest,
+  getMarketOpenInterestUsd,
+} from "../../../utils/openInterestUsd";
 
 interface TradeHeaderProps {
   predictionGroup?: PredictionMarketGroup;
@@ -69,24 +73,6 @@ const formatSignedChange = (
   return `${sign}${formattedAbsolute} (${sign}${(twentyFourHourChange as number).toFixed(2)}%)`;
 };
 
-const formatOpenInterest = (
-  longOi?: string,
-  shortOi?: string,
-  ovlPrice?: number
-) => {
-  const openInterest = Number(longOi ?? 0) + Number(shortOi ?? 0);
-  if (
-    !Number.isFinite(openInterest) ||
-    openInterest <= 0 ||
-    !ovlPrice ||
-    !Number.isFinite(ovlPrice)
-  ) {
-    return "-";
-  }
-
-  return formatPriceWithCurrency(openInterest * ovlPrice, "$");
-};
-
 const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
   const [searchParams] = useSearchParams();
   const marketId = searchParams.get("market");
@@ -115,7 +101,7 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     [market?.marketId]
   );
   const marketOverview = useMarkets7d(marketOverviewIds)[0];
-  const { data: ovlPrice } = useOvlPrice();
+  const { data: aggregatorContracts = [] } = useAggregatorContracts();
   const { data: market24hRange } = useMarket24hRange({
     marketAddress: market?.id,
     chainId: typeof chainId === "number" ? chainId : undefined,
@@ -201,11 +187,8 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     market24hRange?.low,
     market?.priceCurrency
   );
-  const openInterestLabel = formatOpenInterest(
-    market?.parsedOiLong,
-    market?.parsedOiShort,
-    ovlPrice
-  );
+  const { totalOiUsd } = getMarketOpenInterestUsd(market, aggregatorContracts);
+  const openInterestLabel = formatUsdOpenInterest(totalOiUsd);
 
   return (
     <TradeHeaderContainer>

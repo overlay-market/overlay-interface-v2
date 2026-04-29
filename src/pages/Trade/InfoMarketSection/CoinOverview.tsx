@@ -1,7 +1,10 @@
 import React, { useMemo } from "react";
 import { useAggregatorContracts } from "../../../hooks/useAggregatorContracts";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import {
+  formatUsdOpenInterest,
+  getMarketOpenInterestUsd,
+} from "../../../utils/openInterestUsd";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
 import { useMarketAnalytics } from "./useMarketAnalytics";
 import {
@@ -74,65 +77,10 @@ const formatLeverage = (capLeverage?: string | number | null) => {
   return `${Number.isInteger(leverage) ? leverage : leverage.toFixed(1).replace(/\.0$/, "")}x`;
 };
 
-const formatUsdOpenInterest = (value?: number) => {
-  if (value === undefined || !Number.isFinite(value) || value < 0) return "-";
-
-  return formatPriceWithCurrency(value, "$");
-};
-
 const formatCompactAddress = (address?: string) => {
   if (!address) return "-";
   if (address.length <= 14) return address;
   return `${address.slice(0, 6)}...${address.slice(-6)}`;
-};
-
-const normalizeTickerKey = (value?: string) => {
-  if (!value) return "";
-
-  try {
-    return decodeURIComponent(value)
-      .toUpperCase()
-      .replace(/\s*\/\s*/g, "-")
-      .replace(/[^A-Z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  } catch {
-    return value
-      .toUpperCase()
-      .replace(/\s*\/\s*/g, "-")
-      .replace(/[^A-Z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-};
-
-const getAggregatorTickerKeys = (marketName?: string, marketId?: string) => {
-  const pairKeys = new Set(
-    [marketName, marketId]
-      .map(normalizeTickerKey)
-      .filter((key) => key.length > 0)
-  );
-
-  return new Set(
-    Array.from(pairKeys).flatMap((key) => [key, `${key}-PERP`])
-  );
-};
-
-const getQuoteUsdMultiplier = (
-  openInterest?: number,
-  openInterestUsd?: number,
-  lastPrice?: number
-) => {
-  if (
-    !openInterest ||
-    !openInterestUsd ||
-    !lastPrice ||
-    !Number.isFinite(openInterest) ||
-    !Number.isFinite(openInterestUsd) ||
-    !Number.isFinite(lastPrice)
-  ) {
-    return undefined;
-  }
-
-  return openInterestUsd / (openInterest * lastPrice);
 };
 
 const normalizeAnalyticsValue = (value: string) => {
@@ -160,57 +108,12 @@ const CoinOverview: React.FC = () => {
         ? paragraphs
         : [UNKNOWN_DESCRIPTION];
 
-  const longOi = Number(currentMarket?.parsedOiLong ?? 0);
-  const shortOi = Number(currentMarket?.parsedOiShort ?? 0);
-  const totalOi = longOi + shortOi;
+  const { longOi, totalOi, longOiUsd, shortOiUsd, totalOiUsd } =
+    getMarketOpenInterestUsd(currentMarket, aggregatorContracts);
   const longShare = totalOi > 0 ? (longOi / totalOi) * 100 : 0;
   const shortShare = totalOi > 0 ? 100 - longShare : 0;
   const marketLogo =
     currentMarket?.marketId ? getMarketLogo(currentMarket.marketId) : undefined;
-
-  const aggregatorContract = useMemo(() => {
-    const tickerKeys = getAggregatorTickerKeys(
-      currentMarket?.marketName,
-      currentMarket?.marketId
-    );
-
-    if (tickerKeys.size === 0) return undefined;
-
-    return aggregatorContracts.find((contract) => {
-      const contractKeys = [
-        contract.ticker_id,
-        contract.index_name,
-        `${contract.base_currency}-${contract.target_currency}`,
-      ].map(normalizeTickerKey);
-
-      return contractKeys.some((key) => tickerKeys.has(key));
-    });
-  }, [aggregatorContracts, currentMarket?.marketId, currentMarket?.marketName]);
-  const openInterestPrice = Number(
-    aggregatorContract?.last_price ??
-      currentMarket?.parsedMid ??
-      currentMarket?.mid
-  );
-  const quoteUsdMultiplier =
-    getQuoteUsdMultiplier(
-      aggregatorContract?.open_interest,
-      aggregatorContract?.open_interest_usd,
-      aggregatorContract?.last_price
-    ) ?? (currentMarket?.priceCurrency === "$" ? 1 : undefined);
-  const canCalculateOpenInterestUsd =
-    Number.isFinite(openInterestPrice) &&
-    openInterestPrice > 0 &&
-    quoteUsdMultiplier !== undefined;
-  const longOiUsd = canCalculateOpenInterestUsd
-    ? longOi * openInterestPrice * quoteUsdMultiplier
-    : undefined;
-  const shortOiUsd = canCalculateOpenInterestUsd
-    ? shortOi * openInterestPrice * quoteUsdMultiplier
-    : undefined;
-  const totalOiUsd =
-    longOiUsd !== undefined && shortOiUsd !== undefined
-      ? longOiUsd + shortOiUsd
-      : undefined;
 
   return (
     <OverviewShell>
