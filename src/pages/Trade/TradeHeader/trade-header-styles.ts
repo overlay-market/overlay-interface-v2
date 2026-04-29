@@ -42,10 +42,10 @@ export const MarketInfoContainer = styled(Flex)`
 
 export const HeaderPriceBlock = styled.div`
   box-sizing: border-box;
-  flex: 0 0 136px;
-  width: 136px;
-  min-width: 136px;
-  max-width: 136px;
+  flex: 0 0 auto;
+  width: max-content;
+  min-width: 156px;
+  max-width: none;
   height: 72px;
   display: flex;
   min-inline-size: 0;
@@ -65,9 +65,8 @@ export const LastPrice = styled.div<{ $positive?: boolean }>`
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: none;
+  overflow: visible;
 `;
 
 export const PriceChange = styled.div<{ $positive?: boolean }>`
@@ -79,9 +78,8 @@ export const PriceChange = styled.div<{ $positive?: boolean }>`
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: none;
+  overflow: visible;
 `;
 
 export const HeaderMetric = styled.div<{ $wide?: boolean }>`
