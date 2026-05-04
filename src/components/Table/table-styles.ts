@@ -47,11 +47,15 @@ export const StyledRow = styled.tr`
    }
 
   .positions-terminal-table & {
-    height: 54px;
+    height: 50px;
     border-bottom: 0;
 
     &:hover {
       background: #0d0f12;
+    }
+
+    @media (min-width: ${theme.breakpoints.sm}) {
+      height: 54px;
     }
   }
 `;
@@ -64,11 +68,15 @@ export const StyledCell = styled.td`
   font-variant-numeric: tabular-nums;
 
   .positions-terminal-table & {
-    padding: 8px 14px;
+    padding: 8px 12px;
     border-bottom: 0;
     color: ${theme.semantic.textSecondary};
     font-size: 11px;
     vertical-align: middle;
+
+    @media (min-width: ${theme.breakpoints.sm}) {
+      padding: 8px 14px;
+    }
   }
 `;
 

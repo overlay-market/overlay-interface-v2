@@ -26,6 +26,8 @@ const tabs: Array<{ id: WorkspaceTab; label: string }> = [
 ];
 
 const WorkspaceShell = styled.section`
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -35,9 +37,12 @@ const WorkspaceShell = styled.section`
 `;
 
 const WorkspaceTabList = styled.div`
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  min-height: 44px;
+  min-height: 40px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
   background: #070809;
   overflow-x: auto;
@@ -46,11 +51,15 @@ const WorkspaceTabList = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-height: 44px;
+  }
 `;
 
 const WorkspaceTabButton = styled.button<{ $active?: boolean }>`
-  height: 44px;
-  padding: 0 18px;
+  height: 40px;
+  padding: 0 14px;
   border: 0;
   border-right: 1px solid ${theme.semantic.borderMuted};
   border-bottom: 2px solid
@@ -58,7 +67,7 @@ const WorkspaceTabButton = styled.button<{ $active?: boolean }>`
   background: ${({ $active }) => ($active ? "#101214" : "transparent")};
   color: ${({ $active }) =>
     $active ? theme.semantic.textPrimary : theme.semantic.textMuted};
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;
@@ -72,9 +81,17 @@ const WorkspaceTabButton = styled.button<{ $active?: boolean }>`
     outline: 1px solid ${theme.semantic.focus};
     outline-offset: -2px;
   }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    height: 44px;
+    padding: 0 18px;
+    font-size: 13px;
+  }
 `;
 
 const WorkspaceContent = styled.div<{ $scroll?: boolean }>`
+  position: relative;
+  z-index: 1;
   flex: 1;
   min-height: 0;
   overflow: ${({ $scroll }) => ($scroll ? "auto" : "hidden")};
@@ -84,7 +101,7 @@ const WorkspaceContent = styled.div<{ $scroll?: boolean }>`
 const ChartFrame = styled.div`
   width: 100%;
   height: 100%;
-  min-height: 420px;
+  min-height: 320px;
 
   @media (min-width: ${theme.breakpoints.md}) {
     min-height: 520px;
@@ -94,15 +111,27 @@ const ChartFrame = styled.div`
 const CoinOverviewPanel = styled.div`
   container-type: inline-size;
   min-height: 100%;
-  padding: 14px;
+  padding: 10px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 14px;
+  }
 `;
 
 const TradingDataPanel = styled.div`
-  padding: 14px;
+  padding: 10px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 14px;
+  }
 `;
 
 const RiskParamsPanel = styled.div`
-  padding: 0 14px 14px;
+  padding: 0 10px 10px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 0 14px 14px;
+  }
 `;
 
 const TradeWorkspaceTabs: React.FC<TradeWorkspaceTabsProps> = ({

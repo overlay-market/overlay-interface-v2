@@ -21,8 +21,8 @@ export const BrandButton = styled.button`
   align-items: center;
   gap: 10px;
   height: 100%;
-  min-width: 156px;
-  padding: 0 24px 0 18px;
+  min-width: 64px;
+  padding: 0 16px;
   border: 0;
   border-right: 1px solid ${theme.semantic.borderMuted};
   background: transparent;
@@ -37,15 +37,21 @@ export const BrandButton = styled.button`
     outline: 1px solid ${theme.semantic.focus};
     outline-offset: -2px;
   }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-width: 156px;
+    padding: 0 24px 0 18px;
+  }
 `;
 
 export const BrandText = styled.span`
+  display: none;
   font-size: 17px;
   font-weight: 800;
   letter-spacing: 0;
 
-  @media (max-width: 520px) {
-    display: none;
+  @media (min-width: ${theme.breakpoints.sm}) {
+    display: inline;
   }
 `;
 
@@ -65,7 +71,7 @@ export const MobileNavBarContainer = styled(Box)`
   justify-content: center;
   width: 100%;
   height: 73px;
-  padding: 8px 16px;
+  padding: 7px 12px calc(7px + env(safe-area-inset-bottom));
   position: fixed;
   bottom: 0;
   background: rgba(5, 6, 7, 0.94);

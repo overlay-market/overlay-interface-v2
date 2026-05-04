@@ -8,8 +8,12 @@ export const PositionsToolbar = styled.div`
   justify-content: space-between;
   gap: 12px;
   min-height: 42px;
-  padding: 8px 16px 0;
+  padding: 8px 12px 0;
   background: #08090a;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 8px 16px 0;
+  }
 
   @media (max-width: ${theme.breakpoints.xs}) {
     align-items: flex-start;
@@ -142,6 +146,7 @@ export const PositionActionGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
+  flex-wrap: wrap;
 `;
 
 export const PositionActionButton = styled.button<{ $primary?: boolean }>`

@@ -4,7 +4,7 @@ import theme from "../../../theme";
 
 export const MarketSelectorRoot = styled(Box)`
   position: relative;
-  flex: 0 0 100%;
+  flex: 0 0 auto;
   min-width: 0;
   width: 100%;
 
@@ -66,7 +66,7 @@ export const HeaderActions = styled.span`
 
 export const MarketsListContainer = styled.button`
   box-sizing: border-box;
-  height: 72px;
+  height: 64px;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -74,8 +74,8 @@ export const MarketsListContainer = styled.button`
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  padding-left: 16px;
-  padding-right: 12px;
+  padding-left: 12px;
+  padding-right: 10px;
   cursor: pointer;
   border: 0;
   border-right: 1px solid ${theme.semantic.borderMuted};
@@ -93,7 +93,10 @@ export const MarketsListContainer = styled.button`
   }
 
   @media (min-width: ${theme.breakpoints.sm}) {
+    height: 72px;
     width: 280px;
+    padding-left: 16px;
+    padding-right: 12px;
     border-right: 1px solid ${theme.semantic.borderMuted};
   }
 
@@ -108,8 +111,8 @@ export const MarketsListContainer = styled.button`
 
 export const CurrentMarketLogo = styled.img`
   flex: 0 0 auto;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   object-fit: cover;
   border-radius: 50%;
   border: 1px solid ${theme.semantic.border};
@@ -125,7 +128,7 @@ export const DropdownContainer = styled(Box)`
   height: min(680px, calc(100vh - 76px));
   padding: 0;
   position: absolute;
-  top: 72px;
+  top: 64px;
   left: 0;
   z-index: 30;
   background-color: #0d0e10;
@@ -136,6 +139,7 @@ export const DropdownContainer = styled(Box)`
   overflow: hidden;
 
   @media (min-width: ${theme.breakpoints.sm}) {
+    top: 72px;
     width: 560px;
     height: 650px;
   }

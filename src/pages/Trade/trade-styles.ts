@@ -16,17 +16,21 @@ export const TradeShell = styled.div`
   min-width: 0;
 
   @media (max-width: ${theme.breakpoints.md}) {
-    padding-bottom: 84px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 `;
 
 export const TradeMarketBar = styled.div`
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  min-height: 72px;
+  min-height: 64px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
   background: #08090a;
   overflow: visible;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-height: 72px;
+  }
 `;
 
 export const TradeGrid = styled.div`
@@ -65,7 +69,7 @@ export const ChartRegion = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 464px;
+  min-height: clamp(364px, 50vh, 430px);
   overflow: hidden;
   background: #08090a;
   border-right: 1px solid ${theme.semantic.borderMuted};
@@ -79,15 +83,19 @@ export const ChartRegion = styled.div`
 export const OrderBookRegion = styled.div`
   grid-area: book;
   min-width: 0;
-  min-height: 420px;
+  min-height: 340px;
   border-right: 1px solid ${theme.semantic.borderMuted};
   border-bottom: 1px solid ${theme.semantic.borderMuted};
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    min-height: 420px;
+  }
 `;
 
 export const TicketRegion = styled.div`
   grid-area: ticket;
   min-width: 0;
-  min-height: 430px;
+  min-height: 0;
   overflow: visible;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
 
@@ -100,7 +108,7 @@ export const TicketRegion = styled.div`
 export const PositionsRegion = styled.div`
   grid-area: positions;
   min-width: 0;
-  min-height: 158px;
+  min-height: 150px;
   border-right: 1px solid ${theme.semantic.borderMuted};
   border-bottom: 1px solid ${theme.semantic.borderMuted};
 `;
@@ -108,12 +116,17 @@ export const PositionsRegion = styled.div`
 export const BottomTabs = styled.div`
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
   min-height: 38px;
-  padding: 0 16px;
+  padding: 0 12px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
   background: #08090a;
   overflow-x: auto;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    gap: 24px;
+    padding: 0 16px;
+  }
 `;
 
 export const BottomTab = styled.button<{ $active?: boolean }>`

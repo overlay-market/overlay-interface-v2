@@ -16,6 +16,9 @@ export const GradientOutlineBtnWrapper = styled(Button)<{
   height?: string;
   disabled?: boolean;
 }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 7px 16px;
   width: ${({ width }) => (width ? width : "auto")};
   height: ${({ height }) => (height ? height : "auto")};
@@ -28,6 +31,8 @@ export const GradientOutlineBtnWrapper = styled(Button)<{
       ${theme.gradient.accent} border-box`)};
   color: ${theme.semantic.accent};
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   transition: background 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 
   &:hover {
@@ -41,6 +46,8 @@ export const GradientOutlineBtnWrapper = styled(Button)<{
 `;
 
 export const ButtonTitle = styled.div<{ color?: string, disabled?: boolean }>`
+  line-height: 1;
+  white-space: nowrap;
   background: ${({ disabled }) => (disabled 
     ? `linear-gradient(90deg, ${theme.semantic.textMuted} 0%, ${theme.semantic.textSecondary} 100%)` 
     : theme.gradient.accentText)};
@@ -55,6 +62,9 @@ export const GradientSolidBtnWrapper = styled(Button)<{
   height?: string;
   disabled?: boolean;
 }>`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 7px 16px;
   border-radius: ${theme.radius.md};
   width: ${({ width }) => (width ? width : "auto")};
@@ -62,6 +72,8 @@ export const GradientSolidBtnWrapper = styled(Button)<{
   background: ${theme.gradient.accent};
   color: ${theme.color.black};
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   box-shadow: none;
   transition: filter 0.16s ease, box-shadow 0.16s ease;

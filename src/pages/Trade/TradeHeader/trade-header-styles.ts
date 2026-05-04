@@ -8,7 +8,7 @@ export const TradeHeaderContainer = styled(Flex)`
   min-width: 0;
   max-width: 100%;
   width: 100%;
-  min-height: 72px;
+  min-height: 64px;
   box-sizing: border-box;
   background: #08090a;
   border: 1px solid ${theme.semantic.borderMuted};
@@ -19,12 +19,16 @@ export const TradeHeaderContainer = styled(Flex)`
   @media (max-width: ${theme.breakpoints.sm}) {
     flex-direction: column;
   }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-height: 72px;
+  }
 `;
 
 export const MarketInfoContainer = styled(Flex)`
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 72px;
+  min-height: 64px;
   width: auto;
   max-width: 100%;
   justify-content: start;
@@ -38,35 +42,49 @@ export const MarketInfoContainer = styled(Flex)`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-height: 72px;
+  }
 `;
 
 export const HeaderPriceBlock = styled.div`
   box-sizing: border-box;
   flex: 0 0 auto;
   width: max-content;
-  min-width: 156px;
+  min-width: 132px;
   max-width: none;
-  height: 72px;
+  height: 64px;
   display: flex;
   min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: 0 14px;
+  padding: 0 12px;
   overflow: hidden;
   border-right: 1px solid ${theme.semantic.borderMuted};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-width: 156px;
+    height: 72px;
+    padding: 0 14px;
+  }
 `;
 
 export const LastPrice = styled.div<{ $positive?: boolean }>`
   color: ${({ $positive }) =>
     $positive === false ? theme.semantic.negative : theme.semantic.positive};
   font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
   max-width: none;
   overflow: visible;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    font-size: 20px;
+  }
 `;
 
 export const PriceChange = styled.div<{ $positive?: boolean }>`
@@ -74,28 +92,41 @@ export const PriceChange = styled.div<{ $positive?: boolean }>`
   color: ${({ $positive }) =>
     $positive === false ? theme.semantic.negative : theme.semantic.positive};
   font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   max-width: none;
   overflow: visible;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    font-size: 13px;
+  }
 `;
 
 export const HeaderMetric = styled.div<{ $wide?: boolean }>`
   box-sizing: border-box;
-  flex: 0 0 ${({ $wide }) => ($wide ? "178px" : "124px")};
-  width: ${({ $wide }) => ($wide ? "178px" : "124px")};
-  min-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
-  max-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
-  height: 72px;
+  flex: 0 0 ${({ $wide }) => ($wide ? "158px" : "116px")};
+  width: ${({ $wide }) => ($wide ? "158px" : "116px")};
+  min-width: ${({ $wide }) => ($wide ? "158px" : "116px")};
+  max-width: ${({ $wide }) => ($wide ? "158px" : "116px")};
+  height: 64px;
   display: flex;
   min-inline-size: 0;
   flex-direction: column;
   justify-content: center;
-  padding: 0 13px;
+  padding: 0 12px;
   overflow: hidden;
   border-right: 1px solid ${theme.semantic.borderMuted};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    flex-basis: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    min-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    max-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    height: 72px;
+    padding: 0 13px;
+  }
 `;
 
 export const MetricLabel = styled.div`
@@ -113,7 +144,7 @@ export const MetricLabel = styled.div`
 `;
 
 export const MetricValue = styled.div<{ $tone?: "positive" | "negative" }>`
-  margin-top: 7px;
+  margin-top: 6px;
   color: ${({ $tone }) =>
     $tone === "positive"
       ? theme.semantic.positive
@@ -121,13 +152,18 @@ export const MetricValue = styled.div<{ $tone?: "positive" | "negative" }>`
         ? theme.semantic.negative
         : theme.semantic.textPrimary};
   font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    margin-top: 7px;
+    font-size: 14px;
+  }
 `;
 
 export const StyledFlex = styled(Flex)`

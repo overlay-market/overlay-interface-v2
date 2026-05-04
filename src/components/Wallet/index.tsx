@@ -24,7 +24,7 @@ const Wallet: React.FC = () => {
 
   return (
     <Box
-      width="308px"
+      width={{ initial: "288px", sm: "308px" }}
       height={{
         initial: theme.headerSize.mobileHeight,
         sm: theme.headerSize.height,
@@ -35,11 +35,11 @@ const Wallet: React.FC = () => {
       style={{ zIndex: "14" }}
     >
       <Flex
-        gap="20px"
+        gap={{ initial: "10px", sm: "16px", md: "20px" }}
         align="center"
         height="100%"
         justify="end"
-        pr={{ initial: "14px", sm: "24px" }}
+        pr={{ initial: "10px", sm: "20px", md: "24px" }}
       >
         {!isAvatarTradingActive && (
           <GradientOutlineButton
