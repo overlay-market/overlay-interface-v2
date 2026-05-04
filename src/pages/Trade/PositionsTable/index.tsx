@@ -31,7 +31,6 @@ const POSITIONS_COLUMNS = [
   "Entry Price",
   "Mark Price",
   "Est. Liq. Price",
-  "Break-Even Price",
   "Margin",
   "MMR",
   "Unrealized PnL (ROE)",

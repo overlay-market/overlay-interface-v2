@@ -219,9 +219,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
           </CellValue>
         </StyledCell>
         <StyledCell>
-          <CellValue>{isDoubleOrNothing ? "-" : position.entryPrice}</CellValue>
-        </StyledCell>
-        <StyledCell>
           <CellValue>{marginValue}</CellValue>
         </StyledCell>
         <StyledCell>
