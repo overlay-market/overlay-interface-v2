@@ -39,9 +39,16 @@ export const TradeGrid = styled.div`
   grid-template-areas:
     "chart"
     "ticket"
-    "book"
     "positions";
   min-height: 0;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    grid-template-areas:
+      "chart"
+      "ticket"
+      "book"
+      "positions";
+  }
 
   @media (min-width: ${theme.breakpoints.md}) {
     grid-template-columns: minmax(0, 1fr) 320px;
@@ -82,10 +89,15 @@ export const ChartRegion = styled.div`
 
 export const OrderBookRegion = styled.div`
   grid-area: book;
+  display: none;
   min-width: 0;
   min-height: 340px;
   border-right: 1px solid ${theme.semantic.borderMuted};
   border-bottom: 1px solid ${theme.semantic.borderMuted};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    display: block;
+  }
 
   @media (min-width: ${theme.breakpoints.md}) {
     min-height: 420px;
