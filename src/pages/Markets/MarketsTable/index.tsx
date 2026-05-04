@@ -1,67 +1,65 @@
-import { Flex, Skeleton, Table, Text } from "@radix-ui/themes";
-import { LineChart, Line, YAxis } from "recharts";
-import theme from "../../../theme";
-import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import { TransformedMarketData } from "overlay-sdk";
-import ProgressBar from "../../../components/ProgressBar";
-import { useMarkets7d } from "../../../hooks/useMarkets7d";
-import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
-import { Theme } from "@radix-ui/themes";
-import { useState, useEffect } from "react";
-import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
 import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  MagnifyingGlassIcon,
+} from "@radix-ui/react-icons";
+import { TransformedMarketData } from "overlay-sdk";
+import * as React from "react";
+import { useEffect, useState } from "react";
+import { Line, LineChart, YAxis } from "recharts";
+import ProgressBar from "../../../components/ProgressBar";
+import {
+  CategoryName,
+  getMarketClass,
+  MARKET_CATEGORIES,
+  MARKETS_PAGE_CATEGORY_ORDER,
+  MarketClass,
+  NEW_CATEGORIES,
+} from "../../../constants/markets";
+import { useMarkets7d } from "../../../hooks/useMarkets7d";
+import { useMediaQuery } from "../../../hooks/useMediaQuery";
+import useRedirectToTradePage from "../../../hooks/useRedirectToTradePage";
+import theme from "../../../theme";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import { getMarketLogo } from "../../../utils/getMarketLogo";
+import { getMarketGroup, isGamblingMarket } from "../../../utils/marketGuards";
+import {
+  BodyRow,
   CategoriesBar,
   CategoryBarWrapper,
   CategoryButton,
-  MarketsLogos,
+  Cell,
+  DirectoryEyebrow,
+  DirectoryHeader,
+  DirectoryMeta,
+  DirectoryPanel,
+  DirectoryTitle,
+  DirectoryTitleGroup,
+  EmptyState,
+  HeaderButton,
+  HeaderCell,
+  LogoStack,
+  MarketBadge,
+  MarketIdentity,
+  MarketLogo,
+  MarketName,
+  MarketsTableElement,
+  MarketSubline,
+  MarketText,
+  MutedDash,
   NewBadge,
+  NumericCellValue,
+  OiBalance,
+  OiPercentages,
+  RotatingLogoWrap,
   ScrollIndicator,
+  SearchField,
+  SearchInput,
+  SkeletonBlock,
+  SparklineWrap,
+  TableHead,
+  TableScroll,
 } from "./markets-table-styles";
-import { useMediaQuery } from "../../../hooks/useMediaQuery";
-import * as React from "react";
-import { getMarketLogo } from "../../../utils/getMarketLogo";
-import { isGamblingMarket } from "../../../utils/marketGuards";
-import {
-  CategoryName,
-  MARKET_CATEGORIES,
-  MARKETS_PAGE_CATEGORY_ORDER,
-  NEW_CATEGORIES,
-} from "../../../constants/markets";
-import { getMarketGroup } from "../../../utils/marketGuards";
-
-const RotatingLogo: React.FC<{
-  ids: string[];
-  labels: Record<string, string>;
-  getMarketLogo: (id: string) => string;
-}> = ({ ids, labels, getMarketLogo }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % ids.length);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, [ids.length]);
-
-  return (
-    <div style={{ position: "relative", width: 36, height: 36, flexShrink: 0 }}>
-      {ids.map((id, i) => (
-        <MarketsLogos
-          key={id}
-          src={getMarketLogo(id)}
-          alt={labels[id]}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            opacity: i === activeIndex ? 1 : 0,
-            transition: "opacity 0.5s ease-in-out",
-          }}
-        />
-      ))}
-    </div>
-  );
-};
 
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
@@ -74,6 +72,94 @@ type SortableKeys =
   | "twentyFourHourChange"
   | "sevenDayChange";
 
+type SortDirection = "ascending" | "descending";
+type Tone = "positive" | "negative" | "muted";
+
+const decodeMarketId = (marketId: string) => {
+  try {
+    return decodeURIComponent(marketId);
+  } catch {
+    return marketId;
+  }
+};
+
+const normalizeSearch = (value: string) => value.toLowerCase().trim();
+
+const toNumber = (value: string | number | undefined) => {
+  const numeric = Number(String(value ?? "").replaceAll(",", ""));
+  return Number.isFinite(numeric) ? numeric : undefined;
+};
+
+const getTone = (value: number | undefined): Tone => {
+  if (value === undefined || value === 0) return "muted";
+  return value > 0 ? "positive" : "negative";
+};
+
+const formatSignedPercent = (value: number | undefined) => {
+  if (value === undefined || !Number.isFinite(value)) return "-";
+  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+};
+
+const formatFunding = (funding: string | number | undefined) => {
+  const value = toNumber(funding);
+  if (value === undefined) return "-";
+  return `${value >= 0 ? "+" : ""}${value.toFixed(3)}%`;
+};
+
+const formatMarketPrice = (market: TransformedMarketData) => {
+  const marketName = market.marketName ?? decodeMarketId(market.marketId);
+  if (isGamblingMarket(marketName)) return "-";
+  if (market.price === undefined || market.price === null) return "-";
+  return formatPriceWithCurrency(market.price, market.priceCurrency);
+};
+
+const renderSortIcon = (
+  sortConfig: { key: SortableKeys; direction: SortDirection } | null,
+  key: SortableKeys
+) => {
+  if (sortConfig?.key !== key) {
+    return <ChevronDownIcon aria-hidden="true" opacity={0.35} />;
+  }
+
+  return sortConfig.direction === "ascending" ? (
+    <ChevronUpIcon aria-hidden="true" />
+  ) : (
+    <ChevronDownIcon aria-hidden="true" />
+  );
+};
+
+const RotatingLogo: React.FC<{
+  ids: string[];
+  labels: Record<string, string>;
+}> = ({ ids, labels }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % ids.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [ids.length]);
+
+  return (
+    <RotatingLogoWrap>
+      {ids.map((id, index) => (
+        <MarketLogo
+          key={id}
+          src={getMarketLogo(id)}
+          alt={labels[id] ?? decodeMarketId(id)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: index === activeIndex ? 1 : 0,
+            transition: "opacity 0.5s ease-in-out",
+          }}
+        />
+      ))}
+    </RotatingLogoWrap>
+  );
+};
+
 export default function MarketsTable({
   marketsData,
   otherChainMarketsData = [],
@@ -81,11 +167,12 @@ export default function MarketsTable({
   const redirectToTradePage = useRedirectToTradePage();
   const [sortConfig, setSortConfig] = useState<{
     key: SortableKeys;
-    direction: "ascending" | "descending";
+    direction: SortDirection;
   } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<
     CategoryName | "All"
   >("All");
+  const [query, setQuery] = useState("");
 
   const isMobile = useMediaQuery("(max-width: 767px)");
 
@@ -109,7 +196,7 @@ export default function MarketsTable({
   const categoryOptions = React.useMemo<(CategoryName | "All")[]>(() => {
     if (isLoadingMarkets) return [];
 
-    const allMarketsId = new Set(marketsData.map((m) => m.marketId));
+    const allMarketIds = new Set(marketsData.map((market) => market.marketId));
     const orderedCategories = [
       ...MARKETS_PAGE_CATEGORY_ORDER,
       ...(Object.keys(MARKET_CATEGORIES) as CategoryName[]).filter(
@@ -119,14 +206,15 @@ export default function MarketsTable({
 
     const liveCategories = orderedCategories.filter((category) => {
       if (category === CategoryName.Other) {
-        return marketsData.some((m) => !categorizedIds.has(m.marketId));
+        return marketsData.some((market) => !categorizedIds.has(market.marketId));
       }
+
       const idsInCategory = MARKET_CATEGORIES[category];
-      return idsInCategory.some((id) => allMarketsId.has(id));
+      return idsInCategory.some((id) => allMarketIds.has(id));
     });
 
     return ["All", ...liveCategories];
-  }, [isLoadingMarkets, marketsData, categorizedIds]);
+  }, [categorizedIds, isLoadingMarkets, marketsData]);
 
   const filteredMarketsData = React.useMemo(() => {
     if (selectedCategory === "All") return marketsData;
@@ -135,6 +223,7 @@ export default function MarketsTable({
         (market) => !categorizedIds.has(market.marketId)
       );
     }
+
     const categorySet = categoryIdsMap.get(selectedCategory);
     if (!categorySet || categorySet.size === 0) return marketsData;
     return marketsData.filter((market) => categorySet.has(market.marketId));
@@ -147,6 +236,7 @@ export default function MarketsTable({
         (market) => !categorizedIds.has(market.marketId)
       );
     }
+
     const categorySet = categoryIdsMap.get(selectedCategory);
     if (!categorySet || categorySet.size === 0) return otherChainMarketsData;
     return otherChainMarketsData.filter((market) =>
@@ -159,74 +249,103 @@ export default function MarketsTable({
     selectedCategory,
   ]);
 
-  const defaultMarketIds = new Set(
-    filteredMarketsData.map((market) => market.marketId)
+  const defaultMarketIds = React.useMemo(
+    () => new Set(filteredMarketsData.map((market) => market.marketId)),
+    [filteredMarketsData]
   );
-  const uniqueOtherChainMarkets = filteredOtherChainMarketsData.filter(
-    (market) => !defaultMarketIds.has(market.marketId)
-  );
-  const allMarketsData = [...filteredMarketsData, ...uniqueOtherChainMarkets];
 
-  const marketIds = allMarketsData.map((market) => market.marketId);
+  const uniqueOtherChainMarkets = React.useMemo(
+    () =>
+      filteredOtherChainMarketsData.filter(
+        (market) => !defaultMarketIds.has(market.marketId)
+      ),
+    [defaultMarketIds, filteredOtherChainMarketsData]
+  );
+
+  const allMarketsData = React.useMemo(
+    () => [...filteredMarketsData, ...uniqueOtherChainMarkets],
+    [filteredMarketsData, uniqueOtherChainMarkets]
+  );
+
+  const marketIds = React.useMemo(
+    () => filteredMarketsData.map((market) => market.marketId),
+    [filteredMarketsData]
+  );
   const markets7d = useMarkets7d(marketIds);
 
   const sortedData = React.useMemo(() => {
     const sortableItems = [...filteredMarketsData];
+
     if (sortConfig?.key) {
       sortableItems.sort((a, b) => {
-        let aValue = 0,
-          bValue = 0;
-        const aMarket7d = markets7d.find((m) => m.marketId === a.marketId);
-        const bMarket7d = markets7d.find((m) => m.marketId === b.marketId);
+        let aValue = 0;
+        let bValue = 0;
+        const aMarket7d = markets7d.find((market) => market.marketId === a.marketId);
+        const bMarket7d = markets7d.find((market) => market.marketId === b.marketId);
 
         switch (sortConfig.key) {
           case "funding":
-            aValue = parseFloat(String(a.funding ?? "0"));
-            bValue = parseFloat(String(b.funding ?? "0"));
+            aValue = toNumber(a.funding) ?? 0;
+            bValue = toNumber(b.funding) ?? 0;
             break;
           case "oneHourChange":
-            aValue = parseFloat(aMarket7d?.oneHourChange?.toString() ?? "0");
-            bValue = parseFloat(bMarket7d?.oneHourChange?.toString() ?? "0");
+            aValue = aMarket7d?.oneHourChange ?? 0;
+            bValue = bMarket7d?.oneHourChange ?? 0;
             break;
           case "twentyFourHourChange":
-            aValue = parseFloat(
-              aMarket7d?.twentyFourHourChange?.toString() ?? "0"
-            );
-            bValue = parseFloat(
-              bMarket7d?.twentyFourHourChange?.toString() ?? "0"
-            );
+            aValue = aMarket7d?.twentyFourHourChange ?? 0;
+            bValue = bMarket7d?.twentyFourHourChange ?? 0;
             break;
           case "sevenDayChange":
-            aValue = parseFloat(aMarket7d?.sevenDayChange?.toString() ?? "0");
-            bValue = parseFloat(bMarket7d?.sevenDayChange?.toString() ?? "0");
+            aValue = aMarket7d?.sevenDayChange ?? 0;
+            bValue = bMarket7d?.sevenDayChange ?? 0;
             break;
         }
 
-        return aValue < bValue
-          ? sortConfig.direction === "ascending"
-            ? 1
-            : -1
-          : aValue > bValue
-            ? sortConfig.direction === "ascending"
-              ? -1
-              : 1
-            : 0;
+        if (aValue === bValue) return 0;
+        const directionMultiplier =
+          sortConfig.direction === "ascending" ? -1 : 1;
+        return aValue > bValue ? directionMultiplier : -directionMultiplier;
       });
     }
+
     return [...sortableItems, ...uniqueOtherChainMarkets];
   }, [filteredMarketsData, markets7d, sortConfig, uniqueOtherChainMarkets]);
 
+  const searchedData = React.useMemo(() => {
+    const normalizedQuery = normalizeSearch(query);
+    if (!normalizedQuery) return sortedData;
+
+    return sortedData.filter((market) => {
+      const marketName = market.marketName ?? decodeMarketId(market.marketId);
+      const group = getMarketGroup(marketName);
+      const groupSearch = group
+        ? [
+            group.title,
+            group.groupId,
+            ...group.marketIds.map(decodeMarketId),
+            ...Object.values(group.outcomeLabels),
+          ].join(" ")
+        : "";
+
+      return normalizeSearch(`${marketName} ${market.marketId} ${groupSearch}`).includes(
+        normalizedQuery
+      );
+    });
+  }, [query, sortedData]);
+
   const requestSort = (key: SortableKeys) => {
-    let direction: "ascending" | "descending";
+    setSortConfig((currentSort) => {
+      if (currentSort?.key === key) {
+        return {
+          key,
+          direction:
+            currentSort.direction === "ascending" ? "descending" : "ascending",
+        };
+      }
 
-    if (sortConfig?.key === key) {
-      direction =
-        sortConfig.direction === "ascending" ? "descending" : "ascending";
-    } else {
-      direction = "ascending";
-    }
-
-    setSortConfig({ key, direction });
+      return { key, direction: "ascending" };
+    });
   };
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -243,60 +362,97 @@ export default function MarketsTable({
 
   React.useEffect(() => {
     const el = scrollRef.current;
-    if (el) {
-      checkScroll();
-      el.addEventListener("scroll", checkScroll);
-      window.addEventListener("resize", checkScroll);
-      // Also check on a small delay to ensure rendering is complete
-      const timeoutId = setTimeout(checkScroll, 100);
+    if (!el) return undefined;
 
-      return () => {
-        el.removeEventListener("scroll", checkScroll);
-        window.removeEventListener("resize", checkScroll);
-        clearTimeout(timeoutId);
-      };
-    }
+    checkScroll();
+    el.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
+    const timeoutId = setTimeout(checkScroll, 100);
+
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+      clearTimeout(timeoutId);
+    };
   }, [checkScroll, categoryOptions]);
 
+  const handleRowKeyDown = (
+    event: React.KeyboardEvent<HTMLTableRowElement>,
+    callback: () => void,
+    disabled?: boolean
+  ) => {
+    if (disabled) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      callback();
+    }
+  };
+
+  const renderedGroupIds = new Set<string>();
+
   return (
-    <Theme>
-      <CategoryBarWrapper mt="5" mb="3">
+    <DirectoryPanel>
+      <DirectoryHeader>
+        <DirectoryTitleGroup>
+          <DirectoryEyebrow>Market Directory</DirectoryEyebrow>
+          <DirectoryTitle>All Markets</DirectoryTitle>
+          <DirectoryMeta>
+            {isLoadingMarkets
+              ? "Loading market terminal"
+              : `${searchedData.length} visible / ${allMarketsData.length} listed`}
+          </DirectoryMeta>
+        </DirectoryTitleGroup>
+        <SearchField>
+          <MagnifyingGlassIcon aria-hidden="true" />
+          <SearchInput
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search markets"
+            aria-label="Search markets"
+          />
+        </SearchField>
+      </DirectoryHeader>
+
+      <CategoryBarWrapper>
         <ScrollIndicator
           $visible={showScrollLeft}
           $side="left"
           type="button"
           aria-label="Scroll categories left"
           onClick={() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollBy({ left: -150, behavior: "smooth" });
-            }
+            scrollRef.current?.scrollBy({ left: -180, behavior: "smooth" });
           }}
         >
           <ChevronDownIcon style={{ transform: "rotate(90deg)" }} />
         </ScrollIndicator>
         <CategoriesBar ref={scrollRef}>
           {isLoadingMarkets
-            ? Array.from({ length: 8 }).map((_, i) => (
-              <CategoryButton key={i} type="button" $active={false} style={{ pointerEvents: 'none' }}>
-                <Skeleton width="60px" height="20px" />
-              </CategoryButton>
-            ))
-            : categoryOptions.map((category) => {
-              const isNew = NEW_CATEGORIES.includes(category as CategoryName);
-
-              return (
+            ? Array.from({ length: 8 }).map((_, index) => (
                 <CategoryButton
-                  key={category}
+                  key={index}
                   type="button"
-                  $active={selectedCategory === category}
-                  aria-pressed={selectedCategory === category}
-                  onClick={() => setSelectedCategory(category)}
+                  $active={false}
+                  disabled
                 >
-                  {category === "All" ? "All" : category}
-                  {isNew && <NewBadge>New</NewBadge>}
+                  <SkeletonBlock $width="54px" />
                 </CategoryButton>
-              );
-            })}
+              ))
+            : categoryOptions.map((category) => {
+                const isNew = NEW_CATEGORIES.includes(category as CategoryName);
+
+                return (
+                  <CategoryButton
+                    key={category}
+                    type="button"
+                    $active={selectedCategory === category}
+                    aria-pressed={selectedCategory === category}
+                    onClick={() => setSelectedCategory(category)}
+                  >
+                    {category}
+                    {isNew && <NewBadge>New</NewBadge>}
+                  </CategoryButton>
+                );
+              })}
         </CategoriesBar>
         <ScrollIndicator
           $visible={showScrollRight}
@@ -304,567 +460,341 @@ export default function MarketsTable({
           type="button"
           aria-label="Scroll categories right"
           onClick={() => {
-            if (scrollRef.current) {
-              scrollRef.current.scrollBy({ left: 150, behavior: "smooth" });
-            }
+            scrollRef.current?.scrollBy({ left: 180, behavior: "smooth" });
           }}
         >
           <ChevronDownIcon style={{ transform: "rotate(-90deg)" }} />
         </ScrollIndicator>
       </CategoryBarWrapper>
-      <Table.Root
-        variant="surface"
-        ml={{ xs: "16px" }}
-        style={{
-          background: theme.semantic.panel,
-          border: `1px solid ${theme.semantic.border}`,
-          borderRadius: theme.radius.md,
-          marginTop: 0,
-          marginBottom: `${isMobile ? "90px" : "30px"}`,
-          overflow: "hidden",
-        }}
-      >
-        <Table.Header style={{ verticalAlign: "middle" }}>
-          <Table.Row>
-            <Table.ColumnHeaderCell>
-              <Flex align="center" gap="2">
-                Market
-              </Flex>
-            </Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Price</Table.ColumnHeaderCell>
-            {!isMobile && (
-              <Table.ColumnHeaderCell
-                onClick={() => requestSort("oneHourChange")}
-                style={{
-                  cursor: "pointer",
-                  minWidth: "100px",
-                  width: "100px",
-                }}
-              >
-                <Flex
-                  align="center"
-                  justify="start"
-                  gap="1"
-                  style={{ width: "100%" }}
-                >
-                  <span>1h</span>
-                  {sortConfig?.key === "oneHourChange" && (
-                    <span style={{ display: "flex", alignItems: "center" }}>
-                      {sortConfig.direction === "ascending" ? (
-                        <ChevronUpIcon />
-                      ) : (
-                        <ChevronDownIcon />
-                      )}
-                    </span>
-                  )}
-                </Flex>
-              </Table.ColumnHeaderCell>
-            )}
-            {!isMobile && (
-              <Table.ColumnHeaderCell
-                onClick={() => requestSort("twentyFourHourChange")}
-                style={{
-                  cursor: "pointer",
-                  minWidth: "100px",
-                  width: "100px",
-                }}
-              >
-                <Flex
-                  align="center"
-                  justify="start"
-                  gap="1"
-                  style={{ width: "100%" }}
-                >
-                  <span>24h</span>
-                  {sortConfig?.key === "twentyFourHourChange" && (
-                    <span style={{ display: "flex", alignItems: "center" }}>
-                      {sortConfig.direction === "ascending" ? (
-                        <ChevronUpIcon />
-                      ) : (
-                        <ChevronDownIcon />
-                      )}
-                    </span>
-                  )}
-                </Flex>
-              </Table.ColumnHeaderCell>
-            )}
-            {!isMobile && (
-              <Table.ColumnHeaderCell
-                onClick={() => requestSort("sevenDayChange")}
-                style={{
-                  cursor: "pointer",
-                  minWidth: "100px",
-                  width: "100px",
-                }}
-              >
-                <Flex
-                  align="center"
-                  justify="start"
-                  gap="1"
-                  style={{ width: "100%" }}
-                >
-                  <span>7d</span>
-                  {sortConfig?.key === "sevenDayChange" && (
-                    <span style={{ display: "flex", alignItems: "center" }}>
-                      {sortConfig.direction === "ascending" ? (
-                        <ChevronUpIcon />
-                      ) : (
-                        <ChevronDownIcon />
-                      )}
-                    </span>
-                  )}
-                </Flex>
-              </Table.ColumnHeaderCell>
-            )}
-            {!isMobile && (
-              <Table.ColumnHeaderCell
-                onClick={() => requestSort("funding")}
-                style={{
-                  cursor: "pointer",
-                  minWidth: "100px",
-                  width: "100px",
-                }}
-              >
-                <Flex
-                  align="center"
-                  justify="start"
-                  gap="1"
-                  style={{ width: "100%" }}
-                >
-                  <span>Funding</span>
-                  <span>24h</span>
-                  {sortConfig?.key === "funding" && (
-                    <span style={{ display: "flex", alignItems: "center" }}>
-                      {sortConfig.direction === "ascending" ? (
-                        <ChevronUpIcon />
-                      ) : (
-                        <ChevronDownIcon />
-                      )}
-                    </span>
-                  )}
-                </Flex>
-              </Table.ColumnHeaderCell>
-            )}
-            {!isMobile && (
-              <Table.ColumnHeaderCell>OI Balance</Table.ColumnHeaderCell>
-            )}
-            {!isMobile && (
-              <Table.ColumnHeaderCell style={{ textAlign: "center" }}>
-                Oracle
-              </Table.ColumnHeaderCell>
-            )}
-            <Table.ColumnHeaderCell>Last 7 Days</Table.ColumnHeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body style={{ verticalAlign: "middle" }}>
-          {sortedData.length > 0 ? (
-            (() => {
-              // Track which group IDs we've already rendered
-              const renderedGroupIds = new Set<string>();
 
-              return sortedData.map((market, index) => {
-                const marketName =
-                  market.marketName ?? decodeURIComponent(market.marketId);
-
-                // Check if this market belongs to a prediction group
+      {searchedData.length > 0 ? (
+        <TableScroll>
+          <MarketsTableElement>
+            <TableHead>
+              <tr>
+                <HeaderCell>Market</HeaderCell>
+                <HeaderCell $align="right">Price</HeaderCell>
+                {!isMobile && (
+                  <HeaderCell $align="right">
+                    <HeaderButton
+                      type="button"
+                      onClick={() => requestSort("oneHourChange")}
+                    >
+                      1h {renderSortIcon(sortConfig, "oneHourChange")}
+                    </HeaderButton>
+                  </HeaderCell>
+                )}
+                {!isMobile && (
+                  <HeaderCell $align="right">
+                    <HeaderButton
+                      type="button"
+                      onClick={() => requestSort("twentyFourHourChange")}
+                    >
+                      24h {renderSortIcon(sortConfig, "twentyFourHourChange")}
+                    </HeaderButton>
+                  </HeaderCell>
+                )}
+                <HeaderCell $align="right">
+                  <HeaderButton
+                    type="button"
+                    onClick={() => requestSort("sevenDayChange")}
+                  >
+                    7d {renderSortIcon(sortConfig, "sevenDayChange")}
+                  </HeaderButton>
+                </HeaderCell>
+                {!isMobile && (
+                  <HeaderCell $align="right">
+                    <HeaderButton
+                      type="button"
+                      onClick={() => requestSort("funding")}
+                    >
+                      Funding / 24h {renderSortIcon(sortConfig, "funding")}
+                    </HeaderButton>
+                  </HeaderCell>
+                )}
+                {!isMobile && <HeaderCell $align="right">OI Balance</HeaderCell>}
+                {!isMobile && <HeaderCell $align="center">Oracle</HeaderCell>}
+                {!isMobile && <HeaderCell $align="right">Last 7 Days</HeaderCell>}
+              </tr>
+            </TableHead>
+            <tbody>
+              {searchedData.map((market) => {
+                const marketName = market.marketName ?? decodeMarketId(market.marketId);
                 const group = getMarketGroup(marketName);
+
                 if (group) {
-                  // Skip if we already rendered this group
                   if (renderedGroupIds.has(group.groupId)) return null;
                   renderedGroupIds.add(group.groupId);
 
-                  // Find all group markets in sortedData for probability display
                   const groupMarkets = group.marketIds
-                    .map((id) => sortedData.find((m) => m.marketId === id))
+                    .map((id) => searchedData.find((item) => item.marketId === id))
                     .filter(Boolean) as TransformedMarketData[];
 
+                  const selectGroup = () =>
+                    redirectToTradePage(group.marketIds[0], group.groupId);
+
                   return (
-                    <Table.Row
+                    <BodyRow
                       key={`group-${group.groupId}`}
-                      style={{
-                        borderBottom: `1px solid ${theme.color.darkBlue}`,
-                        cursor: "pointer",
-                      }}
-                      onClick={() =>
-                        redirectToTradePage(group.marketIds[0], group.groupId)
-                      }
+                      role="button"
+                      tabIndex={0}
+                      onClick={selectGroup}
+                      onKeyDown={(event) => handleRowKeyDown(event, selectGroup)}
                     >
-                      <Table.Cell
-                        style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
-                      >
-                        <Flex style={{ alignItems: "center" }}>
-                          <div
-                            style={{
-                              position: "relative",
-                              display: "inline-block",
-                            }}
-                          >
-                            {isMobile ? (
-                              <RotatingLogo
-                                ids={group.marketIds}
-                                labels={group.outcomeLabels}
-                                getMarketLogo={getMarketLogo}
-                              />
-                            ) : (
-                              <Flex style={{ position: "relative" }}>
-                                {group.marketIds.slice(0, 3).map((id, i) => (
-                                  <MarketsLogos
-                                    key={id}
-                                    src={getMarketLogo(id)}
-                                    alt={group.outcomeLabels[id]}
-                                    className="rounded-full"
-                                    style={{
-                                      marginLeft: i > 0 ? -10 : 0,
-                                      zIndex: 3 - i,
-                                      border: `2px solid ${theme.color.background}`,
-                                    }}
-                                  />
-                                ))}
-                              </Flex>
-                            )}
-                          </div>
-                          <span
-                            style={{
-                              alignSelf: "center",
-                              marginLeft: 20,
-                            }}
-                          >
-                            {isMobile && group.title.length > 20
-                              ? `${group.title.slice(0, 20)}...`
-                              : group.title}
-                          </span>
-                        </Flex>
-                      </Table.Cell>
-                      <Table.Cell>
-                        <Flex direction="column" gap="2px">
-                          {groupMarkets.map((gm) => {
-                            const mid = gm.price
-                              ? (Number(gm.price) * 100).toFixed(1)
-                              : "-";
+                      <Cell>
+                        <MarketIdentity>
+                          {isMobile ? (
+                            <RotatingLogo
+                              ids={group.marketIds}
+                              labels={group.outcomeLabels}
+                            />
+                          ) : (
+                            <LogoStack>
+                              {group.marketIds.slice(0, 3).map((id) => (
+                                <MarketLogo
+                                  key={id}
+                                  src={getMarketLogo(id)}
+                                  alt={group.outcomeLabels[id] ?? decodeMarketId(id)}
+                                />
+                              ))}
+                            </LogoStack>
+                          )}
+                          <MarketText>
+                            <MarketName>{group.title}</MarketName>
+                            <MarketSubline>
+                              Prediction
+                              <MarketBadge>{group.marketIds.length} outcomes</MarketBadge>
+                            </MarketSubline>
+                          </MarketText>
+                        </MarketIdentity>
+                      </Cell>
+                      <Cell $align="right">
+                        {groupMarkets.length > 0 ? (
+                          groupMarkets.slice(0, 3).map((groupMarket) => {
+                            const percentage =
+                              groupMarket.price === undefined
+                                ? "-"
+                                : `${(Number(groupMarket.price) * 100).toFixed(1)}%`;
+
                             return (
-                              <Text
-                                key={gm.marketId}
-                                size="1"
-                                style={{ color: theme.color.grey2 }}
-                              >
-                                {group.outcomeLabels[gm.marketId] ??
-                                  decodeURIComponent(gm.marketId)}
-                                : {mid}%
-                              </Text>
+                              <div key={groupMarket.marketId}>
+                                <NumericCellValue>
+                                  {group.outcomeLabels[groupMarket.marketId] ??
+                                    decodeMarketId(groupMarket.marketId)}
+                                  : {percentage}
+                                </NumericCellValue>
+                              </div>
                             );
-                          })}
-                        </Flex>
-                      </Table.Cell>
+                          })
+                        ) : (
+                          <MutedDash>-</MutedDash>
+                        )}
+                      </Cell>
                       {!isMobile && (
                         <>
-                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
-                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
-                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
-                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
-                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
-                          <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
+                          <Cell $align="right"><MutedDash>-</MutedDash></Cell>
+                          <Cell $align="right"><MutedDash>-</MutedDash></Cell>
                         </>
                       )}
-                      <Table.Cell style={{ color: "#8B8B8B" }}>-</Table.Cell>
-                    </Table.Row>
+                      <Cell $align="right"><MutedDash>-</MutedDash></Cell>
+                      {!isMobile && (
+                        <>
+                          <Cell $align="right"><MutedDash>-</MutedDash></Cell>
+                          <Cell $align="right"><MutedDash>-</MutedDash></Cell>
+                          <Cell $align="center"><MutedDash>-</MutedDash></Cell>
+                          <Cell $align="right"><MutedDash>-</MutedDash></Cell>
+                        </>
+                      )}
+                    </BodyRow>
                   );
                 }
 
                 const market7d = markets7d.find(
-                  (m) => m.marketId === market.marketId
+                  (marketOverview) => marketOverview.marketId === market.marketId
                 );
-
                 const isComingSoon = !defaultMarketIds.has(market.marketId);
                 const isGambling = isGamblingMarket(marketName);
-
+                const fundingValue = toNumber(market.funding);
+                const oneHourChange = isGambling ? undefined : market7d?.oneHourChange;
+                const twentyFourHourChange = isGambling
+                  ? undefined
+                  : market7d?.twentyFourHourChange;
+                const sevenDayChange = isGambling ? undefined : market7d?.sevenDayChange;
                 const lineColor =
-                  market7d &&
-                    market7d.sevenDaysChartData &&
-                    market7d.sevenDaysChartData.length > 0
-                    ? market7d.sevenDaysChartData[
-                      market7d.sevenDaysChartData.length - 1
-                    ] > market7d.sevenDaysChartData[0]
-                      ? theme.color.green2
-                      : theme.color.red2
-                    : theme.color.grey3;
+                  market7d?.sevenDaysChartData &&
+                  market7d.sevenDaysChartData.length > 0 &&
+                  market7d.sevenDaysChartData[
+                    market7d.sevenDaysChartData.length - 1
+                  ] >= market7d.sevenDaysChartData[0]
+                    ? theme.semantic.positive
+                    : theme.semantic.negative;
+                const marketClass = getMarketClass(market.marketId);
+                const selectMarket = () => redirectToTradePage(market.marketId);
+                const longOi = toNumber(market.longPercentageOfTotalOi) ?? 0;
+                const shortOi = toNumber(market.shortPercentageOfTotalOi) ?? 0;
 
                 return (
-                  <Table.Row
-                    key={index}
-                    style={{
-                      borderBottom: `1px solid ${theme.color.darkBlue}`,
-                      cursor: isComingSoon ? "default" : "pointer",
-                      opacity: isComingSoon ? 0.8 : 1,
+                  <BodyRow
+                    key={market.marketId}
+                    role={isComingSoon ? undefined : "button"}
+                    tabIndex={isComingSoon ? undefined : 0}
+                    $disabled={isComingSoon}
+                    onClick={() => {
+                      if (!isComingSoon) selectMarket();
                     }}
-                    onClick={() =>
-                      !isComingSoon && redirectToTradePage(market.marketId)
+                    onKeyDown={(event) =>
+                      handleRowKeyDown(event, selectMarket, isComingSoon)
                     }
                   >
-                    <Table.Cell
-                      style={{ padding: isMobile ? "8px 0px" : "8px 16px" }}
-                    >
-                      <Flex style={{ alignItems: "center" }}>
-                        <div
-                          style={{
-                            position: "relative",
-                            display: "inline-block",
-                          }}
-                        >
-                          <MarketsLogos
-                            src={getMarketLogo(market.marketId)}
-                            alt={decodeURIComponent(market.marketId)}
-                            className="rounded-full"
-                            style={{
-                              filter: isComingSoon
-                                ? "grayscale(100%) brightness(0.6)"
-                                : "none",
-                            }}
-                          />
-                          {isComingSoon && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "white",
-                                fontSize: "8px",
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                borderRadius: "50%",
-                              }}
+                    <Cell>
+                      <MarketIdentity>
+                        <MarketLogo
+                          src={getMarketLogo(market.marketId)}
+                          alt={marketName}
+                          $muted={isComingSoon}
+                        />
+                        <MarketText>
+                          <MarketName>{marketName}</MarketName>
+                          <MarketSubline>
+                            {isComingSoon ? "Coming Soon" : marketClass}
+                            <MarketBadge
+                              $tone={
+                                marketClass === MarketClass.Vanilla
+                                  ? "positive"
+                                  : "negative"
+                              }
                             >
-                              SOON
-                            </div>
-                          )}
-                        </div>
-                        <span
-                          style={{
-                            alignSelf: "center",
-                            marginLeft: 20,
-                            color: isComingSoon ? "#8B8B8B" : "inherit",
-                          }}
-                        >
-                          {isMobile &&
-                            decodeURIComponent(market.marketId).length > 28
-                            ? `${decodeURIComponent(market.marketId).slice(
-                              0,
-                              28
-                            )}...`
-                            : decodeURIComponent(market.marketId)}
-                        </span>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell
-                      style={{
-                        color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
-                      }}
-                    >
-                      {!isGambling
-                        ? formatPriceWithCurrency(
-                          market.price ?? 0,
-                          market.priceCurrency
-                        )
-                        : "-"}
-                    </Table.Cell>
+                              {market.priceCurrency || "USD"}
+                            </MarketBadge>
+                          </MarketSubline>
+                        </MarketText>
+                      </MarketIdentity>
+                    </Cell>
+                    <Cell $align="right">
+                      <NumericCellValue $tone={isComingSoon ? "muted" : undefined}>
+                        {formatMarketPrice(market)}
+                      </NumericCellValue>
+                    </Cell>
                     {!isMobile && (
-                      <>
-                        <Table.Cell
-                          style={{
-                            color: isComingSoon || isGambling
-                              ? "#8B8B8B"
-                              : (market7d?.oneHourChange ?? 0) >= 0
-                                ? theme.color.green2
-                                : theme.color.red2,
-                          }}
-                        >
-                          {isGambling ? (
-                            "-"
-                          ) : (
-                            <Skeleton loading={!market7d}>
-                              {market7d?.oneHourChange?.toFixed(2)}%
-                            </Skeleton>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell
-                          style={{
-                            color: isComingSoon || isGambling
-                              ? "#8B8B8B"
-                              : (market7d?.twentyFourHourChange ?? 0) >= 0
-                                ? theme.color.green2
-                                : theme.color.red2,
-                          }}
-                        >
-                          {isGambling ? (
-                            "-"
-                          ) : (
-                            <Skeleton loading={!market7d}>
-                              {market7d?.twentyFourHourChange?.toFixed(2)}%
-                            </Skeleton>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell
-                          style={{
-                            color: isComingSoon || isGambling
-                              ? "#8B8B8B"
-                              : (market7d?.sevenDayChange ?? 0) >= 0
-                                ? theme.color.green2
-                                : theme.color.red2,
-                          }}
-                        >
-                          {isGambling ? (
-                            "-"
-                          ) : (
-                            <Skeleton loading={!market7d}>
-                              {market7d?.sevenDayChange?.toFixed(2)}%
-                            </Skeleton>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell
-                          style={{
-                            color:
-                              isComingSoon || isGambling
-                                ? "#8B8B8B"
-                                : theme.color.green2,
-                          }}
-                        >
-                          {isGambling ? (
-                            "-"
-                          ) : (
-                            <span
-                              style={{
-                                color: isComingSoon
-                                  ? "#8B8B8B"
-                                  : market.funding && Number(market.funding) < 0
-                                    ? theme.color.red2
-                                    : theme.color.green2,
-                              }}
-                            >
-                              {market.funding && Number(market.funding) < 0
-                                ? market.funding
-                                : `+${market.funding}`}
-                              %
-                            </span>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell>
-                          {isComingSoon ? (
-                            <Text
-                              size="4"
-                              style={{
-                                background: theme.gradient.accentText,
-                                backgroundClip: "text",
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Coming Soon
-                            </Text>
-                          ) : isGambling ? (
-                            <Text size="2" style={{ color: "#8B8B8B" }}>
-                              -
-                            </Text>
-                          ) : (
-                            <Flex align="center" gap="2">
-                              <Text size="2" style={{ color: theme.color.red2 }}>
-                                {Math.round(
-                                  Number(market.shortPercentageOfTotalOi)
-                                )}
-                                %
-                              </Text>
-                              <ProgressBar
-                                max={100}
-                                value={Number(market.shortPercentageOfTotalOi)}
-                              />
-                              <Text
-                                size="2"
-                                style={{ color: theme.color.green2 }}
-                              >
-                                {Math.round(
-                                  Number(market.longPercentageOfTotalOi)
-                                )}
-                                %
-                              </Text>
-                            </Flex>
-                          )}
-                        </Table.Cell>
-                        <Table.Cell style={{ textAlign: "center" }}>
-                          <img
-                            src={market.oracleLogo}
-                            alt={decodeURIComponent(market.marketId)}
-                            style={{
-                              maxWidth: 24,
-                              maxHeight: 24,
-                            }}
-                          />
-                        </Table.Cell>
-                      </>
+                      <Cell $align="right">
+                        {isGambling || isComingSoon ? (
+                          <MutedDash>-</MutedDash>
+                        ) : market7d ? (
+                          <NumericCellValue $tone={getTone(oneHourChange)}>
+                            {formatSignedPercent(oneHourChange)}
+                          </NumericCellValue>
+                        ) : (
+                          <SkeletonBlock />
+                        )}
+                      </Cell>
                     )}
-                    <Table.Cell
-                      style={{
-                        color: isComingSoon || isGambling ? "#8B8B8B" : "inherit",
-                      }}
-                    >
-                      {isGambling ? (
-                        "-"
+                    {!isMobile && (
+                      <Cell $align="right">
+                        {isGambling || isComingSoon ? (
+                          <MutedDash>-</MutedDash>
+                        ) : market7d ? (
+                          <NumericCellValue $tone={getTone(twentyFourHourChange)}>
+                            {formatSignedPercent(twentyFourHourChange)}
+                          </NumericCellValue>
+                        ) : (
+                          <SkeletonBlock />
+                        )}
+                      </Cell>
+                    )}
+                    <Cell $align="right">
+                      {isGambling || isComingSoon ? (
+                        <MutedDash>-</MutedDash>
+                      ) : market7d ? (
+                        <NumericCellValue $tone={getTone(sevenDayChange)}>
+                          {formatSignedPercent(sevenDayChange)}
+                        </NumericCellValue>
                       ) : (
-                        <Skeleton loading={!market7d}>
-                          <LineChart
-                            width={isMobile ? 80 : 100}
-                            height={30}
-                            data={market7d?.sevenDaysChartData?.map(
-                              (value) => ({
-                                value,
-                              })
-                            )}
-                            margin={{ top: 0, bottom: 0 }}
-                          >
-                            <YAxis
-                              type="number"
-                              domain={["dataMin", "dataMax"]}
-                              hide
-                            />
-                            <Line
-                              type="monotone"
-                              dataKey="value"
-                              stroke={isComingSoon ? "#8B8B8B" : lineColor}
-                              strokeWidth={2}
-                              dot={false}
-                            />
-                          </LineChart>
-                        </Skeleton>
+                        <SkeletonBlock />
                       )}
-                    </Table.Cell>
-                  </Table.Row>
+                    </Cell>
+                    {!isMobile && (
+                      <Cell $align="right">
+                        {isGambling || isComingSoon ? (
+                          <MutedDash>-</MutedDash>
+                        ) : (
+                          <NumericCellValue $tone={getTone(fundingValue)}>
+                            {formatFunding(market.funding)}
+                          </NumericCellValue>
+                        )}
+                      </Cell>
+                    )}
+                    {!isMobile && (
+                      <Cell $align="right">
+                        {isComingSoon || isGambling ? (
+                          <MutedDash>-</MutedDash>
+                        ) : (
+                          <OiBalance>
+                            <OiPercentages>
+                              <span>{longOi.toFixed(0)}%</span>
+                              <span>{shortOi.toFixed(0)}%</span>
+                            </OiPercentages>
+                            <ProgressBar
+                              value={shortOi}
+                              max={100}
+                              width="78px"
+                            />
+                          </OiBalance>
+                        )}
+                      </Cell>
+                    )}
+                    {!isMobile && (
+                      <Cell $align="center">
+                        {market.oracleLogo ? (
+                          <MarketLogo
+                            src={market.oracleLogo}
+                            alt={`${marketName} oracle`}
+                            style={{ width: 28, height: 28 }}
+                          />
+                        ) : (
+                          <MutedDash>-</MutedDash>
+                        )}
+                      </Cell>
+                    )}
+                    {!isMobile && (
+                      <Cell $align="right">
+                        {isGambling ||
+                        isComingSoon ||
+                        !market7d?.sevenDaysChartData?.length ? (
+                          <MutedDash>-</MutedDash>
+                        ) : (
+                          <SparklineWrap>
+                            <LineChart
+                              width={118}
+                              height={34}
+                              data={market7d.sevenDaysChartData.map((value) => ({
+                                value,
+                              }))}
+                            >
+                              <YAxis domain={["dataMin", "dataMax"]} hide />
+                              <Line
+                                type="monotone"
+                                dataKey="value"
+                                stroke={lineColor}
+                                strokeWidth={2}
+                                dot={false}
+                                isAnimationActive={false}
+                              />
+                            </LineChart>
+                          </SparklineWrap>
+                        )}
+                      </Cell>
+                    )}
+                  </BodyRow>
                 );
-              });
-            })()
-          ) : (
-            <>
-              {Array.from({ length: 3 }).map((_, rowIndex) => (
-                <Table.Row
-                  key={`markets-skeleton-row-${rowIndex}`}
-                  style={{
-                    borderBottom: `1px solid ${theme.color.darkBlue}`,
-                    width: "100%",
-                  }}
-                >
-                  {Array.from({ length: isMobile ? 3 : 9 }).map((_, cellIndex) => (
-                    <Table.Cell key={`markets-skeleton-cell-${rowIndex}-${cellIndex}`}>
-                      <Skeleton width={"100%"} height={"42px"} />
-                    </Table.Cell>
-                  ))}
-                </Table.Row>
-              ))}
-            </>
-          )}
-        </Table.Body>
-      </Table.Root>
-    </Theme>
+              })}
+            </tbody>
+          </MarketsTableElement>
+        </TableScroll>
+      ) : (
+        <EmptyState>
+          {isLoadingMarkets ? "Loading markets..." : "No markets match this view."}
+        </EmptyState>
+      )}
+    </DirectoryPanel>
   );
 }
