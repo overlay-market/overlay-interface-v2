@@ -42,12 +42,70 @@ export const TradeWidgetContainer = styled(Flex)`
   }
 `;
 
-export const TicketMetaRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: ${theme.semantic.textMuted};
+export const TradeActionGrid = styled.div<{ $single?: boolean }>`
+  display: grid;
+  grid-template-columns: ${({ $single }) => ($single ? "1fr" : "1fr 1fr")};
+  gap: 8px;
+`;
+
+export const TradeActionButton = styled.button<{
+  $side: "long" | "short";
+  $active?: boolean;
+}>`
+  min-height: 52px;
+  border: 1px solid
+    ${({ $side, $active }) =>
+      $active
+        ? $side === "long"
+          ? theme.semantic.positive
+          : theme.semantic.negative
+        : theme.semantic.borderMuted};
+  border-radius: ${theme.radius.sm};
+  background: ${({ $side, $active }) =>
+    $active
+      ? $side === "long"
+        ? "#083d2f"
+        : theme.semantic.negativeSoft
+      : theme.semantic.panelRaised};
+  color: ${({ $side }) =>
+    $side === "long" ? theme.semantic.positive : theme.semantic.negative};
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    opacity 0.16s ease;
+
+  &:hover:not(:disabled) {
+    border-color: ${({ $side }) =>
+      $side === "long" ? theme.semantic.positive : theme.semantic.negative};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+  }
+`;
+
+export const TradeActionLabel = styled.span`
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.15;
+`;
+
+export const TradeActionPrice = styled.span`
+  display: block;
+  margin-top: 3px;
+  color: ${theme.semantic.textPrimary};
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
   font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 `;
 
 export const AdvancedSettingsButton = styled.button`

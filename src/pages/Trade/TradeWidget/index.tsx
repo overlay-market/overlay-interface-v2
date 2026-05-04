@@ -21,7 +21,6 @@ import Slider from "../../../components/Slider";
 import {
   AdvancedPanel,
   AdvancedSettingsButton,
-  TicketMetaRow,
   TradeWidgetContainer,
 } from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
@@ -40,9 +39,6 @@ interface TradeWidgetProps {
   isLong?: boolean;
   onOutcomeSelect?: (marketId: string, isLong: boolean) => void;
 }
-
-const TICKET_BALANCE_PLACEHOLDER = "LOREM IPSUM"; // TODO: Replace with selected collateral balance from the shared wallet balance hook.
-const TICKET_MAX_OPEN_PLACEHOLDER = "Max Open: LOREM IPSUM"; // TODO: Replace with max-open values calculated from current collateral/leverage.
 
 const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, selectedMarketId, isLong: isLongFromParent, onOutcomeSelect }) => {
   const [searchParams] = useSearchParams();
@@ -180,6 +176,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
   useEffect(() => {
     let isCancelled = false;
     setLoading(false);
+    setTradeState(undefined);
 
     const fetchTradeState = async () => {
       if (
@@ -331,15 +328,11 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
 
       {collateralType === 'OVL' && !isAvatarTradingActive && <ChainAndTokenSelect />}
       <CollateralInputComponent />
-      <TicketMetaRow>
-        <span>Available</span>
-        <span>{TICKET_BALANCE_PLACEHOLDER}</span>
-      </TicketMetaRow>
-      <TradeButtonComponent loading={loading} tradeState={tradeState} />
-      <TicketMetaRow>
-        <span>{TICKET_MAX_OPEN_PLACEHOLDER}</span>
-        <span>{TICKET_MAX_OPEN_PLACEHOLDER}</span>
-      </TicketMetaRow>
+      <TradeButtonComponent
+        loading={loading}
+        tradeState={tradeState}
+        prices={prices}
+      />
       <AdvancedSettingsButton
         onClick={() => setDetailsOpen((o) => !o)}
         type="button"

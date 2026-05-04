@@ -2,6 +2,12 @@ import {
   GradientLoaderButton,
   GradientOutlineButton,
 } from "../../../components/Button";
+import {
+  TradeActionButton,
+  TradeActionGrid,
+  TradeActionLabel,
+  TradeActionPrice,
+} from "./trade-widget-styles";
 import useAccount from "../../../hooks/useAccount";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
@@ -16,9 +22,8 @@ import {
 import { OptimisticPosition } from "../../../state/trade/reducer";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toWei, TradeState, TradeStateData, formatWeiToParsedNumber } from "overlay-sdk";
-import { parseUnits } from "viem";
+import { Address, formatUnits, maxUint256, parseUnits } from "viem";
 import ConfirmTxnModal from "./ConfirmTxnModal";
-import { Address, maxUint256 } from "viem";
 import { useAddPopup } from "../../../state/application/hooks";
 import { currentTimeParsed } from "../../../utils/currentTime";
 import { TransactionType } from "../../../constants/transaction";
@@ -36,15 +41,19 @@ const TRADE_WITH_LIFI = "Bridge & Trade";
 import { usePublicClient } from "wagmi";
 import { waitForReceiptWithTimeout } from "../../../utils/waitForReceiptWithTimeout";
 import { trackEvent } from "../../../analytics/trackEvent";
+import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import { isGamblingMarket } from "../../../utils/marketGuards";
 
 type TradeButtonComponentProps = {
   loading: boolean;
   tradeState?: TradeStateData;
+  prices?: { bid: bigint; ask: bigint; mid: bigint };
 };
 
 const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   loading,
   tradeState,
+  prices,
 }) => {
   const { address, isAvatarTradingActive } = useAccount();
   const { chainId: rawChainId } = useMultichainContext();
@@ -56,7 +65,11 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
   const { openModal } = useModalHelper();
   const publicClient = usePublicClient();
   const { currentMarket: market } = useCurrentMarketState();
-  const { handleTradeStateReset, handleTxnHashUpdate } =
+  const {
+    handlePositionSideSelect,
+    handleTradeStateReset,
+    handleTxnHashUpdate,
+  } =
     useTradeActionHandlers();
   const { handleAddOptimisticPosition, handleRemoveOptimisticPosition } =
     useOptimisticPositionHandlers();
@@ -72,6 +85,11 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     showConfirm: false,
     attemptingTransaction: false,
   });
+  const [pendingTradeSide, setPendingTradeSide] = useState<{
+    isLong: boolean;
+    waitForRefresh: boolean;
+    sawLoading: boolean;
+  } | null>(null);
   const [isApprovalPending, setIsApprovalPending] = useState<boolean>(false);
   const [showGasModal, setShowGasModal] = useState<boolean>(false);
   const [hasShownTradeModal, setHasShownTradeModal] = useState<boolean>(false);
@@ -182,6 +200,122 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     maxInputIncludingFees,
     minCollateral,
     bridgeStage,
+  ]);
+
+  const isDoubleOrNothing = useMemo(
+    () => isGamblingMarket(market?.marketName),
+    [market?.marketName]
+  );
+
+  const formatActionPrice = useCallback(
+    (priceFromPositions: bigint | undefined, fallback?: string | number) => {
+      if (!market) return "-";
+
+      const price =
+        priceFromPositions !== undefined
+          ? Number(formatUnits(priceFromPositions, 18))
+          : Number(fallback);
+
+      if (!Number.isFinite(price) || price <= 0) return "-";
+
+      return formatPriceWithCurrency(price, market.priceCurrency);
+    },
+    [market]
+  );
+
+  const longTradePrice = useMemo(
+    () => formatActionPrice(prices?.ask, market?.parsedAsk ?? market?.ask),
+    [formatActionPrice, market?.ask, market?.parsedAsk, prices?.ask]
+  );
+
+  const shortTradePrice = useMemo(
+    () => formatActionPrice(prices?.bid, market?.parsedBid ?? market?.bid),
+    [formatActionPrice, market?.bid, market?.parsedBid, prices?.bid]
+  );
+
+  const handleTradeActionClick = useCallback(
+    (nextIsLong: boolean) => {
+      if (tradeButtonConfig.isDisabledTradeButton || isApprovalPending) {
+        return;
+      }
+
+      if (nextIsLong !== isLong) {
+        setPendingTradeSide({
+          isLong: nextIsLong,
+          waitForRefresh: true,
+          sawLoading: false,
+        });
+        handlePositionSideSelect(nextIsLong);
+        return;
+      }
+
+      setTradeConfig({
+        showConfirm: true,
+        attemptingTransaction: false,
+      });
+    },
+    [
+      handlePositionSideSelect,
+      isApprovalPending,
+      isLong,
+      tradeButtonConfig.isDisabledTradeButton,
+    ]
+  );
+
+  useEffect(() => {
+    if (
+      !pendingTradeSide ||
+      pendingTradeSide.isLong !== isLong ||
+      !loading ||
+      pendingTradeSide.sawLoading
+    ) {
+      return;
+    }
+
+    setPendingTradeSide((current) =>
+      current ? { ...current, sawLoading: true } : current
+    );
+  }, [isLong, loading, pendingTradeSide]);
+
+  useEffect(() => {
+    if (!pendingTradeSide) return;
+
+    if (!typedValue || !address) {
+      setPendingTradeSide(null);
+    }
+  }, [address, pendingTradeSide, typedValue]);
+
+  useEffect(() => {
+    if (
+      !pendingTradeSide ||
+      pendingTradeSide.isLong !== isLong ||
+      loading ||
+      !tradeState
+    ) {
+      return;
+    }
+
+    if (pendingTradeSide.waitForRefresh && !pendingTradeSide.sawLoading) {
+      return;
+    }
+
+    if (tradeButtonConfig.isDisabledTradeButton || isApprovalPending) {
+      setPendingTradeSide(null);
+      return;
+    }
+
+    setTradeConfig({
+      showConfirm: true,
+      attemptingTransaction: false,
+    });
+    setPendingTradeSide(null);
+  }, [
+    isApprovalPending,
+    isLong,
+    loading,
+    pendingTradeSide,
+    tradeButtonConfig.isDisabledTradeButton,
+    tradeState,
   ]);
 
   const handleTrade = async () => {
@@ -1157,27 +1291,52 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     }
   }, [bridgeStage.stage]);
 
+  const renderTradeActionButtons = () => {
+    const disabled =
+      tradeButtonConfig.isDisabledTradeButton || isApprovalPending;
+    const disabledReason = disabled ? tradeButtonConfig.title : undefined;
+
+    return (
+      <TradeActionGrid $single={isDoubleOrNothing}>
+        <TradeActionButton
+          type="button"
+          $side="long"
+          $active={isLong}
+          disabled={disabled}
+          title={disabledReason}
+          aria-label={`Trade long at ${longTradePrice}`}
+          onClick={() => handleTradeActionClick(true)}
+        >
+          <TradeActionLabel>Trade Long</TradeActionLabel>
+          <TradeActionPrice>{longTradePrice}</TradeActionPrice>
+        </TradeActionButton>
+
+        {!isDoubleOrNothing ? (
+          <TradeActionButton
+            type="button"
+            $side="short"
+            $active={!isLong}
+            disabled={disabled}
+            title={disabledReason}
+            aria-label={`Trade short at ${shortTradePrice}`}
+            onClick={() => handleTradeActionClick(false)}
+          >
+            <TradeActionLabel>Trade Short</TradeActionLabel>
+            <TradeActionPrice>{shortTradePrice}</TradeActionPrice>
+          </TradeActionButton>
+        ) : null}
+      </TradeActionGrid>
+    );
+  };
+
   const renderDefaultState = () => (
     <>
       {loading && <GradientLoaderButton title={"Trade"} />}
 
-      {address &&
-        !loading &&
+      {!loading &&
         tradeState?.tradeState !== TradeState.NeedsApproval &&
-        !isApprovalPending && (
-          <GradientOutlineButton
-            title={tradeButtonConfig.title}
-            width={"100%"}
-            size={tradeButtonConfig.isDisabledTradeButton ? "14px" : "16px"}
-            isDisabled={tradeButtonConfig.isDisabledTradeButton}
-            handleClick={() => {
-              setTradeConfig({
-                showConfirm: true,
-                attemptingTransaction: false,
-              });
-            }}
-          />
-        )}
+        !isApprovalPending &&
+        renderTradeActionButtons()}
 
       {address &&
         !loading &&
