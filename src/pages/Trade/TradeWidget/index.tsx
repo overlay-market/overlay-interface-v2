@@ -7,7 +7,6 @@ import {
 } from "../../../state/trade/hooks";
 import AdditionalTradeDetails from "./AdditionalTradeDetails";
 import TradeButtonComponent from "./TradeButtonComponent";
-import PositionSelectComponent from "./PositionSelectComponent";
 import CollateralInputComponent from "./CollateralInputComponent";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
@@ -303,15 +302,13 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
       pb={"0px"}
       flexShrink={"0"}
     >
-      {predictionGroup && onOutcomeSelect ? (
+      {predictionGroup && onOutcomeSelect && (
         <PredictionGroupPanel
           group={predictionGroup}
           selectedMarketId={selectedMarketId ?? null}
           isLong={isLongFromParent ?? true}
           onOutcomeSelect={onOutcomeSelect}
         />
-      ) : (
-        <PositionSelectComponent prices={prices} />
       )}
 
       {!isGambling ? (

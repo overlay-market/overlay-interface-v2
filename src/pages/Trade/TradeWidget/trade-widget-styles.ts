@@ -1,6 +1,12 @@
 import { Flex } from "@radix-ui/themes";
-import styled from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 import theme from "../../../theme";
+
+const tradeActionLoading = keyframes`
+  to {
+    transform: translateX(100%);
+  }
+`;
 
 export const TradeWidgetContainer = styled(Flex)`
   box-sizing: border-box;
@@ -51,7 +57,10 @@ export const TradeActionGrid = styled.div<{ $single?: boolean }>`
 export const TradeActionButton = styled.button<{
   $side: "long" | "short";
   $active?: boolean;
+  $loading?: boolean;
 }>`
+  position: relative;
+  overflow: hidden;
   min-height: 52px;
   border: 1px solid
     ${({ $side, $active }) =>
@@ -75,6 +84,31 @@ export const TradeActionButton = styled.button<{
     background 0.16s ease,
     opacity 0.16s ease;
 
+  ${({ $loading, $side }) =>
+    $loading
+      ? css`
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        110deg,
+        transparent 0%,
+        ${
+          $side === "long"
+            ? "rgba(59, 215, 131, 0.14)"
+            : "rgba(255, 72, 109, 0.14)"
+        } 42%,
+        transparent 72%
+      );
+      transform: translateX(-100%);
+      animation: ${tradeActionLoading} 1.1s linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+  `
+      : ""}
+
   &:hover:not(:disabled) {
     border-color: ${({ $side }) =>
       $side === "long" ? theme.semantic.positive : theme.semantic.negative};
@@ -82,16 +116,19 @@ export const TradeActionButton = styled.button<{
 
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.48;
+    opacity: ${({ $loading }) => ($loading ? 0.82 : 0.48)};
   }
 
   &:focus-visible {
     outline: 1px solid ${theme.semantic.focus};
     outline-offset: 2px;
   }
+
 `;
 
 export const TradeActionLabel = styled.span`
+  position: relative;
+  z-index: 1;
   display: block;
   font-size: 14px;
   font-weight: 800;
@@ -99,6 +136,8 @@ export const TradeActionLabel = styled.span`
 `;
 
 export const TradeActionPrice = styled.span`
+  position: relative;
+  z-index: 1;
   display: block;
   margin-top: 3px;
   color: ${theme.semantic.textPrimary};

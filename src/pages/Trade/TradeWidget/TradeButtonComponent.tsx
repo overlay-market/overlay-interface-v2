@@ -1291,10 +1291,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
     }
   }, [bridgeStage.stage]);
 
-  const renderTradeActionButtons = () => {
+  const renderTradeActionButtons = (isLoading = false) => {
     const disabled =
-      tradeButtonConfig.isDisabledTradeButton || isApprovalPending;
-    const disabledReason = disabled ? tradeButtonConfig.title : undefined;
+      isLoading || tradeButtonConfig.isDisabledTradeButton || isApprovalPending;
+    const disabledReason = disabled
+      ? isLoading
+        ? "Updating quote..."
+        : tradeButtonConfig.title
+      : undefined;
 
     return (
       <TradeActionGrid $single={isDoubleOrNothing}>
@@ -1302,12 +1306,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
           type="button"
           $side="long"
           $active={isLong}
+          $loading={isLoading}
           disabled={disabled}
+          aria-busy={isLoading}
           title={disabledReason}
-          aria-label={`Trade long at ${longTradePrice}`}
+          aria-label={`Open long at ${longTradePrice}`}
           onClick={() => handleTradeActionClick(true)}
         >
-          <TradeActionLabel>Trade Long</TradeActionLabel>
+          <TradeActionLabel>Open Long</TradeActionLabel>
           <TradeActionPrice>{longTradePrice}</TradeActionPrice>
         </TradeActionButton>
 
@@ -1316,12 +1322,14 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
             type="button"
             $side="short"
             $active={!isLong}
+            $loading={isLoading}
             disabled={disabled}
+            aria-busy={isLoading}
             title={disabledReason}
-            aria-label={`Trade short at ${shortTradePrice}`}
+            aria-label={`Open short at ${shortTradePrice}`}
             onClick={() => handleTradeActionClick(false)}
           >
-            <TradeActionLabel>Trade Short</TradeActionLabel>
+            <TradeActionLabel>Open Short</TradeActionLabel>
             <TradeActionPrice>{shortTradePrice}</TradeActionPrice>
           </TradeActionButton>
         ) : null}
@@ -1331,7 +1339,7 @@ const TradeButtonComponent: React.FC<TradeButtonComponentProps> = ({
 
   const renderDefaultState = () => (
     <>
-      {loading && <GradientLoaderButton title={"Trade"} />}
+      {loading && renderTradeActionButtons(true)}
 
       {!loading &&
         tradeState?.tradeState !== TradeState.NeedsApproval &&
