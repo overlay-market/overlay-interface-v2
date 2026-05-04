@@ -16,9 +16,7 @@ export const DirectoryHeader = styled.div`
   gap: 12px;
   padding: 14px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
-  background:
-    linear-gradient(180deg, rgba(16, 17, 20, 0.84), rgba(8, 9, 10, 0.98)),
-    radial-gradient(circle at 100% 0%, rgba(243, 169, 27, 0.08), transparent 34%);
+  background: linear-gradient(180deg, rgba(16, 17, 20, 0.84), rgba(8, 9, 10, 0.98));
 
   @media (min-width: ${theme.breakpoints.sm}) {
     grid-template-columns: minmax(0, 1fr) minmax(260px, 360px);
@@ -347,12 +345,17 @@ export const MarketBadge = styled.span<{ $tone?: "positive" | "negative" }>`
   height: 17px;
   padding: 0 5px;
   border-radius: 3px;
+  border: 1px solid
+    ${({ $tone }) =>
+      $tone === "negative"
+        ? "rgba(240, 68, 94, 0.18)"
+        : "rgba(255, 255, 255, 0.08)"};
   background: ${({ $tone }) =>
     $tone === "negative"
       ? "rgba(240, 68, 94, 0.15)"
-      : "rgba(40, 209, 154, 0.13)"};
+      : theme.semantic.field};
   color: ${({ $tone }) =>
-    $tone === "negative" ? theme.semantic.negative : theme.semantic.positive};
+    $tone === "negative" ? theme.semantic.negative : theme.semantic.textSecondary};
 `;
 
 export const NumericCellValue = styled.span<{ $tone?: "positive" | "negative" | "muted" }>`

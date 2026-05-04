@@ -10,10 +10,8 @@ import { Line, LineChart, YAxis } from "recharts";
 import ProgressBar from "../../../components/ProgressBar";
 import {
   CategoryName,
-  getMarketClass,
   MARKET_CATEGORIES,
   MARKETS_PAGE_CATEGORY_ORDER,
-  MarketClass,
   NEW_CATEGORIES,
 } from "../../../constants/markets";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
@@ -628,7 +626,6 @@ export default function MarketsTable({
                   ] >= market7d.sevenDaysChartData[0]
                     ? theme.semantic.positive
                     : theme.semantic.negative;
-                const marketClass = getMarketClass(market.marketId);
                 const selectMarket = () => redirectToTradePage(market.marketId);
                 const longOi = toNumber(market.longPercentageOfTotalOi) ?? 0;
                 const shortOi = toNumber(market.shortPercentageOfTotalOi) ?? 0;
@@ -656,14 +653,8 @@ export default function MarketsTable({
                         <MarketText>
                           <MarketName>{marketName}</MarketName>
                           <MarketSubline>
-                            {isComingSoon ? "Coming Soon" : marketClass}
-                            <MarketBadge
-                              $tone={
-                                marketClass === MarketClass.Vanilla
-                                  ? "positive"
-                                  : "negative"
-                              }
-                            >
+                            {isComingSoon ? "Queued" : "Live"}
+                            <MarketBadge>
                               {market.priceCurrency || "USD"}
                             </MarketBadge>
                           </MarketSubline>

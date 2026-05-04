@@ -9,9 +9,7 @@ export const MarketsPageShell = styled.div`
   min-height: calc(100vh - ${theme.headerSize.height});
   padding: 12px 12px calc(88px + env(safe-area-inset-bottom));
   overflow-x: hidden;
-  background:
-    radial-gradient(circle at 10% 0%, rgba(243, 169, 27, 0.08), transparent 30%),
-    linear-gradient(180deg, #070809 0%, #050607 42%);
+  background: linear-gradient(180deg, #070809 0%, #050607 42%);
   color: ${theme.semantic.textPrimary};
 
   @media (min-width: ${theme.breakpoints.sm}) {
@@ -27,9 +25,7 @@ export const MarketsHeroPanel = styled.section`
   min-width: 0;
   border: 1px solid ${theme.semantic.borderMuted};
   border-radius: ${theme.radius.md};
-  background:
-    linear-gradient(180deg, rgba(16, 17, 20, 0.94), rgba(8, 9, 10, 0.98)),
-    radial-gradient(circle at 100% 0%, rgba(40, 209, 154, 0.08), transparent 36%);
+  background: linear-gradient(180deg, rgba(16, 17, 20, 0.94), rgba(8, 9, 10, 0.98));
   overflow: hidden;
 
   @media (min-width: ${theme.breakpoints.md}) {
@@ -71,9 +67,9 @@ export const MarketsEyebrow = styled.div`
 export const MarketsTitle = styled.h1`
   margin: 4px 0 0;
   color: ${theme.semantic.textPrimary};
-  font-size: clamp(28px, 5vw, 54px);
+  font-size: clamp(28px, 4vw, 48px);
   font-weight: 900;
-  line-height: 0.95;
+  line-height: 1;
   letter-spacing: 0;
 `;
 
@@ -124,46 +120,53 @@ export const FeaturedGrid = styled.div`
   }
 `;
 
-export const FeaturedMarketCard = styled.button<{ $image?: string; $muted?: boolean }>`
+export const FeaturedMarketCard = styled.button<{ $muted?: boolean }>`
   position: relative;
-  display: flex;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 12px;
   min-width: 0;
-  min-height: 156px;
-  align-items: flex-end;
+  min-height: 108px;
+  align-items: center;
   overflow: hidden;
   padding: 14px;
   border: 1px solid ${theme.semantic.border};
   border-radius: ${theme.radius.md};
-  background:
-    linear-gradient(90deg, rgba(5, 6, 7, 0.92), rgba(5, 6, 7, 0.46) 58%, rgba(5, 6, 7, 0.78)),
-    ${({ $image }) => ($image ? `url(${$image})` : theme.semantic.panelRaised)};
-  background-size: cover;
-  background-position: center;
+  background: #0b0c0e;
   color: ${theme.semantic.textPrimary};
   text-align: left;
   cursor: ${({ $muted }) => ($muted ? "default" : "pointer")};
-  filter: ${({ $muted }) => ($muted ? "grayscale(1) brightness(0.7)" : "none")};
-  transition: transform 0.16s ease, border-color 0.16s ease;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease;
 
   &::after {
     content: "";
     position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 24%),
-      radial-gradient(circle at 0% 100%, rgba(243, 169, 27, 0.16), transparent 36%);
+    inset: 0 0 auto;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
     pointer-events: none;
   }
 
   &:not(:disabled):hover {
-    transform: translateY(-1px);
-    border-color: ${theme.semantic.accent};
+    background: ${theme.semantic.panelRaised};
+    border-color: ${theme.semantic.textMuted};
   }
 
   &:focus-visible {
     outline: 1px solid ${theme.semantic.focus};
     outline-offset: 2px;
   }
+`;
+
+export const FeaturedLogo = styled.img<{ $muted?: boolean }>`
+  width: 48px;
+  height: 48px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: 999px;
+  object-fit: cover;
+  filter: ${({ $muted }) => ($muted ? "grayscale(1) brightness(0.72)" : "none")};
 `;
 
 export const FeaturedContent = styled.div`
@@ -184,23 +187,23 @@ export const FeaturedMeta = styled.div`
 export const FeaturedBadge = styled.span`
   display: inline-flex;
   align-items: center;
-  height: 20px;
-  padding: 0 7px;
-  border: 1px solid rgba(243, 169, 27, 0.24);
+  height: 19px;
+  padding: 0 6px;
+  border: 1px solid ${theme.semantic.border};
   border-radius: ${theme.radius.xs};
-  background: rgba(243, 169, 27, 0.14);
-  color: ${theme.semantic.accent};
+  background: ${theme.semantic.field};
+  color: ${theme.semantic.textSecondary};
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 800;
   text-transform: uppercase;
 `;
 
 export const FeaturedName = styled.div`
   max-width: 100%;
   color: ${theme.semantic.textPrimary};
-  font-size: clamp(18px, 3vw, 28px);
+  font-size: clamp(17px, 2vw, 22px);
   font-weight: 900;
-  line-height: 1.02;
+  line-height: 1.08;
   overflow-wrap: anywhere;
 `;
 
@@ -208,7 +211,7 @@ export const FeaturedPrice = styled.div<{ $tone?: "positive" | "negative" }>`
   color: ${({ $tone }) =>
     $tone === "negative" ? theme.semantic.negative : theme.semantic.positive};
   font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
 `;

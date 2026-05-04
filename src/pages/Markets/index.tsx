@@ -10,14 +10,13 @@ import { getMarketLogo } from "../../utils/getMarketLogo";
 import { isGamblingMarket } from "../../utils/marketGuards";
 import {
   EXCLUDEDMARKETS,
-  getMarketClass,
-  MarketClass,
   MARKETSORDER,
 } from "../../constants/markets";
 import {
   FeaturedBadge,
   FeaturedContent,
   FeaturedGrid,
+  FeaturedLogo,
   FeaturedMarketCard,
   FeaturedMeta,
   FeaturedName,
@@ -174,16 +173,9 @@ const Markets: React.FC = () => {
     return [...selected, ...fallbackMarkets].slice(0, 4);
   }, [orderedMarkets]);
 
-  const vanillaCount = useMemo(
-    () =>
-      marketsData.filter(
-        (market) => getMarketClass(market.marketId) === MarketClass.Vanilla
-      ).length,
-    [marketsData]
-  );
-
   const liveMarketCount = marketsData.length;
-  const exoticCount = Math.max(liveMarketCount - vanillaCount, 0);
+  const listedMarketCount = allMarkets.length;
+  const queuedMarketCount = uniqueOtherChainMarkets.length;
   const ovlPrice =
     currentPrice === undefined
       ? "-"
@@ -206,7 +198,7 @@ const Markets: React.FC = () => {
               <MarketsEyebrow>Overlay Market Terminal</MarketsEyebrow>
               <MarketsTitle>Markets</MarketsTitle>
               <MarketsSubtitle>
-                Live perps, prediction markets, and exotic feeds in one dense
+                Live perps, prediction markets, and index feeds in one compact
                 trading directory.
               </MarketsSubtitle>
             </MarketsTitleGroup>
@@ -219,23 +211,28 @@ const Markets: React.FC = () => {
               const isComingSoon = !defaultMarketIds.has(market.marketId);
               const funding = Number(market.funding);
               const tone = funding < 0 ? "negative" : "positive";
-              const marketClass = getMarketClass(market.marketId);
 
               return (
                 <FeaturedMarketCard
                   key={market.marketId}
                   type="button"
-                  $image={getMarketLogo(market.marketId)}
                   $muted={isComingSoon}
                   disabled={isComingSoon}
                   onClick={() => handleMarketSelect(market)}
                 >
+                  <FeaturedLogo
+                    src={getMarketLogo(market.marketId)}
+                    alt={marketName}
+                    $muted={isComingSoon}
+                  />
                   <FeaturedContent>
                     <FeaturedMeta>
                       <FeaturedBadge>
-                        {isComingSoon ? "Coming Soon" : marketClass}
+                        {isComingSoon ? "Queued" : "Live"}
                       </FeaturedBadge>
-                      <FeaturedBadge>{formatFunding(market.funding)}</FeaturedBadge>
+                      <FeaturedBadge>
+                        Funding {formatFunding(market.funding)}
+                      </FeaturedBadge>
                     </FeaturedMeta>
                     <FeaturedName>{marketName}</FeaturedName>
                     <FeaturedPrice $tone={tone}>
@@ -250,16 +247,16 @@ const Markets: React.FC = () => {
 
         <MarketsStatsPanel>
           <MarketsStatCard>
+            <StatLabel>Listed Markets</StatLabel>
+            <StatValue>{formatNumberWithCommas(listedMarketCount)}</StatValue>
+          </MarketsStatCard>
+          <MarketsStatCard>
             <StatLabel>Live Markets</StatLabel>
             <StatValue>{formatNumberWithCommas(liveMarketCount)}</StatValue>
           </MarketsStatCard>
           <MarketsStatCard>
-            <StatLabel>Vanilla</StatLabel>
-            <StatValue>{formatNumberWithCommas(vanillaCount)}</StatValue>
-          </MarketsStatCard>
-          <MarketsStatCard>
-            <StatLabel>Exotics</StatLabel>
-            <StatValue>{formatNumberWithCommas(exoticCount)}</StatValue>
+            <StatLabel>Queued</StatLabel>
+            <StatValue>{formatNumberWithCommas(queuedMarketCount)}</StatValue>
           </MarketsStatCard>
           <MarketsStatCard>
             <StatLabel>OVL Price</StatLabel>
@@ -270,7 +267,7 @@ const Markets: React.FC = () => {
 
       <MarketRailPanel>
         <PanelHeader>
-          <PanelTitle>Active Tape</PanelTitle>
+          <PanelTitle>Market Tape</PanelTitle>
           <PanelMeta>{formatNumberWithCommas(uniqueOtherChainMarkets.length)} queued</PanelMeta>
         </PanelHeader>
         <MarketRailScroller aria-label="Featured markets">
