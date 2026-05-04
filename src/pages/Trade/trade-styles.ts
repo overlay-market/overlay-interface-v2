@@ -36,8 +36,7 @@ export const TradeGrid = styled.div`
     "chart"
     "ticket"
     "book"
-    "positions"
-    "assets";
+    "positions";
   min-height: 0;
 
   @media (min-width: ${theme.breakpoints.md}) {
@@ -45,7 +44,7 @@ export const TradeGrid = styled.div`
     grid-template-areas:
       "chart ticket"
       "book ticket"
-      "positions assets";
+      "positions positions";
   }
 
   @media (min-width: 1100px) {
@@ -53,7 +52,7 @@ export const TradeGrid = styled.div`
     grid-template-rows: minmax(564px, calc(100vh - 330px)) 158px;
     grid-template-areas:
       "chart book ticket"
-      "positions positions assets";
+      "positions positions positions";
   }
 
   @media (min-width: 1500px) {
@@ -103,15 +102,6 @@ export const PositionsRegion = styled.div`
   min-width: 0;
   min-height: 158px;
   border-right: 1px solid ${theme.semantic.borderMuted};
-  border-bottom: 1px solid ${theme.semantic.borderMuted};
-`;
-
-export const AssetsRegion = styled.div`
-  grid-area: assets;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 158px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
 `;
 
@@ -167,24 +157,4 @@ export const PositionsPlaceholder = styled.div`
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0;
-`;
-
-export const AssetsHeader = styled.div`
-  min-height: 38px;
-  padding: 10px 16px;
-  border-bottom: 1px solid ${theme.semantic.borderMuted};
-  background: #08090a;
-  font-size: 14px;
-  font-weight: 700;
-`;
-
-export const AssetsBody = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  min-height: 118px;
-  color: ${theme.semantic.textSecondary};
-  font-size: 14px;
-  font-weight: 700;
 `;

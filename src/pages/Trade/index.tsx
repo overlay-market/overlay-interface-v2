@@ -13,9 +13,6 @@ import {
 } from "../../state/currentMarket/hooks";
 import PositionsTable from "./PositionsTable";
 import {
-  AssetsBody,
-  AssetsHeader,
-  AssetsRegion,
   BottomTab,
   BottomTabs,
   ChartRegion,
@@ -257,10 +254,6 @@ const Trade: React.FC = () => {
                 </PositionsTabPanel>
               )}
           </PositionsRegion>
-          <AssetsRegion>
-            <AssetsHeader>Assets</AssetsHeader>
-            <AssetsBody>Connect Wallet</AssetsBody>
-          </AssetsRegion>
         </TradeGrid>
 
       </TradeShell>
