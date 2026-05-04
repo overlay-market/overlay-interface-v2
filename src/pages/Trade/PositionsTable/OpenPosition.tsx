@@ -129,7 +129,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     setShowModal(true);
   };
 
-  const handleReduceClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCloseClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     handleItemClick();
   };
@@ -240,11 +240,14 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
         </StyledCell>
         <StyledCell>
           <PositionActionGroup>
-            <PositionActionButton type="button" onClick={handleReduceClick}>
-              Limit
-            </PositionActionButton>
-            <PositionActionButton type="button" $primary onClick={handleReduceClick}>
-              Market
+            <PositionActionButton
+              type="button"
+              $primary
+              disabled={(position.size === "0" && !isShutdownPosition) || isOptimistic}
+              onClick={handleCloseClick}
+              aria-label={`Close ${position.marketName} position`}
+            >
+              Close
             </PositionActionButton>
           </PositionActionGroup>
         </StyledCell>
