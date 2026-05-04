@@ -41,7 +41,6 @@ const UnwindPosition: React.FC<UnwindPositionProps> = ({ position }) => {
           <ContractName>{position.marketName}</ContractName>
           <ContractMeta>
             <SideBadge $long={isLong}>{positionSide}</SideBadge>
-            <MetaBadge>Cross</MetaBadge>
             <MetaBadge>{positionLeverage && Number(positionLeverage.slice(0, -1))}x</MetaBadge>
           </ContractMeta>
         </ContractStack>

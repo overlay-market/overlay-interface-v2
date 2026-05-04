@@ -200,7 +200,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
             </Flex>
             <ContractMeta>
               <SideBadge $long={isLong}>{positionSide}</SideBadge>
-              <MetaBadge>Cross</MetaBadge>
               <MetaBadge>{positionLeverage && Number(positionLeverage.slice(0, -1))}x</MetaBadge>
             </ContractMeta>
           </ContractStack>
