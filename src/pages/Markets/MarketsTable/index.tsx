@@ -10,6 +10,7 @@ import { Line, LineChart, YAxis } from "recharts";
 import ProgressBar from "../../../components/ProgressBar";
 import {
   CategoryName,
+  isVanillaMarket,
   MARKET_CATEGORIES,
   MARKETS_PAGE_CATEGORY_ORDER,
   NEW_CATEGORIES,
@@ -62,6 +63,7 @@ import {
 interface MarketsTableProps {
   marketsData: TransformedMarketData[];
   otherChainMarketsData?: TransformedMarketData[];
+  showAllMarkets?: boolean;
 }
 
 type SortableKeys =
@@ -161,6 +163,7 @@ const RotatingLogo: React.FC<{
 export default function MarketsTable({
   marketsData,
   otherChainMarketsData = [],
+  showAllMarkets = false,
 }: MarketsTableProps): JSX.Element {
   const redirectToTradePage = useRedirectToTradePage();
   const [sortConfig, setSortConfig] = useState<{
@@ -191,10 +194,24 @@ export default function MarketsTable({
 
   const isLoadingMarkets = marketsData.length === 0;
 
+  const visibleMarketsData = React.useMemo(() => {
+    if (showAllMarkets) return marketsData;
+    return marketsData.filter((market) => isVanillaMarket(market.marketId));
+  }, [marketsData, showAllMarkets]);
+
+  const visibleOtherChainMarketsData = React.useMemo(() => {
+    if (showAllMarkets) return otherChainMarketsData;
+    return otherChainMarketsData.filter((market) =>
+      isVanillaMarket(market.marketId)
+    );
+  }, [otherChainMarketsData, showAllMarkets]);
+
   const categoryOptions = React.useMemo<(CategoryName | "All")[]>(() => {
     if (isLoadingMarkets) return [];
 
-    const allMarketIds = new Set(marketsData.map((market) => market.marketId));
+    const allMarketIds = new Set(
+      visibleMarketsData.map((market) => market.marketId)
+    );
     const orderedCategories = [
       ...MARKETS_PAGE_CATEGORY_ORDER,
       ...(Object.keys(MARKET_CATEGORIES) as CategoryName[]).filter(
@@ -204,7 +221,9 @@ export default function MarketsTable({
 
     const liveCategories = orderedCategories.filter((category) => {
       if (category === CategoryName.Other) {
-        return marketsData.some((market) => !categorizedIds.has(market.marketId));
+        return visibleMarketsData.some(
+          (market) => !categorizedIds.has(market.marketId)
+        );
       }
 
       const idsInCategory = MARKET_CATEGORIES[category];
@@ -212,39 +231,49 @@ export default function MarketsTable({
     });
 
     return ["All", ...liveCategories];
-  }, [categorizedIds, isLoadingMarkets, marketsData]);
+  }, [categorizedIds, isLoadingMarkets, visibleMarketsData]);
+
+  React.useEffect(() => {
+    if (isLoadingMarkets || categoryOptions.includes(selectedCategory)) {
+      return;
+    }
+
+    setSelectedCategory("All");
+  }, [categoryOptions, isLoadingMarkets, selectedCategory]);
 
   const filteredMarketsData = React.useMemo(() => {
-    if (selectedCategory === "All") return marketsData;
+    if (selectedCategory === "All") return visibleMarketsData;
     if (selectedCategory === CategoryName.Other) {
-      return marketsData.filter(
+      return visibleMarketsData.filter(
         (market) => !categorizedIds.has(market.marketId)
       );
     }
 
     const categorySet = categoryIdsMap.get(selectedCategory);
-    if (!categorySet || categorySet.size === 0) return marketsData;
-    return marketsData.filter((market) => categorySet.has(market.marketId));
-  }, [categorizedIds, categoryIdsMap, marketsData, selectedCategory]);
+    if (!categorySet || categorySet.size === 0) return visibleMarketsData;
+    return visibleMarketsData.filter((market) =>
+      categorySet.has(market.marketId)
+    );
+  }, [categorizedIds, categoryIdsMap, selectedCategory, visibleMarketsData]);
 
   const filteredOtherChainMarketsData = React.useMemo(() => {
-    if (selectedCategory === "All") return otherChainMarketsData;
+    if (selectedCategory === "All") return visibleOtherChainMarketsData;
     if (selectedCategory === CategoryName.Other) {
-      return otherChainMarketsData.filter(
+      return visibleOtherChainMarketsData.filter(
         (market) => !categorizedIds.has(market.marketId)
       );
     }
 
     const categorySet = categoryIdsMap.get(selectedCategory);
-    if (!categorySet || categorySet.size === 0) return otherChainMarketsData;
-    return otherChainMarketsData.filter((market) =>
+    if (!categorySet || categorySet.size === 0) return visibleOtherChainMarketsData;
+    return visibleOtherChainMarketsData.filter((market) =>
       categorySet.has(market.marketId)
     );
   }, [
     categorizedIds,
     categoryIdsMap,
-    otherChainMarketsData,
     selectedCategory,
+    visibleOtherChainMarketsData,
   ]);
 
   const defaultMarketIds = React.useMemo(
@@ -258,11 +287,6 @@ export default function MarketsTable({
         (market) => !defaultMarketIds.has(market.marketId)
       ),
     [defaultMarketIds, filteredOtherChainMarketsData]
-  );
-
-  const allMarketsData = React.useMemo(
-    () => [...filteredMarketsData, ...uniqueOtherChainMarkets],
-    [filteredMarketsData, uniqueOtherChainMarkets]
   );
 
   const marketIds = React.useMemo(
@@ -393,11 +417,11 @@ export default function MarketsTable({
       <DirectoryHeader>
         <DirectoryTitleGroup>
           <DirectoryEyebrow>Market Directory</DirectoryEyebrow>
-          <DirectoryTitle>All Markets</DirectoryTitle>
+          <DirectoryTitle>Markets</DirectoryTitle>
           <DirectoryMeta>
             {isLoadingMarkets
               ? "Loading market terminal"
-              : `${searchedData.length} visible / ${allMarketsData.length} listed`}
+              : searchedData.length.toLocaleString("en-US")}
           </DirectoryMeta>
         </DirectoryTitleGroup>
         <SearchField>

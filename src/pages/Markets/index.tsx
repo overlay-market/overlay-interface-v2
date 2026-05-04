@@ -10,6 +10,7 @@ import { getMarketLogo } from "../../utils/getMarketLogo";
 import { isGamblingMarket } from "../../utils/marketGuards";
 import {
   EXCLUDEDMARKETS,
+  isVanillaMarket,
   MARKETSORDER,
 } from "../../constants/markets";
 import {
@@ -27,13 +28,13 @@ import {
   MarketsHeroMain,
   MarketsHeroPanel,
   MarketsPageShell,
-  MarketsStatCard,
-  MarketsStatsPanel,
-  MarketsStatusPill,
   MarketsSubtitle,
   MarketsTitle,
   MarketsTitleGroup,
   MarketsHeroTop,
+  ModeSwitch,
+  ModeSwitchKnob,
+  ModeSwitchText,
   PanelHeader,
   PanelMeta,
   PanelTitle,
@@ -42,8 +43,6 @@ import {
   RailMarketButton,
   RailName,
   RailText,
-  StatLabel,
-  StatValue,
 } from "./markets-styles";
 
 const FEATURED_MARKETS = [
@@ -95,7 +94,7 @@ const Markets: React.FC = () => {
   const [otherChainMarketsData, setOtherChainMarketsData] = useState<
     TransformedMarketData[]
   >([]); // new state
-  const [currentPrice, setCurrentPrice] = useState<number | undefined>();
+  const [showAllMarkets, setShowAllMarkets] = useState(false);
   const sdk = useSDK();
   const { chainId } = useMultichainContext();
   const redirectToTradePage = useRedirectToTradePage();
@@ -105,9 +104,6 @@ const Markets: React.FC = () => {
       try {
         sdk.markets.transformMarketsData().then((activeMarkets) => {
           activeMarkets && setMarketsData(activeMarkets);
-        });
-        sdk.ovl.price().then((price) => {
-          price && setCurrentPrice(price);
         });
         // Fetch from BSC_TESTNET only (chainId 97)
         const sdkForBscTestnet = new OverlaySDK({
@@ -149,8 +145,16 @@ const Markets: React.FC = () => {
     [marketsData, uniqueOtherChainMarkets]
   );
 
+  const visibleMarkets = useMemo(() => {
+    if (showAllMarkets) {
+      return allMarkets;
+    }
+
+    return allMarkets.filter((market) => isVanillaMarket(market.marketId));
+  }, [allMarkets, showAllMarkets]);
+
   const orderedMarkets = useMemo(() => {
-    return [...allMarkets]
+    return [...visibleMarkets]
       .filter((market) => !EXCLUDEDMARKETS.includes(market.marketId))
       .sort((a, b) => {
         const orderedDelta =
@@ -158,7 +162,7 @@ const Markets: React.FC = () => {
         if (orderedDelta !== 0) return orderedDelta;
         return decodeMarketId(a.marketId).localeCompare(decodeMarketId(b.marketId));
       });
-  }, [allMarkets]);
+  }, [visibleMarkets]);
 
   const featuredMarkets = useMemo(() => {
     const selected = FEATURED_MARKETS.map((marketId) =>
@@ -173,14 +177,6 @@ const Markets: React.FC = () => {
     return [...selected, ...fallbackMarkets].slice(0, 4);
   }, [orderedMarkets]);
 
-  const liveMarketCount = marketsData.length;
-  const listedMarketCount = allMarkets.length;
-  const queuedMarketCount = uniqueOtherChainMarkets.length;
-  const ovlPrice =
-    currentPrice === undefined
-      ? "-"
-      : formatPriceWithCurrency(currentPrice, "$");
-
   const handleMarketSelect = (market: TransformedMarketData) => {
     if (!defaultMarketIds.has(market.marketId)) {
       return;
@@ -190,19 +186,31 @@ const Markets: React.FC = () => {
   };
 
   return (
-    <MarketsPageShell>
-      <MarketsHeroPanel>
+    <MarketsPageShell $expanded={showAllMarkets}>
+      <MarketsHeroPanel $expanded={showAllMarkets}>
         <MarketsHeroMain>
           <MarketsHeroTop>
             <MarketsTitleGroup>
               <MarketsEyebrow>Overlay Market Terminal</MarketsEyebrow>
               <MarketsTitle>Markets</MarketsTitle>
               <MarketsSubtitle>
-                Live perps, prediction markets, and index feeds in one compact
-                trading directory.
+                {showAllMarkets
+                  ? "Live perps, prediction markets, index feeds, and queued markets in one expanded directory."
+                  : "Live crypto and commodity perps in one compact trading directory."}
               </MarketsSubtitle>
             </MarketsTitleGroup>
-            <MarketsStatusPill>Live</MarketsStatusPill>
+            <ModeSwitch
+              type="button"
+              role="switch"
+              aria-checked={showAllMarkets}
+              $active={showAllMarkets}
+              onClick={() => setShowAllMarkets((active) => !active)}
+            >
+              <ModeSwitchKnob $active={showAllMarkets} />
+              <ModeSwitchText>
+                {showAllMarkets ? "All markets" : "Core markets"}
+              </ModeSwitchText>
+            </ModeSwitch>
           </MarketsHeroTop>
 
           <FeaturedGrid>
@@ -216,6 +224,7 @@ const Markets: React.FC = () => {
                 <FeaturedMarketCard
                   key={market.marketId}
                   type="button"
+                  $expanded={showAllMarkets}
                   $muted={isComingSoon}
                   disabled={isComingSoon}
                   onClick={() => handleMarketSelect(market)}
@@ -244,31 +253,12 @@ const Markets: React.FC = () => {
             })}
           </FeaturedGrid>
         </MarketsHeroMain>
-
-        <MarketsStatsPanel>
-          <MarketsStatCard>
-            <StatLabel>Listed Markets</StatLabel>
-            <StatValue>{formatNumberWithCommas(listedMarketCount)}</StatValue>
-          </MarketsStatCard>
-          <MarketsStatCard>
-            <StatLabel>Live Markets</StatLabel>
-            <StatValue>{formatNumberWithCommas(liveMarketCount)}</StatValue>
-          </MarketsStatCard>
-          <MarketsStatCard>
-            <StatLabel>Queued</StatLabel>
-            <StatValue>{formatNumberWithCommas(queuedMarketCount)}</StatValue>
-          </MarketsStatCard>
-          <MarketsStatCard>
-            <StatLabel>OVL Price</StatLabel>
-            <StatValue>{ovlPrice}</StatValue>
-          </MarketsStatCard>
-        </MarketsStatsPanel>
       </MarketsHeroPanel>
 
       <MarketRailPanel>
         <PanelHeader>
-          <PanelTitle>Market Tape</PanelTitle>
-          <PanelMeta>{formatNumberWithCommas(uniqueOtherChainMarkets.length)} queued</PanelMeta>
+          <PanelTitle>{showAllMarkets ? "All Markets" : "Core Markets"}</PanelTitle>
+          <PanelMeta>{formatNumberWithCommas(orderedMarkets.length)}</PanelMeta>
         </PanelHeader>
         <MarketRailScroller aria-label="Featured markets">
           {orderedMarkets.slice(0, RAIL_MARKET_COUNT).map((market) => {
@@ -303,6 +293,7 @@ const Markets: React.FC = () => {
       <MarketsTable
         marketsData={marketsData}
         otherChainMarketsData={otherChainMarketsData}
+        showAllMarkets={showAllMarkets}
       />
     </MarketsPageShell>
   );
