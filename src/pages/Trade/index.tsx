@@ -19,7 +19,6 @@ import {
   BottomTab,
   BottomTabs,
   ChartRegion,
-  ControlPill,
   OrderBookRegion,
   PositionsPlaceholder,
   PositionsRegion,
@@ -29,7 +28,6 @@ import {
   TradeGrid,
   TradeMarketBar,
   TradeShell,
-  TradeTopRightControls,
 } from "./trade-styles";
 import { DEFAULT_MARKET } from "../../constants/applications";
 import useActiveMarkets from "../../hooks/useActiveMarkets";
@@ -62,7 +60,7 @@ const Trade: React.FC = () => {
 
   const { currentMarket } = useCurrentMarketState();
   const { handleTradeStateReset, handlePositionSideSelect } = useTradeActionHandlers();
-  const { isLong, selectedLeverage } = useTradeState();
+  const { isLong } = useTradeState();
   const { handleCurrentMarketSet } = useCurrentMarketActionHandlers();
   const { data: markets } = useActiveMarkets();
   const prevMarketRef = useRef<string | undefined>();
@@ -178,11 +176,6 @@ const Trade: React.FC = () => {
         <TradeTickerStrip markets={markets} activeMarketId={marketParam} />
         <TradeMarketBar>
           <TradeHeader predictionGroup={predictionGroup} />
-          <TradeTopRightControls>
-            <ControlPill type="button">Cross</ControlPill>
-            <ControlPill type="button">Leverage {selectedLeverage}x</ControlPill>
-            <ControlPill type="button" aria-label="Trade settings">▦</ControlPill>
-          </TradeTopRightControls>
         </TradeMarketBar>
 
         <TradeGrid>

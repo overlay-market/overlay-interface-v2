@@ -27,48 +27,6 @@ export const TradeMarketBar = styled.div`
   border-bottom: 1px solid ${theme.semantic.borderMuted};
   background: #08090a;
   overflow: visible;
-
-  @media (min-width: 1100px) {
-    grid-template-columns: minmax(0, 1fr) 320px;
-  }
-`;
-
-export const TradeTopRightControls = styled.div`
-  display: none;
-  min-width: 0;
-
-  @media (min-width: 1100px) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 0 14px 0 16px;
-    border-left: 1px solid ${theme.semantic.borderMuted};
-    color: ${theme.semantic.textSecondary};
-    font-size: 14px;
-    font-weight: 600;
-  }
-`;
-
-export const ControlPill = styled.button`
-  height: 34px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: ${theme.radius.sm};
-  background: transparent;
-  color: ${theme.semantic.textPrimary};
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-
-  &:hover {
-    background: ${theme.semantic.hover};
-  }
-
-  &:focus-visible {
-    outline: 1px solid ${theme.semantic.focus};
-    outline-offset: 2px;
-  }
 `;
 
 export const TradeGrid = styled.div`
