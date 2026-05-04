@@ -49,9 +49,7 @@ const POSITIONS_COLUMNS = [
   "Mark Price",
   "Est. Liq. Price",
   "Margin",
-  "MMR",
   "Unrealized PnL (ROE)",
-  "Realized P",
   "Reduce/Close",
 ];
 

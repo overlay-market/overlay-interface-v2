@@ -69,15 +69,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
       : realtimePnL.pnlFormatted > 0
     : Number(position.unrealizedPnL) > 0;
 
-  const fundingRawValue = position.stableValues
-    ? position.stableValues.funding
-    : position.parsedFunding;
-  const fundingNumber = Number(fundingRawValue ?? 0);
-  const fundingValue = fundingNumber.toFixed(2);
-  const fundingToken = position.stableValues
-    ? 'USDT'
-    : 'OVL';
-  const isFundingPositive = fundingNumber > 0;
   const collateralValue = position.stableValues?.initialCollateral
     ? position.stableValues.initialCollateral
     : position.initialCollateral;
@@ -88,10 +79,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
   const roeValue = collateralNumber > 0
     ? `${((numericPnl / collateralNumber) * 100).toFixed(2)}%`
     : "0.00%";
-  // TODO: Replace LOREM IPSUM when the SDK exposes maintenance margin ratio per open position.
-  const mmrValue = "LOREM IPSUM";
-  // TODO: Replace LOREM IPSUM when open-position realized PnL is available in the SDK response.
-  const realizedPnlValue = "LOREM IPSUM";
 
   // Flash effect for PnL changes
   const [flashColor, setFlashColor] = useState<"green" | "red" | null>(null);
@@ -222,9 +209,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
           <CellValue>{marginValue}</CellValue>
         </StyledCell>
         <StyledCell>
-          <CellValue $accent="warning">{mmrValue}</CellValue>
-        </StyledCell>
-        <StyledCell>
           <CellStack>
             <CellValue
               $accent={isPnLPositive ? "positive" : "negative"}
@@ -240,14 +224,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
               {pnlValue} {pnlToken} ({roeValue})
             </CellValue>
             <MutedCellValue>{pnlValue} {pnlToken}</MutedCellValue>
-          </CellStack>
-        </StyledCell>
-        <StyledCell>
-          <CellStack>
-            <CellValue $accent={isFundingPositive ? "positive" : "negative"}>
-              {realizedPnlValue}
-            </CellValue>
-            <MutedCellValue>{fundingValue} {fundingToken}</MutedCellValue>
           </CellStack>
         </StyledCell>
         <StyledCell>
