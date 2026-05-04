@@ -3,6 +3,7 @@ import theme from "../../theme";
 import useRedirectToTradePage from "../../hooks/useRedirectToTradePage";
 import { MarketDataParsed } from "../../types/marketTypes";
 import { formatPriceWithCurrency } from "../../utils/formatPriceWithCurrency";
+import { isVanillaMarket } from "../../constants/markets";
 
 const Strip = styled.div`
   position: relative;
@@ -116,7 +117,9 @@ const TradeTickerStrip: React.FC<TradeTickerStripProps> = ({
   activeMarketId,
 }) => {
   const redirectToTradePage = useRedirectToTradePage();
-  const visibleMarkets = markets;
+  const visibleMarkets = markets.filter((market) =>
+    isVanillaMarket(market.marketId)
+  );
   const duration = Math.max(28, visibleMarkets.length * 2.6);
 
   const renderTickerGroup = (duplicate = false) => (
