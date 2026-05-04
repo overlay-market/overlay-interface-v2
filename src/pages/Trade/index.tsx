@@ -17,7 +17,6 @@ import {
   BottomTabs,
   ChartRegion,
   OrderBookRegion,
-  PositionsPlaceholder,
   PositionsRegion,
   PositionsTabPanel,
   TicketRegion,
@@ -34,13 +33,11 @@ import TradeTickerStrip from "./TradeTickerStrip";
 import OrderBookPanel from "./OrderBookPanel";
 import TradeWorkspaceTabs from "./TradeWorkspaceTabs";
 import PositionHistoryPanel from "./PositionHistoryPanel";
+import TransactionHistoryPanel from "./TransactionHistoryPanel";
 
 const POSITION_TABS = [
   { id: "positions", label: "Positions" },
   { id: "position-history", label: "Position History" },
-  { id: "open-orders", label: "Open Orders" },
-  { id: "order-history", label: "Order History" },
-  { id: "trade-history", label: "Trade History" },
   { id: "transaction-history", label: "Transaction History" },
 ] as const;
 
@@ -67,6 +64,12 @@ const Trade: React.FC = () => {
   const [marketPrices, setMarketPrices] = useState<{ bid: bigint; ask: bigint; mid: bigint } | undefined>(undefined);
   const [activePositionTab, setActivePositionTab] =
     useState<PositionTab>("positions");
+
+  useEffect(() => {
+    if (!POSITION_TABS.some((tab) => tab.id === activePositionTab)) {
+      setActivePositionTab("transaction-history");
+    }
+  }, [activePositionTab]);
 
   const handlePricesUpdate = useCallback((prices: { bid: bigint; ask: bigint; mid: bigint } | undefined) => {
     setMarketPrices(prices);
@@ -242,17 +245,15 @@ const Trade: React.FC = () => {
                 <PositionHistoryPanel />
               </PositionsTabPanel>
             )}
-            {activePositionTab !== "positions" &&
-              activePositionTab !== "position-history" && (
-                <PositionsTabPanel
-                  id={`trade-bottom-panel-${activePositionTab}`}
-                  role="tabpanel"
-                  aria-labelledby={`trade-bottom-tab-${activePositionTab}`}
-                >
-                  {/* TODO: Wire real order/trade/transaction history tables. */}
-                  <PositionsPlaceholder>LOREM IPSUM</PositionsPlaceholder>
-                </PositionsTabPanel>
-              )}
+            {activePositionTab === "transaction-history" && (
+              <PositionsTabPanel
+                id="trade-bottom-panel-transaction-history"
+                role="tabpanel"
+                aria-labelledby="trade-bottom-tab-transaction-history"
+              >
+                <TransactionHistoryPanel />
+              </PositionsTabPanel>
+            )}
           </PositionsRegion>
         </TradeGrid>
 

@@ -147,14 +147,3 @@ export const PositionsTabPanel = styled.div`
     display: none;
   }
 `;
-
-export const PositionsPlaceholder = styled.div`
-  display: flex;
-  align-items: center;
-  min-height: 118px;
-  padding: 16px;
-  color: ${theme.semantic.textMuted};
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0;
-`;
