@@ -18,8 +18,6 @@ import useMultiMarketPositionsPnL from "../../../hooks/useMultiMarketPositionsPn
 import { DEFAULT_CHAINID } from "../../../constants/chains";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import {
-  PositionFilterChip,
-  PositionsFilters,
   PositionsTitle,
   PositionsToolbar,
   PositionsToolbarLeft,
@@ -64,7 +62,6 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
   const previousPositionCountRef = useRef<number>(0); // Track position count before transaction
   const currentPositionCountRef = useRef<number>(0); // Track current position count (for polling)
   const knownPositionIdsRef = useRef<Set<number>>(new Set()); // Track position IDs that existed before trade
-  const [marginMode, setMarginMode] = useState<"all" | "cross" | "isolated">("all");
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -342,18 +339,6 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ onPricesUpdate }) => {
         <PositionsToolbar>
           <PositionsToolbarLeft>
             <PositionsTitle>Positions({positionsTotalNumber})</PositionsTitle>
-            <PositionsFilters aria-label="Position margin mode filters">
-              {(["all", "cross", "isolated"] as const).map((mode) => (
-                <PositionFilterChip
-                  key={mode}
-                  type="button"
-                  $active={marginMode === mode}
-                  onClick={() => setMarginMode(mode)}
-                >
-                  {mode === "all" ? "All" : mode === "cross" ? "Cross" : "Isolated"}
-                </PositionFilterChip>
-              ))}
-            </PositionsFilters>
           </PositionsToolbarLeft>
         </PositionsToolbar>
 

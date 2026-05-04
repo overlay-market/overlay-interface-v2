@@ -18,8 +18,6 @@ import { triggerLoader } from "../UnwindsTable";
 import { isShutdownOpenPosition } from "../../../utils/positionGuards";
 import {
   CloseAllButton,
-  PositionFilterChip,
-  PositionsFilters,
   PositionsTitle,
   PositionsToolbar,
   PositionsToolbarLeft,
@@ -69,7 +67,6 @@ const OpenPositionsTable: React.FC = () => {
     return `${position.positionId}-${position.marketAddress}`;
   };
   const [showCloseModal, setShowCloseModal] = useState(false);
-  const [marginMode, setMarginMode] = useState<"all" | "cross" | "isolated">("all");
 
   const { loading, positions, positionsTotalNumber, refreshPositions } =
     usePositionRefresh(
@@ -114,18 +111,6 @@ const OpenPositionsTable: React.FC = () => {
         <PositionsToolbarLeft>
           <PositionsTitle>Positions({positionsTotalNumber})</PositionsTitle>
           {loading && positions && <LoadingSpinner />}
-          <PositionsFilters aria-label="Position margin mode filters">
-            {(["all", "cross", "isolated"] as const).map((mode) => (
-              <PositionFilterChip
-                key={mode}
-                type="button"
-                $active={marginMode === mode}
-                onClick={() => setMarginMode(mode)}
-              >
-                {mode === "all" ? "All" : mode === "cross" ? "Cross" : "Isolated"}
-              </PositionFilterChip>
-            ))}
-          </PositionsFilters>
         </PositionsToolbarLeft>
         <CloseAllButton
           type="button"

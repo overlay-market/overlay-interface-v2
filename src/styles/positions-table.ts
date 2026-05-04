@@ -38,33 +38,6 @@ export const PositionsTitle = styled.div`
   white-space: nowrap;
 `;
 
-export const PositionsFilters = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
-
-export const PositionFilterChip = styled.button<{ $active?: boolean }>`
-  height: 24px;
-  padding: 0 10px;
-  border: 1px solid
-    ${({ $active }) => ($active ? theme.semantic.border : "transparent")};
-  border-radius: ${theme.radius.xs};
-  background: ${({ $active }) =>
-    $active ? theme.semantic.hover : "transparent"};
-  color: ${({ $active }) =>
-    $active ? theme.semantic.textPrimary : theme.semantic.textMuted};
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  ${focusRing}
-
-  &:hover {
-    color: ${theme.semantic.textPrimary};
-    background: ${theme.semantic.hover};
-  }
-`;
-
 export const CloseAllButton = styled.button`
   height: 26px;
   padding: 0 12px;
