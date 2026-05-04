@@ -9,10 +9,6 @@ import {
   TradeIcon,
   TradeActiveIcon,
 } from "../../assets/icons/navBar-icons/trade";
-import {
-  RocketIcon,
-  RocketActiveIcon,
-} from "../../assets/icons/navBar-icons/rocket";
 // import {
 //   PowercardIcon,
 //   PowercardActiveIcon,
@@ -28,10 +24,6 @@ import {
   TrophyIcon,
 } from "../../assets/icons/navBar-icons/trophy";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
-import {
-  AirdropsActiveIcon,
-  AirdropsIcon,
-} from "../../assets/icons/navBar-icons/airdrops";
 import {
   MarketsActiveIcon,
   MarketsIcon,
@@ -86,13 +78,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: PortfolioActiveIcon,
       showOnMobile: true,
     },
-    {
-      to: "/referrals",
-      label: "Referrals",
-      icon: RocketIcon,
-      activeIcon: RocketActiveIcon,
-      showOnMobile: true,
-    },
     // {
     //   to: "/powercards",
     //   label: "PowerCards",
@@ -107,13 +92,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       icon: TrophyIcon,
       activeIcon: TrophyActiveIcon,
       showOnMobile: true,
-    },
-    {
-      to: "/airdrops",
-      label: "Airdrops",
-      icon: AirdropsIcon,
-      activeIcon: AirdropsActiveIcon,
-      showOnMobile: !isMobile,
     },
     ...(!isAvatarTradingActive
       ? [
