@@ -10,6 +10,7 @@ import {
   getExplorerLink,
 } from "../../../utils/getExplorerLink";
 import { useMarketAnalytics } from "./useMarketAnalytics";
+import { useOvlPrice } from "../../../hooks/useOvlPrice";
 import {
   BarSegment,
   BarTrack,
@@ -92,6 +93,7 @@ const normalizeAnalyticsValue = (value: string) => {
 
 const CoinOverview: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
+  const { data: ovlPrice } = useOvlPrice();
   const { totalVolume, totalTokensLocked, totalTransactions } =
     useMarketAnalytics();
 
@@ -110,7 +112,7 @@ const CoinOverview: React.FC = () => {
         : [UNAVAILABLE_DESCRIPTION];
 
   const { longOi, totalOi, longOiUsd, shortOiUsd, totalOiUsd } =
-    getMarketOpenInterestUsd(currentMarket);
+    getMarketOpenInterestUsd(currentMarket, ovlPrice);
   const longShare = totalOi > 0 ? (longOi / totalOi) * 100 : 0;
   const shortShare = totalOi > 0 ? 100 - longShare : 0;
   const marketLogo =
