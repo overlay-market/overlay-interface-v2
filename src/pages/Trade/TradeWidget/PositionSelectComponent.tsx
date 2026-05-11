@@ -92,7 +92,7 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
     <Flex height={"52px"} gap={"8px"}>
       <LongPositionSelectButton
         type="button"
-        $active={isLong}
+        $active={isDoubleOrNothing || isLong}
         onClick={() => handleSelectPositionSide(true)}
         aria-label={longLabel}
         title={longLabel}
