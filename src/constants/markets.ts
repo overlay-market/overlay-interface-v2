@@ -347,8 +347,6 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",
     "SUPER%20%2F%20ETH",
-    "ETH%20%2F%20USD",
-    "BTC%20%2F%20USD",
   ],
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
