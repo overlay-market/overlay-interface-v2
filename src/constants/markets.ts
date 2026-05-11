@@ -347,8 +347,6 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "ETH%20%2F%20SOL",
     "Real%20Estate%20Dominance",
     "SUPER%20%2F%20ETH",
-    "ETH%20%2F%20USD",
-    "BTC%20%2F%20USD",
   ],
   [CategoryName.Artists]: [
     "Lana%20Del%20Rey",
@@ -426,3 +424,41 @@ export const MARKETS_PAGE_CATEGORY_ORDER: CategoryName[] = [
   CategoryName.Majors,
   CategoryName.Indices,
 ];
+
+export enum MarketClass {
+  Vanilla = "Vanilla",
+  Exotic = "Exotic",
+}
+
+const VANILLA_MAJOR_EXCLUSIONS = new Set([
+  "GOLD%20%2F%20USD",
+  "GOLD%20%2F%20SILVER",
+  "SILVER%20%2F%20USD",
+]);
+
+export const VANILLA_MARKET_IDS = new Set([
+  ...MARKET_CATEGORIES[CategoryName.Altcoins],
+  ...MARKET_CATEGORIES[CategoryName.Majors].filter(
+    (marketId) => !VANILLA_MAJOR_EXCLUSIONS.has(marketId)
+  ),
+]);
+
+const normalizeMarketId = (marketId: string) => {
+  const normalizeDecoded = (value: string) =>
+    encodeURIComponent(value.trim().replace(/\s*\/\s*/g, " / "));
+
+  try {
+    return normalizeDecoded(decodeURIComponent(marketId));
+  } catch {
+    return normalizeDecoded(marketId);
+  }
+};
+
+export const getMarketClass = (marketId: string): MarketClass => {
+  return VANILLA_MARKET_IDS.has(normalizeMarketId(marketId))
+    ? MarketClass.Vanilla
+    : MarketClass.Exotic;
+};
+
+export const isVanillaMarket = (marketId: string) =>
+  getMarketClass(marketId) === MarketClass.Vanilla;

@@ -1,64 +1,191 @@
-import {  Flex } from "@radix-ui/themes";
+import { Flex } from "@radix-ui/themes";
 import theme from "../../../theme";
 import styled from "styled-components";
 
 export const TradeHeaderContainer = styled(Flex)`
-  flex-direction: column;
+  flex-direction: row;
   position: relative;
-  margin-left: -12px;
-  margin-right: -12px;
-  width: calc(100% + 24px);
-  border-top: 1px solid ${theme.color.darkBlue};
-  border-bottom: 1px solid ${theme.color.darkBlue};
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  min-height: 64px;
+  box-sizing: border-box;
+  background: #08090a;
+  border: 1px solid ${theme.semantic.borderMuted};
+  border-top: 0;
+  border-radius: 0 0 ${theme.radius.md} ${theme.radius.md};
+  overflow: visible;
+
+  @media (max-width: ${theme.breakpoints.sm}) {
+    flex-direction: column;
+  }
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: calc(100% + 20px);
-    margin-left: 0;
-    margin-right: -20px;
-    border-top: none;
-  }
-  
-  @media (min-width: ${theme.breakpoints.lg}) {
-    flex-direction: row;
-  }
-
-  @media (min-width: ${theme.breakpoints.xxl}) {
-    margin-left: -16px;
-    padding-left: 16px;
-    width: calc(100% + 20px + 16px);
+    min-height: 72px;
   }
 `;
 
 export const MarketInfoContainer = styled(Flex)`
-  height: 50px;
-  width: 100%;
-  justify-content: space-between;
-  border-top: 1px solid ${theme.color.darkBlue};
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 64px;
+  width: auto;
+  max-width: 100%;
+  justify-content: start;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  background: #08090a;
 
-  @media (min-width:  ${theme.breakpoints.sm}) {    
-    height: ${theme.headerSize.height};
+  &::-webkit-scrollbar {
+    display: none;
   }
 
-  @media (min-width: ${theme.breakpoints.lg}) {
-    justify-content: start;
-    border-top: none;
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-height: 72px;
+  }
+`;
+
+export const HeaderPriceBlock = styled.div`
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: max-content;
+  min-width: 132px;
+  max-width: none;
+  height: 64px;
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 12px;
+  overflow: hidden;
+  border-right: 1px solid ${theme.semantic.borderMuted};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-width: 156px;
+    height: 72px;
+    padding: 0 14px;
+  }
+`;
+
+export const LastPrice = styled.div<{ $positive?: boolean }>`
+  color: ${({ $positive }) =>
+    $positive === false ? theme.semantic.negative : theme.semantic.positive};
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  max-width: none;
+  overflow: visible;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    font-size: 20px;
+  }
+`;
+
+export const PriceChange = styled.div<{ $positive?: boolean }>`
+  margin-top: 5px;
+  color: ${({ $positive }) =>
+    $positive === false ? theme.semantic.negative : theme.semantic.positive};
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  max-width: none;
+  overflow: visible;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    font-size: 13px;
+  }
+`;
+
+export const HeaderMetric = styled.div<{ $wide?: boolean }>`
+  box-sizing: border-box;
+  flex: 0 0 ${({ $wide }) => ($wide ? "158px" : "116px")};
+  width: ${({ $wide }) => ($wide ? "158px" : "116px")};
+  min-width: ${({ $wide }) => ($wide ? "158px" : "116px")};
+  max-width: ${({ $wide }) => ($wide ? "158px" : "116px")};
+  height: 64px;
+  display: flex;
+  min-inline-size: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 12px;
+  overflow: hidden;
+  border-right: 1px solid ${theme.semantic.borderMuted};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    flex-basis: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    min-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    max-width: ${({ $wide }) => ($wide ? "178px" : "124px")};
+    height: 72px;
+    padding: 0 13px;
+  }
+`;
+
+export const MetricLabel = styled.div`
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  color: ${theme.semantic.textMuted};
+  border-bottom: 1px dotted #4a4f58;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const MetricValue = styled.div<{ $tone?: "positive" | "negative" }>`
+  margin-top: 6px;
+  color: ${({ $tone }) =>
+    $tone === "positive"
+      ? theme.semantic.positive
+      : $tone === "negative"
+        ? theme.semantic.negative
+        : theme.semantic.textPrimary};
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    margin-top: 7px;
+    font-size: 14px;
   }
 `;
 
 export const StyledFlex = styled(Flex)`
-  height: 100%;
+  min-width: 122px;
+  height: 64px;
   flex-direction: column;
   justify-content: center;
-  align-items: end;
-  padding-right: 12px;
-  padding-left: 12px;
-  border-right: 1px solid ${theme.color.darkBlue};
-`;
+  align-items: start;
+  padding: 0 14px;
+  border-right: 1px solid ${theme.semantic.borderMuted};
+  color: ${theme.semantic.textSecondary};
 
+  span:first-child {
+    color: ${theme.semantic.textMuted};
+    font-size: 11px !important;
+    line-height: 1.1;
+  }
 
-export const BalanceFlex = styled(Flex)`
-  @media (min-width: ${theme.breakpoints.lg}) {
-    border-right: 1px solid ${theme.color.darkBlue};
-    height: 100%;
+  span:last-child {
+    color: ${theme.semantic.textPrimary};
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.1;
   }
 `;

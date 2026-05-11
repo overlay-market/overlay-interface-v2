@@ -19,12 +19,12 @@ export const PageWrapper = styled(Flex)`
 `;
 
 export const HeroCard = styled(Box)`
-  border: 1px solid ${theme.color.darkBlue};
-  border-radius: 24px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   padding: 24px;
   background:
-    radial-gradient(circle at top right, rgba(113, 206, 255, 0.14), transparent 30%),
-    linear-gradient(180deg, rgba(37, 37, 52, 0.95) 0%, rgba(23, 23, 33, 0.98) 100%);
+    radial-gradient(circle at top right, rgba(243, 169, 27, 0.12), transparent 30%),
+    ${theme.semantic.panel};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 28px;
@@ -32,7 +32,7 @@ export const HeroCard = styled(Box)`
 `;
 
 export const AccentText = styled.span`
-  background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+  background: ${theme.gradient.accentText};
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -50,17 +50,17 @@ export const StatsGrid = styled.div`
 `;
 
 export const StatCard = styled(Box)`
-  border-radius: 18px;
-  border: 1px solid rgba(57, 69, 107, 0.8);
-  background: rgba(23, 23, 33, 0.72);
+  border-radius: ${theme.radius.md};
+  border: 1px solid ${theme.semantic.border};
+  background: ${theme.semantic.bgElevated};
   padding: 16px;
 `;
 
 export const TableCard = styled(Box)`
-  border: 1px solid ${theme.color.darkBlue};
-  border-radius: 24px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   padding: 20px;
-  background: linear-gradient(180deg, rgba(37, 37, 52, 0.88) 0%, rgba(23, 23, 33, 0.94) 100%);
+  background: ${theme.semantic.panel};
 
   @media (min-width: ${theme.breakpoints.sm}) {
     padding: 24px;
@@ -72,17 +72,17 @@ export const EmptyState = styled(Flex)`
   align-items: center;
   justify-content: center;
   text-align: center;
-  border: 1px dashed ${theme.color.darkBlue};
-  border-radius: 18px;
-  background: rgba(23, 23, 33, 0.48);
+  border: 1px dashed ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
+  background: ${theme.semantic.bgElevated};
   padding: 24px;
 `;
 
 export const DataRow = styled.tr`
-  border-bottom: 1px solid ${theme.color.grey6};
+  border-bottom: 1px solid ${theme.semantic.borderMuted};
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: ${theme.semantic.hover};
   }
 `;
 

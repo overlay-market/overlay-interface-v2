@@ -31,12 +31,15 @@ const MarketCards = ({
   return (
     <Skeleton loading={false}>
       <CustomCard
+        type="button"
+        aria-label={`${title} ${priceWithCurrency}`}
+        disabled={isComingSoon}
         style={{
           backgroundImage: `url(${getMarketLogo(id)})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           cursor: isComingSoon ? "default" : "pointer",
-          width: 200,
+          width: 172,
           position: "relative",
           filter: isComingSoon ? "grayscale(100%) brightness(0.6)" : "none",
         }}

@@ -8,12 +8,13 @@ export const Toast = styled.div<{visible: string}>`
   width: 160px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: ${theme.color.grey7};
+  background-color: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
   color: ${theme.color.grey2};
   padding: 10px 20px;
   border-radius: 8px;
   font-size: 14px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: ${theme.shadow.popover};
   opacity: ${({ visible }) => (visible === 'true' ? 1 : 0)};
   visibility: ${({ visible }) => (visible === 'true' ? 'visible' : 'hidden')};
   transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -30,6 +31,6 @@ export const InfoIcon = styled(Info)`
   cursor: pointer;
 
   &:hover {
-    color: ${theme.color.blue2};
+    color: ${theme.semantic.accent};
   }
 `;

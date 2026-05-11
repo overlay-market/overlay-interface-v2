@@ -13,21 +13,23 @@ export const StyledRoot = styled(Root)`
 `;
 
 export const StyledTrack = styled(Track)`
-  background: linear-gradient(90deg, #E5F6FF 0%, #E2CCFF 31.77%, #FFDBB0 77.08%, #FF648A 95.83%);
+  background: linear-gradient(90deg, ${theme.semantic.positive} 0%, ${theme.semantic.accent} 58%, ${theme.semantic.negative} 100%);
   position: relative;
   flex-grow: 1;
   border-radius: 8px;
-  height: 5px;
+  height: 4px;
 `;
 
 export const StyledThumb = styled(Thumb)`
   display: block;
   width: 18px;
   height: 18px;
-  background-color: ${theme.color.red1};
+  background-color: ${theme.semantic.accent};
+  border: 2px solid ${theme.semantic.bg};
   border-radius: 100px;
 
   &:focus {
-    outline: none;
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
   }
 `;

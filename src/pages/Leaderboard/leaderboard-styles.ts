@@ -9,7 +9,7 @@ export const LineSeparator = styled(Flex)`
     position: absolute;
     top: ${theme.headerSize.height};
     left: ${theme.headerSize.tabletWidth};
-    border-bottom: 1px solid ${theme.color.darkBlue};
+    border-bottom: 1px solid ${theme.semantic.border};
   }
 
   @media (min-width: ${theme.breakpoints.md}) {

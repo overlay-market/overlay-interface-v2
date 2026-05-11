@@ -6,6 +6,7 @@ export const MarketHeaderContainer = styled(Flex)`
   height: 50px;
   width: 100%;
   justify-content: space-between;
+  background: ${theme.semantic.panel};
 
   @media (max-width: 767px) {
     display: none;
@@ -13,7 +14,7 @@ export const MarketHeaderContainer = styled(Flex)`
 
   @media (min-width: ${theme.breakpoints.sm}) {
     height: ${theme.headerSize.height};
-    border-bottom: 1px solid ${theme.color.darkBlue};
+    border-bottom: 1px solid ${theme.semantic.border};
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
@@ -28,11 +29,12 @@ export const StyledFlex = styled(Flex)`
   padding: 12px;
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    border-right: 1px solid ${theme.color.darkBlue};
+    border-right: 1px solid ${theme.semantic.border};
   }
 `;
 
 export const StyledText = styled.div`
   font-size: 10px;
   font-weight: 300;
+  color: ${theme.semantic.textMuted};
 `;

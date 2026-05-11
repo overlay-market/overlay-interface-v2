@@ -71,8 +71,9 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
       py="20px"
       px="24px"
       style={{
-        backgroundColor: theme.color.grey4,
-        borderRadius: "8px",
+        backgroundColor: theme.semantic.panel,
+        border: `1px solid ${theme.semantic.border}`,
+        borderRadius: theme.radius.md,
         width: "100%",
         overflow: "hidden",
       }}
@@ -94,10 +95,10 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
                   side="top"
                   sideOffset={6}
                   style={{
-                    backgroundColor: theme.color.grey9,
-                    border: `1px solid ${theme.color.darkBlue}`,
+                    backgroundColor: theme.semantic.panel,
+                    border: `1px solid ${theme.semantic.border}`,
                     padding: "10px 14px",
-                    borderRadius: "6px",
+                    borderRadius: theme.radius.sm,
                     maxWidth: "260px",
                     boxShadow: "0px 6px 12px rgba(0,0,0,0.25)",
                     zIndex: 50,
@@ -178,10 +179,10 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
                   side="top"
                   sideOffset={6}
                   style={{
-                    backgroundColor: theme.color.grey9,
-                    border: `1px solid ${theme.color.darkBlue}`,
+                    backgroundColor: theme.semantic.panel,
+                    border: `1px solid ${theme.semantic.border}`,
                     padding: "6px 10px",
-                    borderRadius: "4px",
+                    borderRadius: theme.radius.sm,
                     fontSize: "12px",
                     zIndex: 50,
                   }}
@@ -209,7 +210,8 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
           <Flex gap="3" align="center">
             <Text size="2" style={{ color: theme.color.grey2 }}>
               {valueTypeLink ? (
-                <a
+                <button
+                  type="button"
                   onClick={
                     valueType === "Copy link ->"
                       ? () => copyText()
@@ -218,25 +220,34 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
                   style={{
                     color: theme.color.blue2,
                     cursor: "pointer",
+                    background: "transparent",
+                    border: 0,
+                    padding: 0,
+                    font: "inherit",
                   }}
                 >
                   {valueType}
-                </a>
+                </button>
               ) : (
                 <span>{valueType}</span>
               )}
             </Text>
             {secondaryAction && (
               <Text size="2">
-                <a
+                <button
+                  type="button"
                   onClick={() => showModal && showModal(true)}
                   style={{
                     color: theme.color.blue2,
                     cursor: "pointer",
+                    background: "transparent",
+                    border: 0,
+                    padding: 0,
+                    font: "inherit",
                   }}
                 >
                   {secondaryAction}
-                </a>
+                </button>
               </Text>
             )}
           </Flex>
@@ -283,8 +294,8 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
             <Tooltip.Provider delayDuration={200}>
               <Tooltip.Root>
                 <Tooltip.Trigger asChild>
-                  <Box
-                    ml="1"
+                  <button
+                    type="button"
                     onClick={hasClaimableReward ? button : undefined}
                     style={{
                       color: hasClaimableReward
@@ -293,10 +304,13 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
                       cursor: hasClaimableReward ? "pointer" : "default",
                       fontSize: "12px",
                       fontWeight: 400,
+                      background: "transparent",
+                      border: 0,
+                      padding: 0,
                     }}
                   >
                     {buttonText}
-                  </Box>
+                  </button>
                 </Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Content

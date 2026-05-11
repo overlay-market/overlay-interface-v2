@@ -1,0 +1,214 @@
+import React, { useEffect, useMemo, useState } from "react";
+import styled from "styled-components";
+import Chart from "./Chart";
+import GamblingTimeline from "./Chart/GamblingTimeline";
+import PredictionGroupChart from "./PredictionGroupChart";
+import CoinOverview from "./InfoMarketSection/CoinOverview";
+import GrafanaPanel from "./InfoMarketSection/GrafanaPanel";
+import RiskParameters from "./InfoMarketSection/RiskParameters";
+import { PredictionMarketGroup } from "../../constants/markets";
+import { useCurrentMarketState } from "../../state/currentMarket/hooks";
+import theme from "../../theme";
+
+type WorkspaceTab = "charts" | "overview" | "trading-data" | "risk-params";
+
+type TradeWorkspaceTabsProps = {
+  prices?: { bid: bigint; ask: bigint; mid: bigint };
+  predictionGroup?: PredictionMarketGroup;
+  shouldRenderGamblingTimeline: boolean;
+};
+
+const tabs: Array<{ id: WorkspaceTab; label: string }> = [
+  { id: "charts", label: "Charts" },
+  { id: "overview", label: "Coin Overview" },
+  { id: "trading-data", label: "Trading Data" },
+  { id: "risk-params", label: "Risk Params" },
+];
+
+const WorkspaceShell = styled.section`
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  background: #08090a;
+`;
+
+const WorkspaceTabList = styled.div`
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  border-bottom: 1px solid ${theme.semantic.borderMuted};
+  background: #070809;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    min-height: 44px;
+  }
+`;
+
+const WorkspaceTabButton = styled.button<{ $active?: boolean }>`
+  height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-right: 1px solid ${theme.semantic.borderMuted};
+  border-bottom: 2px solid
+    ${({ $active }) => ($active ? theme.semantic.textPrimary : "transparent")};
+  background: ${({ $active }) => ($active ? "#101214" : "transparent")};
+  color: ${({ $active }) =>
+    $active ? theme.semantic.textPrimary : theme.semantic.textMuted};
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.semantic.textPrimary};
+    background: ${theme.semantic.hover};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: -2px;
+  }
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    height: 44px;
+    padding: 0 18px;
+    font-size: 13px;
+  }
+`;
+
+const WorkspaceContent = styled.div<{ $scroll?: boolean }>`
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow: ${({ $scroll }) => ($scroll ? "auto" : "hidden")};
+  background: #08090a;
+`;
+
+const ChartFrame = styled.div`
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    min-height: 520px;
+  }
+`;
+
+const CoinOverviewPanel = styled.div`
+  container-type: inline-size;
+  min-height: 100%;
+  padding: 10px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 14px;
+  }
+`;
+
+const TradingDataPanel = styled.div`
+  padding: 10px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 14px;
+  }
+`;
+
+const RiskParamsPanel = styled.div`
+  padding: 0 10px 10px;
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    padding: 0 14px 14px;
+  }
+`;
+
+const TradeWorkspaceTabs: React.FC<TradeWorkspaceTabsProps> = ({
+  prices,
+  predictionGroup,
+  shouldRenderGamblingTimeline,
+}) => {
+  const { currentMarket } = useCurrentMarketState();
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("charts");
+
+  useEffect(() => {
+    setActiveTab("charts");
+  }, [currentMarket?.id, predictionGroup?.groupId]);
+
+  const chartContent = useMemo(() => {
+    if (predictionGroup) {
+      return <PredictionGroupChart group={predictionGroup} />;
+    }
+
+    if (shouldRenderGamblingTimeline) {
+      return <GamblingTimeline />;
+    }
+
+    return <Chart prices={prices} />;
+  }, [predictionGroup, shouldRenderGamblingTimeline, prices]);
+
+  return (
+    <WorkspaceShell>
+      <WorkspaceTabList role="tablist" aria-label="Market workspace">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+
+          return (
+            <WorkspaceTabButton
+              key={tab.id}
+              id={`trade-workspace-tab-${tab.id}`}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`trade-workspace-panel-${tab.id}`}
+              $active={isActive}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </WorkspaceTabButton>
+          );
+        })}
+      </WorkspaceTabList>
+
+      <WorkspaceContent
+        id={`trade-workspace-panel-${activeTab}`}
+        role="tabpanel"
+        aria-labelledby={`trade-workspace-tab-${activeTab}`}
+        $scroll={activeTab !== "charts"}
+      >
+        {activeTab === "charts" ? <ChartFrame>{chartContent}</ChartFrame> : null}
+
+        {activeTab === "overview" ? (
+          <CoinOverviewPanel>
+            <CoinOverview />
+          </CoinOverviewPanel>
+        ) : null}
+
+        {activeTab === "trading-data" ? (
+          <TradingDataPanel>
+            <GrafanaPanel />
+          </TradingDataPanel>
+        ) : null}
+
+        {activeTab === "risk-params" ? (
+          <RiskParamsPanel>
+            <RiskParameters />
+          </RiskParamsPanel>
+        ) : null}
+      </WorkspaceContent>
+    </WorkspaceShell>
+  );
+};
+
+export default TradeWorkspaceTabs;

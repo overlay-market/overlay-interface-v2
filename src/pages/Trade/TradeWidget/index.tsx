@@ -7,7 +7,6 @@ import {
 } from "../../../state/trade/hooks";
 import AdditionalTradeDetails from "./AdditionalTradeDetails";
 import TradeButtonComponent from "./TradeButtonComponent";
-import PositionSelectComponent from "./PositionSelectComponent";
 import CollateralInputComponent from "./CollateralInputComponent";
 import useSDK from "../../../providers/SDKProvider/useSDK";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
@@ -18,7 +17,11 @@ import { useSearchParams } from "react-router-dom";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import useAccount from "../../../hooks/useAccount";
 import Slider from "../../../components/Slider";
-import { TradeWidgetContainer } from "./trade-widget-styles";
+import {
+  AdvancedPanel,
+  AdvancedSettingsButton,
+  TradeWidgetContainer,
+} from "./trade-widget-styles";
 import useDebounce from "../../../hooks/useDebounce";
 import theme from "../../../theme";
 import ChainAndTokenSelect from "./ChainAndTokenSelect";
@@ -186,6 +189,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
   useEffect(() => {
     let isCancelled = false;
     setLoading(false);
+    setTradeState(undefined);
 
     const fetchTradeState = async () => {
       if (
@@ -304,23 +308,21 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
   return (
     <TradeWidgetContainer
       direction={"column"}
-      gap={{ initial: "16px", sm: "24px" }}
-      width={{ initial: "343px", sm: "321px" }}
+      gap={{ initial: "12px", sm: "14px" }}
+      width={{ initial: "100%", sm: "321px" }}
       pr={"0px"}
-      pl={{ initial: "0px", sm: "16px", lg: "8px" }}
-      pt={"8px"}
-      pb={"20px"}
+      pl={"0px"}
+      pt={"0px"}
+      pb={"0px"}
       flexShrink={"0"}
     >
-      {predictionGroup && onOutcomeSelect ? (
+      {predictionGroup && onOutcomeSelect && (
         <PredictionGroupPanel
           group={predictionGroup}
           selectedMarketId={selectedMarketId ?? null}
           isLong={isLongFromParent ?? true}
           onOutcomeSelect={onOutcomeSelect}
         />
-      ) : (
-        <PositionSelectComponent prices={prices} />
       )}
 
       {!isGambling ? (
@@ -337,37 +339,24 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
 
       {collateralType === 'OVL' && !isAvatarTradingActive && <ChainAndTokenSelect />}
       <CollateralInputComponent />
-      <TradeButtonComponent loading={loading} tradeState={tradeState} />
-      <button
+      <TradeButtonComponent
+        loading={loading}
+        tradeState={tradeState}
+        prices={prices}
+      />
+      <AdvancedSettingsButton
         onClick={() => setDetailsOpen((o) => !o)}
-        style={{
-          background: "none",
-          border: "none",
-          padding: 0,
-          marginBottom: "8px",
-          fontSize: "16px",
-          fontWeight: 500,
-          color: theme.color.grey3,
-          cursor: "pointer",
-          textAlign: "right",
-          outline: "none",
-        }}
+        type="button"
+        aria-expanded={detailsOpen}
       >
-        {detailsOpen ? "Hide Advanced Settings ▲" : "Advanced Settings ▼"}
-      </button>
+        {detailsOpen ? "Hide Advanced Settings" : "Advanced Settings"}
+      </AdvancedSettingsButton>
 
       {/* Conditionally render details */}
       {detailsOpen && (
-        <Flex
-          style={{
-            background: theme.color.background,
-            zIndex: 100,
-            border: "8px solid transparent",
-            boxShadow: `rgb(0 0 0 / 40%) 0px 0px 12px 0px`,
-            marginTop: "-14px",
-          }}
+        <AdvancedPanel
           direction={"column"}
-          gap="16px"
+          gap="14px"
         >
           <Flex direction="column" gap="12px" p="8px">
             {isLbscAvailable && !isAvatarTradingActive && (
@@ -432,7 +421,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({ prices, predictionGroup, sele
 
           <MainTradeDetails tradeState={tradeState} />
           <AdditionalTradeDetails tradeState={tradeState} />
-        </Flex>
+        </AdvancedPanel>
       )}
     </TradeWidgetContainer>
   );

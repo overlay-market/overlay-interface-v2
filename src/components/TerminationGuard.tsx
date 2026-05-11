@@ -149,7 +149,7 @@ const TerminationGuard: React.FC = () => {
     }
 
     setModalData({ message, reasons, txHash });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Modal

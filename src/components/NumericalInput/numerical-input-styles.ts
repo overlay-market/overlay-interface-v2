@@ -11,7 +11,7 @@ export const StyledInput = styled.input<{
   color?: string;
 }>`
   color: ${({ error, color }) =>
-    error ? theme.color.red1 : color ? color : theme.color.blue1};
+    error ? theme.color.red1 : color ? color : theme.semantic.textPrimary};
   width: 100%;
   position: relative;
   outline: none;
@@ -20,7 +20,8 @@ export const StyledInput = styled.input<{
   background-color: transparent;
   font-size: ${({ fontSize }) => fontSize ?? "16px"};
   font-weight: ${({ fontWeight }) => fontWeight ?? "700"};
-  font-family: Inter;
+  font-family: "Roboto Mono", "SFMono-Regular", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
   text-align: ${({ align }) => (align ? align : "left")};
   height: ${({ height }) => (height ? height : "auto")};
   white-space: nowrap;
@@ -43,6 +44,7 @@ export const StyledInput = styled.input<{
   }
 
   ::placeholder {
-    opacity: 0.8;
+    color: ${theme.semantic.textMuted};
+    opacity: 1;
   }
 `;

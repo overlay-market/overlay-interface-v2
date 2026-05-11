@@ -15,19 +15,26 @@ import {
 } from "../../../state/portfolio/hooks";
 
 const UNWIND_POSITIONS_COLUMNS = [
-  "Market",
+  "Contract",
   "Size",
-  "Position",
   "Entry Price",
   "Exit Price",
   "Created",
   "Closed",
-  "PnL",
+  "Realized PnL",
 ];
 
 export let triggerLoader: (() => void) | null = null;
 
-const UnwindsTable: React.FC = () => {
+type UnwindsTableProps = {
+  embedded?: boolean;
+  title?: string;
+};
+
+const UnwindsTable: React.FC<UnwindsTableProps> = ({
+  embedded = false,
+  title = "Unwinds",
+}) => {
   const sdk = useSDK();
   const { address: account } = useAccount();
   const isNewTxnHash = useIsNewTxnHash();
@@ -71,20 +78,27 @@ const UnwindsTable: React.FC = () => {
   return (
     <Flex
       direction={"column"}
-      pt={"16px"}
-      pb={"66px"}
+      pt={embedded ? "0" : "16px"}
+      pb={embedded ? "0" : "66px"}
       width={"100%"}
-      style={{
-        borderBottom: `1px solid ${theme.color.darkBlue}`,
-      }}
+      style={
+        embedded
+          ? undefined
+          : {
+              borderBottom: `1px solid ${theme.color.darkBlue}`,
+            }
+      }
     >
-      <Text weight={"bold"} size={"5"}>
-        Unwinds
-      </Text>
+      {title && (
+        <Text weight={"bold"} size={"5"}>
+          {title}
+        </Text>
+      )}
 
       <StyledTable
         headerColumns={UNWIND_POSITIONS_COLUMNS}
-        minWidth="950px"
+        variant="positions"
+        minWidth="1040px"
         currentPage={currentPage}
         itemsPerPage={itemsPerPage}
         positionsTotalNumber={unwindPositionsTotalNumber}

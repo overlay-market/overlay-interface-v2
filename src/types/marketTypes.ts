@@ -29,6 +29,7 @@ export interface MarketDataParsed {
   parsedOiLong?: string;
   parsedOiShort?: string;
   priceCurrency: string;
+  capLeverage?: string | number;
   capleverage?: string;
   volumeAsk: string;
   volumeBid: string;

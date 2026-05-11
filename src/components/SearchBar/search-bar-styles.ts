@@ -35,24 +35,25 @@ export const SearchIcon = styled(MagnifyingGlassIcon)`
 export const SearchInput = styled.input<{ $bgcolor?: string }>`
   width: 100%;
   padding: 8px 28px;  
-  border-radius: 6px;
-  border: 1px solid ${({ $bgcolor }) => $bgcolor || theme.color.grey4};  
-  background: ${({ $bgcolor }) => $bgcolor || theme.color.grey4}; 
-  opacity: 0.7;
-  color: #ddd; 
+  border-radius: ${theme.radius.sm};
+  border: 1px solid ${({ $bgcolor }) => $bgcolor || theme.semantic.border};  
+  background: ${({ $bgcolor }) => $bgcolor || theme.semantic.field}; 
+  color: ${theme.semantic.textPrimary}; 
   font-size: 14px;
   outline: none;
+  transition: border-color 0.16s ease, background 0.16s ease;
     
   &:focus {
-    opacity: 1;
+    border-color: ${theme.semantic.accent};
+    box-shadow: ${theme.shadow.focus};
   }
 
   &::placeholder {
-    color: #777;
+    color: ${theme.semantic.textMuted};
   }
 `;
 
-export const ClearButton = styled.div`
+export const ClearButton = styled.button`
   position: absolute;
   right: 16px;
   top: 50%;
@@ -62,8 +63,14 @@ export const ClearButton = styled.div`
   font-size: 20px;
   border: none;
   cursor: pointer;
+  line-height: 1;
 
   &:hover {
-    color: ${theme.color.blue1};
+    color: ${theme.semantic.accent};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
   }
 `

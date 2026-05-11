@@ -72,8 +72,8 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
 
   const { longLabel, shortLabel } = useMemo(() => {
     return {
-      longLabel: market?.buttons?.long ?? "Buy",
-      shortLabel: market?.buttons?.short ?? "Sell",
+      longLabel: market?.buttons?.long ?? "Long",
+      shortLabel: market?.buttons?.short ?? "Short",
     };
   }, [market]);
 
@@ -82,12 +82,18 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
     [market?.marketName]
   );
 
+  useEffect(() => {
+    if (isDoubleOrNothing && !isLong) {
+      handlePositionSideSelect(true);
+    }
+  }, [isDoubleOrNothing, isLong, handlePositionSideSelect]);
+
   return (
     <Flex height={"52px"} gap={"8px"}>
       <LongPositionSelectButton
-        active={(isDoubleOrNothing || isLong).toString()}
+        type="button"
+        $active={isDoubleOrNothing || isLong}
         onClick={() => handleSelectPositionSide(true)}
-        style={{ background: theme.color.grey4 }}
         aria-label={longLabel}
         title={longLabel}
       >
@@ -98,7 +104,7 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
         ) : (
           <Flex direction={"column"} justify={"center"} align={"center"}>
             <Text size={"3"} weight={"bold"}>
-              {market?.buttons?.long ?? "Buy"}
+              {longLabel}
             </Text>
             <Text size={"1"} style={{ color: theme.color.blue1 }}>
               {currencyAsk}
@@ -108,15 +114,15 @@ const PositionSelectComponent: React.FC<PositionSelectComponentProps> = ({ price
       </LongPositionSelectButton>
       {!isDoubleOrNothing && (
         <ShortPositionSelectButton
-          active={isLong.toString()}
+          type="button"
+          $active={isLong}
           onClick={() => handleSelectPositionSide(false)}
-          style={{ background: theme.color.grey4 }}
           aria-label={shortLabel}
           title={shortLabel}
         >
           <Flex direction={"column"} justify={"center"} align={"center"}>
             <Text size={"3"} weight={"bold"}>
-              {market?.buttons?.short ?? "Sell"}
+              {shortLabel}
             </Text>
             <Text size={"1"} style={{ color: theme.color.blue1 }}>
               {currencyBid}

@@ -6,8 +6,7 @@ import {
   PortfolioContainer,
 } from "./portfolio-styles";
 import OpenPositionsTable from "./OpenPositionsTable";
-import UnwindsTable from "./UnwindsTable";
-import LiquidatesTable from "./LiquidatesTable";
+import PositionHistory from "./PositionHistory";
 import Overview from "./Overview";
 
 const Portfolio: React.FC = () => {
@@ -23,8 +22,7 @@ const Portfolio: React.FC = () => {
       >
         <Overview />
         <OpenPositionsTable />
-        <UnwindsTable />
-        <LiquidatesTable />
+        <PositionHistory />
       </Flex>
     </PortfolioContainer>
   );

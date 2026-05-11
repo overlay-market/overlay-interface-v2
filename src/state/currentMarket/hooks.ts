@@ -35,6 +35,7 @@ export const useCurrentMarketActionHandlers = (): {
         parsedMid: currentMarket.parsedMid?.toString(),
         parsedOiLong: currentMarket.parsedOiLong?.toString(),
         parsedOiShort: currentMarket.parsedOiShort?.toString(),
+        capLeverage: currentMarket.capLeverage?.toString(),
       }
 
       dispatch(setCurrentMarket({ currentMarket: currentMarketParsed }));

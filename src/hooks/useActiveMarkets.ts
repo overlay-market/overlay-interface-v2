@@ -36,6 +36,7 @@ const useActiveMarkets = () => {
                     parsedMid: market.parsedMid?.toString(),
                     parsedOiLong: market.parsedOiLong?.toString(),
                     parsedOiShort: market.parsedOiShort?.toString(),
+                    capLeverage: market.capLeverage?.toString(),
                 };
             });
 

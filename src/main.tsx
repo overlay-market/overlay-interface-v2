@@ -10,6 +10,7 @@ import theme from "./theme";
 import { Provider } from "react-redux";
 import store from "./state/state.tsx";
 import Web3Provider from "./providers/Web3Provider";
+import GlobalStyle from "./global-styles.ts";
 
 const assets = import.meta.glob(
   "/src/assets/**/*.{png,jpg,jpeg,webp,gif,mp4}",
@@ -42,6 +43,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <Web3Provider>
         <BrowserRouter>
           <ThemeProvider theme={theme}>
+            <GlobalStyle />
             <DefaultRadixTheme>
               <App />
             </DefaultRadixTheme>

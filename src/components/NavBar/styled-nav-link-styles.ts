@@ -7,46 +7,60 @@ export const StyledBox = styled(Box)`
   width: 66px;
   height: 57px;
   padding: 8px;
-  border-radius: 12px;
+  border-radius: ${theme.radius.md};
+  transition: background 0.16s ease, color 0.16s ease;
 
   &:hover {
-    background: ${theme.color.grey4};    
+    background: ${theme.semantic.hover};    
   }
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    width: 66px;
-    height: 56px;
-    border-radius: 12px;
-    padding: 9px 8px;
+    width: auto;
+    min-width: 72px;
+    height: ${theme.headerSize.height};
+    border-radius: 0;
+    padding: 0 14px;
   }
   @media (min-width: ${theme.breakpoints.md}) {
-    width: 76px;
-    height: 56px;
-    border-radius: 16px;
-    padding: 9px 12px;
+    min-width: 82px;
+    height: ${theme.headerSize.height};
+    border-radius: 0;
+    padding: 0 18px;
   }
 `;
 
 export const StyledLink = styled(NavLink)`
-  color: ${theme.color.grey2};
+  color: ${theme.semantic.textMuted};
   font-size: 12px;
   font-weight: 400;
   text-decoration: none;
 
   @media (min-width: ${theme.breakpoints.sm}) {
-    font-size: 10px;
-    font-weight: 200;
+    display: inline-flex;
+    align-items: center;
+    height: ${theme.headerSize.height};
+    font-size: 14px;
+    font-weight: 500;
     text-decoration: none;
+  }
+  &.active {
+    color: ${theme.semantic.textPrimary};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+    border-radius: ${theme.radius.md};
   }
 `;
 
 export const ActiveLabel = styled(Box)`
-  font-weight: 400;
-  background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-fill-color: transparent;
+  font-weight: 700;
+  color: ${theme.semantic.accent};
+
+  @media (min-width: ${theme.breakpoints.sm}) {
+    color: ${theme.semantic.accent};
+  }
 `;
 
 export const StyledLinkBurgerMode = styled(NavLink)`
@@ -54,6 +68,11 @@ export const StyledLinkBurgerMode = styled(NavLink)`
   font-size: 14px;
   font-weight: 400;
   text-decoration: none;
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+  }
 `;
 
 export const StyledBoxBurgerMode = styled(Box)`
@@ -62,6 +81,6 @@ export const StyledBoxBurgerMode = styled(Box)`
   padding: 10px 18px;
 
   &:hover {
-    background: ${theme.color.background};
+    background: ${theme.semantic.hover};
   }
 `;

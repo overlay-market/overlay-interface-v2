@@ -26,9 +26,6 @@ const Carousel: React.FC<CarouselProps> = ({
   });
   // Get a set of marketIds from the default chain to filter duplicates
   const defaultMarketIds = new Set(marketsData.map((m) => m.marketId));
-  if (otherChainMarketsData) {
-    console.log("Markets from BSC_TESTNET:", otherChainMarketsData);
-  }
   return (
     <Box ml={{ xs: "16px" }} mt={"32px"}>
       <Text style={{ color: theme.color.grey3 }}>FEATURED</Text>
@@ -54,8 +51,8 @@ const Carousel: React.FC<CarouselProps> = ({
         >
           {orderedMarketsData
             .filter((market) => !EXCLUDEDMARKETS.includes(market.marketId))
-            .map((market, index) => (
-              <SwiperSlide key={"default-" + index} style={{ width: "auto" }}>
+            .map((market) => (
+              <SwiperSlide key={`default-${market.marketId}`} style={{ width: "auto" }}>
                 <MarketCards
                   id={market.marketId}
                   priceWithCurrency={formatPriceWithCurrency(
@@ -70,8 +67,8 @@ const Carousel: React.FC<CarouselProps> = ({
             otherChainMarketsData
               .filter((market) => !EXCLUDEDMARKETS.includes(market.marketId))
               .filter((market) => !defaultMarketIds.has(market.marketId))
-              .map((market, index) => (
-                <SwiperSlide key={"bsc-" + index} style={{ width: "auto" }}>
+              .map((market) => (
+                <SwiperSlide key={`bsc-${market.marketId}`} style={{ width: "auto" }}>
                   <MarketCards
                     id={market.marketId}
                     priceWithCurrency={formatPriceWithCurrency(

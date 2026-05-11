@@ -5,23 +5,24 @@ import theme from "../../../theme";
 export const DescriptionContainer = styled(Box)`
   flex: 1;
   width: 100%;
-  border-radius: 8px;
+  border-radius: ${theme.radius.md};
   background: transparent;
 
   @media (min-width: ${theme.breakpoints.sm}) {  
-    background: ${theme.color.grey4};
+    background: ${theme.semantic.panel};
+    border: 1px solid ${theme.semantic.border};
   }
 `
 
 export const MarketImg = styled.img`  
   height: auto;
-  border-radius: 8px; 
+  border-radius: ${theme.radius.md}; 
   
   @media (min-width: ${theme.breakpoints.sm}) { 
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    border-top-left-radius: ${theme.radius.md};
+    border-top-right-radius: ${theme.radius.md};
   }
 ` 
 export const TruncatedText = styled(Box)<{istruncated: string}>`

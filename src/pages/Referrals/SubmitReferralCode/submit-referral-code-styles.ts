@@ -9,7 +9,7 @@ export const LineSeparator = styled(Flex)`
     position: absolute;
     top: ${theme.headerSize.height};
     left: ${theme.headerSize.tabletWidth};
-    border-bottom: 1px solid ${theme.color.darkBlue};
+    border-bottom: 1px solid ${theme.semantic.border};
   }
 
   @media (min-width: ${theme.breakpoints.md}) {
@@ -21,10 +21,9 @@ export const LineSeparator = styled(Flex)`
 
 export const GradientBorderBox = styled(Flex)`
   @media (min-width: ${theme.breakpoints.sm}) {
-    border: solid 1px transparent; 
-    border-radius: 16px;
-    background: linear-gradient(${theme.color.background}, ${theme.color.background}) padding-box,
-        linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%) border-box;
+    border: 1px solid ${theme.semantic.border}; 
+    border-radius: ${theme.radius.md};
+    background: ${theme.semantic.panel};
   } 
 `;
 
@@ -44,11 +43,11 @@ export const StyledInput = styled.input`
   width: 100%;
   padding: 16px;
   outline: none;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   box-sizing: border-box;
   color: ${theme.color.grey2};
-  background-color: ${theme.color.grey4};
+  background-color: ${theme.semantic.field};
   font-size: 14px;
   font-weight: 600;
   font-family: Inter;
@@ -57,13 +56,13 @@ export const StyledInput = styled.input`
   white-space: nowrap;
 
   &::placeholder {
-    color: #6c7180;
+    color: ${theme.semantic.textMuted};
   }
 `;
 
 export const GradientText = styled(Text)`
   width: fit-content;
-  background: linear-gradient(90deg, #ffc955 0%, #ff7cd5 100%);
+  background: ${theme.gradient.accentText};
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

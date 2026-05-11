@@ -7,19 +7,22 @@ import useBidAndAsk from "../../../hooks/useBidAndAsk";
 import { useMediaQuery } from "../../../hooks/useMediaQuery";
 import useTradingViewChart from "./hooks/useTradingViewChart";
 import usePriceLines from "./hooks/usePriceLines";
-import  theme  from "../../../theme";
 import { EntityId, IChartingLibraryWidget } from "../../../charting_library";
 
 const TVChartContainer = styled.div`
-  height: 258px;
+  height: 100%;
+  min-height: 320px;
   width: 100%;
-  background-color: ${theme.color.background};
+  background-color: #08090a;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
 
   @media (min-width: 640px) {
-    height: 561px;
+    min-height: 520px;
   }
   @media (min-width: 1536px) {
-    height: 643px;
+    min-height: 600px;
   }
 `;
 

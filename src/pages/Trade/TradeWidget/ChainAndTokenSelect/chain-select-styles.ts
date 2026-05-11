@@ -10,8 +10,9 @@ export const ChainSelectContainer = styled(Box)`
   left: 0;
   right: 0;
   border-radius: 0 0 8px 8px;
-  background: ${theme.color.grey4};
-  border-top: 1px solid ${theme.color.darkBlue};
+  background: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
   z-index: 10;
 `;
 
@@ -31,10 +32,10 @@ export const StyledScrollArea = styled(Box)`
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: ${theme.color.grey6};
+    background-color: ${theme.semantic.border};
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background-color: ${theme.color.darkBlue};
+    background-color: ${theme.semantic.textMuted};
   }  
 `;

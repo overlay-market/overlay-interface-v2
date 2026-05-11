@@ -1,11 +1,12 @@
-import { Flex, Text } from "@radix-ui/themes";
-import theme from "../../../theme";
-import ProgressBar from "../../../components/ProgressBar";
 import MarketsList from "./MarketsList";
 import {
-  BalanceFlex,
+  HeaderMetric,
+  HeaderPriceBlock,
+  LastPrice,
   MarketInfoContainer,
-  StyledFlex,
+  MetricLabel,
+  MetricValue,
+  PriceChange,
   TradeHeaderContainer,
 } from "./trade-header-styles";
 import { useSearchParams } from "react-router-dom";
@@ -16,13 +17,61 @@ import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
 import { limitDigitsInDecimals, toWei } from "overlay-sdk";
 import useMultichainContext from "../../../providers/MultichainContextProvider/useMultichainContext";
 import { TRADE_POLLING_INTERVAL } from "../../../constants/applications";
-import { formatPriceWithCurrency } from "../../../utils/formatPriceWithCurrency";
+import {
+  formatNumberWithCommas,
+  formatPriceWithCurrency,
+} from "../../../utils/formatPriceWithCurrency";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 import { PredictionMarketGroup } from "../../../constants/markets";
+import { useMarkets7d } from "../../../hooks/useMarkets7d";
+import { useMarket24hRange } from "../../../hooks/useMarket24hRange";
+import {
+  formatUsdOpenInterest,
+  getMarketOpenInterestUsd,
+} from "../../../utils/openInterestUsd";
+import { useOvlPrice } from "../../../hooks/useOvlPrice";
 
 interface TradeHeaderProps {
   predictionGroup?: PredictionMarketGroup;
 }
+
+const formatHeaderPrice = (
+  value?: string | number,
+  priceCurrency: string = "$"
+) => {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue) || numericValue <= 0) return "-";
+
+  if (priceCurrency === "%") {
+    return formatPriceWithCurrency(numericValue, priceCurrency);
+  }
+
+  return formatNumberWithCommas(numericValue);
+};
+
+const formatSignedChange = (
+  latestPrice?: number,
+  twentyFourHourChange?: number,
+  priceCurrency: string = "$"
+) => {
+  if (
+    !Number.isFinite(latestPrice) ||
+    !Number.isFinite(twentyFourHourChange)
+  ) {
+    return "-";
+  }
+
+  const previousPrice =
+    (latestPrice as number) / (1 + (twentyFourHourChange as number) / 100);
+  const absoluteChange = (latestPrice as number) - previousPrice;
+  const sign = absoluteChange >= 0 ? "+" : "";
+  const formattedAbsolute = formatPriceWithCurrency(
+    Math.abs(absoluteChange),
+    priceCurrency
+  );
+
+  return `${sign}${formattedAbsolute} (${sign}${(twentyFourHourChange as number).toFixed(2)}%)`;
+};
 
 const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
   const [searchParams] = useSearchParams();
@@ -32,13 +81,10 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
+  const { data: ovlPrice } = useOvlPrice();
 
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
   const [funding, setFunding] = useState<string | undefined>(undefined);
-  const [shortPercentageOfTotalOi, setShortPercentageOfTotalOi] =
-    useState<string>("0");
-  const [longPercentageOfTotalOi, setLongPercentageOfTotalOi] =
-    useState<string>("0");
 
   const sdkRef = useRef(sdk);
   useEffect(() => {
@@ -51,6 +97,16 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
   );
 
   const hideMarketInfo = isGambling || !!predictionGroup;
+  const marketOverviewIds = useMemo(
+    () => (market?.marketId ? [market.marketId] : []),
+    [market?.marketId]
+  );
+  const marketOverview = useMarkets7d(marketOverviewIds)[0];
+  const { data: market24hRange } = useMarket24hRange({
+    marketAddress: market?.id,
+    chainId: typeof chainId === "number" ? chainId : undefined,
+    enabled: !hideMarketInfo,
+  });
 
   useEffect(() => {
     if (!marketId || hideMarketInfo) return;
@@ -89,16 +145,12 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
 
     const fetchStaticMarketData = async () => {
       try {
-        const [funding, oiBalance] = await Promise.all([
+        const [funding] = await Promise.all([
           sdkRef.current.trade.getFunding(marketId),
           sdkRef.current.trade.getOIBalance(marketId),
         ]);
 
         if (funding) setFunding(funding);
-        if (oiBalance) {
-          setShortPercentageOfTotalOi(oiBalance.shortPercentageOfTotalOi);
-          setLongPercentageOfTotalOi(oiBalance.longPercentageOfTotalOi);
-        }
       } catch (error) {
         console.error("Error fetching static market data:", error);
       }
@@ -116,58 +168,64 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     return Math.sign(Number(funding)) > 0;
   }, [funding]);
 
+  const isPriceChangePositive = (marketOverview?.twentyFourHourChange ?? 0) >= 0;
+  const displayLastPrice = formatHeaderPrice(
+    currencyPrice !== "-" ? currencyPrice.replace(/[^0-9.-]/g, "") : market?.parsedMid,
+    market?.priceCurrency
+  );
+  const priceChangeLabel = formatSignedChange(
+    marketOverview?.latestPrice,
+    marketOverview?.twentyFourHourChange,
+    market?.priceCurrency
+  );
+  const fundingLabel = `${isFundingRatePositive ? "+" : ""}${funding ? `${funding}%` : "-"} / 24h`;
+  const twentyFourHourHighLabel = formatHeaderPrice(
+    market24hRange?.high,
+    market?.priceCurrency
+  );
+  const twentyFourHourLowLabel = formatHeaderPrice(
+    market24hRange?.low,
+    market?.priceCurrency
+  );
+  const { totalOiUsd } = getMarketOpenInterestUsd(market, ovlPrice);
+  const openInterestLabel = formatUsdOpenInterest(totalOiUsd);
+
   return (
     <TradeHeaderContainer>
       <MarketsList predictionGroup={predictionGroup} />
 
       {!hideMarketInfo ? (
         <MarketInfoContainer>
-          <StyledFlex width={{ initial: "149px", sm: "167px", lg: "149px" }}>
-            <Text weight="light" style={{ fontSize: "10px" }}>
-              Price
-            </Text>
-            <Text>{currencyPrice}</Text>
-          </StyledFlex>
+          <HeaderPriceBlock>
+            <LastPrice $positive={isPriceChangePositive}>
+              {displayLastPrice}
+            </LastPrice>
+            <PriceChange $positive={isPriceChangePositive}>
+              {priceChangeLabel}
+            </PriceChange>
+          </HeaderPriceBlock>
 
-          <StyledFlex width={{ initial: "72px", sm: "167px", lg: "97px" }}>
-            <Text weight="light" style={{ fontSize: "10px" }}>
-              Funding
-            </Text>
-            <Text
-              style={{
-                color: isFundingRatePositive
-                  ? theme.color.green2
-                  : theme.color.red2,
-              }}
-            >
-              {isFundingRatePositive ? `+` : ``}
-              {funding ? `${funding}%` : `-`}
-            </Text>
-          </StyledFlex>
+          <HeaderMetric $wide>
+            <MetricLabel>Funding Rate</MetricLabel>
+            <MetricValue $tone={isFundingRatePositive ? "positive" : "negative"}>
+              {fundingLabel}
+            </MetricValue>
+          </HeaderMetric>
 
-          <BalanceFlex
-            direction={"column"}
-            width={{ initial: "184px", sm: "336px", lg: "195px" }}
-            height={"100%"}
-            justify={"center"}
-            align={"end"}
-            pr={{ initial: "12px", sm: "20px", lg: "12px" }}
-            pl={"10px"}
-            ml={{ sm: "auto", lg: "0" }}
-          >
-            <Text weight="light" style={{ fontSize: "10px" }}>
-              OI balance
-            </Text>
-            <Flex gap={"4px"} align={"center"}>
-              <Text style={{ color: theme.color.red2 }}>
-                {shortPercentageOfTotalOi}%
-              </Text>
-              <ProgressBar max={100} value={Number(shortPercentageOfTotalOi)} />
-              <Text style={{ color: theme.color.green2 }}>
-                {longPercentageOfTotalOi}%
-              </Text>
-            </Flex>
-          </BalanceFlex>
+          <HeaderMetric>
+            <MetricLabel>24h High</MetricLabel>
+            <MetricValue>{twentyFourHourHighLabel}</MetricValue>
+          </HeaderMetric>
+
+          <HeaderMetric>
+            <MetricLabel>24h Low</MetricLabel>
+            <MetricValue>{twentyFourHourLowLabel}</MetricValue>
+          </HeaderMetric>
+
+          <HeaderMetric $wide>
+            <MetricLabel>Open Interest (USD)</MetricLabel>
+            <MetricValue>{openInterestLabel}</MetricValue>
+          </HeaderMetric>
         </MarketInfoContainer>
       ) : null}
     </TradeHeaderContainer>

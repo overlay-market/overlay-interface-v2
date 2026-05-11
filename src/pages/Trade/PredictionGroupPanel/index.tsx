@@ -7,6 +7,7 @@ import theme from "../../../theme";
 import {
   PanelContainer,
   OutcomeRow,
+  OutcomePrimaryButton,
   OutcomeLogo,
   ProbabilityText,
   YesButton,
@@ -37,11 +38,12 @@ const OutcomeRowItem: React.FC<OutcomeRowItemProps> = ({
       : undefined;
 
   return (
-    <OutcomeRow
-      $selected={isSelected}
-      onClick={() => onSelect(marketId, true)}
-    >
-      <Flex align="center" gap="10px" style={{ flex: 1, minWidth: 0 }}>
+    <OutcomeRow $selected={isSelected}>
+      <OutcomePrimaryButton
+        type="button"
+        onClick={() => onSelect(marketId, true)}
+        aria-pressed={isSelected && selectedIsLong}
+      >
         <OutcomeLogo
           src={getMarketLogo(marketId)}
           alt={label}
@@ -49,7 +51,7 @@ const OutcomeRowItem: React.FC<OutcomeRowItemProps> = ({
         <Text size="2" weight="medium" style={{ color: theme.color.white }}>
           {label}
         </Text>
-      </Flex>
+      </OutcomePrimaryButton>
 
       <Flex align="center" gap="8px">
         <ProbabilityText>
@@ -57,6 +59,7 @@ const OutcomeRowItem: React.FC<OutcomeRowItemProps> = ({
         </ProbabilityText>
         <Flex gap="4px">
           <YesButton
+            type="button"
             $active={isSelected && selectedIsLong}
             onClick={(e) => {
               e.stopPropagation();
@@ -66,6 +69,7 @@ const OutcomeRowItem: React.FC<OutcomeRowItemProps> = ({
             Yes
           </YesButton>
           <NoButton
+            type="button"
             $active={isSelected && !selectedIsLong}
             onClick={(e) => {
               e.stopPropagation();

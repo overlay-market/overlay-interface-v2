@@ -1,21 +1,44 @@
-import { Flex, Text, Badge, Tooltip, Skeleton } from "@radix-ui/themes";
+import { Flex, Badge, Tooltip, Skeleton } from "@radix-ui/themes";
 import { StyledCell, StyledRow } from "../../../components/Table";
 import theme from "../../../theme";
 import { OpenPositionData } from "overlay-sdk";
 import { useMemo, useState, useEffect, useRef } from "react";
 import PositionUnwindModal from "../../../components/PositionUnwindModal";
-import { formatNumberWithCommas } from "../../../utils/formatPriceWithCurrency";
+import {
+  formatNumberWithCommas,
+  formatPriceWithCurrency,
+} from "../../../utils/formatPriceWithCurrency";
 import { isGamblingMarket } from "../../../utils/marketGuards";
 import { isShutdownOpenPosition } from "../../../utils/positionGuards";
-import { PositionPnLData } from "../../../hooks/usePositionsPnL";
+import type {
+  MarketPrices,
+  PositionPnLEntry,
+} from "../../../hooks/useMultiMarketPositionsPnL";
+import { formatUnits } from "viem";
+import {
+  CellStack,
+  CellValue,
+  ContractMeta,
+  ContractName,
+  ContractStack,
+  MetaBadge,
+  MutedCellValue,
+  PositionActionButton,
+  PositionActionGroup,
+  SideBadge,
+} from "../../../styles/positions-table";
 
 type OpenPositionProps = {
   position: OpenPositionData;
-  realtimePnL?: PositionPnLData;
-  outcomeLabel?: string;
+  realtimePnL?: PositionPnLEntry;
+  realtimeMarketPrices?: MarketPrices;
 };
 
-const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL, outcomeLabel }) => {
+const OpenPosition: React.FC<OpenPositionProps> = ({
+  position,
+  realtimePnL,
+  realtimeMarketPrices,
+}) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPosition, setSelectedPosition] =
     useState<OpenPositionData | null>(null);
@@ -49,12 +72,41 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL, outc
       : realtimePnL.pnlFormatted > 0
     : Number(position.unrealizedPnL) > 0;
 
-  const currentSize = positionLeverage &&
-    (
-      position.stableValues?.initialCollateral
-        ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
-        : formatNumberWithCommas((Number(position.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' OVL'
-    );
+  const collateralValue = position.stableValues?.initialCollateral
+    ? position.stableValues.initialCollateral
+    : position.initialCollateral;
+  const collateralNumber = Number(String(collateralValue ?? 0).replace(/,/g, ""));
+  const collateralToken = position.stableValues ? "USDT" : "OVL";
+  const marginValue = `${formatNumberWithCommas(collateralNumber)} ${collateralToken}`;
+  const numericPnl = Number(String(pnlValue ?? 0).replace(/,/g, ""));
+  const roeValue = collateralNumber > 0
+    ? `${((numericPnl / collateralNumber) * 100).toFixed(2)}%`
+    : "0.00%";
+
+  const currentSize = positionLeverage
+    ? (
+        position.stableValues?.initialCollateral
+          ? formatNumberWithCommas((Number(position.stableValues.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' USDT'
+          : formatNumberWithCommas((Number(position.initialCollateral) * Number(positionLeverage.slice(0, -1))) + Number(pnlValue)) + ' OVL'
+      )
+    : "-";
+
+  const currentPrice = useMemo(() => {
+    if (realtimeMarketPrices?.mid) {
+      const midFormatted = formatUnits(realtimeMarketPrices.mid, 18);
+      const midNum = parseFloat(midFormatted);
+
+      if (midNum > 0) {
+        return formatPriceWithCurrency(
+          midNum.toFixed(4),
+          position.priceCurrency
+        );
+      }
+    }
+
+    return position.currentPrice;
+  }, [realtimeMarketPrices?.mid, position.currentPrice, position.priceCurrency]);
+
   const isShutdownPosition = isShutdownOpenPosition(position);
   const displayedSize = isShutdownPosition ? "-" : currentSize;
 
@@ -64,6 +116,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL, outc
 
     setSelectedPosition(position);
     setShowModal(true);
+  };
+
+  const handleCloseClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    handleItemClick();
   };
 
   const isDoubleOrNothing = useMemo(
@@ -98,14 +155,10 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL, outc
   return (
     <>
       <StyledRow onClick={handleItemClick}>
-        {outcomeLabel !== undefined && (
-          <StyledCell>
-            <Text weight="medium">{outcomeLabel}</Text>
-          </StyledCell>
-        )}
         <StyledCell>
-          <Flex gap="6px" align="center">
-            {displayedSize}
+          <ContractStack $long={isLong}>
+            <Flex gap="6px" align="center">
+              <ContractName>{position.marketName}</ContractName>
             {position.deprecated && (
               <Tooltip
                 content="This position was built on a deprecated version of the market. You can still unwind it."
@@ -116,46 +169,61 @@ const OpenPosition: React.FC<OpenPositionProps> = ({ position, realtimePnL, outc
                 </Badge>
               </Tooltip>
             )}
-          </Flex>
+            </Flex>
+            <ContractMeta>
+              <SideBadge $long={isLong}>{positionSide}</SideBadge>
+              <MetaBadge>{positionLeverage && Number(positionLeverage.slice(0, -1))}x</MetaBadge>
+            </ContractMeta>
+          </ContractStack>
         </StyledCell>
         <StyledCell>
-          <Flex gap={"6px"}>
-            {positionLeverage && Number(positionLeverage.slice(0, -1))}x
-            <Text
-              weight={"medium"}
-              style={{ color: isLong ? theme.color.green1 : theme.color.red1 }}
-            >
-              {positionSide}
-            </Text>
-          </Flex>
+          <CellValue>{displayedSize}</CellValue>
         </StyledCell>
         <StyledCell>
-          {isDoubleOrNothing ? "-" : position.entryPrice}
+          <CellValue>{isDoubleOrNothing ? "-" : position.entryPrice}</CellValue>
         </StyledCell>
         <StyledCell>
-          {isDoubleOrNothing ? "-" : position.liquidatePrice}
+          <CellValue>{isDoubleOrNothing ? "-" : currentPrice}</CellValue>
+        </StyledCell>
+        <StyledCell>
+          <CellValue $accent="warning">
+            {isDoubleOrNothing ? "-" : position.liquidatePrice}
+          </CellValue>
+        </StyledCell>
+        <StyledCell>
+          <CellValue>{marginValue}</CellValue>
         </StyledCell>
         <StyledCell>
           <Skeleton loading={isOptimistic}>
-            <Flex gap="4px" align="center">
-              <Text
+            <CellStack>
+              <CellValue
+                $accent={isPnLPositive ? "positive" : "negative"}
                 style={{
-                  color: isPnLPositive ? theme.color.green1 : theme.color.red1,
-                  transition: "text-shadow 0.15s ease-out",
                   textShadow: flashColor === "green"
                     ? `0 0 4px ${theme.color.green1}, 0 0 4px ${theme.color.green1}`
                     : flashColor === "red"
-                    ? `0 0 4px ${theme.color.red1}, 0 0 4px ${theme.color.red1}`
-                    : "none",
+                      ? `0 0 4px ${theme.color.red1}, 0 0 4px ${theme.color.red1}`
+                      : "none",
                 }}
               >
-                {pnlValue}
-              </Text>
-              <Text style={{ color: isPnLPositive ? theme.color.green1 : theme.color.red1 }}>
-                {pnlToken}
-              </Text>
-            </Flex>
+                {pnlValue} {pnlToken} ({roeValue})
+              </CellValue>
+              <MutedCellValue>{pnlValue} {pnlToken}</MutedCellValue>
+            </CellStack>
           </Skeleton>
+        </StyledCell>
+        <StyledCell>
+          <PositionActionGroup>
+            <PositionActionButton
+              type="button"
+              $primary
+              disabled={(position.size === "0" && !isShutdownPosition) || isOptimistic}
+              onClick={handleCloseClick}
+              aria-label={`Close ${position.marketName} position`}
+            >
+              Close
+            </PositionActionButton>
+          </PositionActionGroup>
         </StyledCell>
       </StyledRow>
 

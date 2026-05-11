@@ -18,7 +18,7 @@ type StyledNavLinkProps = {
 
 const StyledNavLink: React.FC<StyledNavLinkProps> = ({ link, mode }) => {
   const isMobile = useMediaQuery("(max-width: 767px)");
-  const size = isMobile ? 20 : 16;
+  const size = isMobile ? 20 : 0;
 
   return (
     <>
@@ -29,16 +29,18 @@ const StyledNavLink: React.FC<StyledNavLinkProps> = ({ link, mode }) => {
             return (
               <StyledBox>
                 <Flex
-                  direction="column"
+                  direction={{ initial: "column", sm: "row" }}
                   justify="center"
                   align="center"
-                  gap="4px"
+                  gap={{ initial: "4px", sm: "0" }}
                   height={"100%"}
                   style={{ textAlign: "center" }}
                 >
-                  <div style={{ flexShrink: 0 }}>
-                    <ActiveIcon size={size} />
-                  </div>
+                  {isMobile && (
+                    <div style={{ flexShrink: 0 }}>
+                      <ActiveIcon size={size} />
+                    </div>
+                  )}
                   {isActive ? (
                     <ActiveLabel>{link.label}</ActiveLabel>
                   ) : (

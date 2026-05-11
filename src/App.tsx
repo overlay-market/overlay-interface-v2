@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Trade from "./pages/Trade";
-import { Flex, Theme } from "@radix-ui/themes";
+import { Box, Flex, Theme } from "@radix-ui/themes";
 import NavBar from "./components/NavBar";
 import Markets from "./pages/Markets";
 import MultichainContextProvider from "./providers/MultichainContextProvider";
@@ -50,29 +50,31 @@ const AppContent = () => {
         <ScrollToTop />
         <Popups />
         <TerminationGuard />
-        <Flex direction={{ initial: "column", sm: "row" }} width={"100%"}>
+        <Flex direction="column" width={"100%"} minWidth="0">
           <NavBar />
           <Wallet />
-          <Routes>
-            <Route path="/" element={<Navigate to="/markets" />} />
-            <Route path="/markets" element={<Markets />} />
-            <Route path="/markets-info" element={<MarketsInfo />} />
-            <Route path="/trade/*" element={<Trade />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/referrals" element={<Referrals />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route
-              path="/leaderboard/:seasonId"
-              element={<Leaderboard />}
-            />
-            <Route path="/airdrops" element={<Airdrops />} />
-            <Route path="/funded-trader" element={<FundedTrader />} />
-            <Route path="/exchange/*" element={exchangeElement} />
-            {DevShareCard && (
-              <Route path="/dev/share-card" element={<Suspense fallback={null}><DevShareCard /></Suspense>} />
-            )}
-            <Route path="*" element={<Navigate to="/markets" />} />
-          </Routes>
+          <Box width="100%" minWidth="0">
+            <Routes>
+              <Route path="/" element={<Navigate to="/markets" />} />
+              <Route path="/markets" element={<Markets />} />
+              <Route path="/markets-info" element={<MarketsInfo />} />
+              <Route path="/trade/*" element={<Trade />} />
+              <Route path="/portfolio" element={<Portfolio />} />
+              <Route path="/referrals" element={<Referrals />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
+              <Route
+                path="/leaderboard/:seasonId"
+                element={<Leaderboard />}
+              />
+              <Route path="/airdrops" element={<Airdrops />} />
+              <Route path="/funded-trader" element={<FundedTrader />} />
+              <Route path="/exchange/*" element={exchangeElement} />
+              {DevShareCard && (
+                <Route path="/dev/share-card" element={<Suspense fallback={null}><DevShareCard /></Suspense>} />
+              )}
+              <Route path="*" element={<Navigate to="/markets" />} />
+            </Routes>
+          </Box>
         </Flex>
       </AppContainer>
     </Theme>

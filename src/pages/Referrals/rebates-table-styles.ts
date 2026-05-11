@@ -6,7 +6,12 @@ import theme from "../../theme"
 export const Table = styled.table`
   width: 100%;
   min-width: 400px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: ${theme.semantic.panel};
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.md};
+  overflow: hidden;
 `
 
 export const TableHeader = styled.th<{ width?: number }>`
@@ -19,7 +24,7 @@ export const TableHeader = styled.th<{ width?: number }>`
 `
 
 export const TableRow = styled.tr`
-  border-bottom: 1px solid ${theme.color.grey6};
+  border-bottom: 1px solid ${theme.semantic.borderMuted};
 `
 
 export const TableCell = styled.td`
@@ -44,4 +49,5 @@ export const TriangleButton = styled(Button)`
   min-width: 20px;
   margin-left: 4px;
   background: none;
+  color: ${theme.semantic.textSecondary};
 `
