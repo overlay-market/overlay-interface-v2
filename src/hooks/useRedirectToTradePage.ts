@@ -16,7 +16,7 @@ const useRedirectToTradePage = () => {
     const groupParam = groupId
       ? `&group=${encodeURIComponent(decodeQueryValue(groupId))}`
       : '';
-    navigate(`/trade?market=${encodedMarket}${groupParam}`, { replace: true });
+    navigate(`/trade?market=${encodedMarket}${groupParam}`);
     window.scrollTo(0, 0);
   };
 };
