@@ -25,17 +25,21 @@ import {
   HeaderRight,
   CurrentMarketLogo,
   DropdownContent,
+  MarketModeButton,
+  MarketModeToggle,
   MarketsListContainer,
   DropdownContainer,
   DropdownTop,
   MarketSelectorRoot,
   MarketsTableHeader,
+  SearchControlRow,
   SearchShell,
   StyledScrollArea,
   SearchEmptyMessage,
 } from "./markets-list-styles";
 import {
   CategoryName,
+  isVanillaMarket,
   MARKET_CATEGORIES,
   MARKETSORDER,
   PredictionMarketGroup,
@@ -118,6 +122,7 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showExotics, setShowExotics] = useState(false);
   const [marketLeverageCaps, setMarketLeverageCaps] = useState<
     Record<string, string | number | null>
   >({});
@@ -159,9 +164,16 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
       : [];
   }, [markets]);
 
+  const visibleMarkets = useMemo(() => {
+    return sortedMarkets.filter((market) => {
+      const isCoreMarket = isVanillaMarket(market.marketId);
+      return showExotics ? !isCoreMarket : isCoreMarket;
+    });
+  }, [showExotics, sortedMarkets]);
+
   const marketIds = useMemo(
-    () => sortedMarkets.map((market) => market.marketId),
-    [sortedMarkets]
+    () => visibleMarkets.map((market) => market.marketId),
+    [visibleMarkets]
   );
 
   const marketsPriceOverview = useMarkets7d(marketIds);
@@ -176,9 +188,9 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
   }, [marketsPriceOverview]);
 
   useEffect(() => {
-    if (!isOpen || sortedMarkets.length === 0) return;
+    if (!isOpen || visibleMarkets.length === 0) return;
 
-    const missingLeverageMarkets = sortedMarkets.filter(
+    const missingLeverageMarkets = visibleMarkets.filter(
       (market) =>
         !market.capLeverage && !(market.marketId in marketLeverageCaps)
     );
@@ -217,7 +229,7 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
     return () => {
       cancelled = true;
     };
-  }, [isOpen, marketLeverageCaps, sdk, sortedMarkets]);
+  }, [isOpen, marketLeverageCaps, sdk, visibleMarkets]);
 
   useEffect(() => {
     if (!currentMarket?.id || currentMarket.capLeverage) {
@@ -263,10 +275,10 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
   }, [marketToCategoryMap]);
 
   const categoryOptions = useMemo<(CategoryName | "All")[]>(() => {
-    if (!sortedMarkets.length) return ["All"];
+    if (!visibleMarkets.length) return ["All"];
 
     const liveCategories = new Set<CategoryName>();
-    sortedMarkets.forEach((market) => {
+    visibleMarkets.forEach((market) => {
       liveCategories.add(getMarketCategory(market.marketName, market.marketId));
     });
 
@@ -278,14 +290,20 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
           liveCategories.has(category) && !CATEGORY_ORDER.includes(category)
       ),
     ];
-  }, [getMarketCategory, sortedMarkets]);
+  }, [getMarketCategory, visibleMarkets]);
 
   const [selectedCategory, setSelectedCategory] = useState<
     CategoryName | "All"
   >("All");
 
+  useEffect(() => {
+    if (categoryOptions.includes(selectedCategory)) return;
+
+    setSelectedCategory("All");
+  }, [categoryOptions, selectedCategory]);
+
   const filteredMarkets = useMemo(() => {
-    return sortedMarkets.filter((market) => {
+    return visibleMarkets.filter((market) => {
       const category = getMarketCategory(market.marketName, market.marketId);
       const categoryFilterMatch =
         selectedCategory === "All" || category === selectedCategory;
@@ -299,7 +317,7 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
 
       return categoryFilterMatch && (nameMatch || categoryMatch);
     });
-  }, [sortedMarkets, getMarketCategory, selectedCategory, searchTerm]);
+  }, [visibleMarkets, getMarketCategory, selectedCategory, searchTerm]);
 
   const updateCategoryScrollState = useCallback(() => {
     const element = categoryTabsRef.current;
@@ -377,20 +395,47 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
       </MarketsListContainer>
 
       {isOpen && (
-        <DropdownContainer>
+        <DropdownContainer $exotic={showExotics}>
           <StyledScrollArea>
             <DropdownContent>
-              <DropdownTop>
-                <SearchShell>
-                  <SearchBar
-                    searchTerm={searchTerm}
-                    placeholder={"Search"}
-                    setSearchTerm={setSearchTerm}
-                  />
-                </SearchShell>
+              <DropdownTop $exotic={showExotics}>
+                <SearchControlRow>
+                  <SearchShell>
+                    <SearchBar
+                      searchTerm={searchTerm}
+                      placeholder={"Search"}
+                      setSearchTerm={setSearchTerm}
+                    />
+                  </SearchShell>
+                  <MarketModeToggle aria-label="Market search mode">
+                    <MarketModeButton
+                      type="button"
+                      $active={!showExotics}
+                      aria-pressed={!showExotics}
+                      onClick={() => {
+                        setShowExotics(false);
+                        setSelectedCategory("All");
+                      }}
+                    >
+                      Core
+                    </MarketModeButton>
+                    <MarketModeButton
+                      type="button"
+                      $active={showExotics}
+                      $exotic
+                      aria-pressed={showExotics}
+                      onClick={() => {
+                        setShowExotics(true);
+                        setSelectedCategory("All");
+                      }}
+                    >
+                      Exotics
+                    </MarketModeButton>
+                  </MarketModeToggle>
+                </SearchControlRow>
               </DropdownTop>
 
-              <CategoryTabsShell>
+              <CategoryTabsShell $exotic={showExotics}>
                 <CategoryScrollButton
                   type="button"
                   aria-label="Scroll categories left"
@@ -403,6 +448,7 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
 
                 <CategoryTabs
                   ref={categoryTabsRef}
+                  $exotic={showExotics}
                   aria-label="Market categories"
                 >
                   {categoryOptions.map((category) => (
@@ -410,6 +456,7 @@ const MarketsList: React.FC<MarketsListProps> = ({ predictionGroup }) => {
                       key={category}
                       type="button"
                       $active={selectedCategory === category}
+                      $exotic={showExotics}
                       aria-pressed={selectedCategory === category}
                       onClick={(event) => {
                         setSelectedCategory(category);

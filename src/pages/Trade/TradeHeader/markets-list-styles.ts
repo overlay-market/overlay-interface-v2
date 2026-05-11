@@ -123,7 +123,7 @@ export const CurrentMarketLogo = styled.img`
   }
 `;
 
-export const DropdownContainer = styled(Box)`
+export const DropdownContainer = styled(Box)<{ $exotic?: boolean }>`
   width: min(100vw, 560px);
   height: min(680px, calc(100vh - 76px));
   padding: 0;
@@ -131,9 +131,18 @@ export const DropdownContainer = styled(Box)`
   top: 64px;
   left: 0;
   z-index: 30;
-  background-color: #0d0e10;
-  border: 1px solid ${theme.semantic.border};
-  border-left: 1px solid ${theme.semantic.border};
+  background:
+    ${({ $exotic }) =>
+      $exotic
+        ? "radial-gradient(circle at 100% 0%, rgba(243, 169, 27, 0.10), transparent 34%),"
+        : ""}
+    #0d0e10;
+  border: 1px solid
+    ${({ $exotic }) =>
+      $exotic ? "rgba(243, 169, 27, 0.34)" : theme.semantic.border};
+  border-left: 1px solid
+    ${({ $exotic }) =>
+      $exotic ? "rgba(243, 169, 27, 0.34)" : theme.semantic.border};
   border-radius: 0 0 ${theme.radius.md} ${theme.radius.md};
   box-shadow: ${theme.shadow.popover};
   overflow: hidden;
@@ -192,13 +201,28 @@ export const DropdownContent = styled.div`
   flex-direction: column;
 `;
 
-export const DropdownTop = styled.div`
+export const DropdownTop = styled.div<{ $exotic?: boolean }>`
   padding: 14px 16px 10px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
-  background: #101113;
+  background:
+    ${({ $exotic }) =>
+      $exotic
+        ? "linear-gradient(180deg, rgba(243, 169, 27, 0.08), rgba(16, 17, 19, 0.98))"
+        : "#101113"};
 
   @media (max-width: ${theme.breakpoints.xs}) {
     padding: 12px;
+  }
+`;
+
+export const SearchControlRow = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: ${theme.breakpoints.xs}) {
+    grid-template-columns: minmax(0, 1fr);
   }
 `;
 
@@ -221,13 +245,61 @@ export const SearchShell = styled.div`
   }
 `;
 
-export const CategoryTabsShell = styled.div`
+export const MarketModeToggle = styled.div`
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  min-width: 142px;
+  height: 34px;
+  padding: 3px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: 10px;
+  background: #17191d;
+
+  @media (max-width: ${theme.breakpoints.xs}) {
+    width: 100%;
+  }
+`;
+
+export const MarketModeButton = styled.button<{
+  $active?: boolean;
+  $exotic?: boolean;
+}>`
+  min-width: 0;
+  border: 0;
+  border-radius: 7px;
+  background: ${({ $active, $exotic }) => {
+    if (!$active) return "transparent";
+    return $exotic ? "rgba(243, 169, 27, 0.22)" : theme.semantic.hover;
+  }};
+  color: ${({ $active, $exotic }) => {
+    if (!$active) return theme.semantic.textMuted;
+    return $exotic ? theme.semantic.accentHover : theme.semantic.textPrimary;
+  }};
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+
+  &:hover {
+    color: ${theme.semantic.textPrimary};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+  }
+`;
+
+export const CategoryTabsShell = styled.div<{ $exotic?: boolean }>`
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr) 30px;
   align-items: center;
   min-height: 44px;
   border-bottom: 1px solid ${theme.semantic.borderMuted};
-  background: #0d0e10;
+  background: ${({ $exotic }) =>
+    $exotic ? "rgba(18, 16, 11, 0.94)" : "#0d0e10"};
 `;
 
 export const CategoryScrollButton = styled.button<{ $visible?: boolean }>`
@@ -262,7 +334,7 @@ export const CategoryScrollButton = styled.button<{ $visible?: boolean }>`
   }
 `;
 
-export const CategoryTabs = styled.div`
+export const CategoryTabs = styled.div<{ $exotic?: boolean }>`
   display: flex;
   align-items: center;
   gap: 16px;
@@ -270,7 +342,8 @@ export const CategoryTabs = styled.div`
   min-height: 44px;
   padding: 0 6px;
   overflow-x: auto;
-  background: #0d0e10;
+  background: ${({ $exotic }) =>
+    $exotic ? "rgba(18, 16, 11, 0.94)" : "#0d0e10"};
   scroll-behavior: smooth;
   scrollbar-width: none;
 
@@ -279,13 +352,18 @@ export const CategoryTabs = styled.div`
   }
 `;
 
-export const CategoryTab = styled.button<{ $active?: boolean }>`
+export const CategoryTab = styled.button<{
+  $active?: boolean;
+  $exotic?: boolean;
+}>`
   height: 44px;
   padding: 0;
   border: 0;
   background: transparent;
-  color: ${({ $active }) =>
-    $active ? theme.semantic.textPrimary : theme.semantic.textMuted};
+  color: ${({ $active, $exotic }) => {
+    if (!$active) return theme.semantic.textMuted;
+    return $exotic ? theme.semantic.accentHover : theme.semantic.textPrimary;
+  }};
   font-size: 12px;
   font-weight: ${({ $active }) => ($active ? 800 : 700)};
   white-space: nowrap;
