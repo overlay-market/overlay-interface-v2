@@ -431,9 +431,7 @@ export enum MarketClass {
 }
 
 const VANILLA_MAJOR_EXCLUSIONS = new Set([
-  "GOLD%20%2F%20USD",
   "GOLD%20%2F%20SILVER",
-  "SILVER%20%2F%20USD",
 ]);
 
 export const VANILLA_MARKET_IDS = new Set([
