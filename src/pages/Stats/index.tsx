@@ -54,7 +54,6 @@ const ANALYTICS_QUERY = `
       orderDirection: desc
     ) {
       periodStartUnix
-      totalUsers
       totalTokensLocked
       totalTransactions
       totalVolume
@@ -127,7 +126,6 @@ const bscClient = createPublicClient({
 
 type AnalyticsHourData = {
   periodStartUnix: string;
-  totalUsers: string;
   totalTokensLocked: string;
   totalTransactions: string;
   totalVolume: string;
@@ -180,17 +178,13 @@ type PriceHistoryData = {
 type VolumePoint = {
   timestamp: number;
   volumeUsd: number;
-  volumeOvl: number;
 };
 
 type StatsViewData = {
   accumulatedVolume: VolumePoint[];
   dailyVolume: VolumePoint[];
   totalVolumeUsd: number;
-  totalVolumeOvl: number;
   trailingDayVolumeUsd: number;
-  trailingDayVolumeOvl: number;
-  latestUsers: number;
   latestTransactions: number;
   latestTimestamp?: number;
   oldestTimestamp?: number;
@@ -232,10 +226,6 @@ const decimalUsdFormatter = new Intl.NumberFormat("en-US", {
   currency: "USD",
   minimumFractionDigits: 4,
   maximumFractionDigits: 6,
-});
-
-const ovlFormatter = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 0,
 });
 
 const integerFormatter = new Intl.NumberFormat("en-US", {
@@ -490,7 +480,6 @@ const buildStatsViewData = (
   const dailyVolumeMap = new Map<string, VolumePoint>();
   let previousVolume: bigint | undefined;
   let accumulatedVolumeUsd = 0;
-  let trailingDayVolumeRaw = 0n;
   let trailingDayVolumeUsd = 0;
   let priceIndex = 0;
   const latestPoint = analyticsHourDatas[analyticsHourDatas.length - 1];
@@ -535,16 +524,13 @@ const buildStatsViewData = (
       );
       const dayKey = String(dayTimestamp);
       const existing = dailyVolumeMap.get(dayKey);
-      const deltaOvl = rawOvlToNumber(deltaRaw);
 
       dailyVolumeMap.set(dayKey, {
         timestamp: dayTimestamp,
         volumeUsd: (existing?.volumeUsd ?? 0) + deltaUsd,
-        volumeOvl: (existing?.volumeOvl ?? 0) + deltaOvl,
       });
 
       if (trailingDayStart !== undefined && timestamp > trailingDayStart) {
-        trailingDayVolumeRaw += deltaRaw;
         trailingDayVolumeUsd += deltaUsd;
       }
     }
@@ -552,13 +538,11 @@ const buildStatsViewData = (
     accumulatedVolume.push({
       timestamp,
       volumeUsd: accumulatedVolumeUsd,
-      volumeOvl: rawOvlToNumber(totalVolumeRaw),
     });
 
     previousVolume = totalVolumeRaw;
   }
 
-  const latestVolumeRaw = latestPoint ? BigInt(latestPoint.totalVolume) : 0n;
   const latestAccumulatedPoint =
     accumulatedVolume[accumulatedVolume.length - 1];
 
@@ -568,10 +552,7 @@ const buildStatsViewData = (
       (a, b) => a.timestamp - b.timestamp
     ),
     totalVolumeUsd: latestAccumulatedPoint?.volumeUsd ?? 0,
-    totalVolumeOvl: rawOvlToNumber(latestVolumeRaw),
     trailingDayVolumeUsd,
-    trailingDayVolumeOvl: rawOvlToNumber(trailingDayVolumeRaw),
-    latestUsers: latestPoint ? Number(latestPoint.totalUsers) : 0,
     latestTransactions: latestPoint ? Number(latestPoint.totalTransactions) : 0,
     latestTimestamp,
     oldestTimestamp: analyticsHourDatas[0]
@@ -586,13 +567,11 @@ const VolumeTooltip = ({ active, payload, label }: VolumeTooltipProps) => {
   }
 
   const volumeUsd = Number(payload[0].value);
-  const volumeOvl = Number(payload[0].payload?.volumeOvl ?? 0);
 
   return (
     <TooltipShell>
       <TooltipLabel>{formatTooltipDate(label)}</TooltipLabel>
       <TooltipValue>{formatFullUsd(volumeUsd)}</TooltipValue>
-      <TooltipLabel>{ovlFormatter.format(volumeOvl)} OVL</TooltipLabel>
     </TooltipShell>
   );
 };
@@ -697,20 +676,14 @@ const Stats = () => {
         <SummaryCard>
           <SummaryLabel>Total volume</SummaryLabel>
           <SummaryValue>{formatCompactUsd(statsData?.totalVolumeUsd ?? NaN)}</SummaryValue>
-          <SummaryMeta>
-            {statsData ? `${ovlFormatter.format(statsData.totalVolumeOvl)} OVL` : "-"}
-          </SummaryMeta>
+          <SummaryMeta>Hourly converted USD</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
           <SummaryLabel>24H volume</SummaryLabel>
           <SummaryValue>
             {formatCompactUsd(statsData?.trailingDayVolumeUsd ?? NaN)}
           </SummaryValue>
-          <SummaryMeta>
-            {statsData
-              ? `${ovlFormatter.format(statsData.trailingDayVolumeOvl)} OVL`
-              : "-"}
-          </SummaryMeta>
+          <SummaryMeta>Trailing 24 hours</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
           <SummaryLabel>OVL/USD</SummaryLabel>
@@ -722,9 +695,7 @@ const Stats = () => {
           <SummaryValue>
             {statsData ? integerFormatter.format(statsData.latestTransactions) : "-"}
           </SummaryValue>
-          <SummaryMeta>
-            {statsData ? `${integerFormatter.format(statsData.latestUsers)} users` : "-"}
-          </SummaryMeta>
+          <SummaryMeta>All-time count</SummaryMeta>
         </SummaryCard>
       </SummaryGrid>
 
