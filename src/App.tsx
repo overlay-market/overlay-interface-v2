@@ -25,6 +25,7 @@ import { ZodiacProvider } from "./providers/ZodiacProvider";
 import useAccount from "./hooks/useAccount";
 import TerminationGuard from "./components/TerminationGuard";
 import MarketsInfo from "./pages/MarketsInfo";
+import Stats from "./pages/Stats";
 
 // Dev-only: lazy-loaded share card preview page (excluded from production builds)
 const DevShareCard = import.meta.env.DEV
@@ -58,6 +59,7 @@ const AppContent = () => {
               <Route path="/" element={<Navigate to="/markets" />} />
               <Route path="/markets" element={<Markets />} />
               <Route path="/markets-info" element={<MarketsInfo />} />
+              <Route path="/stats" element={<Stats />} />
               <Route path="/trade/*" element={<Trade />} />
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/referrals" element={<Referrals />} />
