@@ -23,12 +23,16 @@ type SubmitReferralCodeProps = {
   affiliate: string;
   setAffiliate: React.Dispatch<React.SetStateAction<string>>;
   handleBack: () => void;
+  embedded?: boolean;
+  onSuccess?: () => void | Promise<void>;
 };
 
 const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
   affiliate,
   setAffiliate,
   handleBack,
+  embedded = false,
+  onSuccess,
 }) => {
   const { address: traderAddress, status } = useAccount();
   const addPopup = useAddPopup();
@@ -130,6 +134,7 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
       await referralAddAffiliateOrKOLCallback();
       setSucceededToSignUp(true)
       setStoredError(null);
+      await onSuccess?.();
     } catch (callbackError: any) {
       console.error("Error creating affiliate:", callbackError);
       const message =
@@ -152,6 +157,7 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
     referralAddAffiliateOrKOLCallback,
     addPopup,
     hookError,
+    onSuccess,
   ]);
 
   const isLoading = state === ReferralAddAffiliateOrKOLCallbackState.LOADING
@@ -182,6 +188,10 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
       />
     );
   };
+
+  if (embedded) {
+    return <GradientBorderBox style={{ width: "100%" }}>{renderContent()}</GradientBorderBox>;
+  }
 
   return (
     <Flex width={"100%"} height={"100%"} direction={"column"}>

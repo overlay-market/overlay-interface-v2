@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Copy, ExternalLink, Send, Wallet } from "lucide-react";
 import { erc20Abi, formatUnits, isAddress, parseUnits } from "viem";
 import { useAccount as useWagmiAccount, useSwitchChain, useWriteContract } from "wagmi";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import NumericalInput from "../../components/NumericalInput";
+import Modal from "../../components/Modal";
 import { useModalHelper } from "../../components/ConnectWalletModal/utils";
 import { useAddPopup } from "../../state/application/hooks";
 import { TransactionType } from "../../constants/transaction";
@@ -12,6 +14,7 @@ import { useCommunityPools } from "../../hooks/useCommunityPools";
 import { wagmiConfig } from "../../providers/Web3Provider/wagmi";
 import { trackEvent } from "../../analytics/trackEvent";
 import { CommunityPool, CommunityPoolStatus } from "../../types/communityPools";
+import SubmitReferralCode from "../Referrals/SubmitReferralCode";
 import {
   ActionButton,
   AmountBox,
@@ -133,10 +136,24 @@ const getStatusTone = (
   return status;
 };
 
-const CommunityPoolItem = ({ pool }: { pool: CommunityPool }) => {
+type CommunityPoolItemProps = {
+  pool: CommunityPool;
+  referrer: string | null;
+  referralStageCompleted: boolean;
+  onReferralStageCompleted: () => void;
+};
+
+const CommunityPoolItem = ({
+  pool,
+  referrer,
+  referralStageCompleted,
+  onReferralStageCompleted,
+}: CommunityPoolItemProps) => {
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showReferralSignup, setShowReferralSignup] = useState(false);
+  const [affiliate, setAffiliate] = useState(referrer || "");
   const { address: walletAddress, chainId: walletChainId } = useWagmiAccount();
   const { switchChainAsync } = useSwitchChain();
   const { writeContractAsync } = useWriteContract();
@@ -144,6 +161,10 @@ const CommunityPoolItem = ({ pool }: { pool: CommunityPool }) => {
   const addPopup = useAddPopup();
   const balanceQuery = useCommunityPoolBalance(pool);
   const isSupportedChain = isCommunityPoolChainSupported(pool.chain.chainId);
+
+  useEffect(() => {
+    setAffiliate(referrer || "");
+  }, [referrer]);
 
   const targetRaw = useMemo(() => {
     try {
@@ -219,22 +240,8 @@ const CommunityPoolItem = ({ pool }: { pool: CommunityPool }) => {
     window.setTimeout(() => setCopied(false), 1400);
   };
 
-  const handleAction = async () => {
-    if (pool.isDraft || !isSupportedChain || status !== "open") {
-      return;
-    }
-
-    if (!walletAddress) {
-      openModal();
-      return;
-    }
-
-    if (wrongChain) {
-      await switchChainAsync({ chainId: pool.chain.chainId });
-      return;
-    }
-
-    if (!canContribute || !amountRaw) {
+  const executeContribution = async () => {
+    if (!amountRaw) {
       return;
     }
 
@@ -326,8 +333,65 @@ const CommunityPoolItem = ({ pool }: { pool: CommunityPool }) => {
     }
   };
 
+  const handleReferralSignupClose = () => {
+    setShowReferralSignup(false);
+    setAffiliate(referrer || "");
+  };
+
+  const handleReferralSignupSuccess = async () => {
+    setShowReferralSignup(false);
+    onReferralStageCompleted();
+    await executeContribution();
+  };
+
+  const handleAction = async () => {
+    if (pool.isDraft || !isSupportedChain || status !== "open") {
+      return;
+    }
+
+    if (!walletAddress) {
+      openModal();
+      return;
+    }
+
+    if (wrongChain) {
+      await switchChainAsync({ chainId: pool.chain.chainId });
+      return;
+    }
+
+    if (!canContribute || !amountRaw) {
+      return;
+    }
+
+    if (referrer && !referralStageCompleted) {
+      setAffiliate(referrer);
+      setShowReferralSignup(true);
+      return;
+    }
+
+    await executeContribution();
+  };
+
   return (
-    <PoolCard>
+    <>
+      <Modal
+        triggerElement={null}
+        open={showReferralSignup}
+        handleClose={handleReferralSignupClose}
+        width="472px"
+        maxWidth="calc(100vw - 32px)"
+        title=""
+      >
+        <SubmitReferralCode
+          affiliate={affiliate}
+          setAffiliate={setAffiliate}
+          handleBack={handleReferralSignupClose}
+          onSuccess={handleReferralSignupSuccess}
+          embedded
+        />
+      </Modal>
+
+      <PoolCard>
       <PoolTop>
         <PoolLogo $image={pool.logoUrl}>
           {!pool.logoUrl && pool.tokenSymbol.slice(0, 3).toUpperCase()}
@@ -414,17 +478,32 @@ const CommunityPoolItem = ({ pool }: { pool: CommunityPool }) => {
           {copied ? "Safe address copied." : helperText}
         </HelperText>
       </ContributionForm>
-    </PoolCard>
+      </PoolCard>
+    </>
   );
 };
 
 const CommunityPools = () => {
   const { data: pools = [], isLoading, isError, error, refetch } = useCommunityPools();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const referrer = searchParams.get("referrer");
+  const [referralStageCompleted, setReferralStageCompleted] = useState(false);
   const visiblePools = pools.filter(
     (pool) =>
       isAddress(pool.safeAddress) &&
       isAddress(pool.contributionToken.address)
   );
+
+  useEffect(() => {
+    setReferralStageCompleted(false);
+  }, [referrer]);
+
+  const handleReferralStageCompleted = () => {
+    setReferralStageCompleted(true);
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("referrer");
+    setSearchParams(nextSearchParams, { replace: true });
+  };
 
   return (
     <PageShell>
@@ -497,7 +576,13 @@ const CommunityPools = () => {
       ) : (
         <PoolsGrid>
           {visiblePools.map((pool) => (
-            <CommunityPoolItem key={pool.slug} pool={pool} />
+            <CommunityPoolItem
+              key={pool.slug}
+              pool={pool}
+              referrer={referrer}
+              referralStageCompleted={referralStageCompleted}
+              onReferralStageCompleted={handleReferralStageCompleted}
+            />
           ))}
         </PoolsGrid>
       )}
