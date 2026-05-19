@@ -684,7 +684,7 @@ const Stats = () => {
           <SummaryMeta>Hourly converted USD</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
-          <SummaryLabel>30D avg volume</SummaryLabel>
+          <SummaryLabel>Daily Average Volume (30 days span)</SummaryLabel>
           <SummaryValue>
             {formatCompactUsd(statsData?.thirtyDayAverageVolumeUsd ?? NaN)}
           </SummaryValue>
