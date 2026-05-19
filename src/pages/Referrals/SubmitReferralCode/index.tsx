@@ -25,6 +25,7 @@ type SubmitReferralCodeProps = {
   handleBack: () => void;
   embedded?: boolean;
   onSuccess?: () => void | Promise<void>;
+  title?: string;
 };
 
 const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
@@ -33,6 +34,7 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
   handleBack,
   embedded = false,
   onSuccess,
+  title,
 }) => {
   const { address: traderAddress, status } = useAccount();
   const addPopup = useAddPopup();
@@ -185,6 +187,7 @@ const SubmitReferralCode: React.FC<SubmitReferralCodeProps> = ({
         postingSignature={false}
         traderAddress={traderAddress}
         handleSubmit={handleSubmit}
+        title={title}
       />
     );
   };

@@ -17,6 +17,7 @@ interface FormProps {
   postingSignature: boolean;
   traderAddress: string | undefined;
   handleSubmit: () => void;
+  title?: string;
 }
 
 export const Form: React.FC<FormProps> = ({
@@ -27,13 +28,14 @@ export const Form: React.FC<FormProps> = ({
   postingSignature,
   traderAddress,
   handleSubmit,
+  title = "Earn while others trade.",
 }) => {
   const { openModal } = useModalHelper();
 
   return (
     <ContentContainer>
       <Text size={{ initial: "2", sm: "4" }} weight="bold" align="center">
-        Earn while others trade.
+        {title}
       </Text>
       <Flex direction="column" gap="20px">
         <ReferralModal tier="affiliate" />

@@ -53,6 +53,7 @@ import {
   ProgressFill,
   ProgressLabels,
   ProgressTrack,
+  ReferralCodeButton,
   StatePanel,
   StatusBadge,
   TokenSymbol,
@@ -387,6 +388,7 @@ const CommunityPoolItem = ({
           setAffiliate={setAffiliate}
           handleBack={handleReferralSignupClose}
           onSuccess={handleReferralSignupSuccess}
+          title="Submit your referral code"
           embedded
         />
       </Modal>
@@ -488,6 +490,8 @@ const CommunityPools = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const referrer = searchParams.get("referrer");
   const [referralStageCompleted, setReferralStageCompleted] = useState(false);
+  const [showReferralCodeModal, setShowReferralCodeModal] = useState(false);
+  const [manualReferralAffiliate, setManualReferralAffiliate] = useState(referrer || "");
   const visiblePools = pools.filter(
     (pool) =>
       isAddress(pool.safeAddress) &&
@@ -496,6 +500,7 @@ const CommunityPools = () => {
 
   useEffect(() => {
     setReferralStageCompleted(false);
+    setManualReferralAffiliate(referrer || "");
   }, [referrer]);
 
   const handleReferralStageCompleted = () => {
@@ -505,8 +510,41 @@ const CommunityPools = () => {
     setSearchParams(nextSearchParams, { replace: true });
   };
 
+  const handleOpenReferralCodeModal = () => {
+    setManualReferralAffiliate(referrer || "");
+    setShowReferralCodeModal(true);
+  };
+
+  const handleCloseReferralCodeModal = () => {
+    setShowReferralCodeModal(false);
+    setManualReferralAffiliate(referrer || "");
+  };
+
+  const handleManualReferralSuccess = () => {
+    setShowReferralCodeModal(false);
+    handleReferralStageCompleted();
+  };
+
   return (
     <PageShell>
+      <Modal
+        triggerElement={null}
+        open={showReferralCodeModal}
+        handleClose={handleCloseReferralCodeModal}
+        width="472px"
+        maxWidth="calc(100vw - 32px)"
+        title=""
+      >
+        <SubmitReferralCode
+          affiliate={manualReferralAffiliate}
+          setAffiliate={setManualReferralAffiliate}
+          handleBack={handleCloseReferralCodeModal}
+          onSuccess={handleManualReferralSuccess}
+          title="Submit your referral code"
+          embedded
+        />
+      </Modal>
+
       <HeroPanel>
         <HeroCopy>
           <Eyebrow>Community-funded listings</Eyebrow>
@@ -516,6 +554,9 @@ const CommunityPools = () => {
             Overlay launches the market and contributors share 50% of trading fees
             pro-rata.
           </HeroSubtitle>
+          <ReferralCodeButton type="button" onClick={handleOpenReferralCodeModal}>
+            I have a referral code
+          </ReferralCodeButton>
         </HeroCopy>
         <HeroStats>
           <HeroStat>

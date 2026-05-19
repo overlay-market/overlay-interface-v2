@@ -59,6 +59,32 @@ export const HeroSubtitle = styled.p`
   line-height: 1.5;
 `;
 
+export const ReferralCodeButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 38px;
+  margin-top: 16px;
+  padding: 0 14px;
+  border: 1px solid ${theme.semantic.border};
+  border-radius: ${theme.radius.sm};
+  background: ${theme.semantic.field};
+  color: ${theme.semantic.textPrimary};
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+
+  &:hover {
+    border-color: ${theme.semantic.textMuted};
+  }
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+  }
+`;
+
 export const HeroStats = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
