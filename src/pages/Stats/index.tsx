@@ -184,7 +184,7 @@ type StatsViewData = {
   accumulatedVolume: VolumePoint[];
   dailyVolume: VolumePoint[];
   totalVolumeUsd: number;
-  trailingDayVolumeUsd: number;
+  thirtyDayAverageVolumeUsd: number;
   latestTransactions: number;
   latestTimestamp?: number;
   oldestTimestamp?: number;
@@ -205,6 +205,8 @@ const Q192 = 2n ** 192n;
 const PRICE_SCALE = 10n ** 18n;
 const HOUR_SECONDS = 60 * 60;
 const DAY_MS = 24 * 60 * 60 * 1000;
+const THIRTY_DAYS = 30;
+const THIRTY_DAYS_MS = THIRTY_DAYS * DAY_MS;
 const OHLCV_PAGE_LIMIT = 1000;
 const MAX_OHLCV_REQUESTS = 8;
 
@@ -480,14 +482,14 @@ const buildStatsViewData = (
   const dailyVolumeMap = new Map<string, VolumePoint>();
   let previousVolume: bigint | undefined;
   let accumulatedVolumeUsd = 0;
-  let trailingDayVolumeUsd = 0;
+  let trailingThirtyDayVolumeUsd = 0;
   let priceIndex = 0;
   const latestPoint = analyticsHourDatas[analyticsHourDatas.length - 1];
   const latestTimestamp = latestPoint
     ? Number(latestPoint.periodStartUnix) * 1000
     : undefined;
-  const trailingDayStart =
-    latestTimestamp === undefined ? undefined : latestTimestamp - DAY_MS;
+  const trailingThirtyDayStart =
+    latestTimestamp === undefined ? undefined : latestTimestamp - THIRTY_DAYS_MS;
 
   const getPriceAtTimestamp = (timestamp: number) => {
     while (
@@ -530,8 +532,11 @@ const buildStatsViewData = (
         volumeUsd: (existing?.volumeUsd ?? 0) + deltaUsd,
       });
 
-      if (trailingDayStart !== undefined && timestamp > trailingDayStart) {
-        trailingDayVolumeUsd += deltaUsd;
+      if (
+        trailingThirtyDayStart !== undefined &&
+        timestamp > trailingThirtyDayStart
+      ) {
+        trailingThirtyDayVolumeUsd += deltaUsd;
       }
     }
 
@@ -552,7 +557,7 @@ const buildStatsViewData = (
       (a, b) => a.timestamp - b.timestamp
     ),
     totalVolumeUsd: latestAccumulatedPoint?.volumeUsd ?? 0,
-    trailingDayVolumeUsd,
+    thirtyDayAverageVolumeUsd: trailingThirtyDayVolumeUsd / THIRTY_DAYS,
     latestTransactions: latestPoint ? Number(latestPoint.totalTransactions) : 0,
     latestTimestamp,
     oldestTimestamp: analyticsHourDatas[0]
@@ -679,11 +684,11 @@ const Stats = () => {
           <SummaryMeta>Hourly converted USD</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
-          <SummaryLabel>24H volume</SummaryLabel>
+          <SummaryLabel>30D avg volume</SummaryLabel>
           <SummaryValue>
-            {formatCompactUsd(statsData?.trailingDayVolumeUsd ?? NaN)}
+            {formatCompactUsd(statsData?.thirtyDayAverageVolumeUsd ?? NaN)}
           </SummaryValue>
-          <SummaryMeta>Trailing 24 hours</SummaryMeta>
+          <SummaryMeta>Daily average over trailing 30 days</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
           <SummaryLabel>OVL/USD</SummaryLabel>
