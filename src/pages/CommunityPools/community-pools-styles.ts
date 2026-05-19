@@ -151,6 +151,93 @@ export const InfoItemText = styled.div`
   line-height: 1.4;
 `;
 
+export const RoiPanel = styled.section`
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin-top: 12px;
+  padding: 13px 14px;
+  border: 1px solid ${theme.semantic.borderMuted};
+  border-radius: ${theme.radius.md};
+  background: ${theme.semantic.bgElevated};
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    grid-template-columns: minmax(210px, 0.6fr) minmax(0, 1fr);
+    align-items: center;
+  }
+`;
+
+export const RoiHeader = styled.div`
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+`;
+
+export const RoiTitle = styled.h2`
+  margin: 0;
+  color: ${theme.semantic.textPrimary};
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.2;
+`;
+
+export const RoiSubtitle = styled.div`
+  color: ${theme.semantic.textMuted};
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+`;
+
+export const RoiScale = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid ${theme.semantic.borderMuted};
+  border-radius: ${theme.radius.sm};
+  background: ${theme.semantic.borderMuted};
+
+  @media (max-width: ${theme.breakpoints.xs}) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+`;
+
+export const RoiScaleItem = styled.div`
+  min-width: 0;
+  padding: 10px 11px;
+  background: ${theme.semantic.field};
+`;
+
+export const RoiScaleVolume = styled.div`
+  color: ${theme.semantic.textMuted};
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+`;
+
+export const RoiScaleValue = styled.div`
+  margin-top: 6px;
+  color: ${theme.semantic.accentHover};
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  overflow-wrap: anywhere;
+`;
+
+export const RoiNote = styled.div`
+  min-width: 0;
+  color: ${theme.semantic.textMuted};
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+
+  @media (min-width: ${theme.breakpoints.md}) {
+    grid-column: 2;
+  }
+`;
+
 export const PoolsHeader = styled.div`
   display: flex;
   align-items: center;

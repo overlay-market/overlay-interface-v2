@@ -54,6 +54,15 @@ import {
   ProgressLabels,
   ProgressTrack,
   ReferralCodeButton,
+  RoiHeader,
+  RoiNote,
+  RoiPanel,
+  RoiScale,
+  RoiScaleItem,
+  RoiScaleValue,
+  RoiScaleVolume,
+  RoiSubtitle,
+  RoiTitle,
   StatePanel,
   StatusBadge,
   TokenSymbol,
@@ -136,6 +145,21 @@ const getStatusTone = (
   if (pool.isDraft) return "draft";
   return status;
 };
+
+const roiRows = [
+  {
+    volume: "$1M",
+    monthlyRoi: "3%",
+  },
+  {
+    volume: "$10M",
+    monthlyRoi: "30%",
+  },
+  {
+    volume: "$100M",
+    monthlyRoi: "300%",
+  },
+];
 
 type CommunityPoolItemProps = {
   pool: CommunityPool;
@@ -595,6 +619,27 @@ const CommunityPools = () => {
           <InfoItemText>Unfilled pools become refundable after the pool window closes.</InfoItemText>
         </InfoItem>
       </InfoStrip>
+
+      <RoiPanel>
+        <RoiHeader>
+          <RoiTitle>Monthly ROI reach</RoiTitle>
+          <RoiSubtitle>
+            Based on a $10K pool, 0.1% trading fee, and 30% contributor share.
+          </RoiSubtitle>
+        </RoiHeader>
+        <RoiScale>
+          {roiRows.map((row) => (
+            <RoiScaleItem key={row.volume}>
+              <RoiScaleVolume>{row.volume} volume</RoiScaleVolume>
+              <RoiScaleValue>{row.monthlyRoi} monthly ROI</RoiScaleValue>
+            </RoiScaleItem>
+          ))}
+        </RoiScale>
+        <RoiNote>
+          Volume is the total trade size counted at both entry and unwind over
+          the month.
+        </RoiNote>
+      </RoiPanel>
 
       <PoolsHeader>
         <PoolsTitle>Active Pools</PoolsTitle>
