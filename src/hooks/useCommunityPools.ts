@@ -3,7 +3,9 @@ import { DATA_API_BASE_URL } from "../constants/applications";
 import { CommunityPool } from "../types/communityPools";
 
 const fetchCommunityPools = async (): Promise<CommunityPool[]> => {
-  const response = await fetch(`${DATA_API_BASE_URL}/community-pools`);
+  const response = await fetch(`${DATA_API_BASE_URL}/community-pools?ts=${Date.now()}`, {
+    cache: "no-store",
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to fetch community pools: ${response.status} ${response.statusText}`);

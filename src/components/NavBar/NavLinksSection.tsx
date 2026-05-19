@@ -69,6 +69,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       showOnMobile: true,
     },
     {
+      to: `/trade?market=${encodedMarket}`,
+      label: "Trade",
+      icon: TradeIcon,
+      activeIcon: TradeActiveIcon,
+      showOnMobile: true,
+    },
+    {
       to: "/community-pools",
       label:
         isMobile && mode === NAVBAR_MODE.DEFAULT
@@ -76,13 +83,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
           : "Community Pools",
       icon: RocketIcon,
       activeIcon: RocketActiveIcon,
-      showOnMobile: true,
-    },
-    {
-      to: `/trade?market=${encodedMarket}`,
-      label: "Trade",
-      icon: TradeIcon,
-      activeIcon: TradeActiveIcon,
       showOnMobile: true,
     },
     {

@@ -161,6 +161,8 @@ const roiRows = [
   },
 ];
 
+const showDraftCommunityPools = import.meta.env.DEV;
+
 type CommunityPoolItemProps = {
   pool: CommunityPool;
   referrer: string | null;
@@ -519,8 +521,17 @@ const CommunityPools = () => {
   const visiblePools = pools.filter(
     (pool) =>
       isAddress(pool.safeAddress) &&
-      isAddress(pool.contributionToken.address)
+      isAddress(pool.contributionToken.address) &&
+      (showDraftCommunityPools || !pool.isDraft)
   );
+  const emptyPoolsMessage = showDraftCommunityPools
+    ? "No community pools are currently listed."
+    : "Community pools are coming soon.";
+  const poolsMetaLabel = visiblePools.length > 0
+    ? `${visiblePools.length} listed`
+    : showDraftCommunityPools
+      ? "0 listed"
+      : "Coming soon";
 
   useEffect(() => {
     setReferralStageCompleted(false);
@@ -643,7 +654,7 @@ const CommunityPools = () => {
 
       <PoolsHeader>
         <PoolsTitle>Active Pools</PoolsTitle>
-        <PoolsMeta>{visiblePools.length} listed</PoolsMeta>
+        <PoolsMeta>{poolsMetaLabel}</PoolsMeta>
       </PoolsHeader>
 
       {isLoading ? (
@@ -661,7 +672,7 @@ const CommunityPools = () => {
           </div>
         </StatePanel>
       ) : visiblePools.length === 0 ? (
-        <StatePanel>No community pools are currently listed.</StatePanel>
+        <StatePanel>{emptyPoolsMessage}</StatePanel>
       ) : (
         <PoolsGrid>
           {visiblePools.map((pool) => (
