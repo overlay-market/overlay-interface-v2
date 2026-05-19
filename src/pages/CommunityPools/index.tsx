@@ -551,8 +551,8 @@ const CommunityPools = () => {
           <HeroTitle>Community Pools</HeroTitle>
           <HeroSubtitle>
             Fund a token&apos;s perps market together. When a pool reaches its target,
-            Overlay launches the market and contributors share 50% of trading fees
-            pro-rata.
+            Overlay launches the market with a 0.1% trading fee and contributors
+            share 30% of those fees pro-rata.
           </HeroSubtitle>
           <ReferralCodeButton type="button" onClick={handleOpenReferralCodeModal}>
             I have a referral code
@@ -565,7 +565,7 @@ const CommunityPools = () => {
           </HeroStat>
           <HeroStat>
             <HeroStatLabel>Fee Share</HeroStatLabel>
-            <HeroStatValue>50%</HeroStatValue>
+            <HeroStatValue>30%</HeroStatValue>
           </HeroStat>
           <HeroStat>
             <HeroStatLabel>Minimum</HeroStatLabel>
@@ -585,7 +585,10 @@ const CommunityPools = () => {
         </InfoItem>
         <InfoItem>
           <InfoItemTitle>Fees accrue</InfoItemTitle>
-          <InfoItemText>Pool contributors receive weekly pro-rata trading-fee payouts.</InfoItemText>
+          <InfoItemText>
+            Each market charges a 0.1% trading fee; contributors receive weekly
+            pro-rata payouts from 30% of that fee stream.
+          </InfoItemText>
         </InfoItem>
         <InfoItem>
           <InfoItemTitle>Countdown ends</InfoItemTitle>
