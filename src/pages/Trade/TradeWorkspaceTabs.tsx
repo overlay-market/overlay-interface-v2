@@ -4,13 +4,12 @@ import Chart from "./Chart";
 import GamblingTimeline from "./Chart/GamblingTimeline";
 import PredictionGroupChart from "./PredictionGroupChart";
 import CoinOverview from "./InfoMarketSection/CoinOverview";
-import GrafanaPanel from "./InfoMarketSection/GrafanaPanel";
 import RiskParameters from "./InfoMarketSection/RiskParameters";
 import { PredictionMarketGroup } from "../../constants/markets";
 import { useCurrentMarketState } from "../../state/currentMarket/hooks";
 import theme from "../../theme";
 
-type WorkspaceTab = "charts" | "overview" | "trading-data" | "risk-params";
+type WorkspaceTab = "charts" | "overview" | "risk-params";
 
 type TradeWorkspaceTabsProps = {
   prices?: { bid: bigint; ask: bigint; mid: bigint };
@@ -21,7 +20,6 @@ type TradeWorkspaceTabsProps = {
 const tabs: Array<{ id: WorkspaceTab; label: string }> = [
   { id: "charts", label: "Charts" },
   { id: "overview", label: "Coin Overview" },
-  { id: "trading-data", label: "Trading Data" },
   { id: "risk-params", label: "Risk Params" },
 ];
 
@@ -118,14 +116,6 @@ const CoinOverviewPanel = styled.div`
   }
 `;
 
-const TradingDataPanel = styled.div`
-  padding: 10px;
-
-  @media (min-width: ${theme.breakpoints.sm}) {
-    padding: 14px;
-  }
-`;
-
 const RiskParamsPanel = styled.div`
   padding: 0 10px 10px;
 
@@ -193,12 +183,6 @@ const TradeWorkspaceTabs: React.FC<TradeWorkspaceTabsProps> = ({
           <CoinOverviewPanel>
             <CoinOverview />
           </CoinOverviewPanel>
-        ) : null}
-
-        {activeTab === "trading-data" ? (
-          <TradingDataPanel>
-            <GrafanaPanel />
-          </TradingDataPanel>
         ) : null}
 
         {activeTab === "risk-params" ? (
