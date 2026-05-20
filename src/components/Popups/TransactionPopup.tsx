@@ -43,6 +43,9 @@ const TransactionPopup: React.FC<TxnPopupProps> = ({ content }) => {
       case TransactionType.CLAIM_OVL:
         title = "Claim Successful";
         break;
+      case TransactionType.COMMUNITY_POOL_CONTRIBUTION:
+        title = "Contribution Successful";
+        break;
       default:
         title = "Transaction Successful";
     }

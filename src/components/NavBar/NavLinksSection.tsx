@@ -33,6 +33,10 @@ import {
   FundedTraderActiveIcon,
 } from "../../assets/icons/navBar-icons/funded-trader";
 import { useAvatarTrading } from "../../hooks/useAvatarTrading";
+import {
+  RocketActiveIcon,
+  RocketIcon,
+} from "../../assets/icons/navBar-icons/rocket";
 
 export interface NavLinkAsset {
   to: string;
@@ -69,6 +73,16 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       label: "Trade",
       icon: TradeIcon,
       activeIcon: TradeActiveIcon,
+      showOnMobile: true,
+    },
+    {
+      to: "/community-pools",
+      label:
+        isMobile && mode === NAVBAR_MODE.DEFAULT
+          ? "Pools"
+          : "Community Pools",
+      icon: RocketIcon,
+      activeIcon: RocketActiveIcon,
       showOnMobile: true,
     },
     {

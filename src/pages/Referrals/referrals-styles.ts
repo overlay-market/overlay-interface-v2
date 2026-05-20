@@ -30,6 +30,8 @@ export const GradientBorderBox = styled(Flex)`
 export const ContentContainer = styled(Flex)`
   flex-direction: column;
   width: 343px;
+  max-width: 100%;
+  box-sizing: border-box;
   gap: 20px;
   padding: 0;
 

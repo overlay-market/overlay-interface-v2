@@ -26,6 +26,7 @@ import useAccount from "./hooks/useAccount";
 import TerminationGuard from "./components/TerminationGuard";
 import MarketsInfo from "./pages/MarketsInfo";
 import Stats from "./pages/Stats";
+import CommunityPools from "./pages/CommunityPools";
 
 // Dev-only: lazy-loaded share card preview page (excluded from production builds)
 const DevShareCard = import.meta.env.DEV
@@ -58,6 +59,7 @@ const AppContent = () => {
             <Routes>
               <Route path="/" element={<Navigate to="/markets" />} />
               <Route path="/markets" element={<Markets />} />
+              <Route path="/community-pools" element={<CommunityPools />} />
               <Route path="/markets-info" element={<MarketsInfo />} />
               <Route path="/stats" element={<Stats />} />
               <Route path="/trade/*" element={<Trade />} />
