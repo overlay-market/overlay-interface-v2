@@ -22,6 +22,9 @@ import {
   DetailRow,
   DetailValue,
   Eyebrow,
+  EmptyStateContent,
+  EmptyStateText,
+  EmptyStateTitle,
   ContributionForm,
   HelperText,
   HeroCopy,
@@ -63,10 +66,14 @@ import {
   RoiScaleVolume,
   RoiSubtitle,
   RoiTitle,
+  RequestFormLink,
   StatePanel,
   StatusBadge,
   TokenSymbol,
 } from "./community-pools-styles";
+
+const COMMUNITY_POOL_REQUEST_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSdQr6GX8a5khZpxcB7Z6JDEvx1FsPoKQhF78D1qaVV6BslUig/viewform";
 
 const shortenAddress = (address: string) => `${address.slice(0, 6)}...${address.slice(-4)}`;
 
@@ -524,14 +531,9 @@ const CommunityPools = () => {
       isAddress(pool.contributionToken.address) &&
       (showDraftCommunityPools || !pool.isDraft)
   );
-  const emptyPoolsMessage = showDraftCommunityPools
-    ? "No community pools are currently listed."
-    : "Community pools are coming soon.";
   const poolsMetaLabel = visiblePools.length > 0
     ? `${visiblePools.length} listed`
-    : showDraftCommunityPools
-      ? "0 listed"
-      : "Coming soon";
+    : "0 listed";
 
   useEffect(() => {
     setReferralStageCompleted(false);
@@ -672,7 +674,26 @@ const CommunityPools = () => {
           </div>
         </StatePanel>
       ) : visiblePools.length === 0 ? (
-        <StatePanel>{emptyPoolsMessage}</StatePanel>
+        <StatePanel>
+          {showDraftCommunityPools ? (
+            "No community pools are currently listed."
+          ) : (
+            <EmptyStateContent>
+              <EmptyStateTitle>No active community pools.</EmptyStateTitle>
+              <EmptyStateText>
+                Want to launch a market through a community-funded pool?
+              </EmptyStateText>
+              <RequestFormLink
+                href={COMMUNITY_POOL_REQUEST_FORM_URL}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Request a market community pool
+                <ExternalLink size={14} />
+              </RequestFormLink>
+            </EmptyStateContent>
+          )}
+        </StatePanel>
       ) : (
         <PoolsGrid>
           {visiblePools.map((pool) => (

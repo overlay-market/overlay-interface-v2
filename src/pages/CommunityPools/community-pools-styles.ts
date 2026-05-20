@@ -238,6 +238,48 @@ export const RoiNote = styled.div`
   }
 `;
 
+export const EmptyStateContent = styled.div`
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  max-width: 420px;
+`;
+
+export const EmptyStateTitle = styled.div`
+  color: ${theme.semantic.textPrimary};
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.2;
+`;
+
+export const EmptyStateText = styled.div`
+  color: ${theme.semantic.textMuted};
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+`;
+
+export const RequestFormLink = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid ${theme.semantic.accent};
+  border-radius: ${theme.radius.sm};
+  background: ${theme.gradient.accent};
+  color: ${theme.color.black};
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: 1px solid ${theme.semantic.focus};
+    outline-offset: 2px;
+  }
+`;
+
 export const PoolsHeader = styled.div`
   display: flex;
   align-items: center;
