@@ -27,7 +27,6 @@ import TerminationGuard from "./components/TerminationGuard";
 import MarketsInfo from "./pages/MarketsInfo";
 import Stats from "./pages/Stats";
 import CommunityPools from "./pages/CommunityPools";
-import TeamMemberVerification from "./pages/TeamMemberVerification";
 
 // Dev-only: lazy-loaded share card preview page (excluded from production builds)
 const DevShareCard = import.meta.env.DEV
@@ -63,8 +62,6 @@ const AppContent = () => {
               <Route path="/community-pools" element={<CommunityPools />} />
               <Route path="/markets-info" element={<MarketsInfo />} />
               <Route path="/stats" element={<Stats />} />
-              <Route path="/team-member-verification" element={<TeamMemberVerification />} />
-              <Route path="/official-verification" element={<TeamMemberVerification />} />
               <Route path="/trade/*" element={<Trade />} />
               <Route path="/portfolio" element={<Portfolio />} />
               <Route path="/referrals" element={<Referrals />} />
