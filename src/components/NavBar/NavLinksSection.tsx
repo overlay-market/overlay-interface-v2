@@ -73,13 +73,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       showOnMobile: true,
     },
     {
-      to: "/team-member-verification",
-      label: "Verify",
-      icon: VerifyIcon,
-      activeIcon: VerifyActiveIcon,
-      showOnMobile: true,
-    },
-    {
       to: `/trade?market=${encodedMarket}`,
       label: "Trade",
       icon: TradeIcon,
@@ -132,6 +125,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
           },
         ]
       : []),
+    {
+      to: "/team-member-verification",
+      label: "Verify",
+      icon: VerifyIcon,
+      activeIcon: VerifyActiveIcon,
+      showOnMobile: true,
+    },
     // {
     //   to: "/faucet",
     //   label: "Faucet",
