@@ -35,7 +35,7 @@ export interface TeamMemberVerificationResponse {
   verified: boolean;
   query: {
     value: string;
-    type?: TeamMemberVerificationType;
+    type: TeamMemberVerificationType;
     normalizedValue: string;
   };
   result?: TeamMemberVerificationRecord;
@@ -43,7 +43,7 @@ export interface TeamMemberVerificationResponse {
 
 export interface TeamMemberVerificationRequest {
   value: string;
-  type?: TeamMemberVerificationType;
+  type: TeamMemberVerificationType;
 }
 
 const verifyTeamMember = async (

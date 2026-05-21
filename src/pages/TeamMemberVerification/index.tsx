@@ -9,8 +9,8 @@ import {
   ShieldQuestion,
 } from "lucide-react";
 import {
-  TeamMemberVerificationType,
   useTeamMemberVerification,
+  TeamMemberVerificationType,
 } from "../../hooks/useTeamMemberVerification";
 import theme from "../../theme";
 import {
@@ -44,19 +44,13 @@ import {
   VerificationGrid,
 } from "./team-member-verification-styles";
 
-type VerificationSelectValue = TeamMemberVerificationType | "auto";
 type ResultState = "idle" | "verified" | "unverified";
 
 const VERIFICATION_TYPES: Array<{
-  value: VerificationSelectValue;
+  value: TeamMemberVerificationType;
   label: string;
   placeholder: string;
 }> = [
-  {
-    value: "auto",
-    label: "Auto detect",
-    placeholder: "URL, email, handle, wallet, or phone",
-  },
   {
     value: "telegram",
     label: "Telegram",
@@ -118,7 +112,7 @@ const TYPE_LABELS: Record<TeamMemberVerificationType, string> = {
 
 const TeamMemberVerification: React.FC = () => {
   const [verificationType, setVerificationType] =
-    useState<VerificationSelectValue>("auto");
+    useState<TeamMemberVerificationType>("telegram");
   const [query, setQuery] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
   const verification = useTeamMemberVerification();
@@ -149,7 +143,7 @@ const TeamMemberVerification: React.FC = () => {
     verification.reset();
     await verification.mutateAsync({
       value: trimmedQuery,
-      type: verificationType === "auto" ? undefined : verificationType,
+      type: verificationType,
     });
   };
 
@@ -275,7 +269,7 @@ const TeamMemberVerification: React.FC = () => {
             <TypeSelect
               value={verificationType}
               onChange={(event) =>
-                setVerificationType(event.target.value as VerificationSelectValue)
+                setVerificationType(event.target.value as TeamMemberVerificationType)
               }
               aria-label="Verification type"
             >
