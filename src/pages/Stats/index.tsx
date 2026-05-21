@@ -30,7 +30,6 @@ import {
   StatsPageShell,
   StatusGroup,
   StatusPill,
-  Subtitle,
   SummaryCard,
   SummaryGrid,
   SummaryLabel,
@@ -650,9 +649,6 @@ const Stats = () => {
     priceQuery.error?.message;
   const displayedPriceUsd =
     priceQuery.data?.priceUsd ?? priceHistoryQuery.data?.latestPriceUsd;
-  const sourcePair = priceQuery.data
-    ? `${priceQuery.data.token0Symbol}/${priceQuery.data.token1Symbol}`
-    : "OVL/USDT";
 
   return (
     <StatsPageShell>
@@ -660,13 +656,8 @@ const Stats = () => {
         <TitleGroup>
           <Eyebrow>Overlay Analytics</Eyebrow>
           <Title>Volume</Title>
-          <Subtitle>
-            Accumulated and daily protocol volume converted from OVL with
-            hourly prices from the PancakeSwap v3 pool.
-          </Subtitle>
         </TitleGroup>
         <StatusGroup>
-          <StatusPill>{sourcePair} hourly prices</StatusPill>
           <StatusPill>
             {statsData?.latestTimestamp
               ? `Latest ${formatTooltipDate(statsData.latestTimestamp)}`
@@ -681,7 +672,6 @@ const Stats = () => {
         <SummaryCard>
           <SummaryLabel>Total volume</SummaryLabel>
           <SummaryValue>{formatCompactUsd(statsData?.totalVolumeUsd ?? NaN)}</SummaryValue>
-          <SummaryMeta>Hourly converted USD</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
           <SummaryLabel>Daily Average Volume (30 days span)</SummaryLabel>
