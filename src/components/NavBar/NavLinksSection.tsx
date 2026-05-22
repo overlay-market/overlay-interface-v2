@@ -37,6 +37,10 @@ import {
   RocketActiveIcon,
   RocketIcon,
 } from "../../assets/icons/navBar-icons/rocket";
+import {
+  VerifyActiveIcon,
+  VerifyIcon,
+} from "../../assets/icons/navBar-icons/verify";
 
 export interface NavLinkAsset {
   to: string;
@@ -121,6 +125,13 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
           },
         ]
       : []),
+    {
+      to: "/team-member-verification",
+      label: "Verify",
+      icon: VerifyIcon,
+      activeIcon: VerifyActiveIcon,
+      showOnMobile: true,
+    },
     // {
     //   to: "/faucet",
     //   label: "Faucet",
