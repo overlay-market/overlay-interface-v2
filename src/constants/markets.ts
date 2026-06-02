@@ -78,6 +78,7 @@ import VvvLogo from '../assets/images/markets-full-logos/vvv-logo.jpg';
 import ChzLogo from '../assets/images/markets-full-logos/chzLogo.jpg';
 import FraxLogo from '../assets/images/markets-full-logos/frax-logo.jpg';
 import RedLogo from '../assets/images/markets-full-logos/red-logo.jpg';
+import AltLogo from '../assets/images/markets-full-logos/AltLogo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -160,6 +161,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "CHZ%20%2F%20USD": ChzLogo,
   "FRAX%20%2F%20USD": FraxLogo,
   "RED%20%2F%20USD": RedLogo,
+  "ALT%20%2F%20USD": AltLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -192,6 +194,7 @@ export const MARKETSORDER = [
   "CHZ%20%2F%20USD",
   "FRAX%20%2F%20USD",
   "RED%20%2F%20USD",
+  "ALT%20%2F%20USD",
   "James%20Wynn%20Mind%20Stability%20Index",
   "Binance%20Alpha%20Index",
   "Founders%20Operations%20Index",
@@ -415,6 +418,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "CHZ%20%2F%20USD",
     "FRAX%20%2F%20USD",
     "RED%20%2F%20USD",
+    "ALT%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
