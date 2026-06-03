@@ -396,6 +396,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "GOLD%20%2F%20SILVER",
     "SILVER%20%2F%20USD",
     "OIL%20%2F%20USD",
+    "BNB%20%2F%20USD",
   ],
   [CategoryName.Prediction]: [
     "Will%20Google%20have%20the%20best%20AI%20model%20end%20of%20March",
