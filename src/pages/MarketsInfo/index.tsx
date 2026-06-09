@@ -26,7 +26,6 @@ const headerColumns = [
   "24H Volume (Quote)",
   "24H Volume (Base)",
   "Open Interest",
-  "Open Interest (USD)",
   "Funding Rate (Daily)",
   "Updated",
 ] as const;
@@ -183,9 +182,6 @@ const MarketsInfo: React.FC = () => {
         </DataCell>
         <DataCell>
           <Text size="2">{formatMetric(contract.open_interest, contract.base_currency, { maxFractionDigits: 4 })}</Text>
-        </DataCell>
-        <DataCell>
-          <Text size="2">{formatMetric(contract.open_interest_usd, undefined, { prefix: "$", maxFractionDigits: 2 })}</Text>
         </DataCell>
         <DataCell>
           <Text size="2">{formatFundingRate(contract.funding_rate)}</Text>

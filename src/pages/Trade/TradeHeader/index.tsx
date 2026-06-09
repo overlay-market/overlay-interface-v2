@@ -25,11 +25,6 @@ import { isGamblingMarket } from "../../../utils/marketGuards";
 import { PredictionMarketGroup } from "../../../constants/markets";
 import { useMarkets7d } from "../../../hooks/useMarkets7d";
 import { useMarket24hRange } from "../../../hooks/useMarket24hRange";
-import {
-  formatUsdOpenInterest,
-  getMarketOpenInterestUsd,
-} from "../../../utils/openInterestUsd";
-import { useOvlPrice } from "../../../hooks/useOvlPrice";
 
 interface TradeHeaderProps {
   predictionGroup?: PredictionMarketGroup;
@@ -81,7 +76,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
   const sdk = useSDK();
   const { currentMarket: market } = useCurrentMarketState();
   const { typedValue, selectedLeverage, isLong } = useTradeState();
-  const { data: ovlPrice } = useOvlPrice();
 
   const [currencyPrice, setCurrencyPrice] = useState<string>("-");
   const [funding, setFunding] = useState<string | undefined>(undefined);
@@ -187,9 +181,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
     market24hRange?.low,
     market?.priceCurrency
   );
-  const { totalOiUsd } = getMarketOpenInterestUsd(market, ovlPrice);
-  const openInterestLabel = formatUsdOpenInterest(totalOiUsd);
-
   return (
     <TradeHeaderContainer>
       <MarketsList predictionGroup={predictionGroup} />
@@ -222,10 +213,6 @@ const TradeHeader: React.FC<TradeHeaderProps> = ({ predictionGroup }) => {
             <MetricValue>{twentyFourHourLowLabel}</MetricValue>
           </HeaderMetric>
 
-          <HeaderMetric $wide>
-            <MetricLabel>Open Interest (USD)</MetricLabel>
-            <MetricValue>{openInterestLabel}</MetricValue>
-          </HeaderMetric>
         </MarketInfoContainer>
       ) : null}
     </TradeHeaderContainer>

@@ -1,16 +1,13 @@
 import React, { useMemo } from "react";
 import { useCurrentMarketState } from "../../../state/currentMarket/hooks";
-import {
-  formatUsdOpenInterest,
-  getMarketOpenInterestUsd,
-} from "../../../utils/openInterestUsd";
+import { getMarketOpenInterestUsd } from "../../../utils/openInterestUsd";
+import { formatNumberForDisplay } from "../../../utils/formatNumberForDisplay";
 import { getMarketLogo } from "../../../utils/getMarketLogo";
 import {
   ExplorerDataType,
   getExplorerLink,
 } from "../../../utils/getExplorerLink";
 import { useMarketAnalytics } from "./useMarketAnalytics";
-import { useOvlPrice } from "../../../hooks/useOvlPrice";
 import {
   BarSegment,
   BarTrack,
@@ -41,7 +38,6 @@ import {
   StatCard,
   StatLabel,
   StatRail,
-  StatUnit,
   StatValue,
 } from "./coin-overview-styles";
 
@@ -91,11 +87,15 @@ const normalizeAnalyticsValue = (value: string) => {
   return trimmed.length > 0 ? trimmed : "-";
 };
 
+const formatOpenInterest = (value?: number) => {
+  if (value === undefined || !Number.isFinite(value) || value < 0) return "-";
+
+  return formatNumberForDisplay(value, 10, 4);
+};
+
 const CoinOverview: React.FC = () => {
   const { currentMarket } = useCurrentMarketState();
-  const { data: ovlPrice } = useOvlPrice();
-  const { totalVolume, totalTokensLocked, totalTransactions } =
-    useMarketAnalytics();
+  const { totalVolume, totalTransactions } = useMarketAnalytics();
 
   const paragraphs = useMemo(
     () => splitDescription(currentMarket?.descriptionText),
@@ -111,8 +111,20 @@ const CoinOverview: React.FC = () => {
         ? paragraphs
         : [UNAVAILABLE_DESCRIPTION];
 
-  const { longOi, totalOi, longOiUsd, shortOiUsd, totalOiUsd } =
-    getMarketOpenInterestUsd(currentMarket, ovlPrice);
+  const { longOi, shortOi, totalOi } = getMarketOpenInterestUsd(currentMarket);
+  const parsedMid = Number(currentMarket?.parsedMid);
+  const canCalculateNotionalOi =
+    Number.isFinite(parsedMid) && parsedMid > 0;
+  const longNotionalOi = canCalculateNotionalOi
+    ? longOi * parsedMid
+    : undefined;
+  const shortNotionalOi = canCalculateNotionalOi
+    ? shortOi * parsedMid
+    : undefined;
+  const totalNotionalOi =
+    longNotionalOi !== undefined && shortNotionalOi !== undefined
+      ? longNotionalOi + shortNotionalOi
+      : undefined;
   const longShare = totalOi > 0 ? (longOi / totalOi) * 100 : 0;
   const shortShare = totalOi > 0 ? 100 - longShare : 0;
   const marketLogo =
@@ -121,7 +133,6 @@ const CoinOverview: React.FC = () => {
   const marketAddressUrl = currentMarket?.id
     ? getExplorerLink(56, currentMarket.id, ExplorerDataType.ADDRESS)
     : undefined;
-  const tokensLockedLabel = normalizeAnalyticsValue(totalTokensLocked);
 
   return (
     <OverviewShell>
@@ -193,16 +204,16 @@ const CoinOverview: React.FC = () => {
               </BarTrack>
               <OiRows>
                 <OiRow>
-                  <span>Long OI (USD)</span>
-                  <OiValue>{formatUsdOpenInterest(longOiUsd)}</OiValue>
+                  <span>Long OI</span>
+                  <OiValue>{formatOpenInterest(longNotionalOi)}</OiValue>
                 </OiRow>
                 <OiRow>
-                  <span>Short OI (USD)</span>
-                  <OiValue>{formatUsdOpenInterest(shortOiUsd)}</OiValue>
+                  <span>Short OI</span>
+                  <OiValue>{formatOpenInterest(shortNotionalOi)}</OiValue>
                 </OiRow>
                 <OiRow>
-                  <span>Total OI (USD)</span>
-                  <OiValue>{formatUsdOpenInterest(totalOiUsd)}</OiValue>
+                  <span>Total OI</span>
+                  <OiValue>{formatOpenInterest(totalNotionalOi)}</OiValue>
                 </OiRow>
               </OiRows>
             </OiPanel>
@@ -214,13 +225,6 @@ const CoinOverview: React.FC = () => {
         <StatCard>
           <StatLabel>Total Volume</StatLabel>
           <StatValue>{normalizeAnalyticsValue(totalVolume)}</StatValue>
-        </StatCard>
-        <StatCard>
-          <StatLabel>TVL</StatLabel>
-          <StatValue>
-            {tokensLockedLabel}
-            {tokensLockedLabel !== "-" ? <StatUnit>USD</StatUnit> : null}
-          </StatValue>
         </StatCard>
         <StatCard>
           <StatLabel>Transactions</StatLabel>
