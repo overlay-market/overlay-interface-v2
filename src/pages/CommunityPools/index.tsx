@@ -125,6 +125,13 @@ const getPoolStatus = (
   balanceRaw: bigint | undefined,
   targetRaw: bigint
 ): CommunityPoolStatus => {
+  // A launched pool stays "launched" regardless of the current Safe balance —
+  // once the market is live the pooled USDT is moved out of the Safe, which would
+  // otherwise make the pool read as "expired"/"open" from the on-chain balance alone.
+  if (pool.marketAddress) {
+    return "launched";
+  }
+
   const safeBalance = balanceRaw ?? 0n;
 
   if (targetRaw > 0n && safeBalance >= targetRaw) {
@@ -140,6 +147,7 @@ const getPoolStatus = (
 
 const getStatusLabel = (pool: CommunityPool, status: CommunityPoolStatus) => {
   if (pool.isDraft) return "Draft";
+  if (status === "launched") return "Launched";
   if (status === "funded") return "Funded";
   if (status === "expired") return "Expired";
   return "Open";
@@ -150,6 +158,7 @@ const getStatusTone = (
   status: CommunityPoolStatus
 ): "open" | "funded" | "expired" | "draft" => {
   if (pool.isDraft) return "draft";
+  if (status === "launched") return "funded"; // reuse the green "funded" badge styling
   return status;
 };
 
@@ -232,6 +241,7 @@ const CommunityPoolItem = ({
     if (pool.isDraft) return "Draft pool: transactions are disabled.";
     if (!isSupportedChain) return `${pool.chain.chainName} is not configured in this wallet session.`;
     if (balanceQuery.isError) return "Unable to read the Safe balance.";
+    if (status === "launched") return "Market launched — this pool is live.";
     if (status === "funded") return "Target reached. Contributions are closed.";
     if (status === "expired") return "Countdown ended before the target was reached.";
     if (invalidAmount) return amountRaw ? "Amount exceeds the remaining pool target." : "Enter a valid amount.";
@@ -252,6 +262,7 @@ const CommunityPoolItem = ({
   const buttonLabel = useMemo(() => {
     if (pool.isDraft) return "Draft Pool";
     if (!isSupportedChain) return "Unsupported Chain";
+    if (status === "launched") return "Launched";
     if (status === "funded") return "Funded";
     if (status === "expired") return "Expired";
     if (!walletAddress) return "Connect Wallet";
