@@ -158,7 +158,7 @@ const getStatusTone = (
   status: CommunityPoolStatus
 ): "open" | "funded" | "expired" | "draft" => {
   if (pool.isDraft) return "draft";
-  if (status === "launched") return "funded"; // reuse the green "funded" badge styling
+  if (status === "launched") return "open"; // green/positive tone (funded is amber, expired is red)
   return status;
 };
 
