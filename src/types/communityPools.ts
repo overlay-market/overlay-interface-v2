@@ -18,6 +18,7 @@ export interface CommunityPool {
   tokenName?: string;
   logoUrl?: string;
   safeAddress: `0x${string}`;
+  marketAddress?: `0x${string}`;
   chain: CommunityPoolChain;
   contributionToken: CommunityPoolContributionToken;
   targetAmountRaw: string;
@@ -30,4 +31,4 @@ export interface CommunityPool {
   updatedAt?: string;
 }
 
-export type CommunityPoolStatus = "open" | "funded" | "expired";
+export type CommunityPoolStatus = "open" | "funded" | "expired" | "launched";
