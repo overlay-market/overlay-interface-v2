@@ -185,7 +185,6 @@ type StatsViewData = {
   dailyVolume: VolumePoint[];
   totalVolumeUsd: number;
   thirtyDayAverageVolumeUsd: number;
-  excludedTrailingDays: number;
   latestTransactions: number;
   latestTimestamp?: number;
   oldestTimestamp?: number;
@@ -589,7 +588,6 @@ const buildStatsViewData = (
     ),
     totalVolumeUsd: latestAccumulatedPoint?.volumeUsd ?? 0,
     thirtyDayAverageVolumeUsd: trailingThirtyDayVolumeUsd / activeTrailingDays,
-    excludedTrailingDays,
     latestTransactions: latestPoint ? Number(latestPoint.totalTransactions) : 0,
     latestTimestamp,
     oldestTimestamp: analyticsHourDatas[0]
@@ -720,11 +718,7 @@ const Stats = () => {
           <SummaryValue>
             {formatCompactUsd(statsData?.thirtyDayAverageVolumeUsd ?? NaN)}
           </SummaryValue>
-          <SummaryMeta>
-            {statsData && statsData.excludedTrailingDays > 0
-              ? `Trailing 30 days, excluding ${Math.round(statsData.excludedTrailingDays)}d protocol closure (key rotation)`
-              : "Daily average over trailing 30 days"}
-          </SummaryMeta>
+          <SummaryMeta>Average daily volume</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
           <SummaryLabel>OVL/USD</SummaryLabel>
