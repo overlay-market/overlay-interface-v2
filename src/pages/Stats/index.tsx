@@ -210,6 +210,29 @@ const THIRTY_DAYS_MS = THIRTY_DAYS * DAY_MS;
 const OHLCV_PAGE_LIMIT = 1000;
 const MAX_OHLCV_REQUESTS = 8;
 
+// Protocol was intentionally paused for key rotation; these UTC windows had
+// no real trading and are excluded from the 30-day average so the closure
+// doesn't skew it. [start, end) — end is exclusive.
+const PROTOCOL_CLOSURE_PERIODS: Array<{ startUnixMs: number; endUnixMsExclusive: number }> = [
+  {
+    startUnixMs: Date.UTC(2026, 5, 13), // 2026-06-13T00:00:00Z
+    endUnixMsExclusive: Date.UTC(2026, 6, 11), // 2026-07-11T00:00:00Z (through Jul 10 inclusive)
+  },
+];
+
+const closureOverlapMs = (windowStart: number, windowEnd: number) =>
+  PROTOCOL_CLOSURE_PERIODS.reduce((total, period) => {
+    const overlapStart = Math.max(windowStart, period.startUnixMs);
+    const overlapEnd = Math.min(windowEnd, period.endUnixMsExclusive);
+
+    return overlapEnd > overlapStart ? total + (overlapEnd - overlapStart) : total;
+  }, 0);
+
+const isWithinClosurePeriod = (timestamp: number) =>
+  PROTOCOL_CLOSURE_PERIODS.some(
+    (period) => timestamp >= period.startUnixMs && timestamp < period.endUnixMsExclusive
+  );
+
 const compactUsdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
@@ -534,7 +557,8 @@ const buildStatsViewData = (
 
       if (
         trailingThirtyDayStart !== undefined &&
-        timestamp > trailingThirtyDayStart
+        timestamp > trailingThirtyDayStart &&
+        !isWithinClosurePeriod(timestamp)
       ) {
         trailingThirtyDayVolumeUsd += deltaUsd;
       }
@@ -551,13 +575,19 @@ const buildStatsViewData = (
   const latestAccumulatedPoint =
     accumulatedVolume[accumulatedVolume.length - 1];
 
+  const excludedTrailingDays =
+    trailingThirtyDayStart !== undefined && latestTimestamp !== undefined
+      ? closureOverlapMs(trailingThirtyDayStart, latestTimestamp) / DAY_MS
+      : 0;
+  const activeTrailingDays = Math.max(THIRTY_DAYS - excludedTrailingDays, 1);
+
   return {
     accumulatedVolume,
     dailyVolume: [...dailyVolumeMap.values()].sort(
       (a, b) => a.timestamp - b.timestamp
     ),
     totalVolumeUsd: latestAccumulatedPoint?.volumeUsd ?? 0,
-    thirtyDayAverageVolumeUsd: trailingThirtyDayVolumeUsd / THIRTY_DAYS,
+    thirtyDayAverageVolumeUsd: trailingThirtyDayVolumeUsd / activeTrailingDays,
     latestTransactions: latestPoint ? Number(latestPoint.totalTransactions) : 0,
     latestTimestamp,
     oldestTimestamp: analyticsHourDatas[0]
@@ -688,7 +718,7 @@ const Stats = () => {
           <SummaryValue>
             {formatCompactUsd(statsData?.thirtyDayAverageVolumeUsd ?? NaN)}
           </SummaryValue>
-          <SummaryMeta>Daily average over trailing 30 days</SummaryMeta>
+          <SummaryMeta>Average daily volume</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
           <SummaryLabel>OVL/USD</SummaryLabel>
