@@ -247,6 +247,7 @@ export const MARKETSORDER = [
   "Knives%20-%20CS2%20Skins",
   "Frogs%20vs%20Dogs%20-%20Meme%20War",
   "Knives%20vs%20Rifles%20-%20CS2%20Skins",
+  "INV%2FUSD",
   "RPL%2FUSD",
 ];
 
