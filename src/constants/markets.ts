@@ -422,6 +422,14 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "FRAX%20%2F%20USD",
     "RED%20%2F%20USD",
     "ALT%20%2F%20USD",
+    // RPL/USD and INV/USD market names have no spaces around the slash
+    // (unlike the entries above), so both the raw and space-normalized
+    // forms are listed: MarketsTable's category-tab filter compares
+    // raw marketId, while isVanillaMarket() compares a normalized form.
+    "RPL%2FUSD",
+    "RPL%20%2F%20USD",
+    "INV%2FUSD",
+    "INV%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
