@@ -248,6 +248,7 @@ export const MARKETSORDER = [
   "Frogs%20vs%20Dogs%20-%20Meme%20War",
   "Knives%20vs%20Rifles%20-%20CS2%20Skins",
   "INV%2FUSD",
+  "RPL%2FUSD",
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
