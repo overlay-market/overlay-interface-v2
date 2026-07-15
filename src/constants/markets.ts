@@ -79,6 +79,8 @@ import ChzLogo from '../assets/images/markets-full-logos/chzLogo.jpg';
 import FraxLogo from '../assets/images/markets-full-logos/frax-logo.jpg';
 import RedLogo from '../assets/images/markets-full-logos/red-logo.jpg';
 import AltLogo from '../assets/images/markets-full-logos/AltLogo.jpg';
+import RplLogo from '../assets/images/markets-full-logos/rpl-logo.jpg';
+import InvLogo from '../assets/images/markets-full-logos/inv-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -162,6 +164,8 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "FRAX%20%2F%20USD": FraxLogo,
   "RED%20%2F%20USD": RedLogo,
   "ALT%20%2F%20USD": AltLogo,
+  "RPL%2FUSD": RplLogo,
+  "INV%2FUSD": InvLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -422,6 +426,14 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "FRAX%20%2F%20USD",
     "RED%20%2F%20USD",
     "ALT%20%2F%20USD",
+    // RPL/USD and INV/USD market names have no spaces around the slash
+    // (unlike the entries above), so both the raw and space-normalized
+    // forms are listed: MarketsTable's category-tab filter compares
+    // raw marketId, while isVanillaMarket() compares a normalized form.
+    "RPL%2FUSD",
+    "RPL%20%2F%20USD",
+    "INV%2FUSD",
+    "INV%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
