@@ -79,6 +79,8 @@ import ChzLogo from '../assets/images/markets-full-logos/chzLogo.jpg';
 import FraxLogo from '../assets/images/markets-full-logos/frax-logo.jpg';
 import RedLogo from '../assets/images/markets-full-logos/red-logo.jpg';
 import AltLogo from '../assets/images/markets-full-logos/AltLogo.jpg';
+import RplLogo from '../assets/images/markets-full-logos/rpl-logo.jpg';
+import InvLogo from '../assets/images/markets-full-logos/inv-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -162,6 +164,8 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "FRAX%20%2F%20USD": FraxLogo,
   "RED%20%2F%20USD": RedLogo,
   "ALT%20%2F%20USD": AltLogo,
+  "RPL%2FUSD": RplLogo,
+  "INV%2FUSD": InvLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
