@@ -81,6 +81,7 @@ import RedLogo from '../assets/images/markets-full-logos/red-logo.jpg';
 import AltLogo from '../assets/images/markets-full-logos/AltLogo.jpg';
 import RplLogo from '../assets/images/markets-full-logos/rpl-logo.jpg';
 import InvLogo from '../assets/images/markets-full-logos/inv-logo.jpg';
+import OvlLogo from '../assets/images/markets-full-logos/ovl-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -166,6 +167,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "ALT%20%2F%20USD": AltLogo,
   "RPL%2FUSD": RplLogo,
   "INV%2FUSD": InvLogo,
+  "OVL%20%2F%20USD": OvlLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -253,6 +255,7 @@ export const MARKETSORDER = [
   "Knives%20vs%20Rifles%20-%20CS2%20Skins",
   "INV%2FUSD",
   "RPL%2FUSD",
+  "OVL%20%2F%20USD",
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
@@ -434,6 +437,7 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "RPL%20%2F%20USD",
     "INV%2FUSD",
     "INV%20%2F%20USD",
+    "OVL%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
