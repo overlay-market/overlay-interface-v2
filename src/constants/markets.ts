@@ -81,7 +81,7 @@ import RedLogo from '../assets/images/markets-full-logos/red-logo.jpg';
 import AltLogo from '../assets/images/markets-full-logos/AltLogo.jpg';
 import RplLogo from '../assets/images/markets-full-logos/rpl-logo.jpg';
 import InvLogo from '../assets/images/markets-full-logos/inv-logo.jpg';
-import OvlLogo from '../assets/images/markets-full-logos/ovl-logo.webp';
+import OvlLogo from '../assets/images/markets-full-logos/ovl-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
