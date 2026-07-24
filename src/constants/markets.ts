@@ -82,6 +82,7 @@ import AltLogo from '../assets/images/markets-full-logos/AltLogo.jpg';
 import RplLogo from '../assets/images/markets-full-logos/rpl-logo.jpg';
 import InvLogo from '../assets/images/markets-full-logos/inv-logo.jpg';
 import OvlLogo from '../assets/images/markets-full-logos/ovl-logo.jpg';
+import FolksLogo from '../assets/images/markets-full-logos/folks-logo.jpg';
 
 export const DEFAULT_LOGO = DefaultLogo;
 
@@ -168,6 +169,7 @@ export const MARKETS_FULL_LOGOS: { [marketId: string]: string | undefined } = {
   "RPL%2FUSD": RplLogo,
   "INV%2FUSD": InvLogo,
   "OVL%20%2F%20USD": OvlLogo,
+  "FOLKS%2FUSD": FolksLogo,
 };
 
 export const MARKETS_VIDEOS: { [marketId: string]: string | undefined } = {
@@ -256,6 +258,7 @@ export const MARKETSORDER = [
   "INV%2FUSD",
   "RPL%2FUSD",
   "OVL%20%2F%20USD",
+  "FOLKS%2FUSD",
 ];
 
 export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
@@ -438,6 +441,9 @@ export const MARKET_CATEGORIES: MarketCategoryMap = {
     "INV%2FUSD",
     "INV%20%2F%20USD",
     "OVL%20%2F%20USD",
+    // FOLKS/USD follows the same no-space convention as RPL/INV above.
+    "FOLKS%2FUSD",
+    "FOLKS%20%2F%20USD",
   ],
   [CategoryName.Other]: [],
 };
