@@ -181,7 +181,6 @@ type VolumePoint = {
 type StatsViewData = {
   accumulatedVolume: VolumePoint[];
   totalVolumeUsd: number;
-  thirtyDayAverageVolumeUsd: number;
   latestTransactions: number;
   latestTimestamp?: number;
   oldestTimestamp?: number;
@@ -201,34 +200,8 @@ type VolumeTooltipProps = {
 const Q192 = 2n ** 192n;
 const PRICE_SCALE = 10n ** 18n;
 const HOUR_SECONDS = 60 * 60;
-const DAY_MS = 24 * 60 * 60 * 1000;
-const THIRTY_DAYS = 30;
-const THIRTY_DAYS_MS = THIRTY_DAYS * DAY_MS;
 const OHLCV_PAGE_LIMIT = 1000;
 const MAX_OHLCV_REQUESTS = 8;
-
-// Protocol was intentionally paused for key rotation; these UTC windows had
-// no real trading and are excluded from the 30-day average so the closure
-// doesn't skew it. [start, end) — end is exclusive.
-const PROTOCOL_CLOSURE_PERIODS: Array<{ startUnixMs: number; endUnixMsExclusive: number }> = [
-  {
-    startUnixMs: Date.UTC(2026, 5, 13), // 2026-06-13T00:00:00Z
-    endUnixMsExclusive: Date.UTC(2026, 6, 11), // 2026-07-11T00:00:00Z (through Jul 10 inclusive)
-  },
-];
-
-const closureOverlapMs = (windowStart: number, windowEnd: number) =>
-  PROTOCOL_CLOSURE_PERIODS.reduce((total, period) => {
-    const overlapStart = Math.max(windowStart, period.startUnixMs);
-    const overlapEnd = Math.min(windowEnd, period.endUnixMsExclusive);
-
-    return overlapEnd > overlapStart ? total + (overlapEnd - overlapStart) : total;
-  }, 0);
-
-const isWithinClosurePeriod = (timestamp: number) =>
-  PROTOCOL_CLOSURE_PERIODS.some(
-    (period) => timestamp >= period.startUnixMs && timestamp < period.endUnixMsExclusive
-  );
 
 const compactUsdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -501,14 +474,11 @@ const buildStatsViewData = (
   const accumulatedVolume: VolumePoint[] = [];
   let previousVolume: bigint | undefined;
   let accumulatedVolumeUsd = 0;
-  let trailingThirtyDayVolumeUsd = 0;
   let priceIndex = 0;
   const latestPoint = analyticsHourDatas[analyticsHourDatas.length - 1];
   const latestTimestamp = latestPoint
     ? Number(latestPoint.periodStartUnix) * 1000
     : undefined;
-  const trailingThirtyDayStart =
-    latestTimestamp === undefined ? undefined : latestTimestamp - THIRTY_DAYS_MS;
 
   const getPriceAtTimestamp = (timestamp: number) => {
     while (
@@ -536,15 +506,6 @@ const buildStatsViewData = (
 
     accumulatedVolumeUsd += deltaUsd;
 
-    if (
-      previousVolume !== undefined &&
-      trailingThirtyDayStart !== undefined &&
-      timestamp > trailingThirtyDayStart &&
-      !isWithinClosurePeriod(timestamp)
-    ) {
-      trailingThirtyDayVolumeUsd += deltaUsd;
-    }
-
     accumulatedVolume.push({
       timestamp,
       volumeUsd: accumulatedVolumeUsd,
@@ -556,16 +517,9 @@ const buildStatsViewData = (
   const latestAccumulatedPoint =
     accumulatedVolume[accumulatedVolume.length - 1];
 
-  const excludedTrailingDays =
-    trailingThirtyDayStart !== undefined && latestTimestamp !== undefined
-      ? closureOverlapMs(trailingThirtyDayStart, latestTimestamp) / DAY_MS
-      : 0;
-  const activeTrailingDays = Math.max(THIRTY_DAYS - excludedTrailingDays, 1);
-
   return {
     accumulatedVolume,
     totalVolumeUsd: latestAccumulatedPoint?.volumeUsd ?? 0,
-    thirtyDayAverageVolumeUsd: trailingThirtyDayVolumeUsd / activeTrailingDays,
     latestTransactions: latestPoint ? Number(latestPoint.totalTransactions) : 0,
     latestTimestamp,
     oldestTimestamp: analyticsHourDatas[0]
@@ -669,8 +623,8 @@ const Stats = () => {
           <Eyebrow>Overlay Analytics</Eyebrow>
           <Title>Volume</Title>
           <Subtitle>
-            Accumulated and daily protocol volume converted from OVL with
-            hourly prices from the PancakeSwap v3 pool.
+            Accumulated protocol volume converted from OVL with hourly
+            prices from the PancakeSwap v3 pool.
           </Subtitle>
         </TitleGroup>
         <StatusGroup>
@@ -690,13 +644,6 @@ const Stats = () => {
           <SummaryLabel>Total volume</SummaryLabel>
           <SummaryValue>{formatCompactUsd(statsData?.totalVolumeUsd ?? NaN)}</SummaryValue>
           <SummaryMeta>Hourly converted USD</SummaryMeta>
-        </SummaryCard>
-        <SummaryCard>
-          <SummaryLabel>Daily Average Volume (30 days span)</SummaryLabel>
-          <SummaryValue>
-            {formatCompactUsd(statsData?.thirtyDayAverageVolumeUsd ?? NaN)}
-          </SummaryValue>
-          <SummaryMeta>Average daily volume</SummaryMeta>
         </SummaryCard>
         <SummaryCard>
           <SummaryLabel>OVL/USD</SummaryLabel>
