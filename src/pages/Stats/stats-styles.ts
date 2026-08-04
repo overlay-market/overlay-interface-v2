@@ -106,7 +106,7 @@ export const SummaryGrid = styled.section`
   }
 
   @media (min-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 `;
 
