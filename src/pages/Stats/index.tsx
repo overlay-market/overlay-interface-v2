@@ -3,8 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -182,7 +180,6 @@ type VolumePoint = {
 
 type StatsViewData = {
   accumulatedVolume: VolumePoint[];
-  dailyVolume: VolumePoint[];
   totalVolumeUsd: number;
   thirtyDayAverageVolumeUsd: number;
   latestTransactions: number;
@@ -502,7 +499,6 @@ const buildStatsViewData = (
 ): StatsViewData => {
   const sortedPrices = [...hourlyPrices].sort((a, b) => a.timestamp - b.timestamp);
   const accumulatedVolume: VolumePoint[] = [];
-  const dailyVolumeMap = new Map<string, VolumePoint>();
   let previousVolume: bigint | undefined;
   let accumulatedVolumeUsd = 0;
   let trailingThirtyDayVolumeUsd = 0;
@@ -540,28 +536,13 @@ const buildStatsViewData = (
 
     accumulatedVolumeUsd += deltaUsd;
 
-    if (previousVolume !== undefined) {
-      const dayStart = new Date(timestamp);
-      const dayTimestamp = Date.UTC(
-        dayStart.getUTCFullYear(),
-        dayStart.getUTCMonth(),
-        dayStart.getUTCDate()
-      );
-      const dayKey = String(dayTimestamp);
-      const existing = dailyVolumeMap.get(dayKey);
-
-      dailyVolumeMap.set(dayKey, {
-        timestamp: dayTimestamp,
-        volumeUsd: (existing?.volumeUsd ?? 0) + deltaUsd,
-      });
-
-      if (
-        trailingThirtyDayStart !== undefined &&
-        timestamp > trailingThirtyDayStart &&
-        !isWithinClosurePeriod(timestamp)
-      ) {
-        trailingThirtyDayVolumeUsd += deltaUsd;
-      }
+    if (
+      previousVolume !== undefined &&
+      trailingThirtyDayStart !== undefined &&
+      timestamp > trailingThirtyDayStart &&
+      !isWithinClosurePeriod(timestamp)
+    ) {
+      trailingThirtyDayVolumeUsd += deltaUsd;
     }
 
     accumulatedVolume.push({
@@ -583,9 +564,6 @@ const buildStatsViewData = (
 
   return {
     accumulatedVolume,
-    dailyVolume: [...dailyVolumeMap.values()].sort(
-      (a, b) => a.timestamp - b.timestamp
-    ),
     totalVolumeUsd: latestAccumulatedPoint?.volumeUsd ?? 0,
     thirtyDayAverageVolumeUsd: trailingThirtyDayVolumeUsd / activeTrailingDays,
     latestTransactions: latestPoint ? Number(latestPoint.totalTransactions) : 0,
@@ -810,64 +788,6 @@ const Stats = () => {
                     isAnimationActive={false}
                   />
                 </AreaChart>
-              </ResponsiveContainer>
-            )}
-          </ChartBody>
-        </ChartPanel>
-
-        <ChartPanel>
-          <ChartHeader>
-            <ChartTitleGroup>
-              <ChartTitle>Daily volume</ChartTitle>
-              <ChartMeta>UTC daily buckets</ChartMeta>
-            </ChartTitleGroup>
-            <Legend $color={theme.semantic.positive}>USD</Legend>
-          </ChartHeader>
-          <ChartBody>
-            {isLoading || !statsData?.dailyVolume.length ? (
-              <EmptyState>
-                {isLoading ? "Loading volume..." : "No daily volume data"}
-              </EmptyState>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={statsData.dailyVolume}
-                  margin={{ top: 8, right: 12, bottom: 4, left: 6 }}
-                >
-                  <CartesianGrid
-                    stroke={theme.semantic.borderMuted}
-                    strokeDasharray="3 3"
-                    vertical={false}
-                  />
-                  <XAxis
-                    dataKey="timestamp"
-                    type="number"
-                    scale="time"
-                    domain={["dataMin", "dataMax"]}
-                    tickFormatter={formatChartDate}
-                    minTickGap={28}
-                    tick={{ fill: theme.semantic.textMuted, fontSize: 12 }}
-                    tickLine={false}
-                    axisLine={{ stroke: theme.semantic.border }}
-                  />
-                  <YAxis
-                    tickFormatter={formatCompactUsd}
-                    width={72}
-                    tick={{ fill: theme.semantic.textMuted, fontSize: 12 }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip
-                    content={<VolumeTooltip />}
-                    cursor={{ fill: "rgba(255, 255, 255, 0.04)" }}
-                  />
-                  <Bar
-                    dataKey="volumeUsd"
-                    fill={theme.semantic.positive}
-                    radius={[4, 4, 0, 0]}
-                    isAnimationActive={false}
-                  />
-                </BarChart>
               </ResponsiveContainer>
             )}
           </ChartBody>
