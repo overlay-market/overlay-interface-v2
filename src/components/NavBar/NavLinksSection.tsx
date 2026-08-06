@@ -29,15 +29,6 @@ import {
   MarketsIcon,
 } from "../../assets/icons/navBar-icons/markets";
 import {
-  FundedTraderIcon,
-  FundedTraderActiveIcon,
-} from "../../assets/icons/navBar-icons/funded-trader";
-import { useAvatarTrading } from "../../hooks/useAvatarTrading";
-import {
-  RocketActiveIcon,
-  RocketIcon,
-} from "../../assets/icons/navBar-icons/rocket";
-import {
   VerifyActiveIcon,
   VerifyIcon,
 } from "../../assets/icons/navBar-icons/verify";
@@ -58,7 +49,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
   mode = NAVBAR_MODE.DEFAULT,
 }) => {
   const { currentMarket } = useCurrentMarketState();
-  const { isAvatarTradingActive } = useAvatarTrading();
 
   const activeMarket = currentMarket?.marketName ?? DEFAULT_MARKET;
   const encodedMarket = encodeURIComponent(activeMarket);
@@ -77,16 +67,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       label: "Trade",
       icon: TradeIcon,
       activeIcon: TradeActiveIcon,
-      showOnMobile: true,
-    },
-    {
-      to: "/community-pools",
-      label:
-        isMobile && mode === NAVBAR_MODE.DEFAULT
-          ? "Pools"
-          : "Community Pools",
-      icon: RocketIcon,
-      activeIcon: RocketActiveIcon,
       showOnMobile: true,
     },
     {
@@ -111,20 +91,6 @@ const NavLinksSection: React.FC<NavLinksSectionProps> = ({
       activeIcon: TrophyActiveIcon,
       showOnMobile: true,
     },
-    ...(!isAvatarTradingActive
-      ? [
-          {
-            to: "/funded-trader",
-            label:
-              isMobile && mode === NAVBAR_MODE.DEFAULT
-                ? "Funded"
-                : "Funded Trader",
-            icon: FundedTraderIcon,
-            activeIcon: FundedTraderActiveIcon,
-            showOnMobile: true,
-          },
-        ]
-      : []),
     {
       to: "/team-member-verification",
       label: "Verify",
