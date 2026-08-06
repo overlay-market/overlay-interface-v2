@@ -16,7 +16,6 @@ import Referrals from "./pages/Referrals";
 import Leaderboard from "./pages/Leaderboard";
 import { LiFiProvider } from "./providers/LiFiProvider";
 import Airdrops from "./pages/Airdrops";
-import FundedTrader from "./pages/FundedTrader";
 import ExchangeLiFi from "./pages/ExchangeLiFi";
 import AnalyticsListener from "./analytics/AnalyticsListener";
 import WalletTracker from "./analytics/WalletTracker";
@@ -26,7 +25,6 @@ import useAccount from "./hooks/useAccount";
 import TerminationGuard from "./components/TerminationGuard";
 import MarketsInfo from "./pages/MarketsInfo";
 import Stats from "./pages/Stats";
-import CommunityPools from "./pages/CommunityPools";
 import TeamMemberVerification from "./pages/TeamMemberVerification";
 
 // Dev-only: lazy-loaded share card preview page (excluded from production builds)
@@ -60,7 +58,6 @@ const AppContent = () => {
             <Routes>
               <Route path="/" element={<Navigate to="/markets" />} />
               <Route path="/markets" element={<Markets />} />
-              <Route path="/community-pools" element={<CommunityPools />} />
               <Route path="/markets-info" element={<MarketsInfo />} />
               <Route path="/stats" element={<Stats />} />
               <Route path="/team-member-verification" element={<TeamMemberVerification />} />
@@ -74,7 +71,6 @@ const AppContent = () => {
                 element={<Leaderboard />}
               />
               <Route path="/airdrops" element={<Airdrops />} />
-              <Route path="/funded-trader" element={<FundedTrader />} />
               <Route path="/exchange/*" element={exchangeElement} />
               {DevShareCard && (
                 <Route path="/dev/share-card" element={<Suspense fallback={null}><DevShareCard /></Suspense>} />
