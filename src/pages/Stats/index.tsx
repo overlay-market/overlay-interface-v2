@@ -11,7 +11,9 @@ import {
 } from "recharts";
 import { createPublicClient, formatUnits, http, type Address } from "viem";
 import { bsc } from "viem/chains";
+import { OVL_ADDRESS } from "overlay-sdk";
 import theme from "../../theme";
+import { DEFAULT_CHAINID } from "../../constants/chains";
 import {
   ChartBody,
   ChartGrid,
@@ -65,6 +67,10 @@ const ANALYTICS_QUERY = `
 const PANCAKESWAP_V3_POOL_ADDRESS =
   "0x927aE3c2cd88717a1525a55021AF9612C3F04583" as Address;
 
+const OVL_TOKEN_ADDRESS = OVL_ADDRESS[DEFAULT_CHAINID as number] as Address;
+
+const GENESIS_OVL_SUPPLY = 88_888_888;
+
 const POOL_OHLCV_ENDPOINT =
   `https://api.geckoterminal.com/api/v2/networks/bsc/pools/${PANCAKESWAP_V3_POOL_ADDRESS.toLowerCase()}/ohlcv/hour`;
 
@@ -113,6 +119,13 @@ const ERC20_ABI = [
     name: "decimals",
     inputs: [],
     outputs: [{ type: "uint8" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "totalSupply",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
     stateMutability: "view",
   },
 ] as const;
@@ -225,6 +238,17 @@ const decimalUsdFormatter = new Intl.NumberFormat("en-US", {
 
 const integerFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
+});
+
+const signedIntegerFormatter = new Intl.NumberFormat("en-US", {
+  maximumFractionDigits: 0,
+  signDisplay: "exceptZero",
+});
+
+const burntPercentFormatter = new Intl.NumberFormat("en-US", {
+  style: "percent",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4,
 });
 
 const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {
@@ -358,6 +382,23 @@ const readOvlPriceFromPool = async (): Promise<OvlPriceData> => {
     token0Symbol,
     token1Symbol,
   };
+};
+
+const readOvlTotalSupply = async (): Promise<number> => {
+  const [totalSupply, decimals] = await Promise.all([
+    bscClient.readContract({
+      address: OVL_TOKEN_ADDRESS,
+      abi: ERC20_ABI,
+      functionName: "totalSupply",
+    }),
+    bscClient.readContract({
+      address: OVL_TOKEN_ADDRESS,
+      abi: ERC20_ABI,
+      functionName: "decimals",
+    }),
+  ]);
+
+  return Number(formatUnits(totalSupply, decimals));
 };
 
 const fetchPoolHourlyPrices = async (
@@ -571,6 +612,13 @@ const Stats = () => {
     refetchInterval: 60 * 1000,
   });
 
+  const totalSupplyQuery = useQuery<number, Error>({
+    queryKey: ["stats", "ovlTotalSupply", OVL_TOKEN_ADDRESS],
+    queryFn: readOvlTotalSupply,
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+  });
+
   const priceHistoryQuery = useQuery<PriceHistoryData, Error>({
     queryKey: [
       "stats",
@@ -609,7 +657,15 @@ const Stats = () => {
   const errorMessage =
     analyticsQuery.error?.message ||
     priceHistoryQuery.error?.message ||
-    priceQuery.error?.message;
+    priceQuery.error?.message ||
+    totalSupplyQuery.error?.message;
+  const totalSupplyDelta = totalSupplyQuery.data
+    ? totalSupplyQuery.data - GENESIS_OVL_SUPPLY
+    : undefined;
+  const burntOvl =
+    totalSupplyDelta !== undefined ? Math.max(0, -totalSupplyDelta) : undefined;
+  const burntPercent =
+    burntOvl !== undefined ? burntOvl / GENESIS_OVL_SUPPLY : undefined;
   const displayedPriceUsd =
     priceQuery.data?.priceUsd ?? priceHistoryQuery.data?.latestPriceUsd;
   const sourcePair = priceQuery.data
@@ -656,6 +712,32 @@ const Stats = () => {
             {statsData ? integerFormatter.format(statsData.latestTransactions) : "-"}
           </SummaryValue>
           <SummaryMeta>All-time count</SummaryMeta>
+        </SummaryCard>
+        <SummaryCard>
+          <SummaryLabel>Total supply</SummaryLabel>
+          <SummaryValue>
+            {totalSupplyQuery.data
+              ? integerFormatter.format(totalSupplyQuery.data)
+              : "-"}
+          </SummaryValue>
+          <SummaryMeta>
+            {totalSupplyDelta !== undefined
+              ? `${signedIntegerFormatter.format(totalSupplyDelta)} OVL vs genesis (${integerFormatter.format(GENESIS_OVL_SUPPLY)})`
+              : `Genesis supply ${integerFormatter.format(GENESIS_OVL_SUPPLY)}`}
+          </SummaryMeta>
+        </SummaryCard>
+        <SummaryCard>
+          <SummaryLabel>Burned</SummaryLabel>
+          <SummaryValue>
+            {burntPercent !== undefined
+              ? burntPercentFormatter.format(burntPercent)
+              : "-"}
+          </SummaryValue>
+          <SummaryMeta>
+            {burntOvl !== undefined
+              ? `${integerFormatter.format(burntOvl)} OVL of ${integerFormatter.format(GENESIS_OVL_SUPPLY)} genesis`
+              : "Since genesis"}
+          </SummaryMeta>
         </SummaryCard>
       </SummaryGrid>
 
