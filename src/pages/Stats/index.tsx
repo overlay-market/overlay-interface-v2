@@ -245,6 +245,12 @@ const signedIntegerFormatter = new Intl.NumberFormat("en-US", {
   signDisplay: "exceptZero",
 });
 
+const burntPercentFormatter = new Intl.NumberFormat("en-US", {
+  style: "percent",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 4,
+});
+
 const dateTimeFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
@@ -656,6 +662,10 @@ const Stats = () => {
   const totalSupplyDelta = totalSupplyQuery.data
     ? totalSupplyQuery.data - GENESIS_OVL_SUPPLY
     : undefined;
+  const burntOvl =
+    totalSupplyDelta !== undefined ? Math.max(0, -totalSupplyDelta) : undefined;
+  const burntPercent =
+    burntOvl !== undefined ? burntOvl / GENESIS_OVL_SUPPLY : undefined;
   const displayedPriceUsd =
     priceQuery.data?.priceUsd ?? priceHistoryQuery.data?.latestPriceUsd;
   const sourcePair = priceQuery.data
@@ -714,6 +724,19 @@ const Stats = () => {
             {totalSupplyDelta !== undefined
               ? `${signedIntegerFormatter.format(totalSupplyDelta)} OVL vs genesis (${integerFormatter.format(GENESIS_OVL_SUPPLY)})`
               : `Genesis supply ${integerFormatter.format(GENESIS_OVL_SUPPLY)}`}
+          </SummaryMeta>
+        </SummaryCard>
+        <SummaryCard>
+          <SummaryLabel>Burned</SummaryLabel>
+          <SummaryValue>
+            {burntPercent !== undefined
+              ? burntPercentFormatter.format(burntPercent)
+              : "-"}
+          </SummaryValue>
+          <SummaryMeta>
+            {burntOvl !== undefined
+              ? `${integerFormatter.format(burntOvl)} OVL of ${integerFormatter.format(GENESIS_OVL_SUPPLY)} genesis`
+              : "Since genesis"}
           </SummaryMeta>
         </SummaryCard>
       </SummaryGrid>
