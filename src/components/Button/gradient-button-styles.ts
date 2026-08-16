@@ -30,7 +30,10 @@ export const GradientOutlineBtnWrapper = styled(Button)<{
     : `linear-gradient(${theme.semantic.panel}, ${theme.semantic.panel}) padding-box,
       ${theme.gradient.accent} border-box`)};
   color: ${theme.semantic.accent};
-  font-weight: 700;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.012em;
   line-height: 1;
   white-space: nowrap;
   transition: background 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
@@ -48,6 +51,9 @@ export const GradientOutlineBtnWrapper = styled(Button)<{
 export const ButtonTitle = styled.div<{ color?: string, disabled?: boolean }>`
   line-height: 1;
   white-space: nowrap;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
   background: ${({ disabled }) => (disabled 
     ? `linear-gradient(90deg, ${theme.semantic.textMuted} 0%, ${theme.semantic.textSecondary} 100%)` 
     : theme.gradient.accentText)};
@@ -71,7 +77,10 @@ export const GradientSolidBtnWrapper = styled(Button)<{
   height: ${({ height }) => (height ? height : "auto")};
   background: ${theme.gradient.accent};
   color: ${theme.color.black};
-  font-weight: 700;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.012em;
   line-height: 1;
   white-space: nowrap;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};

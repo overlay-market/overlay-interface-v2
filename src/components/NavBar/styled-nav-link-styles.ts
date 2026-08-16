@@ -31,8 +31,10 @@ export const StyledBox = styled(Box)`
 
 export const StyledLink = styled(NavLink)`
   color: ${theme.semantic.textMuted};
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   text-decoration: none;
 
   @media (min-width: ${theme.breakpoints.sm}) {
@@ -40,7 +42,8 @@ export const StyledLink = styled(NavLink)`
     align-items: center;
     height: ${theme.headerSize.height};
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 550;
+    letter-spacing: 0.012em;
     text-decoration: none;
   }
   &.active {
@@ -55,7 +58,8 @@ export const StyledLink = styled(NavLink)`
 `;
 
 export const ActiveLabel = styled(Box)`
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.014em;
   color: ${theme.semantic.accent};
 
   @media (min-width: ${theme.breakpoints.sm}) {
@@ -65,8 +69,10 @@ export const ActiveLabel = styled(Box)`
 
 export const StyledLinkBurgerMode = styled(NavLink)`
   color: ${theme.color.grey2};
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
+  letter-spacing: 0.01em;
   text-decoration: none;
 
   &:focus-visible {
