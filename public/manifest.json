@@ -1,0 +1,14 @@
+{
+    "name": "Overlay",
+    "short_name": "Overlay",
+    "description": "Overlay Protocol - Trade anything, without counterparty risk.",
+    "icons": [
+        {
+            "src": "overlay-logo-only-no-background.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "iconPath": "overlay-logo-only-no-background.png",
+    "homepage_url": "https://overlay.market"
+}
