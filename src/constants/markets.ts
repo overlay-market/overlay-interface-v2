@@ -261,7 +261,12 @@ export const MARKETSORDER = [
   "FOLKS%2FUSD",
 ];
 
-export const EXCLUDEDMARKETS = ["ETH%20Dominance", "Hikaru%20Nakamura"];
+export const EXCLUDEDMARKETS = [
+  "ETH%20Dominance",
+  "Hikaru%20Nakamura",
+  // FOLKS/USD: oracle pusher ran out of BNB gas, feed stale (2026-09-01). Hidden until re-funded.
+  "FOLKS%2FUSD",
+];
 
 export const MARKETS_WITH_GAMBLING_TIMELINE = ["Double%20or%20Nothing"];
 
